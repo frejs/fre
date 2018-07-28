@@ -1,0 +1,20 @@
+{
+  "name": "fre",
+  "version": "0.0.2",
+  "description": "<p align=\"center\"><img src=\"http://wx1.sinaimg.cn/mw690/0060lm7Tly1ftpkxuuf5vj3096097jrv.jpg\" alt=\"fre logo\" width=\"180\"></p>\r <h1 align=\"center\">Fre</h1>\r <p align=\"center\">Fast 1kb UI library different from React or Vue.</p>",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/132yse/fre.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/132yse/fre/issues"
+  },
+  "homepage": "https://github.com/132yse/fre#readme"
+}
