@@ -2,13 +2,13 @@ const path = require('path')
 
 
 module.exports = {
+  mode: 'development',
   entry: './src/index.ts',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'fre.js',
   },
   resolve: {
-
     extensions: [".ts", ".tsx", ".js"]
   },
   module: {
@@ -24,8 +24,8 @@ module.exports = {
               'transform-decorators-legacy',
               [
                 "transform-react-jsx", {
-                  "pragma": "h"
-                }
+                "pragma": "h"
+              }
               ]
             ]
           }
