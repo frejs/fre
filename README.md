@@ -47,7 +47,7 @@ Fre.render(<App />, document.body)
 ```
 
 
-#### 进展
+#### Progress
 
 - [x] JSX
 - [x] 虚拟dom
