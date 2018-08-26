@@ -2,10 +2,8 @@
 <h1 align="center">Fre</h1>
 <p align="center">Fast 1kb JavaScript library like both React and Vue.</p>
 <p align="center">
-
-[![NPM version](https://img.shields.io/npm/v/smox.svg?style=flat-square)](https://npmjs.com/package/fre)
-[![NPM downloads](https://img.shields.io/npm/dm/smox.svg?style=flat-square)](https://npmjs.com/package/fre)
-
+<a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/v/fre.svg?style=flat-square" alt="npm-v"></a>
+<a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/dm/fre.svg?style=flat-square" alt="npm-d"></a>
 </p>
 
 ### Feature
@@ -18,6 +16,7 @@
 Fre (pronounced `/friː/`, like free) is a react-vue-like javascript library
 
 ### Install
+
 ```shell
 yarn add fre -S
 ```
@@ -57,11 +56,10 @@ class App extends Fre.Component {
 Fre.render(<App />, document.body)
 ```
 
-
 #### Progress
 
 - [x] JSX
-- [x] 虚拟dom
+- [x] 虚拟 dom
 - [x] diff
 - [x] 对象劫持
 - [x] 生命周期
@@ -84,4 +82,4 @@ Fre 是我“欲”开发的一个前端 mvvm 框架，集 react 和 vue 的优�
 
 还有就是
 
-logo！！！终于！！！不H了！！！
+logo！！！终于！！！不 H 了！！！
