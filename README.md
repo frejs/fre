@@ -39,7 +39,7 @@ class App extends Fre.Component {
   }
 
   down() {
-    this.state.count++
+    this.state.count--
   }
 
   render() {
@@ -88,6 +88,6 @@ logo！！！终于！！！不 H 了！！！
 ### 备注
 暂时比较鸡肋，不能用于线上生产
 
-react 大部分代码来自：[从零开始实现一个React](https://github.com/hujiulong/simple-react) ，感谢作者的文章
+react 大部分代码来自：[simple-react](https://github.com/hujiulong/simple-react) ，感谢作者的文章
 
 vue 部分我也不知道是哪个了emmm，自行百度 手写 vue 框架
