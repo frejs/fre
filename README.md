@@ -1,10 +1,12 @@
 <p align="center"><img src="http://wx2.sinaimg.cn/mw690/0060lm7Tly1ftpm5b3ihfj3096097aaj.jpg" alt="fre logo" width="180"></p>
 <h1 align="center">Fre</h1>
 <p align="center">Fast 1kb JavaScript library like both React and Vue.</p>
+
 <p align="center">
 [![NPM version](https://img.shields.io/npm/v/smox.svg?style=flat-square)](https://npmjs.com/package/smox)
 [![NPM downloads](https://img.shields.io/npm/dm/smox.svg?style=flat-square)](https://npmjs.com/package/smox)
 </p>
+
 ### Feature
 
 - :tada: React-like Component solution with JSX
