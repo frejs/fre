@@ -74,7 +74,7 @@ Fre.render(<App />, document.body)
 Fre 是我“欲”开发的一个前端 mvvm 框架，集 react 和 vue 的优点，以下：
 
 - 拥有和 react 一致的组件化方案，包括 jsx 、类的形式声明组件，生命周期等
-- 拥有和 vue 一致的响应式原理，就对象劫持
+- 拥有和 vue 一致的响应式机制，就对象劫持
 
 好吧，其实就是劫持版的 react，也算是 jsx 版本的 vue
 
