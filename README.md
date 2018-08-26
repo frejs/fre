@@ -30,7 +30,7 @@ class App extends Fre.Component {
   constructor(props) {
     super(props)
     this.state = {
-      num: 1
+      count: 1
     }
   }
 
