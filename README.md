@@ -83,3 +83,9 @@ Fre 是我“欲”开发的一个前端 mvvm 框架，集 react 和 vue 的优�
 还有就是
 
 logo！！！终于！！！不 H 了！！！
+
+
+### 备注
+暂时比较鸡肋，不能用于线上生产
+react fork 自：[从零开始实现一个React](https://github.com/hujiulong/simple-react),感谢作者
+vue 部分我也不知道是哪个了emmm，自行百度 手写 vue 框架
