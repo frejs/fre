@@ -2,6 +2,9 @@
 <h1 align="center">Fre</h1>
 <p align="center">Fast 1kb JavaScript library like both React and Vue.</p>
 
+[![NPM version](https://img.shields.io/npm/v/smox.svg?style=flat-square)](https://npmjs.com/package/smox)
+[![NPM downloads](https://img.shields.io/npm/dm/smox.svg?style=flat-square)](https://npmjs.com/package/smox)
+
 ### Feature
 
 - :tada: React-like Component solution with JSX
@@ -10,6 +13,11 @@
 ### Introduction
 
 Fre (pronounced `/friː/`, like free) is a react-vue-like javascript library
+
+### Install
+```shell
+yarn add fre -S
+```
 
 ### Use
 
