@@ -11,6 +11,41 @@
 
 Fre (pronounced `/friː/`, like free) is a react-vue-like javascript library
 
+### Use
+
+```JavaScript
+import Fre from 'fre'
+
+class App extends Fre.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      num: 1
+    }
+  }
+
+  up() {
+    this.state.count++
+  }
+
+  down() {
+    this.state.count++
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>{this.state.count}</h1>
+        <button onClick={() => this.up()}>+</button>
+        <button onClick={() => this.down()}>-</button>
+      </div>
+    )
+  }
+}
+
+Fre.render(<App />, document.body)
+```
+
 
 #### 进展
 
