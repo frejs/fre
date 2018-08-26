@@ -9,10 +9,10 @@
 
 ### Introduction
 
-Fre (pronounced /friː/, like free) is a react-vue-like javascript library
+Fre (pronounced `/friː/`, like free) is a react-vue-like javascript library
 
 
-### 进展
+#### 进展
 
 - [x] JSX
 - [x] 虚拟dom
@@ -23,7 +23,7 @@ Fre (pronounced /friː/, like free) is a react-vue-like javascript library
 - [ ] nextTick
 - [ ] hoc
 
-### p.S.
+### p.s.
 
 啊，我实在编不出来英文了，换中文先
 
