@@ -1,4 +1,4 @@
-import {setAttr} from './dom'
+import { setAttr } from '../vdom/dom'
 
 export function diff(node, vnode, container) {
     const ret = diffNode(node, vnode)

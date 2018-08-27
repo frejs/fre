@@ -1,5 +1,5 @@
-import {Watcher} from './watcher'
-import {Observer} from './observer'
+import { Watcher } from "./watcher"
+import { Observer } from "../observer/observer"
 
 export class Component {
     state

@@ -28,6 +28,12 @@ Fre (pronounced `/friː/`, like free) is a react-vue-like javascript library
 yarn add fre -S
 ```
 
+### Build
+
+```shell
+npm run build
+```
+
 ### Use
 
 ```JavaScript
