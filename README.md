@@ -85,7 +85,7 @@ Fre 是我“欲”开发的一个前端 mvvm 框架，集 react 和 vue 的优�
 logo！！！终于！！！不 H 了！！！
 
 
-### 备注
+### ...
 暂时比较鸡肋，不能用于线上生产
 
 diff 部分的代码来自：[simple-react](https://github.com/hujiulong/simple-react) ，感谢作者的文章
