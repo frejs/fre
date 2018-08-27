@@ -1,4 +1,4 @@
-import render from "./dom/render"
+import render from "./render"
 import {h} from './h'
 import Component from './component'
 

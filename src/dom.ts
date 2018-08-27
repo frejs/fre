@@ -1,4 +1,4 @@
-export function setAttr(node, name, value) {
+export function setAttr(node:any, name:string, value:string) {
   if (/on\w+/.test(name)) {
     name = name.toLowerCase()
     node[name] = value
