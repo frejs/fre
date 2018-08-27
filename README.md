@@ -15,6 +15,13 @@
 
 Fre (pronounced `/friː/`, like free) is a react-vue-like javascript library
 
+
+### Demo
+
+[fre-bangumi](https://github.com/132yse/fre-bangumi) (线上地址：v.chinko.cc)
+
+[fre-bangumi](https://github.com/132yse/fre-counter)
+
 ### Install
 
 ```shell
