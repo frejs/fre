@@ -1,6 +1,6 @@
 {
   "name": "fre",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "<p align=\"center\"><img src=\"http://wx2.sinaimg.cn/mw690/0060lm7Tly1ftpm5b3ihfj3096097aaj.jpg\" alt=\"fre logo\" width=\"180\"></p>\r <h1 align=\"center\">Fre</h1>\r <p align=\"center\">Fast 1kb JavaScript library like both React and Vue.</p>",
   "main": "./dist/fre.js",
   "scripts": {

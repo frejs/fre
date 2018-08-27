@@ -6,10 +6,10 @@ export function setAttr(node: any, name: string, value: string) {
         switch (name) {
             case 'className':
                 name = 'class'
-                node[name] = value
+                node.setAttribute(name, value)
                 break
             case 'value':
-                if (node.tagName.toUpperCase() === 'INPUT' || node.tagName.toUpperCase() === 'TEXTAREA') {
+                if (node.tagName.toUpperCase() === 'input' || node.tagName.toUpperCase() === 'textarea') {
                     node.value = value
                 } else {
                     node.setAttribute(name, value)
