@@ -1,10 +1,11 @@
 {
   "name": "fre",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "<p align=\"center\"><img src=\"http://wx2.sinaimg.cn/mw690/0060lm7Tly1ftpm5b3ihfj3096097aaj.jpg\" alt=\"fre logo\" width=\"180\"></p>\r <h1 align=\"center\">Fre</h1>\r <p align=\"center\">Fast 1kb JavaScript library like both React and Vue.</p>",
   "main": "./dist/fre.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
@@ -12,9 +13,15 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/132yse/fre/issues"
   },
-  "homepage": "https://github.com/132yse/fre#readme"
+  "homepage": "https://github.com/132yse/fre#readme",
+  "devDependencies": {
+    "ts-loader": "^4.5.0",
+    "typescript": "^3.0.1",
+    "webpack": "^4.17.1",
+    "webpack-cli": "^3.1.0"
+  }
 }

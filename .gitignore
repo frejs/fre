@@ -1,0 +1,12 @@
+/node_modules/
+/src/component.js
+/src/dep.js
+/src/diff.js
+/src/dom.js
+/src/fre.js
+/src/h.js
+/src/observer.js
+/src/render.js
+/src/watcher.js
+yarn.lock
+yarn-error.log
