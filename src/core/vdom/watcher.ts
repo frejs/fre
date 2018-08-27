@@ -1,8 +1,7 @@
-import {Dep} from "./dep"
-import {renderComponent} from './diff'
+import {Dep} from "../components/dep"
+import {renderComponent} from '../render/diff'
 
 export class Watcher {
-    vm
 
     constructor(vm) {
         this.vm = vm
@@ -10,6 +9,7 @@ export class Watcher {
         this.update = this.update.bind(this)
 
     }
+    vm
 
     update() {
         renderComponent(this.vm)

@@ -1,5 +1,15 @@
+
 {
-  "compilerOptions": {
-    "removeComments": true
+    "compilerOptions": {
+      "outDir": "./dist/",
+      "noImplicitAny": false,
+      "sourceMap": false,
+      "module": "es6",
+      "target": "es5",
+      "jsx": "react",
+      "allowJs": true
+    },
+    "exclude": [
+        "node_modules"
+    ]
   }
-}

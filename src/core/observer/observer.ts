@@ -1,4 +1,4 @@
-import {Dep} from "./dep"
+import { Dep } from "../components/dep"
 
 export class Observer {
     constructor(state: any) {
