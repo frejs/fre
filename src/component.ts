@@ -15,6 +15,7 @@ export class Component {
         new Observer(this.state)
         new Watcher(this)
     }
+
 }
 
 export default Component

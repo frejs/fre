@@ -1,8 +1,11 @@
 import {Dep} from "./dep"
 
 export class Observer {
+    state
+
     constructor(state: any) {
-        this.observe(state)
+        this.state = new Proxy(state, {})
+        this.observe(this.state)
     }
 
     observe(state) {
@@ -22,10 +25,10 @@ export class Observer {
             enumerable: true,
             configurable: true,
             get() {
-                if (Dep.target) {
-                    dep.add(Dep.target)
-                }
-                Dep.target = null
+                dep.clean()
+
+                dep.add(Dep.target)
+
                 return val
             },
             set(newVal) {

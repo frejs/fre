@@ -1,4 +1,5 @@
 /node_modules/
+/.idea/
 /src/component.js
 /src/dep.js
 /src/diff.js

@@ -12,6 +12,7 @@ export class Watcher {
     }
 
     update() {
+        console.log('111')
         renderComponent(this.vm)
     }
 }
