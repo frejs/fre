@@ -57,11 +57,14 @@ mount(html`<${counter} />`, document.body)
 比如支持 `<i class=icon>` 无需引号、自闭合、不再担心 calss 和 calssName 的问题
 
 * hooks 风格
+
 其实这次写框架，最初就是因为 hooks，因为 hooks 让所有事情变得简单，function 可以跨越整个世界
 
 * Proxy
+
 这次的 Proxy 写的比较简单，其实它能做的事情很多，后面会慢慢完善
 
 * vodm diff
+
 伪需求，只是为了更好的抽象，没啥实际用处
 
