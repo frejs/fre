@@ -11,7 +11,7 @@
 - :tada: hooks style makes function run anywhere
 - :confetti_ball: tagged template turn to JSX-like
 - :mega: Reactive because Proxy
-- :confetti_ball: All in one , just 1 KB
+- :telescope: All in one , just 1 KB
 
 
 ### Introduction

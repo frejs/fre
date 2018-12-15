@@ -9,8 +9,5 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "htm": "^1.0.1"
-  }
+  "license": "MIT"
 }
