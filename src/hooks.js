@@ -25,7 +25,7 @@ export function useState(state) {
       if (!once) {
         oldTree = first
         once = true
-      }else{
+      } else {
         oldTree = oldDom
       }
       newTree = vm.type()
