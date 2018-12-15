@@ -1,13 +1,4 @@
 /node_modules/
 /.idea/
-/src/component.js
-/src/dep.js
-/src/diff.js
-/src/dom.js
-/src/index.js
-/src/h.js
-/src/observer.js
-/src/render.js
-/src/watcher.js
 yarn.lock
 yarn-error.log

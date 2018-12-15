@@ -1,6 +1,6 @@
 <p align="center"><img src="http://wx2.sinaimg.cn/mw690/0060lm7Tly1ftpm5b3ihfj3096097aaj.jpg" alt="fre logo" width="180"></p>
 <h1 align="center">Fre</h1>
-<p align="center">Fast 1kb JavaScript library like both React and Vue.</p>
+<p align="center">Fast 1kb JavaScript library tiny and perfect.</p>
 <p align="center">
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/v/fre.svg?style=flat-square" alt="npm-v"></a>
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/dm/fre.svg?style=flat-square" alt="npm-d"></a>
@@ -8,19 +8,16 @@
 
 ### Feature
 
-- :tada: React-like Component solution with JSX
-- :zap: Vue-like Reactivity
+- :tada: hooks style makes function run anywhere
+- :confetti_ball: tagged template turn to JSX-like
+- :mega: Reactive because Proxy
+- :confetti_ball: All in one , just 1 KB
+
 
 ### Introduction
 
-Fre (pronounced `/friː/`, like free) is a react-vue-like javascript library
+Fre (pronounced `/friː/`, like free) is a tiny and perfect javascript library
 
-
-### Demo
-
-[fre-bangumi](https://github.com/132yse/fre-bangumi) (线上地址：http://v.chinko.cc)
-
-[fre-counter](https://github.com/132yse/fre-counter)
 
 ### Install
 
@@ -31,68 +28,40 @@ yarn add fre -S
 ### Use
 
 ```JavaScript
-import Fre from 'fre'
+import {useState, html, mount} from 'fre'
 
-class App extends Fre.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      count: 1
-    }
-  }
+function counter() {
+  const state = useState({
+    count: 0
+  })
 
-  up() {
-    this.state.count++
-  }
-
-  down() {
-    this.state.count--
-  }
-
-  render() {
-    return (
-      <div>
-        <h1>{this.state.count}</h1>
-        <button onClick={() => this.up()}>+</button>
-        <button onClick={() => this.down()}>-</button>
-      </div>
-    )
-  }
+  return html`
+    <div>
+      <p>${state.count}</p>
+      <button onclick=${() => {state.count++}}>+</button>
+      <button onclick=${() => {state.count--}}>-</button>
+    </div> 
+  `
 }
 
-Fre.render(<App />, document.body)
+mount(html`<${counter} />`, document.body)
+
 ```
-
-#### Progress
-
-- [x] JSX
-- [x] 虚拟 dom
-- [x] diff
-- [x] 对象劫持
-- [x] 生命周期
-- [x] 事件机制
-- [ ] nextTick
-- [ ] hoc
-
 ### p.s.
 
-啊，我实在编不出来英文了，换中文先
+* 为什么是 tagged template 而不是 JSX 或 模板引擎
 
-Fre 是我“欲”开发的一个前端 mvvm 框架，集 react 和 vue 的优点，以下：
+我一直在寻找一个无需编译的、浏览器自动运行的写法，诚然 vue 的模板引擎是可以的，然而那种感觉宛如穿越到上个世纪
+所以我大胆的使用了 `模板字符串`，出乎意料的是，除了带来 JSX 类似的功能体验，还有很多优点：
 
-- 拥有和 react 一致的组件化方案，包括 jsx 、类的组件声明方式，生命周期等
-- 拥有和 vue 一致的响应式机制，就对象劫持
+比如支持 `<i class=icon>` 无需引号、自闭合、不再担心 calss 和 calssName 的问题
 
-好吧，其实就是劫持版的 react，也算是 jsx 版本的 vue
+* hooks 风格
+其实这次写框架，最初就是因为 hooks，因为 hooks 让所有事情变得简单，function 可以跨越整个世界
 
-接下来我会继续完善，暂时只是一个理想模型，不能用于生产
+* Proxy
+这次的 Proxy 写的比较简单，其实它能做的事情很多，后面会慢慢完善
 
-还有就是
+* vodm diff
+伪需求，只是为了更好的抽象，没啥实际用处
 
-logo！！！终于！！！不 H 了！！！
-
-
-### ...
-暂时比较鸡肋，不能用于线上生产
-
-diff 部分的代码来自：[simple-react](https://github.com/hujiulong/simple-react) ，感谢作者的文章
