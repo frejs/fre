@@ -193,7 +193,6 @@ var prevNode;
 exports.prevNode = prevNode;
 
 function diff(oldTree, newTree) {
-  exports.prevNode = prevNode = newTree;
   var index = 0;
   var patches = {};
   walk(oldTree, newTree, index, patches);
@@ -204,6 +203,7 @@ function walk(oldNode, newNode, index, patches) {
   var currentPatches = [];
 
   if (typeof oldNode.type === 'function') {
+    exports.prevNode = prevNode = oldNode.type(oldNode.props);
     walk(oldNode.type(oldNode.props), newNode.type(newNode.props), index, patches);
   } else if (typeof oldNode === 'string' && typeof newNode === 'string' || typeof oldNode === 'number' && typeof oldNode === 'number') {
     if (oldNode !== newNode) {
@@ -321,7 +321,6 @@ function usePatch(node, patches) {
         break;
 
       case 'REPLACE':
-        console.log(patch.newNode);
         var newNode = _typeof(patch.newNode) === 'object' ? (0, _render.render)(patch.newNode) : document.createTextNode(patch.newNode);
         node.parentNode.replaceChild(newNode, node);
         break;
@@ -382,8 +381,7 @@ function proxy(state) {
         oldTree = _diff.prevNode;
       }
 
-      newTree = _render.vm.type(); // console.log(oldTree.children[0].type(oldTree.children[0].props),newTree.children[0].type(newTree.children[0].props))
-
+      newTree = _render.vm.type();
       var patches = (0, _diff.diff)(oldTree, newTree);
       (0, _patch.patch)(_render.ele, patches);
       return true;
@@ -554,7 +552,7 @@ function _templateObject4() {
 }
 
 function _templateObject3() {
-  var data = _taggedTemplateLiteral(["\n    <div>\n      <p>", "</p>\n      <p>", "</p>\n    </div>\n  "]);
+  var data = _taggedTemplateLiteral(["\n    <div>\n      <p>", "</p>\n      <p>", "</p>\n      <button onclick=", ">x</button>\n    </div>\n  "]);
 
   _templateObject3 = function _templateObject3() {
     return data;
@@ -600,7 +598,9 @@ function count(props) {
   var state = (0, _src.useState)({
     sex: 'boy'
   });
-  return (0, _src.html)(_templateObject3(), props.count, state.sex);
+  return (0, _src.html)(_templateObject3(), props.count, state.sex, function () {
+    state.sex = state.sex === 'boy' ? 'girl' : 'boy';
+  });
 }
 
 (0, _src.render)((0, _src.html)(_templateObject4(), counter), document.body);
@@ -631,7 +631,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51505" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53209" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

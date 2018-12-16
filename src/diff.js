@@ -6,7 +6,6 @@ const REPLACE = 'REPLACE'
 export let prevNode
 
 export function diff(oldTree, newTree) {
-  prevNode = newTree
   let index = 0
   let patches = {}
 
@@ -16,8 +15,10 @@ export function diff(oldTree, newTree) {
 }
 
 function walk(oldNode, newNode, index, patches) {
+
   let currentPatches = []
   if (typeof oldNode.type === 'function') {
+    prevNode = oldNode.type(oldNode.props)
     walk(oldNode.type(oldNode.props),newNode.type(newNode.props),index,patches)
   } else if (
     (typeof oldNode === 'string' && typeof newNode === 'string') ||

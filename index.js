@@ -22,6 +22,7 @@ function count(props){
     <div>
       <p>${props.count}</p>
       <p>${state.sex}</p>
+      <button onclick=${()=>{state.sex=state.sex==='boy'?'girl':'boy'}}>x</button>
     </div>
   `
 }

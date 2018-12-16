@@ -35,7 +35,6 @@ function usePatch(node, patches) {
         node.textContent = patch.text
         break
       case 'REPLACE':
-      console.log(patch.newNode)
         let newNode =
           typeof patch.newNode === 'object'
             ? render(patch.newNode)
