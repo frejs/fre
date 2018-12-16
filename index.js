@@ -15,8 +15,14 @@ function counter() {
 }
 
 function count(props){
+  const state = useState({
+    sex:'boy'
+  })
   return h`
-    <p>${props.count}</p>
+    <div>
+      <p>${props.count}</p>
+      <p>${state.sex}</p>
+    </div>
   `
 }
 

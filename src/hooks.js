@@ -9,7 +9,10 @@ let newTree
 
 export function useState(state) {
   if (Object.keys(save).length > 0) {
-    state = save
+    state = {
+      ...state,
+      ...save
+    }
   }
 
   return proxy(state)
@@ -33,6 +36,8 @@ function proxy(state) {
         oldTree = prevNode
       }
       newTree = vm.type()
+
+      // console.log(oldTree.children[0].type(oldTree.children[0].props),newTree.children[0].type(newTree.children[0].props))
 
       let patches = diff(oldTree, newTree)
 

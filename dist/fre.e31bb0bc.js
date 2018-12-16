@@ -346,6 +346,10 @@ var _diff = require("./diff");
 
 var _patch = require("./patch");
 
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var save = {};
 var once = false;
 var oldTree;
@@ -353,7 +357,7 @@ var newTree;
 
 function useState(state) {
   if (Object.keys(save).length > 0) {
-    state = save;
+    state = _objectSpread({}, state, save);
   }
 
   return proxy(state);
@@ -378,7 +382,8 @@ function proxy(state) {
         oldTree = _diff.prevNode;
       }
 
-      newTree = _render.vm.type();
+      newTree = _render.vm.type(); // console.log(oldTree.children[0].type(oldTree.children[0].props),newTree.children[0].type(newTree.children[0].props))
+
       var patches = (0, _diff.diff)(oldTree, newTree);
       (0, _patch.patch)(_render.ele, patches);
       return true;
@@ -549,7 +554,7 @@ function _templateObject4() {
 }
 
 function _templateObject3() {
-  var data = _taggedTemplateLiteral(["\n    <p>", "</p>\n  "]);
+  var data = _taggedTemplateLiteral(["\n    <div>\n      <p>", "</p>\n      <p>", "</p>\n    </div>\n  "]);
 
   _templateObject3 = function _templateObject3() {
     return data;
@@ -592,7 +597,10 @@ function counter() {
 }
 
 function count(props) {
-  return (0, _src.html)(_templateObject3(), props.count);
+  var state = (0, _src.useState)({
+    sex: 'boy'
+  });
+  return (0, _src.html)(_templateObject3(), props.count, state.sex);
 }
 
 (0, _src.render)((0, _src.html)(_templateObject4(), counter), document.body);
@@ -623,7 +631,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56158" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65012" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
