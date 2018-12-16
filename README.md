@@ -63,9 +63,11 @@ webpack 需配置：
 }
 ```
 
-#### p.s.
+#### Article
 
 知乎分享：[Fre：又一个小而美的前端MVVM框架](https://zhuanlan.zhihu.com/p/52510521)
 
 #### License
-MIT Inspirated by react & vue & htm
+MIT 
+
+Inspirated by react & vue & htm
