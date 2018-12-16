@@ -1,18 +1,22 @@
-import { first, vm, ele } from './render'
-import { diff, oldDom } from './diff'
+import { onceNode, vm, ele } from './render'
+import { diff, prevNode } from './diff'
 import { patch } from './patch'
 
 let save = {}
+let once = false
 let oldTree
 let newTree
-let once = false
 
 export function useState(state) {
   if (Object.keys(save).length > 0) {
     state = save
   }
 
-  let proxy = new Proxy(state, {
+  return proxy(state)
+}
+
+function proxy(state) {
+  let newState = new Proxy(state, {
     get(obj, key) {
       if (save[key]) {
         return save[key]
@@ -23,10 +27,10 @@ export function useState(state) {
     set(obj, key, val) {
       save[key] = val
       if (!once) {
-        oldTree = first
+        oldTree = onceNode
         once = true
       } else {
-        oldTree = oldDom
+        oldTree = prevNode
       }
       newTree = vm.type()
 
@@ -38,5 +42,5 @@ export function useState(state) {
     }
   })
 
-  return proxy
+  return newState
 }

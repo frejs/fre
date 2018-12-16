@@ -3,11 +3,10 @@ const REMOVE = 'REMOVE'
 const TEXT = 'TEXT'
 const REPLACE = 'REPLACE'
 
-// let Index = 0
-export let oldDom
+export let prevNode
 
 export function diff(oldTree, newTree) {
-  oldDom = newTree
+  prevNode = newTree
   let index = 0
   let patches = {}
 
@@ -36,7 +35,7 @@ function walk(oldNode, newNode, index, patches) {
     }
     diffChildren(oldNode.children, newNode.children, index, patches)
   } else {
-    Index += oldNode.children.length
+    index += oldNode.children.length
     currentPatches.push({ type: REPLACE, newNode })
   }
 

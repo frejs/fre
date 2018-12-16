@@ -1,12 +1,11 @@
-export let vm
-export let first
-export let ele
+export let vm,onceNode,ele
 
 export function mount(vnode, el) {
   ele = el
-  el.innerHTML = ''
-  first = vnode.type()
+  onceNode = vnode.type()
   vm = vnode
+
+  el.innerHTML = ''
   const node = render(vnode)
   el.appendChild(node)
 }

@@ -16,7 +16,7 @@
 
 ### Introduction
 
-Fre (pronounced `/friː/`, like free) is a tiny and perfect javascript library
+Fre (pronounced `/fri:/`, like free) is a tiny and perfect javascript library
 
 
 ### Install
@@ -28,7 +28,7 @@ yarn add fre -S
 ### Use
 
 ```JavaScript
-import {useState, html, mount} from 'fre'
+import { useState, html, mount } from 'fre'
 
 function counter() {
   const state = useState({
@@ -44,17 +44,33 @@ function counter() {
   `
 }
 
-mount(html`<${counter} />`, document.body)
+mount(html`<${counter}/>`, document.body)
 
 ```
+
+### JSX
+
+默认也对外暴露了 h 函数，可以选用 JSX
+```JavaScript
+import { h } from 'fre'
+```
+webpack 需配置：
+```JavaScript
+{
+  "plugins": [
+    ["transform-react-jsx", { "pragma":"fre.h" }]
+  ]
+}
+```
+
 ### p.s.
 
 * 为什么是 tagged template 而不是 JSX 或 模板引擎
 
 我一直在寻找一个无需编译的、浏览器自动运行的写法，诚然 vue 的模板引擎是可以的，然而那种感觉宛如穿越到上个世纪
-所以我大胆的使用了 `模板字符串`，出乎意料的是，除了带来 JSX 类似的功能体验，还有很多优点：
+所以我大胆的使用了 `模板字符串`，出乎意料的是，除了带来 JSX 类似的体验外，还能支持 html 自身的特性：
 
-比如支持 `<i class=icon>` 无需引号、自闭合、不再担心 calss 和 calssName 的问题
+比如支持 `<i class=icon>` 无需引号、自闭合，还能和 js 隔离，不再担心 calss 和 calssName 的问题
 
 * hooks 风格
 
@@ -62,9 +78,9 @@ mount(html`<${counter} />`, document.body)
 
 * Proxy
 
-这次的 Proxy 写的比较简单，其实它能做的事情很多，后面会慢慢完善
+这次的 Proxy 写的比较简单，其实它能做的事情很多，甚至 diff 也可以由它来实现，后面满满补充
 
 * vodm diff
 
-伪需求，只是为了更好的抽象，没啥实际用处
+伪需求，只是为了更好的抽象，暂时除了减小 dom 操作并没有其他卵用
 

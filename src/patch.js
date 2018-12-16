@@ -1,7 +1,7 @@
 import { render, setAttr } from './render'
 
 let allPatches
-let index = 0
+let index
 
 export function patch(node, patches) {
   allPatches = patches
