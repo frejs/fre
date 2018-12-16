@@ -37,10 +37,7 @@ function proxy(state) {
       }
       newTree = vm.type()
 
-      // console.log(oldTree.children[0].type(oldTree.children[0].props),newTree.children[0].type(newTree.children[0].props))
-
       let patches = diff(oldTree, newTree)
-
       patch(ele, patches)
 
       return true
