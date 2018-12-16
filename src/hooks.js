@@ -8,6 +8,7 @@ let oldTree
 let newTree
 
 export function useState(state) {
+  console.log(arguments.caller)
   if (Object.keys(save).length > 0) {
     state = {
       ...state,
