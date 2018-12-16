@@ -12,7 +12,7 @@ export function mount(vnode, el) {
 
 export function render(vnode) {
   if (typeof vnode.type === 'function') {
-    vnode = vnode.type()
+    vnode = vnode.type(vnode.props)
   }
   let node = document.createElement(vnode.type)
   for (let name in vnode.props) {

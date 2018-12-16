@@ -1,3 +1,5 @@
+import{ render, html as h, useState } from './src'
+
 function counter() {
   const state = useState({
     count: 0
@@ -5,16 +7,17 @@ function counter() {
 
   return h`
     <div>
-      <p>${state.count}</p>
+      ${h`<${count} count=${state.count} />`}
       <button onclick=${() => {state.count++}}>+</button>
       <button onclick=${() => {state.count--}}>-</button>
     </div> 
   `
 }
 
-mount(h`<${counter} />`, document.body)
+function count(props){
+  return h`
+    <p>${props.count}</p>
+  `
+}
 
-// hooks √
-// Proxy √
-// tagged template √
-// vdom diff √
+render(h`<${counter} />`, document.body)

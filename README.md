@@ -28,7 +28,7 @@ yarn add fre -S
 ### Use
 
 ```JavaScript
-import { useState, html, mount } from 'fre'
+import{ render, html, useState } from 'fre'
 
 function counter() {
   const state = useState({
@@ -37,14 +37,20 @@ function counter() {
 
   return html`
     <div>
-      <p>${state.count}</p>
+      ${html`<${count} count=${state.count} />`}
       <button onclick=${() => {state.count++}}>+</button>
       <button onclick=${() => {state.count--}}>-</button>
     </div> 
   `
 }
 
-mount(html`<${counter}/>`, document.body)
+function count(props){
+  return html`
+    <p>${props.count}</p>
+  `
+}
+
+render(h`<${counter} />`, document.body)
 
 ```
 

@@ -17,8 +17,9 @@ export function diff(oldTree, newTree) {
 
 function walk(oldNode, newNode, index, patches) {
   let currentPatches = []
-
-  if (
+  if (typeof oldNode.type === 'function') {
+    walk(oldNode.type(oldNode.props),newNode.type(newNode.props),index,patches)
+  } else if (
     (typeof oldNode === 'string' && typeof newNode === 'string') ||
     (typeof oldNode === 'number' && typeof oldNode === 'number')
   ) {
