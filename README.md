@@ -48,7 +48,7 @@ mount(html`<${counter}/>`, document.body)
 
 ```
 
-### JSX
+#### JSX
 
 默认也对外暴露了 h 函数，可以选用 JSX
 ```JavaScript
@@ -63,7 +63,9 @@ webpack 需配置：
 }
 ```
 
-### p.s.
+#### p.s.
 
 知乎分享：[Fre：又一个小而美的前端MVVM框架](https://zhuanlan.zhihu.com/p/52510521)
 
+#### License
+MIT Inspirated by react & vue & htm
