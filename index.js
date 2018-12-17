@@ -1,4 +1,4 @@
-import{ render, html as h, useState } from './src'
+import { render, html as h, useState } from './src'
 
 function counter() {
   const state = useState({

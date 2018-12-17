@@ -28,16 +28,16 @@ yarn add fre -S
 ### Use
 
 ```JavaScript
-import{ render, html, useState } from 'fre'
+import{ render, html as h, useState } from './src'
 
 function counter() {
   const state = useState({
     count: 0
-  })
+  },this)
 
-  return html`
+  return h`
     <div>
-      ${html`<${count} count=${state.count} />`}
+      ${h`<${count} count=${state.count} />`}
       <button onclick=${() => {state.count++}}>+</button>
       <button onclick=${() => {state.count--}}>-</button>
     </div> 
@@ -45,8 +45,15 @@ function counter() {
 }
 
 function count(props){
-  return html`
-    <p>${props.count}</p>
+  const state = useState({
+    sex:'boy'
+  },this)
+  return h`
+    <div>
+      <p>${props.count}</p>
+      <p>${state.sex}</p>
+      <button onclick=${()=>{state.sex=state.sex==='boy'?'girl':'boy'}}>x</button>
+    </div>
   `
 }
 
