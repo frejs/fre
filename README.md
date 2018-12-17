@@ -78,7 +78,7 @@ webpack 需配置：
 
 #### Article
 
-知乎分享：[Fre：又一个小而美的前端MVVM框架](https://zhuanlan.zhihu.com/p/52510521)
+Fre：又一个小而美的前端MVVM框架 -> [知乎](https://zhuanlan.zhihu.com/p/52510521)  [掘金](https://juejin.im/post/5c160f69e51d4529355b89c8)
 
 #### License
 MIT 
