@@ -18,7 +18,6 @@ function walk(oldNode, newNode, index, patches) {
 
   let currentPatches = []
   if (typeof oldNode.type === 'function') {
-    prevNode = oldNode.type(oldNode.props)
     walk(oldNode.type(oldNode.props),newNode.type(newNode.props),index,patches)
   } else if (
     (typeof oldNode === 'string' && typeof newNode === 'string') ||

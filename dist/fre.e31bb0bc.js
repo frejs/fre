@@ -113,19 +113,19 @@ Object.defineProperty(exports, "__esModule", {
 exports.mount = mount;
 exports.render = render;
 exports.setAttr = setAttr;
-exports.ele = exports.onceNode = exports.vm = void 0;
+exports.ele = exports.prevNode = exports.vm = void 0;
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-var vm, onceNode, ele;
+var vm, prevNode, ele;
 exports.ele = ele;
-exports.onceNode = onceNode;
+exports.prevNode = prevNode;
 exports.vm = vm;
 
 function mount(vnode, el) {
   exports.ele = ele = el;
-  exports.onceNode = onceNode = vnode.type();
   exports.vm = vm = vnode;
+  exports.prevNode = prevNode = vnode.type();
   el.innerHTML = '';
   var node = render(vnode);
   el.appendChild(node);
@@ -133,6 +133,7 @@ function mount(vnode, el) {
 
 function render(vnode) {
   if (typeof vnode.type === 'function') {
+    exports.prevNode = prevNode = vnode.type(vnode.props);
     vnode = vnode.type(vnode.props);
   }
 
@@ -203,7 +204,6 @@ function walk(oldNode, newNode, index, patches) {
   var currentPatches = [];
 
   if (typeof oldNode.type === 'function') {
-    exports.prevNode = prevNode = oldNode.type(oldNode.props);
     walk(oldNode.type(oldNode.props), newNode.type(newNode.props), index, patches);
   } else if (typeof oldNode === 'string' && typeof newNode === 'string' || typeof oldNode === 'number' && typeof oldNode === 'number') {
     if (oldNode !== newNode) {
@@ -350,13 +350,10 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var save = {};
-var once = false;
 var oldTree;
 var newTree;
 
 function useState(state) {
-  console.log(arguments.caller);
-
   if (Object.keys(save).length > 0) {
     state = _objectSpread({}, state, save);
   }
@@ -375,15 +372,8 @@ function proxy(state) {
     },
     set: function set(obj, key, val) {
       save[key] = val;
-
-      if (!once) {
-        oldTree = _render.onceNode;
-        once = true;
-      } else {
-        oldTree = _diff.prevNode;
-      }
-
-      newTree = _render.vm.type();
+      oldTree = _render.prevNode;
+      newTree = _render.vm.type(_render.vm.props);
       var patches = (0, _diff.diff)(oldTree, newTree);
       (0, _patch.patch)(_render.ele, patches);
       return true;
@@ -588,7 +578,7 @@ function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(
 function counter() {
   var state = (0, _src.useState)({
     count: 0
-  });
+  }, this);
   return (0, _src.html)(_templateObject(), (0, _src.html)(_templateObject2(), count, state.count), function () {
     state.count++;
   }, function () {
@@ -599,7 +589,7 @@ function counter() {
 function count(props) {
   var state = (0, _src.useState)({
     sex: 'boy'
-  });
+  }, this);
   return (0, _src.html)(_templateObject3(), props.count, state.sex, function () {
     state.sex = state.sex === 'boy' ? 'girl' : 'boy';
   });
@@ -633,7 +623,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64272" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59859" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

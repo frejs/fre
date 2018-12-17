@@ -3,7 +3,7 @@ import{ render, html as h, useState } from './src'
 function counter() {
   const state = useState({
     count: 0
-  })
+  },this)
 
   return h`
     <div>
@@ -17,7 +17,7 @@ function counter() {
 function count(props){
   const state = useState({
     sex:'boy'
-  })
+  },this)
   return h`
     <div>
       <p>${props.count}</p>
