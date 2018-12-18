@@ -17,6 +17,7 @@
 ### Introduction
 
 Fre (pronounced `/fri:/`, like free) is a tiny and perfect javascript library
+<p color="#f2e">暂时不能用于生产环境，还有一个大坑没搞，寒假再战！</p>
 
 
 ### Install
@@ -79,8 +80,7 @@ webpack 需配置：
 #### Article
 
 《Fre：又一个小而美的前端MVVM框架》：[知乎](https://zhuanlan.zhihu.com/p/52510521)、[掘金](https://juejin.im/post/5c160f69e51d4529355b89c8)
+《fre 揭秘系列：arguments.callee.caller、Function.caller 替代方案》：[github](https://github.com/frontend9/fe9-library/issues/188)
 
 #### License
-MIT 
-
-Inspirated by react & vue & htm
+MIT · Inspirated by react & vue & htm
