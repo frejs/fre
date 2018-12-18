@@ -10,7 +10,7 @@ function counter() {
       ${h`<${count} count=${state.count} />`}
       <button onclick=${() => {state.count++}}>+</button>
       <button onclick=${() => {state.count--}}>-</button>
-    </div> 
+    </div>
   `
 }
 

@@ -2,8 +2,8 @@ export let vm, prevNode, ele
 
 export function mount(vnode, el) {
   ele = el
-  vm = vnode
   prevNode = vnode.type()
+  vm = vnode
   el.innerHTML = ''
   const node = render(vnode)
   el.appendChild(node)
@@ -11,7 +11,6 @@ export function mount(vnode, el) {
 
 export function render(vnode) {
   if (typeof vnode.type === 'function') {
-    prevNode = vnode.type(vnode.props)
     vnode = vnode.type(vnode.props)
   }
   let node = document.createElement(vnode.type)

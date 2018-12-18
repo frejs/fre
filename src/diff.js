@@ -6,6 +6,7 @@ const REPLACE = 'REPLACE'
 export let prevNode
 
 export function diff(oldTree, newTree) {
+  
   let index = 0
   let patches = {}
 

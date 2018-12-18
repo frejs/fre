@@ -124,8 +124,8 @@ exports.vm = vm;
 
 function mount(vnode, el) {
   exports.ele = ele = el;
-  exports.vm = vm = vnode;
   exports.prevNode = prevNode = vnode.type();
+  exports.vm = vm = vnode;
   el.innerHTML = '';
   var node = render(vnode);
   el.appendChild(node);
@@ -133,7 +133,6 @@ function mount(vnode, el) {
 
 function render(vnode) {
   if (typeof vnode.type === 'function') {
-    exports.prevNode = prevNode = vnode.type(vnode.props);
     vnode = vnode.type(vnode.props);
   }
 
@@ -564,7 +563,7 @@ function _templateObject2() {
 }
 
 function _templateObject() {
-  var data = _taggedTemplateLiteral(["\n    <div>\n      ", "\n      <button onclick=", ">+</button>\n      <button onclick=", ">-</button>\n    </div> \n  "]);
+  var data = _taggedTemplateLiteral(["\n    <div>\n      ", "\n      <button onclick=", ">+</button>\n      <button onclick=", ">-</button>\n    </div>\n  "]);
 
   _templateObject = function _templateObject() {
     return data;
@@ -623,7 +622,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49738" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62282" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
