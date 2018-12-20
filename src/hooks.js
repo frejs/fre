@@ -1,16 +1,14 @@
-import { prevNode, vm, ele } from './render'
-import { diff } from './diff'
-import { patch } from './patch'
-
-let save = {}
+let golbal = {}
 let oldTree
 let newTree
 
 export function useState(state) {
+  const caller = caller()
+
   if (Object.keys(save).length > 0) {
     state = {
       ...state,
-      ...save
+      ...golbal[caller]
     }
   }
 
@@ -20,8 +18,8 @@ export function useState(state) {
 function proxy(state) {
   let newState = new Proxy(state, {
     get(obj, key) {
-      if (save[key]) {
-        return save[key]
+      if (golbal[caller][key]) {
+        return golbal[caller][key]
       } else {
         return obj[key]
       }
@@ -39,4 +37,16 @@ function proxy(state) {
   })
 
   return newState
+}
+
+function caller() {
+  try {
+    throw new Error()
+  } catch (e) {
+    try {
+      return e.stack.split('at ')[3].split(' ')[0]
+    } catch (e) {
+      return ''
+    }
+  }
 }
