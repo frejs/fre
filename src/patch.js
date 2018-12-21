@@ -111,7 +111,7 @@ function walk(obj, fns) {
       if (i === 'type') {
         let f = obj[i]
         if (typeof f === 'function') {
-          fns[f.name] = f
+          fns[f.name] = obj
         }
       } else if (i === 'children') {
         let arr = obj[i]

@@ -3,6 +3,9 @@ import { fns } from './patch'
 let golbal = {}
 let oldTree
 let newTree
+let once = true
+
+let c
 
 export function useState(state) {
   if (Object.keys(golbal).length > 0) {
@@ -11,16 +14,29 @@ export function useState(state) {
       ...golbal
     }
   }
-
-  let caller = call() // counter
-
+  // counter
+  if (once) {
+    c = fns[call()]
+    once = false
+  }
   return proxy(state)
 }
 
 function proxy(state) {
   let newState = new Proxy(state, {
-    get(obj, key) {},
+    get(obj, key) {
+      if (golbal[key]) {
+        return golbal[key]
+      } else {
+        return obj[key]
+      }
+    },
     set(obj, key, val) {
+      golbal[key] = val
+      obj[key] = val
+      let vnode = c.type()
+
+      console.log(vnode)
       return true
     }
   })
