@@ -1,26 +1,26 @@
 //这个方法就是，第一次渲染的时候，parent 是根节点，然后 parent 就变成 element 了
 export var comps
 
-export function patch(parent, element, oldNode, node) {
-  console.log(element)
-  if (oldNode == null) {
-    comps = filterFn(node)
+export function patch(parent, element, oldVnode, vnode) {
+  if (oldVnode == null) {
+    comps = filterFn(vnode)
     //首次渲染，将node 的 dom 插到 body 下
-    element = parent.insertBefore(create(node), element)
-  } else if (node.tag && node.tag === oldNode.tag) {
-    update(element, oldNode.data, node.data) //更新属性
+    element = parent.insertBefore(create(vnode), element)
+  } else if (vnode.type && vnode.type === oldVnode.type) {
+    console.log(parent,element)
+    update(element, oldVnode.props, vnode.props) //更新属性
 
     var reusableChildren = {} //可以复用的孩子{key:[type,vnode]}
     var oldElements = [] //旧的真实元素
     var newKeys = {} //新的vnode {key:vnode}
 
-    for (var i = 0; i < oldNode.children.length; i++) {
+    for (var i = 0; i < oldVnode.children.length; i++) {
       //循环旧的 vnode，这次循环主要是筛选出带key，可以复用的vnode，最终是{key:[type,vnode]}
       var oldElement = element.childNodes[i]
       oldElements[i] = oldElement
 
-      var oldChild = oldNode.children[i]
-      var oldKey = oldChild.data ? oldChild.data.key : null
+      var oldChild = oldVnode.children[i]
+      var oldKey = oldChild.props? oldChild.props.key : null
 
       if (null != oldKey) {
         reusableChildren[oldKey] = [oldElement, oldChild]
@@ -30,15 +30,15 @@ export function patch(parent, element, oldNode, node) {
     var i = 0
     var j = 0
 
-    while (j < node.children.length) {
+    while (j < vnode.children.length) {
       //循环新的node的子节点，循环这个的目的
       var oldElement = oldElements[i] //这个是一个个 旧的 node 真实节点
-      var oldChild = oldNode.children[i] //一个个旧的 vnode
-      var newChild = node.children[j] //一个个新的vnode
+      var oldChild = oldVnode.children[i] //一个个旧的 vnode
+      var newChild = vnode.children[j] //一个个新的vnode
 
-      var oldKey = oldChild.data ? oldChild.data.key : null
+      var oldKey = oldChild.props ? oldChild.props.key : null
 
-      var newKey = newChild.data ? newChild.data.key : null
+      var newKey = newChild.props ? newChild.props.key : null
 
       var reusableChild = reusableChildren[newKey] || []
 
@@ -67,10 +67,10 @@ export function patch(parent, element, oldNode, node) {
       }
     }
 
-    while (i < oldNode.children.length) {
+    while (i < oldVnode.children.length) {
       //这个主要是用于删除的
-      var oldChild = oldNode.children[i]
-      var oldKey = oldChild.data ? oldChild.data.key : null
+      var oldChild = oldVnode.children[i]
+      var oldKey = oldChild.props ? oldChild.props.key : null
       if (null == oldKey) {
         element.removeChild(reusableChild[0])
       }
@@ -80,14 +80,14 @@ export function patch(parent, element, oldNode, node) {
     for (var i in reusableChildren) {
       var reusableChild = reusableChildren[i]
       var reusableNode = reusableChild[1]
-      if (!newKeys[reusableNode.data.key]) {
+      if (!newKeys[reusableNode.props.key]) {
         element.removeChild(reusableChild[0])
       }
     }
-  } else if (node !== oldNode) {
+  } else if (oldVnode !== vnode) {
     //然后会如果两个对象不同的话就直接替换
     var i = element
-    parent.replaceChild((element = create(node)), i)
+    parent.replaceChild((element = create(vnode)), i)
   }
 
   return element

@@ -124,15 +124,14 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
 var comps;
 exports.comps = comps;
 
-function patch(parent, element, oldNode, node) {
-  console.log(element);
+function patch(parent, element, oldVnode, vnode) {
+  if (oldVnode == null) {
+    exports.comps = comps = filterFn(vnode); //首次渲染，将node 的 dom 插到 body 下
 
-  if (oldNode == null) {
-    exports.comps = comps = filterFn(node); //首次渲染，将node 的 dom 插到 body 下
-
-    element = parent.insertBefore(create(node), element);
-  } else if (node.tag && node.tag === oldNode.tag) {
-    update(element, oldNode.data, node.data); //更新属性
+    element = parent.insertBefore(create(vnode), element);
+  } else if (vnode.type && vnode.type === oldVnode.type) {
+    console.log(parent, element);
+    update(element, oldVnode.props, vnode.props); //更新属性
 
     var reusableChildren = {}; //可以复用的孩子{key:[type,vnode]}
 
@@ -140,12 +139,12 @@ function patch(parent, element, oldNode, node) {
 
     var newKeys = {}; //新的vnode {key:vnode}
 
-    for (var i = 0; i < oldNode.children.length; i++) {
+    for (var i = 0; i < oldVnode.children.length; i++) {
       //循环旧的 vnode，这次循环主要是筛选出带key，可以复用的vnode，最终是{key:[type,vnode]}
       var oldElement = element.childNodes[i];
       oldElements[i] = oldElement;
-      var oldChild = oldNode.children[i];
-      var oldKey = oldChild.data ? oldChild.data.key : null;
+      var oldChild = oldVnode.children[i];
+      var oldKey = oldChild.props ? oldChild.props.key : null;
 
       if (null != oldKey) {
         reusableChildren[oldKey] = [oldElement, oldChild];
@@ -155,16 +154,16 @@ function patch(parent, element, oldNode, node) {
     var i = 0;
     var j = 0;
 
-    while (j < node.children.length) {
+    while (j < vnode.children.length) {
       //循环新的node的子节点，循环这个的目的
       var oldElement = oldElements[i]; //这个是一个个 旧的 node 真实节点
 
-      var oldChild = oldNode.children[i]; //一个个旧的 vnode
+      var oldChild = oldVnode.children[i]; //一个个旧的 vnode
 
-      var newChild = node.children[j]; //一个个新的vnode
+      var newChild = vnode.children[j]; //一个个新的vnode
 
-      var oldKey = oldChild.data ? oldChild.data.key : null;
-      var newKey = newChild.data ? newChild.data.key : null;
+      var oldKey = oldChild.props ? oldChild.props.key : null;
+      var newKey = newChild.props ? newChild.props.key : null;
       var reusableChild = reusableChildren[newKey] || [];
 
       if (null == newKey) {
@@ -193,10 +192,10 @@ function patch(parent, element, oldNode, node) {
       }
     }
 
-    while (i < oldNode.children.length) {
+    while (i < oldVnode.children.length) {
       //这个主要是用于删除的
-      var oldChild = oldNode.children[i];
-      var oldKey = oldChild.data ? oldChild.data.key : null;
+      var oldChild = oldVnode.children[i];
+      var oldKey = oldChild.props ? oldChild.props.key : null;
 
       if (null == oldKey) {
         element.removeChild(reusableChild[0]);
@@ -209,14 +208,14 @@ function patch(parent, element, oldNode, node) {
       var reusableChild = reusableChildren[i];
       var reusableNode = reusableChild[1];
 
-      if (!newKeys[reusableNode.data.key]) {
+      if (!newKeys[reusableNode.props.key]) {
         element.removeChild(reusableChild[0]);
       }
     }
-  } else if (node !== oldNode) {
+  } else if (oldVnode !== vnode) {
     //然后会如果两个对象不同的话就直接替换
     var i = element;
-    parent.replaceChild(element = create(node), i);
+    parent.replaceChild(element = create(vnode), i);
   }
 
   return element;
@@ -316,9 +315,11 @@ exports.rerender = rerender;
 
 var _patch = require("./patch");
 
+var _hooks = require("./hooks");
+
 var parent;
 var element;
-var oldVnode = element;
+var oldVnode;
 var vnode;
 
 function render(vdom, el) {
@@ -328,17 +329,23 @@ function render(vdom, el) {
 }
 
 function rerender() {
+  if (!_hooks.once) {
+    vnode = _hooks.comp.type();
+  }
+
   setTimeout(function () {
+    console.log(oldVnode, vnode);
     element = (0, _patch.patch)(parent, element, oldVnode, oldVnode = vnode);
   });
 }
-},{"./patch":"src/patch.js"}],"src/hooks.js":[function(require,module,exports) {
+},{"./patch":"src/patch.js","./hooks":"src/hooks.js"}],"src/hooks.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.useState = useState;
+exports.comp = exports.once = void 0;
 
 var _render = require("./render");
 
@@ -350,7 +357,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 var golbal = {};
 var once = true;
+exports.once = once;
 var comp;
+exports.comp = comp;
 
 function useState(state) {
   if (Object.keys(golbal).length > 0) {
@@ -358,8 +367,8 @@ function useState(state) {
   }
 
   if (once) {
-    comp = _patch.comps[c()];
-    once = false;
+    exports.comp = comp = _patch.comps[c()];
+    exports.once = once = false;
   }
 
   return proxy(state);
@@ -561,7 +570,7 @@ function _templateObject2() {
 }
 
 function _templateObject() {
-  var data = _taggedTemplateLiteral(["\n    <div>\n      <p>", "</p>\n      <button onclick=", ">+</button>\n      <button onclick=", ">-</button>\n    </div>\n  "]);
+  var data = _taggedTemplateLiteral(["\n    <div>\n      <p key=\"p\">", "</p>\n      <button onclick=", " key=\"+\">+</button>\n      <button onclick=", " key=\"-\">-</button>\n    </div>\n  "]);
 
   _templateObject = function _templateObject() {
     return data;
@@ -576,7 +585,6 @@ function counter() {
   var state = (0, _src.useState)({
     count: 0
   });
-  console.log(state);
   return (0, _src.html)(_templateObject(), state.count, function () {
     state.count++;
   }, function () {
@@ -612,7 +620,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57324" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61034" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

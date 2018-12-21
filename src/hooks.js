@@ -2,8 +2,8 @@ import { rerender } from './render'
 import { comps, parent } from './patch'
 
 let golbal = {}
-let once = true
-let comp
+export var once = true
+export var comp
 
 export function useState(state) {
   if (Object.keys(golbal).length > 0) {

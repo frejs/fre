@@ -1,8 +1,9 @@
 import { patch } from './patch'
+import { comp, once } from './hooks'
 
 let parent
 let element
-let oldVnode = element
+let oldVnode
 let vnode
 
 export function render(vdom, el) {
@@ -12,7 +13,11 @@ export function render(vdom, el) {
 }
 
 export function rerender() {
+  if (!once) {
+    vnode = comp.type()
+  }
   setTimeout(() => {
-  element =  patch(parent, element, oldVnode, (oldVnode = vnode))
+    console.log(oldVnode,vnode)
+    element = patch(parent, element, oldVnode, (oldVnode = vnode))
   })
 }

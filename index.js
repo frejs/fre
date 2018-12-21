@@ -5,13 +5,11 @@ function counter() {
     count: 0
   })
 
-  console.log(state)
-
   return html`
     <div>
-      <p>${state.count}</p>
-      <button onclick=${() => {state.count++}}>+</button>
-      <button onclick=${() => {state.count--}}>-</button>
+      <p key="p">${state.count}</p>
+      <button onclick=${() => {state.count++}} key="+">+</button>
+      <button onclick=${() => {state.count--}} key="-">-</button>
     </div>
   `
 }
