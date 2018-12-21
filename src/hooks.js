@@ -1,11 +1,9 @@
-import { fns,dom } from './patch'
+import { rerender, oldNode, el } from './render'
+import { comps, parent } from './patch'
 
 let golbal = {}
-let oldTree
-let newTree
 let once = true
-
-let c
+let comp
 
 export function useState(state) {
   if (Object.keys(golbal).length > 0) {
@@ -14,9 +12,9 @@ export function useState(state) {
       ...golbal
     }
   }
-  // counter
+
   if (once) {
-    c = fns[call()]
+    comp = comps[c()]
     once = false
   }
   return proxy(state)
@@ -34,11 +32,7 @@ function proxy(state) {
     set(obj, key, val) {
       golbal[key] = val
       obj[key] = val
-      let vnode = c.type() //新的 vnode
-
-      console.log(vnode)
-
-      
+      rerender(el, parent, oldNode, comp.type())
       return true
     }
   })
@@ -46,7 +40,7 @@ function proxy(state) {
   return newState
 }
 
-function call() {
+function c() {
   try {
     throw new Error()
   } catch (e) {

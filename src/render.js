@@ -1,13 +1,17 @@
-import { create, patch } from './patch'
-import { once } from './hooks'
+import { patch } from './patch'
+
+export let parent
+export let oldNode
+export let el
 
 export function render(vnode, el) {
-  setTimeout(_render(vnode, el), 0)
+  rerender(el, null, null, vnode)
+  el = el
 }
 
-function _render(vnode, el) {
-  if (once) {
-    patch(el, null, null, vnode)
-    once = true
-  }
+export function rerender(parent, element, oldVnode, vnode) {
+  setTimeout(() => {
+    parent = patch(parent, element, oldVnode, (oldNode = vnode))
+  })
+
 }

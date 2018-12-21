@@ -23,3 +23,16 @@ function counter(){
 }
 
 counter()
+
+
+// function call() {
+//   try {
+//     throw new Error()
+//   } catch (e) {
+//     try {
+//       return e.stack.match(/Object.(\S*)/)[1]
+//     } catch (e) {
+//       return ''
+//     }
+//   }
+// }

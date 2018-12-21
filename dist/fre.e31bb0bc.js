@@ -112,7 +112,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.patch = patch;
 exports.create = create;
-exports.fns = void 0;
+exports.comps = exports.parent = void 0;
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
@@ -120,53 +120,110 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-var fns;
-exports.fns = fns;
+//这个方法就是，第一次渲染的时候，parent 是根节点，然后 parent 就变成 element 了
+var parent, comps;
+exports.comps = comps;
+exports.parent = parent;
 
-function patch(parent, dom, oldVnode, vnode) {
-  if (oldVnode === vnode) {} else if (oldVnode === null || oldVnode.type !== vnode.type) {
-    var newDom = create(vnode);
-    parent.insertBefore(newDom, dom);
-    dom = newDom;
-  } else if (oldVnode.type === null) {
-    dom.nodeValue = vnode;
-  } else {
-    update(dom, oldVnode.props, vnode.props);
-    var oldKeyed = {};
-    var newKeyed = {};
-    var oldDom = [];
-    var oldChildren = oldVnode.children;
-    var children = vnode.children;
-    oldChildren.forEach(function (child) {
-      oldDom[i] = dom.childNodes[i];
-      var oldKey = child.key;
+function patch(parent, element, oldNode, node) {
+  if (oldNode == null) {
+    exports.comps = comps = filterFn(node); //首次渲染，将node 的 dom 插到 body 下
 
-      if (oldKey) {
-        oldKeyed[oldKey] = [oldDom[i], child];
-      }
-    });
-    var n = 0;
+    element = parent.insertBefore(create(node), element);
+  } else if (node.tag && node.tag === oldNode.tag) {
+    update(element, oldNode.data, node.data); //更新属性
 
-    while (n < children.length) {
-      var oldKey = oldChildren[n].key;
-      var newKey = children[n].key;
+    var reusableChildren = {}; //可以复用的孩子{key:[type,vnode]}
 
-      if (!newKey || !oldKey) {
-        patch(dom, oldDom[n], oldChildren[n], children[n]);
-        n++;
-      } else {
-        newKeyed[newKey] = children[n];
-        n++;
+    var oldElements = []; //旧的真实元素
+
+    var newKeys = {}; //新的vnode {key:vnode}
+
+    for (var i = 0; i < oldNode.children.length; i++) {
+      //循环旧的 vnode，这次循环主要是筛选出带key，可以复用的vnode，最终是{key:[type,vnode]}
+      var oldElement = element.childNodes[i];
+      oldElements[i] = oldElement;
+      var oldChild = oldNode.children[i];
+      var oldKey = oldChild.data ? oldChild.data.key : null;
+
+      if (null != oldKey) {
+        reusableChildren[oldKey] = [oldElement, oldChild];
       }
     }
+
+    var i = 0;
+    var j = 0;
+
+    while (j < node.children.length) {
+      //循环新的node的子节点，循环这个的目的
+      var oldElement = oldElements[i]; //这个是一个个 旧的 node 真实节点
+
+      var oldChild = oldNode.children[i]; //一个个旧的 vnode
+
+      var newChild = node.children[j]; //一个个新的vnode
+
+      var oldKey = oldChild.data ? oldChild.data.key : null;
+      var newKey = newChild.data ? newChild.data.key : null;
+      var reusableChild = reusableChildren[newKey] || [];
+
+      if (null == newKey) {
+        //这种是文字或者数字，直接下一个
+        if (null == oldKey) {
+          patch(element, oldElement, oldChild, newChild);
+          j++;
+        }
+
+        i++;
+      } else {
+        if (oldKey === newKey) {
+          //key相同的，如果新旧的key是相同的，就可以复用
+          patch(element, reusableChild[0], reusableChild[1], newChild);
+          i++;
+        } else if (reusableChild[0]) {
+          //如果key不同，就在前面插入这个element
+          console.log(element, reusableChild[0], oldElement);
+          element.insertBefore(reusableChild[0], oldElement);
+          patch(element, reusableChild[0], reusableChild[1], newChild);
+        } else {
+          patch(element, oldElement, null, newChild);
+        }
+
+        j++;
+        newKeys[newKey] = newChild;
+      }
+    }
+
+    while (i < oldNode.children.length) {
+      //这个主要是用于删除的
+      var oldChild = oldNode.children[i];
+      var oldKey = oldChild.data ? oldChild.data.key : null;
+
+      if (null == oldKey) {
+        element.removeChild(reusableChild[0]);
+      }
+
+      i++;
+    }
+
+    for (var i in reusableChildren) {
+      var reusableChild = reusableChildren[i];
+      var reusableNode = reusableChild[1];
+
+      if (!newKeys[reusableNode.data.key]) {
+        element.removeChild(reusableChild[0]);
+      }
+    }
+  } else if (node !== oldNode) {
+    //然后会如果两个对象不同的话就直接替换
+    var i = element;
+    parent.replaceChild(element = create(node), i);
   }
 
-  return dom;
+  parent = element;
+  return element;
 }
 
 function create(vnode) {
-  exports.fns = fns = filterFn(vnode);
-
   if (typeof vnode.type === 'function') {
     vnode = vnode.type(vnode.props);
   }
@@ -249,13 +306,44 @@ function walk(obj, fns) {
 
   return fns;
 }
-},{}],"src/hooks.js":[function(require,module,exports) {
+},{}],"src/render.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.render = render;
+exports.rerender = rerender;
+exports.el = exports.oldNode = exports.parent = void 0;
+
+var _patch = require("./patch");
+
+var parent;
+exports.parent = parent;
+var oldNode;
+exports.oldNode = oldNode;
+var el;
+exports.el = el;
+
+function render(vnode, el) {
+  rerender(el, null, null, vnode);
+  el = el;
+}
+
+function rerender(parent, element, oldVnode, vnode) {
+  setTimeout(function () {
+    parent = (0, _patch.patch)(parent, element, oldVnode, exports.oldNode = oldNode = vnode);
+  });
+}
+},{"./patch":"src/patch.js"}],"src/hooks.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.useState = useState;
+
+var _render = require("./render");
 
 var _patch = require("./patch");
 
@@ -264,19 +352,16 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var golbal = {};
-var oldTree;
-var newTree;
 var once = true;
-var c;
+var comp;
 
 function useState(state) {
   if (Object.keys(golbal).length > 0) {
     state = _objectSpread({}, state, golbal);
-  } // counter
-
+  }
 
   if (once) {
-    c = _patch.fns[call()];
+    comp = _patch.comps[c()];
     once = false;
   }
 
@@ -295,16 +380,14 @@ function proxy(state) {
     set: function set(obj, key, val) {
       golbal[key] = val;
       obj[key] = val;
-      var vnode = c.type(); //新的 vnode
-
-      console.log(vnode);
+      (0, _render.rerender)(_render.el, _patch.parent, _render.oldNode, comp.type());
       return true;
     }
   });
   return newState;
 }
 
-function call() {
+function c() {
   try {
     throw new Error();
   } catch (e) {
@@ -315,7 +398,7 @@ function call() {
     }
   }
 }
-},{"./patch":"src/patch.js"}],"src/html.js":[function(require,module,exports) {
+},{"./render":"src/render.js","./patch":"src/patch.js"}],"src/html.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -429,25 +512,7 @@ function h(type, props) {
 var html = _html.default.bind(h);
 
 exports.html = html;
-},{"./html":"src/html.js"}],"src/render.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.render = render;
-
-var _patch = require("./patch");
-
-function render(vnode, el) {
-  setTimeout(_render(vnode, el), 0);
-}
-
-function _render(vnode, el) {
-  var dom = (0, _patch.patch)(el, null, null, vnode);
-  console.log(dom);
-}
-},{"./patch":"src/patch.js"}],"src/index.js":[function(require,module,exports) {
+},{"./html":"src/html.js"}],"src/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -514,6 +579,7 @@ function counter() {
   var state = (0, _src.useState)({
     count: 0
   });
+  console.log(state);
   return (0, _src.html)(_templateObject(), state.count, function () {
     state.count++;
   }, function () {
@@ -549,7 +615,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54006" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50625" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

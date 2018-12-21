@@ -21,3 +21,29 @@
 // }
 
 // xxx()
+
+
+
+
+
+// import { patch } from './pkg/patch'
+
+// let oldNode = {
+//   type: 'div',
+//   props: {},
+//   children: [{ type: 'p', props: {}, children: [0] }]
+// }
+
+// let node = {
+//   type: 'div',
+//   props: {},
+//   children: [{ type: 'p', props: {}, children: [1] }]
+// }
+
+// let parent = document.body
+
+// let element = document.body.children[0]
+
+// console.log(element)
+
+// patch(parent, element, oldNode, node)

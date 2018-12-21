@@ -1,8 +1,7 @@
-//这个方法就是，第一次渲染的时候，parent 是根节点，然后 parent 就变成 element 了
-export let parent, comps
+
+
 export function patch(parent, element, oldNode, node) {
   if (oldNode == null) {
-    comps = filterFn(node)
     //首次渲染，将node 的 dom 插到 body 下
     element = parent.insertBefore(create(node), element)
   } else if (node.tag && node.tag === oldNode.tag) {
@@ -89,12 +88,11 @@ export function patch(parent, element, oldNode, node) {
     parent.replaceChild((element = create(node)), i)
   }
 
-  parent = element
-
   return element
 }
 
 export function create(vnode) {
+
   if (typeof vnode.type === 'function') {
     vnode = vnode.type(vnode.props)
   }
@@ -145,28 +143,4 @@ function setAttrs(node, name, value) {
     default:
       node.setAttribute(name, value)
   }
-}
-
-function filterFn(obj) {
-  let fns = {}
-  return walk(obj, fns)
-}
-
-function walk(obj, fns) {
-  if (obj) {
-    Object.keys(obj).forEach(i => {
-      if (i === 'type') {
-        let f = obj[i]
-        if (typeof f === 'function') {
-          fns[f.name] = obj
-        }
-      } else if (i === 'children') {
-        let arr = obj[i]
-        arr.forEach(child => {
-          walk(child, fns)
-        })
-      }
-    })
-  }
-  return fns
 }

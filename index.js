@@ -5,6 +5,8 @@ function counter() {
     count: 0
   })
 
+  console.log(state)
+
   return html`
     <div>
       <p>${state.count}</p>
