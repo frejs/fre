@@ -124,8 +124,8 @@ var fns;
 exports.fns = fns;
 
 function patch(parent, dom, oldVnode, vnode) {
-  if (oldVnode === vnode) {} else if (oldVnode.type !== vnode.type || oldVnode === null) {
-    newDom = create(vnode);
+  if (oldVnode === vnode) {} else if (oldVnode === null || oldVnode.type !== vnode.type) {
+    var newDom = create(vnode);
     parent.insertBefore(newDom, dom);
     dom = newDom;
   } else if (oldVnode.type === null) {
@@ -295,7 +295,8 @@ function proxy(state) {
     set: function set(obj, key, val) {
       golbal[key] = val;
       obj[key] = val;
-      var vnode = c.type();
+      var vnode = c.type(); //新的 vnode
+
       console.log(vnode);
       return true;
     }
@@ -439,8 +440,12 @@ exports.render = render;
 var _patch = require("./patch");
 
 function render(vnode, el) {
-  var dom = (0, _patch.create)(vnode);
-  el.appendChild(dom);
+  setTimeout(_render(vnode, el), 0);
+}
+
+function _render(vnode, el) {
+  var dom = (0, _patch.patch)(el, null, null, vnode);
+  console.log(dom);
 }
 },{"./patch":"src/patch.js"}],"src/index.js":[function(require,module,exports) {
 "use strict";
@@ -544,7 +549,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64803" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54006" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

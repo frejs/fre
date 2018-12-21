@@ -1,6 +1,13 @@
-import { create } from './patch'
+import { create, patch } from './patch'
+import { once } from './hooks'
 
 export function render(vnode, el) {
-  let dom = create(vnode)
-  el.appendChild(dom)
+  setTimeout(_render(vnode, el), 0)
+}
+
+function _render(vnode, el) {
+  if (once) {
+    patch(el, null, null, vnode)
+    once = true
+  }
 }

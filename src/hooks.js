@@ -1,4 +1,4 @@
-import { fns } from './patch'
+import { fns,dom } from './patch'
 
 let golbal = {}
 let oldTree
@@ -34,9 +34,11 @@ function proxy(state) {
     set(obj, key, val) {
       golbal[key] = val
       obj[key] = val
-      let vnode = c.type()
+      let vnode = c.type() //新的 vnode
 
       console.log(vnode)
+
+      
       return true
     }
   })

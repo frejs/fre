@@ -2,8 +2,8 @@ export let fns
 
 export function patch(parent, dom, oldVnode, vnode) {
   if (oldVnode === vnode) {
-  } else if (oldVnode.type !== vnode.type || oldVnode === null) {
-    newDom = create(vnode)
+  } else if (oldVnode === null || oldVnode.type !== vnode.type) {
+    let newDom = create(vnode)
     parent.insertBefore(newDom, dom)
     dom = newDom
   } else if (oldVnode.type === null) {
