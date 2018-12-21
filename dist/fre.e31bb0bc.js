@@ -112,7 +112,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.patch = patch;
 exports.create = create;
-exports.comps = exports.parent = void 0;
+exports.comps = void 0;
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
@@ -121,11 +121,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 //这个方法就是，第一次渲染的时候，parent 是根节点，然后 parent 就变成 element 了
-var parent, comps;
+var comps;
 exports.comps = comps;
-exports.parent = parent;
 
 function patch(parent, element, oldNode, node) {
+  console.log(element);
+
   if (oldNode == null) {
     exports.comps = comps = filterFn(node); //首次渲染，将node 的 dom 插到 body 下
 
@@ -181,7 +182,6 @@ function patch(parent, element, oldNode, node) {
           i++;
         } else if (reusableChild[0]) {
           //如果key不同，就在前面插入这个element
-          console.log(element, reusableChild[0], oldElement);
           element.insertBefore(reusableChild[0], oldElement);
           patch(element, reusableChild[0], reusableChild[1], newChild);
         } else {
@@ -219,7 +219,6 @@ function patch(parent, element, oldNode, node) {
     parent.replaceChild(element = create(node), i);
   }
 
-  parent = element;
   return element;
 }
 
@@ -314,25 +313,23 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.render = render;
 exports.rerender = rerender;
-exports.el = exports.oldNode = exports.parent = void 0;
 
 var _patch = require("./patch");
 
 var parent;
-exports.parent = parent;
-var oldNode;
-exports.oldNode = oldNode;
-var el;
-exports.el = el;
+var element;
+var oldVnode = element;
+var vnode;
 
-function render(vnode, el) {
-  rerender(el, null, null, vnode);
-  el = el;
+function render(vdom, el) {
+  parent = el;
+  vnode = vdom;
+  rerender();
 }
 
-function rerender(parent, element, oldVnode, vnode) {
+function rerender() {
   setTimeout(function () {
-    parent = (0, _patch.patch)(parent, element, oldVnode, exports.oldNode = oldNode = vnode);
+    element = (0, _patch.patch)(parent, element, oldVnode, oldVnode = vnode);
   });
 }
 },{"./patch":"src/patch.js"}],"src/hooks.js":[function(require,module,exports) {
@@ -380,7 +377,7 @@ function proxy(state) {
     set: function set(obj, key, val) {
       golbal[key] = val;
       obj[key] = val;
-      (0, _render.rerender)(_render.el, _patch.parent, _render.oldNode, comp.type());
+      (0, _render.rerender)();
       return true;
     }
   });
@@ -615,7 +612,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50625" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57324" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

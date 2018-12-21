@@ -1,4 +1,4 @@
-import { rerender, oldNode, el } from './render'
+import { rerender } from './render'
 import { comps, parent } from './patch'
 
 let golbal = {}
@@ -32,7 +32,7 @@ function proxy(state) {
     set(obj, key, val) {
       golbal[key] = val
       obj[key] = val
-      rerender(el, parent, oldNode, comp.type())
+      rerender()
       return true
     }
   })

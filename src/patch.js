@@ -1,6 +1,8 @@
 //这个方法就是，第一次渲染的时候，parent 是根节点，然后 parent 就变成 element 了
-export let parent, comps
+export var comps
+
 export function patch(parent, element, oldNode, node) {
+  console.log(element)
   if (oldNode == null) {
     comps = filterFn(node)
     //首次渲染，将node 的 dom 插到 body 下
@@ -54,7 +56,6 @@ export function patch(parent, element, oldNode, node) {
           i++
         } else if (reusableChild[0]) {
           //如果key不同，就在前面插入这个element
-          console.log(element, reusableChild[0], oldElement)
           element.insertBefore(reusableChild[0], oldElement)
           patch(element, reusableChild[0], reusableChild[1], newChild)
         } else {
@@ -88,8 +89,6 @@ export function patch(parent, element, oldNode, node) {
     var i = element
     parent.replaceChild((element = create(node)), i)
   }
-
-  parent = element
 
   return element
 }

@@ -1,17 +1,18 @@
 import { patch } from './patch'
 
-export let parent
-export let oldNode
-export let el
+let parent
+let element
+let oldVnode = element
+let vnode
 
-export function render(vnode, el) {
-  rerender(el, null, null, vnode)
-  el = el
+export function render(vdom, el) {
+  parent = el
+  vnode = vdom
+  rerender()
 }
 
-export function rerender(parent, element, oldVnode, vnode) {
+export function rerender() {
   setTimeout(() => {
-    parent = patch(parent, element, oldVnode, (oldNode = vnode))
+  element =  patch(parent, element, oldVnode, (oldVnode = vnode))
   })
-
 }
