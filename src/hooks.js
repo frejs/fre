@@ -1,37 +1,26 @@
+import { fns } from './patch'
+
 let golbal = {}
 let oldTree
 let newTree
 
 export function useState(state) {
-  const caller = caller()
-
-  if (Object.keys(save).length > 0) {
+  if (Object.keys(golbal).length > 0) {
     state = {
       ...state,
-      ...golbal[caller]
+      ...golbal
     }
   }
+
+  let caller = call() // counter
 
   return proxy(state)
 }
 
 function proxy(state) {
   let newState = new Proxy(state, {
-    get(obj, key) {
-      if (golbal[caller][key]) {
-        return golbal[caller][key]
-      } else {
-        return obj[key]
-      }
-    },
+    get(obj, key) {},
     set(obj, key, val) {
-      save[key] = val
-      oldTree = prevNode
-      newTree = vm.type(vm.props)
-
-      let patches = diff(oldTree, newTree)
-      patch(ele, patches)
-
       return true
     }
   })
@@ -39,12 +28,12 @@ function proxy(state) {
   return newState
 }
 
-function caller() {
+function call() {
   try {
     throw new Error()
   } catch (e) {
     try {
-      return e.stack.split('at ')[3].split(' ')[0]
+      return e.stack.match(/Object.(\S*)/)[1]
     } catch (e) {
       return ''
     }

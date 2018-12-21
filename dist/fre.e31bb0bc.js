@@ -104,233 +104,152 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   // Override the current require with this new one
   return newRequire;
-})({"src/render.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.mount = mount;
-exports.render = render;
-exports.setAttr = setAttr;
-exports.ele = exports.prevNode = exports.vm = void 0;
-
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-var vm, prevNode, ele;
-exports.ele = ele;
-exports.prevNode = prevNode;
-exports.vm = vm;
-
-function mount(vnode, el) {
-  exports.ele = ele = el;
-  exports.prevNode = prevNode = vnode.type();
-  exports.vm = vm = vnode;
-  el.innerHTML = '';
-  var node = render(vnode);
-  el.appendChild(node);
-}
-
-function render(vnode) {
-  if (typeof vnode.type === 'function') {
-    vnode = vnode.type(vnode.props);
-  }
-
-  var node = document.createElement(vnode.type);
-
-  for (var name in vnode.props) {
-    setAttr(node, name, vnode.props[name]);
-  }
-
-  vnode.children.forEach(function (child) {
-    child = _typeof(child) == 'object' ? render(child) : document.createTextNode(child);
-    node.appendChild(child);
-  });
-  return node;
-}
-
-function setAttr(node, name, value) {
-  if (/on\w+/.test(name)) {
-    name = name.toLowerCase();
-    node[name] = value || '';
-  } else {
-    switch (name) {
-      case 'className':
-        name === 'class';
-        break;
-
-      case 'value':
-        if (node.tagName.toUpperCase() === 'INPUT' || node.tagName.toUpperCase() === 'TEXTAREA') {
-          node.value = value;
-        } else {
-          node.setAttribute(name, value);
-        }
-
-        break;
-
-      case 'style':
-        node.style.cssText = value;
-        break;
-
-      default:
-        node.setAttribute(name, value);
-    }
-  }
-}
-},{}],"src/diff.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.diff = diff;
-exports.prevNode = void 0;
-var ATTRS = 'ATTRS';
-var REMOVE = 'REMOVE';
-var TEXT = 'TEXT';
-var REPLACE = 'REPLACE';
-var prevNode;
-exports.prevNode = prevNode;
-
-function diff(oldTree, newTree) {
-  var index = 0;
-  var patches = {};
-  walk(oldTree, newTree, index, patches);
-  return patches;
-}
-
-function walk(oldNode, newNode, index, patches) {
-  var currentPatches = [];
-
-  if (typeof oldNode.type === 'function') {
-    walk(oldNode.type(oldNode.props), newNode.type(newNode.props), index, patches);
-  } else if (typeof oldNode === 'string' && typeof newNode === 'string' || typeof oldNode === 'number' && typeof oldNode === 'number') {
-    if (oldNode !== newNode) {
-      currentPatches.push({
-        type: TEXT,
-        text: newNode
-      });
-    }
-  } else if (!newNode) {
-    currentPatches.push({
-      type: REMOVE,
-      index: index
-    });
-  } else if (oldNode.type === newNode.type) {
-    var attrs = diffAttr(oldNode.props, newNode.props);
-
-    if (Object.keys(attrs).length > 0) {
-      currentPatches.push({
-        type: ATTRS,
-        attrs: attrs
-      });
-    }
-
-    diffChildren(oldNode.children, newNode.children, index, patches);
-  } else {
-    index += oldNode.children.length;
-    currentPatches.push({
-      type: REPLACE,
-      newNode: newNode
-    });
-  }
-
-  if (currentPatches.length > 0) {
-    patches[index] = currentPatches;
-  }
-}
-
-function diffAttr(oldAttr, newAttr) {
-  var patch = {};
-
-  for (var key in oldAttr) {
-    if (typeof oldAttr[key] !== 'function') {
-      if (oldAttr[key] !== newAttr[key]) {
-        patch[key] = newAttr[key];
-      }
-    }
-  }
-
-  for (var _key in newAttr) {
-    if (typeof newAttr[_key] !== 'function') {
-      if (!oldAttr.hasOwnProperty(_key)) {
-        patch[_key] = newAttr[_key];
-      }
-    }
-  }
-
-  return patch;
-}
-
-function diffChildren(oldChildren, newChildren, index, patches) {
-  oldChildren.forEach(function (child, i) {
-    walk(child, newChildren[i], ++index, patches);
-  });
-}
-},{}],"src/patch.js":[function(require,module,exports) {
+})({"src/patch.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.patch = patch;
+exports.create = create;
+exports.fns = void 0;
 
-var _render = require("./render");
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-var allPatches;
-var index;
+var fns;
+exports.fns = fns;
 
-function patch(node, patches) {
-  allPatches = patches;
-  index = 0;
-  walk(node);
+function patch(parent, dom, oldVnode, vnode) {
+  if (oldVnode === vnode) {} else if (oldVnode.type !== vnode.type || oldVnode === null) {
+    newDom = create(vnode);
+    parent.insertBefore(newDom, dom);
+    dom = newDom;
+  } else if (oldVnode.type === null) {
+    dom.nodeValue = vnode;
+  } else {
+    update(dom, oldVnode.props, vnode.props);
+    var oldKeyed = {};
+    var newKeyed = {};
+    var oldDom = [];
+    var oldChildren = oldVnode.children;
+    var children = vnode.children;
+    oldChildren.forEach(function (child) {
+      oldDom[i] = dom.childNodes[i];
+      var oldKey = child.key;
+
+      if (oldKey) {
+        oldKeyed[oldKey] = [oldDom[i], child];
+      }
+    });
+    var n = 0;
+
+    while (n < children.length) {
+      var oldKey = oldChildren[n].key;
+      var newKey = children[n].key;
+
+      if (!newKey || !oldKey) {
+        patch(dom, oldDom[n], oldChildren[n], children[n]);
+        n++;
+      } else {
+        newKeyed[newKey] = children[n];
+        n++;
+      }
+    }
+  }
+
+  return dom;
 }
 
-function walk(node) {
-  var currentPatch = allPatches[index++];
-  node.childNodes.forEach(function (child) {
-    return walk(child);
-  });
+function create(vnode) {
+  exports.fns = fns = filterFn(vnode);
 
-  if (currentPatch) {
-    usePatch(node, currentPatch);
+  if (typeof vnode.type === 'function') {
+    vnode = vnode.type(vnode.props);
+  }
+
+  var dom = document.createElement(vnode.type);
+
+  for (var name in vnode.props) {
+    setAttrs(dom, name, vnode.props[name]);
+  }
+
+  vnode.children.forEach(function (child) {
+    child = _typeof(child) == 'object' ? create(child) : document.createTextNode(child);
+    dom.appendChild(child);
+  });
+  return dom;
+}
+
+function update(dom, oldProps, props) {
+  var cloneProps = _objectSpread({}, oldProps, props);
+
+  for (var name in cloneProps) {
+    setAttrs(dom, name, cloneProps[name]);
   }
 }
 
-function usePatch(node, patches) {
-  patches.forEach(function (patch) {
-    switch (patch.type) {
-      case 'ATTRS':
-        for (var key in patch.attrs) {
-          var value = patch.attrs[key];
+function setAttrs(node, name, value) {
+  switch (name) {
+    case String(name.match(/on\w+/)):
+      name = name.toLowerCase();
+      node[name] = value || '';
+      break;
 
-          if (value) {
-            (0, _render.setAttr)(node, key, value);
-          } else {
-            node.removeAttribute(key);
-          }
-        }
+    case 'className':
+      name === 'class';
+      break;
 
-        break;
+    case 'key':
+      break;
 
-      case 'TEXT':
-        node.textContent = patch.text;
-        break;
+    case 'value':
+      if (node.tagName.toUpperCase() === 'INPUT' || node.tagName.toUpperCase() === 'TEXTAREA') {
+        node.value = value;
+      } else {
+        node.setAttribute(name, value);
+      }
 
-      case 'REPLACE':
-        var newNode = _typeof(patch.newNode) === 'object' ? (0, _render.render)(patch.newNode) : document.createTextNode(patch.newNode);
-        node.parentNode.replaceChild(newNode, node);
-        break;
+      break;
 
-      case 'REMOVE':
-        node.parentNode.removeChild(node);
-        break;
-    }
-  });
+    case 'style':
+      node.style.cssText = value;
+      break;
+
+    default:
+      node.setAttribute(name, value);
+  }
 }
-},{"./render":"src/render.js"}],"src/hooks.js":[function(require,module,exports) {
+
+function filterFn(obj) {
+  var fns = {};
+  return walk(obj, fns);
+}
+
+function walk(obj, fns) {
+  if (obj) {
+    Object.keys(obj).forEach(function (i) {
+      if (i === 'type') {
+        var f = obj[i];
+
+        if (typeof f === 'function') {
+          fns[f.name] = f;
+        }
+      } else if (i === 'children') {
+        var arr = obj[i];
+        arr.forEach(function (child) {
+          walk(child, fns);
+        });
+      }
+    });
+  }
+
+  return fns;
+}
+},{}],"src/hooks.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -338,49 +257,48 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.useState = useState;
 
-var _render = require("./render");
-
-var _diff = require("./diff");
-
 var _patch = require("./patch");
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var save = {};
+var golbal = {};
 var oldTree;
 var newTree;
 
 function useState(state) {
-  if (Object.keys(save).length > 0) {
-    state = _objectSpread({}, state, save);
+  if (Object.keys(golbal).length > 0) {
+    state = _objectSpread({}, state, golbal);
   }
+
+  var caller = call(); // counter
 
   return proxy(state);
 }
 
 function proxy(state) {
   var newState = new Proxy(state, {
-    get: function get(obj, key) {
-      if (save[key]) {
-        return save[key];
-      } else {
-        return obj[key];
-      }
-    },
+    get: function get(obj, key) {},
     set: function set(obj, key, val) {
-      save[key] = val;
-      oldTree = _render.prevNode;
-      newTree = _render.vm.type(_render.vm.props);
-      var patches = (0, _diff.diff)(oldTree, newTree);
-      (0, _patch.patch)(_render.ele, patches);
       return true;
     }
   });
   return newState;
 }
-},{"./render":"src/render.js","./diff":"src/diff.js","./patch":"src/patch.js"}],"src/html.js":[function(require,module,exports) {
+
+function call() {
+  try {
+    throw new Error();
+  } catch (e) {
+    try {
+      return e.stack.match(/Object.(\S*)/)[1];
+    } catch (e) {
+      return '';
+    }
+  }
+}
+},{"./patch":"src/patch.js"}],"src/html.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -486,6 +404,7 @@ function h(type, props) {
   return {
     type: type,
     props: props,
+    key: props.key || null,
     children: children
   };
 }
@@ -493,7 +412,22 @@ function h(type, props) {
 var html = _html.default.bind(h);
 
 exports.html = html;
-},{"./html":"src/html.js"}],"src/index.js":[function(require,module,exports) {
+},{"./html":"src/html.js"}],"src/render.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.render = render;
+
+var _patch = require("./patch");
+
+function render(vnode, el) {
+  console.log(vnode);
+  var dom = (0, _patch.create)(vnode);
+  el.appendChild(dom);
+}
+},{"./patch":"src/patch.js"}],"src/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -517,16 +451,18 @@ Object.defineProperty(exports, "h", {
     return _h.h;
   }
 });
-exports.render = void 0;
+Object.defineProperty(exports, "render", {
+  enumerable: true,
+  get: function () {
+    return _render.render;
+  }
+});
 
 var _hooks = require("./hooks");
 
 var _h = require("./h");
 
 var _render = require("./render");
-
-var render = _render.mount;
-exports.render = render;
 },{"./hooks":"src/hooks.js","./h":"src/h.js","./render":"src/render.js"}],"index.js":[function(require,module,exports) {
 "use strict";
 
@@ -577,7 +513,7 @@ function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(
 function counter() {
   var state = (0, _src.useState)({
     count: 0
-  }, this);
+  });
   return (0, _src.html)(_templateObject(), (0, _src.html)(_templateObject2(), count, state.count), function () {
     state.count++;
   }, function () {
@@ -588,7 +524,7 @@ function counter() {
 function count(props) {
   var state = (0, _src.useState)({
     sex: 'boy'
-  }, this);
+  });
   return (0, _src.html)(_templateObject3(), props.count, state.sex, function () {
     state.sex = state.sex === 'boy' ? 'girl' : 'boy';
   });
@@ -622,7 +558,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62282" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63686" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

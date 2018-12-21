@@ -1,7 +1,5 @@
 import { useState } from './hooks'
 import { html, h } from './h'
-import { mount } from './render'
-
-const render = mount
+import { render } from './render'
 
 export { useState, html, h, render }

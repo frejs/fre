@@ -1,13 +1,13 @@
-import { render, html as h, useState } from './src'
+import { render, html, useState } from './src'
 
 function counter() {
   const state = useState({
     count: 0
-  },this)
+  })
 
-  return h`
+  return html`
     <div>
-      ${h`<${count} count=${state.count} />`}
+      ${html`<${count} count=${state.count} />`}
       <button onclick=${() => {state.count++}}>+</button>
       <button onclick=${() => {state.count--}}>-</button>
     </div>
@@ -17,8 +17,8 @@ function counter() {
 function count(props){
   const state = useState({
     sex:'boy'
-  },this)
-  return h`
+  })
+  return html`
     <div>
       <p>${props.count}</p>
       <p>${state.sex}</p>
@@ -27,4 +27,4 @@ function count(props){
   `
 }
 
-render(h`<${counter} />`, document.body)
+render(html`<${counter} />`, document.body)

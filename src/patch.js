@@ -1,4 +1,6 @@
-function patch(parent, dom, oldVnode, vnode) {
+export let fns
+
+export function patch(parent, dom, oldVnode, vnode) {
   if (oldVnode === vnode) {
   } else if (oldVnode.type !== vnode.type || oldVnode === null) {
     newDom = create(vnode)
@@ -43,25 +45,20 @@ function patch(parent, dom, oldVnode, vnode) {
   return dom
 }
 
-function create(vnode) {
-  let dom
-  if (typeof vnode === 'string' || typeof vnode === 'number') {
-    dom = document.createTextNode(node)
-  } else if (typeof vnode === 'function') {
-    dom = vnode.type(vnode.ptops)
-  } else {
-    dom = document.createElement(vnode.type)
-  }
+export function create(vnode) {
+  fns = filterFn(vnode)
 
-  let props = vnode.props
-  if (props) {
-    for (let name in porps) {
-      setAttrs(dom, name, props[name])
-    }
+  if (typeof vnode.type === 'function') {
+    vnode = vnode.type(vnode.props)
   }
-
+  let dom = document.createElement(vnode.type)
+  for (let name in vnode.props) {
+    setAttrs(dom, name, vnode.props[name])
+  }
   vnode.children.forEach(child => {
-    dom.appendChild(create(child))
+    child =
+      typeof child == 'object' ? create(child) : document.createTextNode(child)
+    dom.appendChild(child)
   })
 
   return dom
@@ -83,6 +80,8 @@ function setAttrs(node, name, value) {
     case 'className':
       name === 'class'
       break
+    case 'key':
+      break
     case 'value':
       if (
         node.tagName.toUpperCase() === 'INPUT' ||
@@ -99,4 +98,28 @@ function setAttrs(node, name, value) {
     default:
       node.setAttribute(name, value)
   }
+}
+
+function filterFn(obj) {
+  let fns = {}
+  return walk(obj, fns)
+}
+
+function walk(obj, fns) {
+  if (obj) {
+    Object.keys(obj).forEach(i => {
+      if (i === 'type') {
+        let f = obj[i]
+        if (typeof f === 'function') {
+          fns[f.name] = f
+        }
+      } else if (i === 'children') {
+        let arr = obj[i]
+        arr.forEach(child => {
+          walk(child, fns)
+        })
+      }
+    })
+  }
+  return fns
 }
