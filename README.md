@@ -50,7 +50,7 @@ render(html`<${counter} />`, document.body)
 
 #### functionalComponent
 
-目前只能完美支持惰性组件，子组件无状态，但是可以多次 render
+如下，目前只能完美支持惰性组件，但是可以多次 render
 
 讨论请点击 >[这里](https://github.com/132yse/fre/issues/5)<
 
