@@ -48,6 +48,37 @@ render(html`<${counter} />`, document.body)
 
 ```
 
+### Components
+
+目前只能完美支持惰性组件，子组件无状态，但是可以多次 render
+讨论点击[https://github.com/132yse/fre/issues/5](这个issue)
+
+```javaScript
+import{ render, html, useState } from 'fre'
+
+function counter() {
+  const state = useState({
+    count: 0
+  })
+
+  return html`
+    <div>
+      ${html`<${count} count=${state.count} />`}
+      <button onclick=${() => {state.count++}}>+</button>
+      <button onclick=${() => {state.count--}}>-</button>
+    </div> 
+  `
+}
+
+function count(props){
+  return html`
+    <h1>${props.count}</h1>
+  `
+}
+
+render(html`<${counter} />`, document.body)
+```
+
 #### JSX
 
 默认也对外暴露了 h 函数，可以选用 JSX
