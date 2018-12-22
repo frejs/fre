@@ -118,19 +118,15 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
 //这个方法就是，第一次渲染的时候，parent 是根节点，然后 parent 就变成 element 了
 var comps;
 exports.comps = comps;
 
 function patch(parent, element, oldVnode, vnode) {
   if (oldVnode == null) {
-    exports.comps = comps = filterFn(vnode); //首次渲染，将node 的 dom 插到 body 下
-
+    //首次渲染，将node 的 dom 插到 body 下
     element = parent.insertBefore(create(vnode), element);
   } else if (vnode.type && vnode.type === oldVnode.type) {
-    console.log(parent, element);
     update(element, oldVnode.props, vnode.props); //更新属性
 
     var reusableChildren = {}; //可以复用的孩子{key:[type,vnode]}
@@ -222,21 +218,19 @@ function patch(parent, element, oldVnode, vnode) {
 }
 
 function create(vnode) {
-  if (typeof vnode.type === 'function') {
-    vnode = vnode.type(vnode.props);
+  var element = typeof vnode === 'string' || typeof vnode === 'number' ? document.createTextNode(vnode) : document.createElement(vnode.type);
+
+  if (vnode.props) {
+    vnode.children.forEach(function (child) {
+      element.appendChild(create(child));
+    });
+
+    for (var name in vnode.props) {
+      setAttrs(element, name, vnode.props[name]);
+    }
   }
 
-  var dom = document.createElement(vnode.type);
-
-  for (var name in vnode.props) {
-    setAttrs(dom, name, vnode.props[name]);
-  }
-
-  vnode.children.forEach(function (child) {
-    child = _typeof(child) == 'object' ? create(child) : document.createTextNode(child);
-    dom.appendChild(child);
-  });
-  return dom;
+  return element;
 }
 
 function update(dom, oldProps, props) {
@@ -278,6 +272,43 @@ function setAttrs(node, name, value) {
       node.setAttribute(name, value);
   }
 }
+},{}],"src/render.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.render = render;
+exports.rerender = rerender;
+exports.comps = void 0;
+
+var _patch = require("./patch");
+
+var _hooks = require("./hooks");
+
+var parent;
+var element;
+var oldVnode;
+var vnode;
+var comps;
+exports.comps = comps;
+
+function render(vdom, el) {
+  exports.comps = comps = filterFn(vdom);
+  parent = el;
+  vnode = vdom.type();
+  rerender();
+}
+
+function rerender() {
+  if (!_hooks.once) {
+    vnode = _hooks.comp.type();
+  }
+
+  setTimeout(function () {
+    element = (0, _patch.patch)(parent, element, oldVnode, oldVnode = vnode);
+  });
+}
 
 function filterFn(obj) {
   var fns = {};
@@ -304,40 +335,6 @@ function walk(obj, fns) {
 
   return fns;
 }
-},{}],"src/render.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.render = render;
-exports.rerender = rerender;
-
-var _patch = require("./patch");
-
-var _hooks = require("./hooks");
-
-var parent;
-var element;
-var oldVnode;
-var vnode;
-
-function render(vdom, el) {
-  parent = el;
-  vnode = vdom;
-  rerender();
-}
-
-function rerender() {
-  if (!_hooks.once) {
-    vnode = _hooks.comp.type();
-  }
-
-  setTimeout(function () {
-    console.log(oldVnode, vnode);
-    element = (0, _patch.patch)(parent, element, oldVnode, oldVnode = vnode);
-  });
-}
 },{"./patch":"src/patch.js","./hooks":"src/hooks.js"}],"src/hooks.js":[function(require,module,exports) {
 "use strict";
 
@@ -349,8 +346,6 @@ exports.comp = exports.once = void 0;
 
 var _render = require("./render");
 
-var _patch = require("./patch");
-
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -360,14 +355,17 @@ var once = true;
 exports.once = once;
 var comp;
 exports.comp = comp;
+var index = 0;
 
 function useState(state) {
   if (Object.keys(golbal).length > 0) {
     state = _objectSpread({}, state, golbal);
   }
 
+  index++;
+
   if (once) {
-    exports.comp = comp = _patch.comps[c()];
+    exports.comp = comp = _render.comps[c()];
     exports.once = once = false;
   }
 
@@ -404,7 +402,7 @@ function c() {
     }
   }
 }
-},{"./render":"src/render.js","./patch":"src/patch.js"}],"src/html.js":[function(require,module,exports) {
+},{"./render":"src/render.js"}],"src/html.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -620,7 +618,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61034" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56525" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

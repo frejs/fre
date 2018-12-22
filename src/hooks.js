@@ -1,9 +1,9 @@
-import { rerender } from './render'
-import { comps, parent } from './patch'
+import { rerender,comps } from './render'
 
 let golbal = {}
 export var once = true
 export var comp
+let index = 0
 
 export function useState(state) {
   if (Object.keys(golbal).length > 0) {
@@ -12,6 +12,8 @@ export function useState(state) {
       ...golbal
     }
   }
+
+  index++
 
   if (once) {
     comp = comps[c()]

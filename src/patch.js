@@ -3,11 +3,9 @@ export var comps
 
 export function patch(parent, element, oldVnode, vnode) {
   if (oldVnode == null) {
-    comps = filterFn(vnode)
     //首次渲染，将node 的 dom 插到 body 下
     element = parent.insertBefore(create(vnode), element)
   } else if (vnode.type && vnode.type === oldVnode.type) {
-    console.log(parent,element)
     update(element, oldVnode.props, vnode.props) //更新属性
 
     var reusableChildren = {} //可以复用的孩子{key:[type,vnode]}
@@ -20,7 +18,7 @@ export function patch(parent, element, oldVnode, vnode) {
       oldElements[i] = oldElement
 
       var oldChild = oldVnode.children[i]
-      var oldKey = oldChild.props? oldChild.props.key : null
+      var oldKey = oldChild.props ? oldChild.props.key : null
 
       if (null != oldKey) {
         reusableChildren[oldKey] = [oldElement, oldChild]
@@ -94,20 +92,22 @@ export function patch(parent, element, oldVnode, vnode) {
 }
 
 export function create(vnode) {
-  if (typeof vnode.type === 'function') {
-    vnode = vnode.type(vnode.props)
-  }
-  let dom = document.createElement(vnode.type)
-  for (let name in vnode.props) {
-    setAttrs(dom, name, vnode.props[name])
-  }
-  vnode.children.forEach(child => {
-    child =
-      typeof child == 'object' ? create(child) : document.createTextNode(child)
-    dom.appendChild(child)
-  })
+  let element =
+    typeof vnode === 'string' || typeof vnode === 'number'
+      ? document.createTextNode(vnode)
+      : document.createElement(vnode.type)
 
-  return dom
+  if (vnode.props) {
+    vnode.children.forEach(child => {
+      element.appendChild(create(child))
+    })
+
+    for (let name in vnode.props) {
+      setAttrs(element, name, vnode.props[name])
+    }
+  }
+
+  return element
 }
 
 function update(dom, oldProps, props) {
@@ -144,28 +144,4 @@ function setAttrs(node, name, value) {
     default:
       node.setAttribute(name, value)
   }
-}
-
-function filterFn(obj) {
-  let fns = {}
-  return walk(obj, fns)
-}
-
-function walk(obj, fns) {
-  if (obj) {
-    Object.keys(obj).forEach(i => {
-      if (i === 'type') {
-        let f = obj[i]
-        if (typeof f === 'function') {
-          fns[f.name] = obj
-        }
-      } else if (i === 'children') {
-        let arr = obj[i]
-        arr.forEach(child => {
-          walk(child, fns)
-        })
-      }
-    })
-  }
-  return fns
 }
