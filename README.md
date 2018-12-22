@@ -50,9 +50,9 @@ render(html`<${counter} />`, document.body)
 
 #### functionalComponent
 
-如下，目前只能完美支持惰性组件，但是可以多次 render
+如下，fre 的组件化并没有 react 的靠谱，组件是“蠢笨”的可供复用的代码块，只有跟组件拥有状态，但这妨碍你进行多次 render 创造多个跟组件
 
-讨论请点击 >[这里](https://github.com/132yse/fre/issues/5)<
+更多讨论请点击 >[这里](https://github.com/132yse/fre/issues/5)<
 
 ```javaScript
 import{ render, html, useState } from 'fre'

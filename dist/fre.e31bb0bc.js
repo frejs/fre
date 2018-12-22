@@ -131,6 +131,7 @@ function patch(parent, element, oldVnode, vnode) {
     if (typeof vnode.type === 'function') {
       vnode = vnode.type(vnode.props);
       oldVnode = oldVnode.type(oldVnode.props);
+      console.log(vnode, oldVnode);
       patch(parent, element, oldVnode, vnode);
     }
 
@@ -242,11 +243,11 @@ function create(vnode) {
   return element;
 }
 
-function update(dom, oldProps, props) {
+function update(element, oldProps, props) {
   var cloneProps = _objectSpread({}, oldProps, props);
 
   for (var name in cloneProps) {
-    setAttrs(dom, name, cloneProps[name]);
+    setAttrs(element, name, cloneProps[name]);
   }
 }
 
@@ -349,25 +350,12 @@ function proxy(state) {
     },
     set: function set(obj, key, val) {
       golbal[key] = val;
-      obj[key] = val; //这里怎样知道是哪个函数调用的
-
+      obj[key] = val;
       (0, _render.rerender)();
       return true;
     }
   });
   return newState;
-}
-
-function c() {
-  try {
-    throw new Error();
-  } catch (e) {
-    try {
-      return e.stack.match(/Object.(\S*)/)[1];
-    } catch (e) {
-      return '';
-    }
-  }
 }
 },{"./render":"src/render.js"}],"src/html.js":[function(require,module,exports) {
 "use strict";
@@ -609,7 +597,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55454" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64760" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

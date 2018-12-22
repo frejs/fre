@@ -10,6 +10,7 @@ export function patch(parent, element, oldVnode, vnode) {
     if (typeof vnode.type === 'function') {
       vnode = vnode.type(vnode.props)
       oldVnode = oldVnode.type(oldVnode.props)
+      console.log(vnode,oldVnode)
       patch(parent, element, oldVnode, vnode)
     }
     update(element, oldVnode.props, vnode.props) //更新属性
