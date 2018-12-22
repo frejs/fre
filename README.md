@@ -48,7 +48,7 @@ render(html`<${counter} />`, document.body)
 
 ```
 
-### Components
+#### functionalComponent
 
 目前只能完美支持惰性组件，子组件无状态，但是可以多次 render
 
