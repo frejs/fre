@@ -20,7 +20,7 @@ function build(statics) {
     .replace(/<([\w:-]+)(?:\s[^<>]*?)?(\/?)>/g,(str, name, a) => str.replace(/(?:'.*?'|".*?"|([A-Z]))/g, (s, c) => (c ? ':::' + c : s)) + (a ? '</' + name + '>' : ''))
     .replace(/[\r\n]|\ \ +/g,'')
     .trim()
-
+    
   return Function('h','$_h','return ' + walk((TEMPLATE.content || TEMPLATE).firstChild))
 }
 

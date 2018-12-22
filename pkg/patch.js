@@ -1,6 +1,6 @@
-
-
 export function patch(parent, element, oldNode, node) {
+  console.log('111')
+  console.log(c())
   if (oldNode == null) {
     //首次渲染，将node 的 dom 插到 body 下
     element = parent.insertBefore(create(node), element)
@@ -142,5 +142,17 @@ function setAttrs(node, name, value) {
       break
     default:
       node.setAttribute(name, value)
+  }
+}
+
+function c() {
+  try {
+    throw new Error()
+  } catch (e) {
+    try {
+      return e.stack
+    } catch (e) {
+      return ''
+    }
   }
 }

@@ -123,6 +123,8 @@ var comps;
 exports.comps = comps;
 
 function patch(parent, element, oldVnode, vnode) {
+  console.log(c());
+
   if (oldVnode == null) {
     //首次渲染，将node 的 dom 插到 body 下
     element = parent.insertBefore(create(vnode), element);
@@ -570,8 +572,28 @@ var _render = require("./render");
 
 var _src = require("./src");
 
-function _templateObject2() {
+function _templateObject4() {
   var data = _taggedTemplateLiteral(["<", " />"]);
+
+  _templateObject4 = function _templateObject4() {
+    return data;
+  };
+
+  return data;
+}
+
+function _templateObject3() {
+  var data = _taggedTemplateLiteral(["\n    <div>\n      <p>", "</p>\n      <p>", "</p>\n      <button onclick=", ">x</button>\n    </div>\n  "]);
+
+  _templateObject3 = function _templateObject3() {
+    return data;
+  };
+
+  return data;
+}
+
+function _templateObject2() {
+  var data = _taggedTemplateLiteral(["<", " count=", " />"]);
 
   _templateObject2 = function _templateObject2() {
     return data;
@@ -581,7 +603,7 @@ function _templateObject2() {
 }
 
 function _templateObject() {
-  var data = _taggedTemplateLiteral(["\n    <div>\n      <p key=\"p\">", "</p>\n      <button onclick=", " key=\"+\">+</button>\n      <button onclick=", " key=\"-\">-</button>\n    </div>\n  "]);
+  var data = _taggedTemplateLiteral(["\n    <div>\n      ", "\n      <button onclick=", ">+</button>\n      <button onclick=", ">-</button>\n    </div> \n  "]);
 
   _templateObject = function _templateObject() {
     return data;
@@ -596,14 +618,23 @@ function counter() {
   var state = (0, _src.useState)({
     count: 0
   });
-  return (0, _src.html)(_templateObject(), state.count, function () {
+  return (0, _src.html)(_templateObject(), (0, _src.html)(_templateObject2(), count, state.count), function () {
     state.count++;
   }, function () {
     state.count--;
   });
 }
 
-(0, _src.render)((0, _src.html)(_templateObject2(), counter), document.body);
+function count(props) {
+  var state = (0, _src.useState)({
+    sex: 'boy'
+  });
+  return (0, _src.html)(_templateObject3(), props.count, state.sex, function () {
+    state.sex = state.sex === 'boy' ? 'girl' : 'boy';
+  });
+}
+
+(0, _src.render)((0, _src.html)(_templateObject4(), counter), document.body);
 },{"./src":"src/index.js"}],"C:/Users/admin/AppData/Local/Yarn/Data/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -631,7 +662,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63898" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64887" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

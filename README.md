@@ -38,23 +38,10 @@ function counter() {
 
   return html`
     <div>
-      ${html`<${count} count=${state.count} />`}
+      <h1>${state.count}</h1>
       <button onclick=${() => {state.count++}}>+</button>
       <button onclick=${() => {state.count--}}>-</button>
     </div> 
-  `
-}
-
-function count(props){
-  const state = useState({
-    sex:'boy'
-  })
-  return html`
-    <div>
-      <p>${props.count}</p>
-      <p>${state.sex}</p>
-      <button onclick=${()=>{state.sex=state.sex==='boy'?'girl':'boy'}}>x</button>
-    </div>
   `
 }
 
