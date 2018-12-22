@@ -19,15 +19,6 @@ const proxyClone = obj => {
 
   return new Proxy(Object.prototype, {
     getPrototypeOf: () => Object.getPrototypeOf(obj),
-    setPrototypeOf: () => {
-      throw new Error('Not yet implemented: setPrototypeOf')
-    },
-    isExtensible: () => {
-      throw new Error('Not yet implemented: isExtensible')
-    },
-    preventExtensions: () => {
-      throw new Error('Not yet implemented: preventExtensions')
-    },
     getOwnPropertyDescriptor: (target, name) => {
       let desc
       if (!deleted[name]) {

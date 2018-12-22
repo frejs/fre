@@ -1,35 +1,45 @@
-import { rerender, comps } from './render'
+import { rerender } from './render'
 
 let golbal = {}
-export var once = true
+const override = Object.create(null)
+const deleted = Object.create(null)
 
 export function useState(state) {
-  if (Object.keys(golbal).length > 0) {
+  if (Object.keys(override).length > 0) {
     state = {
       ...state,
-      ...golbal
+      ...override
     }
   }
 
   return proxy(state)
 }
 
-function proxy(state) {
-  let newState = new Proxy(state, {
-    get(obj, key) {
-      if (golbal[key]) {
-        return golbal[key]
-      } else {
-        return obj[key]
-      }
-    },
-    set(obj, key, val) {
-      golbal[key] = val
-      obj[key] = val
-      rerender()
-      return true
+function proxy(obj) {
+  function get(key) {
+    let value
+    if (!deleted[key]) value = override[key] || obj[key]
+    if (typeof value === 'object') {
+      value = proxy(value)
+      override[key] = value
     }
-  })
+    return value
+  }
+
+  let newState = new Proxy(
+    {},
+    {
+      get(_, key) {
+        return get(key)
+      },
+      set(_, key, val) {
+        override[key] = val
+        delete deleted[key]
+        rerender()
+        return true
+      }
+    }
+  )
 
   return newState
 }

@@ -2,15 +2,17 @@ import{ render, html, useState } from './src'
 
 function counter() {
   const state = useState({
-    count: 0
+    count: {
+      num:0
+    }
   })
 
   return html`
     <div>
-      ${html`<${count} count=${state.count} />`}
+      ${html`<${count} count=${state.count.nu} />`}
       <button onclick=${() => {state.count++}}>+</button>
       <button onclick=${() => {state.count--}}>-</button>
-    </div> 
+    </div>
   `
 }
 
@@ -21,3 +23,10 @@ function count(props){
 }
 
 render(html`<${counter} />`, document.body)
+
+// let state = {
+//   count: 1,
+//   sex: {
+//     sex: 'boy'
+//   }
+// }

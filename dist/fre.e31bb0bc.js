@@ -319,38 +319,47 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.useState = useState;
-exports.once = void 0;
 
 var _render = require("./render");
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var golbal = {};
-var once = true;
-exports.once = once;
+var override = Object.create(null);
+var deleted = Object.create(null);
 
 function useState(state) {
-  if (Object.keys(golbal).length > 0) {
-    state = _objectSpread({}, state, golbal);
+  if (Object.keys(override).length > 0) {
+    state = _objectSpread({}, state, override);
   }
 
   return proxy(state);
 }
 
-function proxy(state) {
-  var newState = new Proxy(state, {
-    get: function get(obj, key) {
-      if (golbal[key]) {
-        return golbal[key];
-      } else {
-        return obj[key];
-      }
+function proxy(obj) {
+  function _get(key) {
+    var value;
+    if (!deleted[key]) value = override[key] || obj[key];
+
+    if (_typeof(value) === 'object') {
+      value = proxy(value);
+      override[key] = value;
+    }
+
+    return value;
+  }
+
+  var newState = new Proxy({}, {
+    get: function get(_, key) {
+      return _get(key);
     },
-    set: function set(obj, key, val) {
-      golbal[key] = val;
-      obj[key] = val;
+    set: function set(_, key, val) {
+      override[key] = val;
+      delete deleted[key];
       (0, _render.rerender)();
       return true;
     }
@@ -543,7 +552,7 @@ function _templateObject2() {
 }
 
 function _templateObject() {
-  var data = _taggedTemplateLiteral(["\n    <div>\n      ", "\n      <button onclick=", ">+</button>\n      <button onclick=", ">-</button>\n    </div> \n  "]);
+  var data = _taggedTemplateLiteral(["\n    <div>\n      ", "\n      <button onclick=", ">+</button>\n      <button onclick=", ">-</button>\n    </div>\n  "]);
 
   _templateObject = function _templateObject() {
     return data;
@@ -556,9 +565,11 @@ function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(
 
 function counter() {
   var state = (0, _src.useState)({
-    count: 0
+    count: {
+      num: 0
+    }
   });
-  return (0, _src.html)(_templateObject(), (0, _src.html)(_templateObject2(), count, state.count), function () {
+  return (0, _src.html)(_templateObject(), (0, _src.html)(_templateObject2(), count, state.count.nu), function () {
     state.count++;
   }, function () {
     state.count--;
@@ -569,7 +580,12 @@ function count(props) {
   return (0, _src.html)(_templateObject3(), props.count);
 }
 
-(0, _src.render)((0, _src.html)(_templateObject4(), counter), document.body);
+(0, _src.render)((0, _src.html)(_templateObject4(), counter), document.body); // let state = {
+//   count: 1,
+//   sex: {
+//     sex: 'boy'
+//   }
+// }
 },{"./src":"src/index.js"}],"C:/Users/admin/AppData/Local/Yarn/Data/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -597,7 +613,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64760" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55468" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
