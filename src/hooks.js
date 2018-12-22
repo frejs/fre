@@ -26,23 +26,10 @@ function proxy(state) {
     set(obj, key, val) {
       golbal[key] = val
       obj[key] = val
-      //这里怎样知道是哪个函数调用的
       rerender()
       return true
     }
   })
 
   return newState
-}
-
-function c() {
-  try {
-    throw new Error()
-  } catch (e) {
-    try {
-      return e.stack.match(/Object.(\S*)/)[1]
-    } catch (e) {
-      return ''
-    }
-  }
 }

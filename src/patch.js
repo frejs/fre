@@ -117,10 +117,10 @@ export function create(vnode) {
   return element
 }
 
-function update(dom, oldProps, props) {
+function update(element, oldProps, props) {
   let cloneProps = { ...oldProps, ...props }
   for (let name in cloneProps) {
-    setAttrs(dom, name, cloneProps[name])
+    setAttrs(element, name, cloneProps[name])
   }
 }
 
