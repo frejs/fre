@@ -12,7 +12,7 @@ export function useState(state) {
     }
   }
 
-  comp = comps['counter']
+  comp = comps[c()]
   return proxy(state)
 }
 
@@ -28,6 +28,7 @@ function proxy(state) {
     set(obj, key, val) {
       golbal[key] = val
       obj[key] = val
+      //这里怎样知道是哪个函数调用的
       rerender()
       return true
     }

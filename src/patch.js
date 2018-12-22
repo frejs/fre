@@ -2,7 +2,6 @@
 export var comps
 
 export function patch(parent, element, oldVnode, vnode) {
-  console.log(c())
   if (oldVnode == null) {
     //首次渲染，将node 的 dom 插到 body 下
     element = parent.insertBefore(create(vnode), element)
