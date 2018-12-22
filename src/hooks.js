@@ -2,7 +2,6 @@ import { rerender, comps } from './render'
 
 let golbal = {}
 export var once = true
-export var comp
 
 export function useState(state) {
   if (Object.keys(golbal).length > 0) {
@@ -12,7 +11,6 @@ export function useState(state) {
     }
   }
 
-  comp = comps[c()]
   return proxy(state)
 }
 

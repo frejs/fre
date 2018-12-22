@@ -17,7 +17,6 @@
 ### Introduction
 
 Fre (pronounced `/fri:/`, like free) is a tiny and perfect javascript library
-<p style="color:#f2e">暂时不能用于生产环境，还有一个大坑没搞，寒假再战！</p>
 
 
 ### Install

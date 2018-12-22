@@ -18,18 +18,16 @@ export function patch(parent, element, oldVnode, vnode) {
     var oldElements = [] //旧的真实元素
     var newKeys = {} //新的vnode {key:vnode}
 
-    for (var i = 0; i < oldVnode.children.length; i++) {
-      //循环旧的 vnode，这次循环主要是筛选出带key，可以复用的vnode，最终是{key:[type,vnode]}
-      var oldElement = element.childNodes[i]
-      oldElements[i] = oldElement
-
-      var oldChild = oldVnode.children[i]
+    //遍历旧的 vnode，这次循环主要是筛选出带key，可以复用的vnode，最终是{key:[type,vnode]}
+    oldVnode.children.forEach((oldChild, index) => {
+      var oldElement = element.childNodes[index]
+      oldElements[index] = oldElement
       var oldKey = oldChild.props ? oldChild.props.key : null
 
       if (null != oldKey) {
         reusableChildren[oldKey] = [oldElement, oldChild]
       }
-    }
+    })
 
     var i = 0
     var j = 0
@@ -81,7 +79,7 @@ export function patch(parent, element, oldVnode, vnode) {
       i++
     }
 
-    for (var i in reusableChildren) {
+    for (let i in reusableChildren) {
       var reusableChild = reusableChildren[i]
       var reusableNode = reusableChild[1]
       if (!newKeys[reusableNode.props.key]) {

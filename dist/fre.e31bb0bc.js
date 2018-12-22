@@ -141,19 +141,17 @@ function patch(parent, element, oldVnode, vnode) {
     var oldElements = []; //旧的真实元素
 
     var newKeys = {}; //新的vnode {key:vnode}
+    //遍历旧的 vnode，这次循环主要是筛选出带key，可以复用的vnode，最终是{key:[type,vnode]}
 
-    for (var i = 0; i < oldVnode.children.length; i++) {
-      //循环旧的 vnode，这次循环主要是筛选出带key，可以复用的vnode，最终是{key:[type,vnode]}
-      var oldElement = element.childNodes[i];
-      oldElements[i] = oldElement;
-      var oldChild = oldVnode.children[i];
+    oldVnode.children.forEach(function (oldChild, index) {
+      var oldElement = element.childNodes[index];
+      oldElements[index] = oldElement;
       var oldKey = oldChild.props ? oldChild.props.key : null;
 
       if (null != oldKey) {
         reusableChildren[oldKey] = [oldElement, oldChild];
       }
-    }
-
+    });
     var i = 0;
     var j = 0;
 
@@ -207,8 +205,8 @@ function patch(parent, element, oldVnode, vnode) {
       i++;
     }
 
-    for (var i in reusableChildren) {
-      var reusableChild = reusableChildren[i];
+    for (var _i in reusableChildren) {
+      var reusableChild = reusableChildren[_i];
       var reusableNode = reusableChild[1];
 
       if (!newKeys[reusableNode.props.key]) {
@@ -291,78 +289,36 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.render = render;
 exports.rerender = rerender;
-exports.comps = void 0;
 
 var _patch = require("./patch");
-
-var _hooks = require("./hooks");
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var parent;
 var element;
 var oldVnode;
 var vnode;
-var comps;
-exports.comps = comps;
+var root;
 
 function render(vdom, el) {
-  exports.comps = comps = filterFn(vdom);
+  root = vdom;
   parent = el;
   vnode = vdom.type();
-
-  if (vnode.children) {
-    vnode.children.forEach(function (child) {
-      var fns = filterFn(child);
-      exports.comps = comps = _objectSpread({}, comps, fns);
-    });
-  }
-
   rerender();
 }
 
 function rerender() {
-  vnode = _hooks.comp.type(_hooks.comp.props);
+  vnode = root.type(root.props);
   setTimeout(function () {
     element = (0, _patch.patch)(parent, element, oldVnode, oldVnode = vnode);
   });
 }
-
-function filterFn(obj) {
-  var fns = {};
-  return walk(obj, fns);
-}
-
-function walk(obj, fns) {
-  if (obj) {
-    Object.keys(obj).forEach(function (i) {
-      if (i === 'type') {
-        var f = obj[i];
-
-        if (typeof f === 'function') {
-          fns[f.name] = obj;
-        }
-      } else if (i === 'children') {
-        var arr = obj[i];
-        arr.forEach(function (child) {
-          walk(child, fns);
-        });
-      }
-    });
-  }
-
-  return fns;
-}
-},{"./patch":"src/patch.js","./hooks":"src/hooks.js"}],"src/hooks.js":[function(require,module,exports) {
+},{"./patch":"src/patch.js"}],"src/hooks.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.useState = useState;
-exports.comp = exports.once = void 0;
+exports.once = void 0;
 
 var _render = require("./render");
 
@@ -373,15 +329,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 var golbal = {};
 var once = true;
 exports.once = once;
-var comp;
-exports.comp = comp;
 
 function useState(state) {
   if (Object.keys(golbal).length > 0) {
     state = _objectSpread({}, state, golbal);
   }
 
-  exports.comp = comp = _render.comps[c()];
   return proxy(state);
 }
 
@@ -571,8 +524,28 @@ var _render = require("./render");
 
 var _src = require("./src");
 
-function _templateObject2() {
+function _templateObject4() {
   var data = _taggedTemplateLiteral(["<", " />"]);
+
+  _templateObject4 = function _templateObject4() {
+    return data;
+  };
+
+  return data;
+}
+
+function _templateObject3() {
+  var data = _taggedTemplateLiteral(["\n    <h1>", "</h1>\n  "]);
+
+  _templateObject3 = function _templateObject3() {
+    return data;
+  };
+
+  return data;
+}
+
+function _templateObject2() {
+  var data = _taggedTemplateLiteral(["<", " count=", " />"]);
 
   _templateObject2 = function _templateObject2() {
     return data;
@@ -582,7 +555,7 @@ function _templateObject2() {
 }
 
 function _templateObject() {
-  var data = _taggedTemplateLiteral(["\n    <div>\n      <h1>", "</h1>\n      <button onclick=", ">+</button>\n      <button onclick=", ">-</button>\n    </div> \n  "]);
+  var data = _taggedTemplateLiteral(["\n    <div>\n      ", "\n      <button onclick=", ">+</button>\n      <button onclick=", ">-</button>\n    </div> \n  "]);
 
   _templateObject = function _templateObject() {
     return data;
@@ -597,14 +570,18 @@ function counter() {
   var state = (0, _src.useState)({
     count: 0
   });
-  return (0, _src.html)(_templateObject(), state.count, function () {
+  return (0, _src.html)(_templateObject(), (0, _src.html)(_templateObject2(), count, state.count), function () {
     state.count++;
   }, function () {
     state.count--;
   });
 }
 
-(0, _src.render)((0, _src.html)(_templateObject2(), counter), document.body);
+function count(props) {
+  return (0, _src.html)(_templateObject3(), props.count);
+}
+
+(0, _src.render)((0, _src.html)(_templateObject4(), counter), document.body);
 },{"./src":"src/index.js"}],"C:/Users/admin/AppData/Local/Yarn/Data/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -632,7 +609,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51946" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55454" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

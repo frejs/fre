@@ -7,10 +7,16 @@ function counter() {
 
   return html`
     <div>
-      <h1>${state.count}</h1>
+      ${html`<${count} count=${state.count} />`}
       <button onclick=${() => {state.count++}}>+</button>
       <button onclick=${() => {state.count--}}>-</button>
     </div> 
+  `
+}
+
+function count(props){
+  return html`
+    <h1>${props.count}</h1>
   `
 }
 
