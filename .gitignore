@@ -3,3 +3,5 @@
 /.cache/
 yarn.lock
 yarn-error.log
+ignore.js
+/pkg/

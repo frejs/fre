@@ -9,9 +9,9 @@ function counter() {
 
   return html`
     <div>
-      ${html`<${count} count=${state.count.nu} />`}
-      <button onclick=${() => {state.count++}}>+</button>
-      <button onclick=${() => {state.count--}}>-</button>
+      ${html`<${count} count=${state.count.num} />`}
+      <button onclick=${() => {state.count.num++}}>+</button>
+      <button onclick=${() => {state.count.num--}}>-</button>
     </div>
   `
 }
@@ -23,10 +23,3 @@ function count(props){
 }
 
 render(html`<${counter} />`, document.body)
-
-// let state = {
-//   count: 1,
-//   sex: {
-//     sex: 'boy'
-//   }
-// }

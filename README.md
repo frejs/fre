@@ -50,7 +50,7 @@ render(html`<${counter} />`, document.body)
 
 #### functionalComponent
 
-如下，fre 的组件化并没有 react 的靠谱，组件是无自身状态的可复用的代码块
+如下，fre 和 vue、react 不同，fre 的组件是无自身状态、可复用的标记代码块
 
 只有跟组件拥有全局状态，但这不妨碍你进行多次 render 创造多个跟组件
 
@@ -92,7 +92,7 @@ webpack 需配置：
 ```JavaScript
 {
   "plugins": [
-    ["transform-react-jsx", { "pragma":"fre.h" }]
+    ["transform-react-jsx", { "pragma":"Fre.h" }]
   ]
 }
 ```
@@ -104,4 +104,4 @@ webpack 需配置：
 《fre 揭秘系列：Function.caller 替代方案》：[github](https://github.com/frontend9/fe9-library/issues/188)
 
 #### License
-MIT · Inspirated by react & vue & htm
+MIT · Inspirated by react & vue & htm & hyperapp
