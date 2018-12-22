@@ -6,6 +6,12 @@ export function patch(parent, element, oldVnode, vnode) {
     //首次渲染，将node 的 dom 插到 body 下
     element = parent.insertBefore(create(vnode), element)
   } else if (vnode.type && vnode.type === oldVnode.type) {
+    //标签相同，就更新属性，但是如果都是function的话，那就没办法
+    if (typeof vnode.type === 'function') {
+      vnode = vnode.type(vnode.props)
+      oldVnode = oldVnode.type(oldVnode.props)
+      patch(parent, element, oldVnode, vnode)
+    }
     update(element, oldVnode.props, vnode.props) //更新属性
 
     var reusableChildren = {} //可以复用的孩子{key:[type,vnode]}
@@ -92,6 +98,9 @@ export function patch(parent, element, oldVnode, vnode) {
 }
 
 export function create(vnode) {
+  if (typeof vnode.type === 'function') {
+    vnode = vnode.type(vnode.props)
+  }
   let element =
     typeof vnode === 'string' || typeof vnode === 'number'
       ? document.createTextNode(vnode)

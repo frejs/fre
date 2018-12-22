@@ -1,5 +1,5 @@
 import { patch } from './patch'
-import { comp, once } from './hooks'
+import { comp } from './hooks'
 
 let parent
 let element
@@ -11,13 +11,18 @@ export function render(vdom, el) {
   comps = filterFn(vdom)
   parent = el
   vnode = vdom.type()
+  if (vnode.children) {
+    vnode.children.forEach(child => {
+      const fns = filterFn(child)
+      comps = { ...comps, ...fns }
+    })
+  }
   rerender()
 }
 
 export function rerender() {
-  if (!once) {
-    vnode = comp.type()
-  }
+  vnode = comp.type(comp.props)
+  
   setTimeout(() => {
     element = patch(parent, element, oldVnode, (oldVnode = vnode))
   })

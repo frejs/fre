@@ -127,6 +127,13 @@ function patch(parent, element, oldVnode, vnode) {
     //首次渲染，将node 的 dom 插到 body 下
     element = parent.insertBefore(create(vnode), element);
   } else if (vnode.type && vnode.type === oldVnode.type) {
+    //标签相同，就更新属性，但是如果都是function的话，那就没办法
+    if (typeof vnode.type === 'function') {
+      vnode = vnode.type(vnode.props);
+      oldVnode = oldVnode.type(oldVnode.props);
+      patch(parent, element, oldVnode, vnode);
+    }
+
     update(element, oldVnode.props, vnode.props); //更新属性
 
     var reusableChildren = {}; //可以复用的孩子{key:[type,vnode]}
@@ -218,6 +225,10 @@ function patch(parent, element, oldVnode, vnode) {
 }
 
 function create(vnode) {
+  if (typeof vnode.type === 'function') {
+    vnode = vnode.type(vnode.props);
+  }
+
   var element = typeof vnode === 'string' || typeof vnode === 'number' ? document.createTextNode(vnode) : document.createElement(vnode.type);
 
   if (vnode.props) {
@@ -286,6 +297,10 @@ var _patch = require("./patch");
 
 var _hooks = require("./hooks");
 
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var parent;
 var element;
 var oldVnode;
@@ -297,14 +312,19 @@ function render(vdom, el) {
   exports.comps = comps = filterFn(vdom);
   parent = el;
   vnode = vdom.type();
+
+  if (vnode.children) {
+    vnode.children.forEach(function (child) {
+      var fns = filterFn(child);
+      exports.comps = comps = _objectSpread({}, comps, fns);
+    });
+  }
+
   rerender();
 }
 
 function rerender() {
-  if (!_hooks.once) {
-    vnode = _hooks.comp.type();
-  }
-
+  vnode = _hooks.comp.type(_hooks.comp.props);
   setTimeout(function () {
     element = (0, _patch.patch)(parent, element, oldVnode, oldVnode = vnode);
   });
@@ -355,20 +375,13 @@ var once = true;
 exports.once = once;
 var comp;
 exports.comp = comp;
-var index = 0;
 
 function useState(state) {
   if (Object.keys(golbal).length > 0) {
     state = _objectSpread({}, state, golbal);
   }
 
-  index++;
-
-  if (once) {
-    exports.comp = comp = _render.comps[c()];
-    exports.once = once = false;
-  }
-
+  exports.comp = comp = _render.comps['counter'];
   return proxy(state);
 }
 
@@ -557,8 +570,28 @@ var _render = require("./render");
 
 var _src = require("./src");
 
-function _templateObject2() {
+function _templateObject4() {
   var data = _taggedTemplateLiteral(["<", " />"]);
+
+  _templateObject4 = function _templateObject4() {
+    return data;
+  };
+
+  return data;
+}
+
+function _templateObject3() {
+  var data = _taggedTemplateLiteral(["\n    <div>\n      <p>", "</p>\n      <p>", "</p>\n      <button onclick=", ">x</button>\n    </div>\n  "]);
+
+  _templateObject3 = function _templateObject3() {
+    return data;
+  };
+
+  return data;
+}
+
+function _templateObject2() {
+  var data = _taggedTemplateLiteral(["<", " count=", " />"]);
 
   _templateObject2 = function _templateObject2() {
     return data;
@@ -568,7 +601,7 @@ function _templateObject2() {
 }
 
 function _templateObject() {
-  var data = _taggedTemplateLiteral(["\n    <div>\n      <p key=\"p\">", "</p>\n      <button onclick=", " key=\"+\">+</button>\n      <button onclick=", " key=\"-\">-</button>\n    </div>\n  "]);
+  var data = _taggedTemplateLiteral(["\n    <div>\n      ", "\n      <button onclick=", ">+</button>\n      <button onclick=", ">-</button>\n    </div> \n  "]);
 
   _templateObject = function _templateObject() {
     return data;
@@ -583,14 +616,23 @@ function counter() {
   var state = (0, _src.useState)({
     count: 0
   });
-  return (0, _src.html)(_templateObject(), state.count, function () {
+  return (0, _src.html)(_templateObject(), (0, _src.html)(_templateObject2(), count, state.count), function () {
     state.count++;
   }, function () {
     state.count--;
   });
 }
 
-(0, _src.render)((0, _src.html)(_templateObject2(), counter), document.body);
+function count(props) {
+  var state = (0, _src.useState)({
+    sex: 'boy'
+  });
+  return (0, _src.html)(_templateObject3(), props.count, state.sex, function () {
+    state.sex = state.sex === 'boy' ? 'girl' : 'boy';
+  });
+}
+
+(0, _src.render)((0, _src.html)(_templateObject4(), counter), document.body);
 },{"./src":"src/index.js"}],"C:/Users/admin/AppData/Local/Yarn/Data/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -618,7 +660,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56525" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56870" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

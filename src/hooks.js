@@ -1,9 +1,8 @@
-import { rerender,comps } from './render'
+import { rerender, comps } from './render'
 
 let golbal = {}
 export var once = true
 export var comp
-let index = 0
 
 export function useState(state) {
   if (Object.keys(golbal).length > 0) {
@@ -13,12 +12,7 @@ export function useState(state) {
     }
   }
 
-  index++
-
-  if (once) {
-    comp = comps[c()]
-    once = false
-  }
+  comp = comps['counter']
   return proxy(state)
 }
 
