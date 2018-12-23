@@ -117,6 +117,14 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
 function patch(parent, element, oldVnode, vnode) {
   if (oldVnode == vnode) {} else if (oldVnode == null) {
     element = parent.insertBefore(create(vnode), element);
@@ -203,7 +211,9 @@ function patch(parent, element, oldVnode, vnode) {
 
 function create(vnode) {
   if (typeof vnode.type === 'function') {
-    vnode = vnode.type(vnode.props);
+    var _vnode;
+
+    vnode = (_vnode = vnode).type.apply(_vnode, [vnode.props].concat(_toConsumableArray(vnode.children)));
   }
 
   var element = typeof vnode === 'string' || typeof vnode === 'number' ? document.createTextNode(vnode) : document.createElement(vnode.type);
@@ -498,28 +508,8 @@ var _render = require("./render");
 
 var _src = require("./src");
 
-function _templateObject4() {
-  var data = _taggedTemplateLiteral(["<", " />"]);
-
-  _templateObject4 = function _templateObject4() {
-    return data;
-  };
-
-  return data;
-}
-
-function _templateObject3() {
-  var data = _taggedTemplateLiteral(["\n    <h1>", "</h1>\n  "]);
-
-  _templateObject3 = function _templateObject3() {
-    return data;
-  };
-
-  return data;
-}
-
 function _templateObject2() {
-  var data = _taggedTemplateLiteral(["<", " count=", " />"]);
+  var data = _taggedTemplateLiteral(["<", " />"]);
 
   _templateObject2 = function _templateObject2() {
     return data;
@@ -529,7 +519,7 @@ function _templateObject2() {
 }
 
 function _templateObject() {
-  var data = _taggedTemplateLiteral(["\n    <div>\n      ", "\n      <button onclick=", ">+</button>\n      <button onclick=", ">-</button>\n    </div>\n  "]);
+  var data = _taggedTemplateLiteral(["\n    <div class=main>\n      <section class=top>\n        <div class=logo>\n          <img src=\"https://ws1.sinaimg.cn/large/0065Zy9egy1fygjdcy3u5j3096097weo.jpg\"/>\n          <p><b>Fre</b> - \u53C8\u4E00\u4E2A\u5C0F\u800C\u7F8E\u7684\u524D\u7AEF MVVM \u6846\u67B6.</p>\n          <div class=option>\n            <a href=\"https://github.com/132yse/fre#use\">\u8D77\u6B65</a>\n            <a href=\"https://github.com/132yse/fre\">github</a>\n          </div>\n        </div>\n      </section>\n    </div>\n  "]);
 
   _templateObject = function _templateObject() {
     return data;
@@ -540,24 +530,11 @@ function _templateObject() {
 
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 
-function counter() {
-  var state = (0, _src.observe)({
-    count: {
-      num: 0
-    }
-  });
-  return (0, _src.html)(_templateObject(), (0, _src.html)(_templateObject2(), count, state.count.num), function () {
-    state.count.num++;
-  }, function () {
-    state.count.num--;
-  });
+function app() {
+  return (0, _src.html)(_templateObject());
 }
 
-function count(props) {
-  return (0, _src.html)(_templateObject3(), props.count);
-}
-
-(0, _src.mount)((0, _src.html)(_templateObject4(), counter), document.body);
+(0, _src.mount)((0, _src.html)(_templateObject2(), app), document.body);
 },{"./src":"src/index.js"}],"C:/Users/admin/AppData/Local/Yarn/Data/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -585,7 +562,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50211" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61831" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

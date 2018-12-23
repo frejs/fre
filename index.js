@@ -1,25 +1,19 @@
 import{ mount, html, observe } from './src'
 
-function counter() {
-  const state = observe({
-    count: {
-      num:0
-    }
-  })
+function app() {
 
   return html`
-    <div>
-      ${html`<${count} count=${state.count.num} />`}
-      <button onclick=${() => {state.count.num++}}>+</button>
-      <button onclick=${() => {state.count.num--}}>-</button>
-    </div>
+    <section class=top>
+      <div class=logo>
+        <img src="https://ws1.sinaimg.cn/large/0065Zy9egy1fygjdcy3u5j3096097weo.jpg"/>
+        <p><b>Fre</b> - 又一个小而美的前端 MVVM 框架.</p>
+        <div class=option>
+          <a href="https://github.com/132yse/fre#use">起步</a>
+          <a href="https://github.com/132yse/fre">github</a>
+        </div>
+      </div>
+    </section>
   `
 }
 
-function count(props){
-  return html`
-    <h1>${props.count}</h1>
-  `
-}
-
-mount(html`<${counter} />`, document.body)
+mount(html`<${app} />`, document.body)

@@ -85,7 +85,7 @@ export function patch(parent, element, oldVnode, vnode) {
 
 export function create(vnode) {
   if (typeof vnode.type === 'function') {
-    vnode = vnode.type(vnode.props)
+    vnode = vnode.type(vnode.props, ...vnode.children)
   }
   let element =
     typeof vnode === 'string' || typeof vnode === 'number'
