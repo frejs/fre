@@ -1,5 +1,6 @@
 export function patch(parent, element, oldVnode, vnode) {
-  if (oldVnode == null) {
+  if (oldVnode == vnode) {
+  } else if (oldVnode == null) {
     element = parent.insertBefore(create(vnode), element)
   } else if (vnode.type && vnode.type === oldVnode.type) {
     if (typeof vnode.type === 'function') {

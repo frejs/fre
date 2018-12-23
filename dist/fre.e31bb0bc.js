@@ -118,7 +118,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function patch(parent, element, oldVnode, vnode) {
-  if (oldVnode == null) {
+  if (oldVnode == vnode) {} else if (oldVnode == null) {
     element = parent.insertBefore(create(vnode), element);
   } else if (vnode.type && vnode.type === oldVnode.type) {
     if (typeof vnode.type === 'function') {
@@ -541,7 +541,7 @@ function _templateObject() {
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 
 function counter() {
-  var state = (0, _src.useState)({
+  var state = (0, _src.observe)({
     count: {
       num: 0
     }
@@ -557,7 +557,7 @@ function count(props) {
   return (0, _src.html)(_templateObject3(), props.count);
 }
 
-(0, _src.render)((0, _src.html)(_templateObject4(), counter), document.body);
+(0, _src.mount)((0, _src.html)(_templateObject4(), counter), document.body);
 },{"./src":"src/index.js"}],"C:/Users/admin/AppData/Local/Yarn/Data/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -585,7 +585,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62276" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50211" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

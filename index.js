@@ -1,7 +1,7 @@
-import{ render, html, useState } from './src'
+import{ mount, html, observe } from './src'
 
 function counter() {
-  const state = useState({
+  const state = observe({
     count: {
       num:0
     }
@@ -22,4 +22,4 @@ function count(props){
   `
 }
 
-render(html`<${counter} />`, document.body)
+mount(html`<${counter} />`, document.body)
