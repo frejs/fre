@@ -1,5 +1,5 @@
-import { useState } from './useState'
+import { observe } from './observe'
 import { html, h } from './h'
-import { render } from './render'
+import { mount } from './render'
 
-export default { useState, html, h, render }
+export { observe, html, h, mount }

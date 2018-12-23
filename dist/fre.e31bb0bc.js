@@ -266,18 +266,14 @@ function setAttrs(node, name, value) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.render = render;
+exports.mount = mount;
 exports.rerender = rerender;
 
 var _patch = require("./patch");
 
-var parent;
-var element;
-var oldVnode;
-var vnode;
-var root;
+var parent, element, oldVnode, vnode, root, lock;
 
-function render(vdom, el) {
+function mount(vdom, el) {
   root = vdom;
   parent = el;
   vnode = vdom.type();
@@ -286,17 +282,22 @@ function render(vdom, el) {
 
 function rerender() {
   vnode = root.type(root.props);
-  setTimeout(function () {
-    element = (0, _patch.patch)(parent, element, oldVnode, oldVnode = vnode);
-  });
+
+  if (!lock) {
+    lock = true;
+    setTimeout(function () {
+      lock = !lock;
+      element = (0, _patch.patch)(parent, element, oldVnode, oldVnode = vnode);
+    });
+  }
 }
-},{"./patch":"src/patch.js"}],"src/hooks.js":[function(require,module,exports) {
+},{"./patch":"src/patch.js"}],"src/observe.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.useState = useState;
+exports.observe = observe;
 
 var _render = require("./render");
 
@@ -309,7 +310,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 var override = Object.create(null);
 var deleted = Object.create(null);
 
-function useState(state) {
+function observe(state) {
   if (Object.keys(override).length > 0) {
     state = _objectSpread({}, state, override);
   }
@@ -462,10 +463,10 @@ exports.html = html;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-Object.defineProperty(exports, "useState", {
+Object.defineProperty(exports, "observe", {
   enumerable: true,
   get: function () {
-    return _hooks.useState;
+    return _observe.observe;
   }
 });
 Object.defineProperty(exports, "html", {
@@ -480,19 +481,19 @@ Object.defineProperty(exports, "h", {
     return _h.h;
   }
 });
-Object.defineProperty(exports, "render", {
+Object.defineProperty(exports, "mount", {
   enumerable: true,
   get: function () {
-    return _render.render;
+    return _render.mount;
   }
 });
 
-var _hooks = require("./hooks");
+var _observe = require("./observe");
 
 var _h = require("./h");
 
 var _render = require("./render");
-},{"./hooks":"src/hooks.js","./h":"src/h.js","./render":"src/render.js"}],"index.js":[function(require,module,exports) {
+},{"./observe":"src/observe.js","./h":"src/h.js","./render":"src/render.js"}],"index.js":[function(require,module,exports) {
 "use strict";
 
 var _src = require("./src");
@@ -584,7 +585,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58341" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62276" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

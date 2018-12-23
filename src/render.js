@@ -1,12 +1,8 @@
 import { patch } from './patch'
 
-let parent
-let element
-let oldVnode
-let vnode
-let root
+let parent, element, oldVnode, vnode, root, lock
 
-export function render(vdom, el) {
+export function mount(vdom, el) {
   root = vdom
   parent = el
   vnode = vdom.type()
@@ -15,8 +11,11 @@ export function render(vdom, el) {
 
 export function rerender() {
   vnode = root.type(root.props)
-  
-  setTimeout(() => {
-    element = patch(parent, element, oldVnode, (oldVnode = vnode))
-  })
+  if (!lock) {
+    lock = true
+    setTimeout(() => {
+      lock = !lock
+      element = patch(parent, element, oldVnode, (oldVnode = vnode))
+    })
+  }
 }

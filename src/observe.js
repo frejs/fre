@@ -3,7 +3,7 @@ import { rerender } from './render'
 const override = Object.create(null)
 const deleted = Object.create(null)
 
-export function useState(state) {
+export function observe(state) {
   if (Object.keys(override).length > 0) {
     state = { ...state,...override }
   }
