@@ -18,7 +18,7 @@
 
 Fre (pronounced `/fri:/`, like free) is a tiny and perfect javascript library, It means freedom ~
 
-其实，free 是一部动漫名，也是我最喜欢的番没有之一，haru 是我儿子！ [参见c站]()
+其实，free 是一部动漫名，也是我最喜欢的番没有之一，haru 是我儿子！ [参见c站](https://www.clicli.top/search/free)
 
 ### Install
 
