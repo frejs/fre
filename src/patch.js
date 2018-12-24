@@ -10,32 +10,32 @@ export function patch(parent, element, oldVnode, vnode) {
     }
     update(element, oldVnode.props, vnode.props)
 
-    var reusableChildren = {}
-    var oldElements = []
-    var newKeys = {}
+    let reusableChildren = {}
+    let oldElements = []
+    let newKeys = {}
 
     oldVnode.children.forEach((oldChild, index) => {
-      var oldElement = element.childNodes[index]
+      let oldElement = element.childNodes[index]
       oldElements[index] = oldElement
-      var oldKey = oldChild.props ? oldChild.props.key : null
+      let oldKey = oldChild.props ? oldChild.props.key : null
 
       if (null != oldKey) {
         reusableChildren[oldKey] = [oldElement, oldChild]
       }
     })
 
-    var i = 0
-    var j = 0
+    let i = 0
+    let j = 0
 
     while (j < vnode.children.length) {
-      var oldElement = oldElements[i]
-      var oldChild = oldVnode.children[i]
-      var newChild = vnode.children[j]
+      let oldElement = oldElements[i]
+      let oldChild = oldVnode.children[i]
+      let newChild = vnode.children[j]
 
-      var oldKey = oldChild.props ? oldChild.props.key : null
-      var newKey = newChild.props ? newChild.props.key : null
+      let oldKey = oldChild.props ? oldChild.props.key : null
+      let newKey = newChild.props ? newChild.props.key : null
 
-      var reusableChild = reusableChildren[newKey] || []
+      let reusableChild = reusableChildren[newKey] || []
 
       if (null == newKey) {
         if (null == oldKey) {
@@ -60,8 +60,8 @@ export function patch(parent, element, oldVnode, vnode) {
     }
 
     while (i < oldVnode.children.length) {
-      var oldChild = oldVnode.children[i]
-      var oldKey = oldChild.props ? oldChild.props.key : null
+      let oldChild = oldVnode.children[i]
+      let oldKey = oldChild.props ? oldChild.props.key : null
       if (null == oldKey) {
         element.removeChild(reusableChild[0])
       }
@@ -69,14 +69,14 @@ export function patch(parent, element, oldVnode, vnode) {
     }
 
     for (let i in reusableChildren) {
-      var reusableChild = reusableChildren[i]
-      var reusableNode = reusableChild[1]
+      let reusableChild = reusableChildren[i]
+      let reusableNode = reusableChild[1]
       if (!newKeys[reusableNode.props.key]) {
         element.removeChild(reusableChild[0])
       }
     }
   } else if (oldVnode !== vnode) {
-    var i = element
+    let i = element
     parent.replaceChild((element = create(vnode)), i)
   }
 
