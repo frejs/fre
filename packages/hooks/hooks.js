@@ -27,15 +27,13 @@ function useState(state) {
     bucket = buckets.get(hook)
     if (!(bucket.cursor in bucket.slots)) {
       let slot = [
-        typeof state == "function" ? state() : state,
-        function setter(v) {
-          slot[0] = v
-        }
+        typeof state == 'function' ? state() : state,
+        v => slot[0] = v
       ]
       bucket.slots[bucket.cursor] = slot
     }
     return [...bucket.slots[bucket.cursor++]]
   } else {
-    throw new Error("Only use useState() inside of use-wrapped functions.")
+    throw new Error('Only use useState() inside of use-wrapped functions.')
   }
 }
