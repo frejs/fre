@@ -5,6 +5,7 @@ function Counter() {
   return (
     <div>
       <h1>{count}</h1>
+      <Sex sex='boy' />
       <button onClick={() => setCount(count + 1)}>+</button>
     </div>
   )
