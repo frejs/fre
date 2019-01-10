@@ -36,6 +36,6 @@ function useState(state) {
     }
     return [...bucket.slots[bucket.cursor++]]
   } else {
-    throw new Error("Only use useState() inside of hook-wrapped functions.")
+    throw new Error("Only use useState() inside of use-wrapped functions.")
   }
 }
