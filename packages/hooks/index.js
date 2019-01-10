@@ -1,7 +1,7 @@
 let buckets = new WeakMap()
 let currentBucket = []
 
-function use(...fns) {
+export function use(...fns) {
   fns = fns.map(fn => {
     return function hook(...args) {
       if (buckets.has(hook)) {
@@ -16,7 +16,7 @@ function use(...fns) {
   return fns
 }
 
-function useState(state) {
+export function useState(state) {
   if (currentBucket.length > 0) {
     let hook = currentBucket[currentBucket.length - 1]
     let bucket

@@ -5,3 +5,6 @@ yarn.lock
 yarn-error.log
 .ignore/
 packages/.fre/
+examples/counter/node_modules/
+examples/counter/.cache/
+examples/counter/dist/
