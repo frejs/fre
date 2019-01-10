@@ -1,7 +1,13 @@
 import { render, h, useState } from '../../packages/core'
 
-function counter() {
-  return <h1>111</h1>
+function Counter() {
+  const [count, setCount] = useState(0)
+  return (
+    <div>
+      <h1>{count}</h1>
+      <button onClick={() => setCount(count + 1)}>+</button>
+    </div>
+  )
 }
 
-render(<counter />, document.body)
+render(<Counter />, document.body)
