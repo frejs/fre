@@ -92,11 +92,12 @@ export function create(vnode) {
       ? document.createTextNode(vnode)
       : document.createElement(vnode.type)
 
-  if (vnode.props) {
+  if (vnode.children) {
     vnode.children.forEach(child => {
       element.appendChild(create(child))
     })
-
+  }
+  if (vnode.props) {
     for (let name in vnode.props) {
       setAttrs(element, name, vnode.props[name])
     }

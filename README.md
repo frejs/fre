@@ -13,12 +13,11 @@
 - :mega: Reactive because Proxy
 - :telescope: All in one , just 1 KB
 
-
 ### Introduction
 
 Fre (pronounced `/fri:/`, like free) is a tiny and perfect javascript library, It means freedom ~
 
-其实，free 是一部动漫名，也是我最喜欢的番没有之一，haru 是我儿子！ [参见c站](https://www.clicli.top/search/free)
+其实，free 是一部动漫名，也是我最喜欢的番没有之一，haru 是我儿子！ [参见 c 站](https://www.clicli.top/search/free)
 
 ### Install
 
@@ -29,33 +28,60 @@ yarn add fre -S
 ### Use
 
 ```JavaScript
-import{ observe, html, mount } from './src'
+import { render, h, useState } from '../../packages/core'
 
-function counter() {
-  const data = observe({
-    count: 0
-  })
-
-  return html`
+function Counter() {
+  const [count, setCount] = useState(0)
+  return (
     <div>
-      <h1>${data.count}</h1>
-      <button onclick=${() => {data.count++}}>+</button>
-      <button onclick=${() => {data.count--}}>-</button>
-    </div> 
-  `
+      <h1>{count}</h1>
+      <button onClick={() => setCount(count + 1)}>+</button>
+    </div>
+  )
 }
 
-mount(html`<${counter} />`, document.body)
+render(<Counter />, document.body)
 
 ```
-#### Proxy
 
-```JavaScript
-const data = observe({
-  count: 0
-})
+#### hooks API
+
+其实这里应该叫做`functionalCompoent`比较合适，一种新的组件化方案
+
+非常感谢 react 发明了 hooks API 这一神作，和 `render props`、`HOC`、`mixin` 不同，它的“状态共享”不借助类
+
+它是真真 ♂ 的 function 自己维护状态
+
+这使得 fre 的组件化得以实现，在此之前，这是 fre 最大的坑，之前的 Proxy 劫持方案，无法记录是状态来自哪里
+
+所以，这次重构，真正使得 fre 成为一个`完整`的框架了，接下来就是优化 diff 等√
+
+```javaScript
+import { render, h, useState } from '../../packages/core'
+
+function Counter() {
+  const [count, setCount] = useState(0)
+  return (
+    <div>
+      <h1>{count}</h1>
+      <Sex sex='boy' />
+      <button onClick={() => sex === 'boy' ? setSex('girl') : setSex('boy')}>x</button>
+    </div>
+  )
+}
+
+function Sex(props){
+  const [sex, setSex] = useState(props.sex)
+  return (
+    <div>
+      <h1>{count}</h1>
+      <button onClick={() => setCount(count + 1)}>+</button>
+    </div>
+  )
+}
+
+render(<Counter />, document.body)
 ```
-会生成一个全递归的 Proxy 对象，会自动去`observe`，data 更新会自动触发 rerender，这个更新是准确
 
 #### tagged template
 
@@ -66,59 +92,26 @@ fre 提供 JSX-like 的 tagged template 语法，浏览器原生支持，无需�
 ```javascript
 html`
   <div>
-    <h1>${data.count}</h1>
-    <button onclick=${() => {data.count++}}>+</button>
-    <button onclick=${() => {data.count--}}>-</button>
-  </div> 
+    <h1>${count}</h1>
+    <button onclick=${() => setCount(count+1)>+</button>
+  </div>
 `
 ```
+
 和 jsx 一样，最终会被转换成 h 函数，进而生成 vdom tree
 
 性能不会差，可以粗略理解为 vue 的 compile 过程，如果使用 jsx ，将直接省略这个过程
 
-#### hooks API
-
-其实这里应该叫做`functionalCompoent`比较合适，一种新的组件化方案
-
-如下，fre 和 vue、react 不同，fre 的组件是无自身状态、可复用的标记代码块
-
-只有根组件拥有全局状态，但这不妨碍你进行多次 render 创造多个根组件
-
-更多讨论请点击 >[这里](https://github.com/132yse/fre/issues/5)<
-
-```javaScript
-import{ mount, html, observe } from 'fre'
-
-function counter() {
-  const data = observe({
-    count: 0
-  })
-
-  return html`
-    <div>
-      ${html`<${count} count=${data.count} />`}
-      <button onclick=${() => {data.count++}}>+</button>
-      <button onclick=${() => {data.count--}}>-</button>
-    </div> 
-  `
-}
-
-function count(props){
-  return html`
-    <h1>${props.count}</h1>
-  `
-}
-
-mount(html`<${counter} />`, document.body)
-```
-
 #### JSX
 
 默认也对外暴露了 h 函数，可以选用 JSX
+
 ```JavaScript
 import { h } from 'fre'
 ```
+
 webpack 需配置：
+
 ```JavaScript
 {
   "plugins": [
@@ -133,9 +126,10 @@ fre 使用的是 preact 的 diff 方案，vdom 直接和 dom 比对，然后操�
 
 #### Article
 
-《Fre：又一个小而美的前端MVVM框架》：[知乎](https://zhuanlan.zhihu.com/p/52510521)、[掘金](https://juejin.im/post/5c160f69e51d4529355b89c8)
+《Fre：又一个小而美的前端 MVVM 框架》：[知乎](https://zhuanlan.zhihu.com/p/52510521)、[掘金](https://juejin.im/post/5c160f69e51d4529355b89c8)
 
 《fre 揭秘系列：Function.caller 替代方案》：[github](https://github.com/frontend9/fe9-library/issues/188)
 
 #### License
-*MIT* Inspirated by vue & react & htm & hyperapp
+
+_MIT_ Inspirated by vue & react & htm & hyperapp

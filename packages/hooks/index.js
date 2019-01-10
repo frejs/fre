@@ -1,3 +1,4 @@
+import { rerender } from '../core/render'
 let buckets = new WeakMap()
 let currentBucket = []
 
@@ -28,7 +29,10 @@ export function useState(state) {
     if (!(bucket.cursor in bucket.slots)) {
       let slot = [
         typeof state == 'function' ? state() : state,
-        v => slot[0] = v
+        v => {
+          slot[0] = v
+          rerender()
+        }
       ]
       bucket.slots[bucket.cursor] = slot
     }
