@@ -82,7 +82,7 @@ html`
 
 如下，fre 和 vue、react 不同，fre 的组件是无自身状态、可复用的标记代码块
 
-只有跟组件拥有全局状态，但这不妨碍你进行多次 render 创造多个跟组件
+只有根组件拥有全局状态，但这不妨碍你进行多次 render 创造多个根组件
 
 更多讨论请点击 >[这里](https://github.com/132yse/fre/issues/5)<
 
