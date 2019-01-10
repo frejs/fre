@@ -39,7 +39,3 @@ function useState(state) {
     throw new Error("Only use useState() inside of hook-wrapped functions.")
   }
 }
-
-// map结构: {hook:bucket}
-// bucket: {cursor:slots}
-// slots：[state,setter]

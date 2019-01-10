@@ -4,7 +4,7 @@
 
 #### 原理
 
-通过 use 包裹函数使其成为可以有用 hooks 的函数
+通过 use 包裹函数使其成为可以使用 hooks 的函数
 
 ```javascript
 import { use, useState } from 'fre'
