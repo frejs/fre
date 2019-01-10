@@ -1,3 +1,7 @@
-import{ mount, html, useState } from '../../packages/core'
+import { render, h, useState } from '../../packages/core'
 
-console.log('111')
+function counter() {
+  return <h1>111</h1>
+}
+
+render(<counter />, document.body)
