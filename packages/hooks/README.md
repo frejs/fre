@@ -1,6 +1,6 @@
 ## Fre.use
 
-> 40 lines 的 hooks API 方案，性价比高的一比
+> 40 lines 的 hooks API 方案，性价比超高
 
 #### 原理
 
