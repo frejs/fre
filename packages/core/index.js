@@ -1,5 +1,5 @@
-import { useState, use } from '../hooks'
-import { h } from './h'
-import { render } from './render'
+import { h } from "./h"
+import { render } from "./render"
+import { useState } from "./hook"
 
-export { useState, h, render, use }
+export { h, render, useState }
