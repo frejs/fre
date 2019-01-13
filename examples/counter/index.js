@@ -1,8 +1,11 @@
 import { render, useState, h } from "../../packages/core"
 
-function App() {
+function Sex() {
+  const [sex, setSex] = useState("boy")
   return (
-    <div>
+    <div class="sex">
+      <h1>{sex}</h1>
+      <button onClick={() => setSex(sex === "boy" ? "girl" : "boy")}>x</button>
       <Counter />
     </div>
   )
@@ -11,11 +14,11 @@ function App() {
 function Counter() {
   const [count, setCount] = useState(0)
   return (
-    <div>
+    <div class="counter">
       <h1>{count}</h1>
       <button onClick={() => setCount(count + 1)}>+</button>
     </div>
   )
 }
 
-render(<App />, document.body)
+render(<Sex />, document.getElementById('app'))
