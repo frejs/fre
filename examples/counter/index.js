@@ -1,4 +1,4 @@
-import { h,render } from "../../packages/core"
+import { h,render } from "../../packages"
 
 function Counter() {
   // const [count, setCount] = useState(0)
