@@ -1,7 +1,6 @@
 /node_modules/
 /.idea/
 /.cache/
-yarn.lock
 yarn-error.log
 .ignore/
 packages/.fre/
