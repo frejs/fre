@@ -16,11 +16,12 @@
 ### 重构
 彻底重写 fre ，放弃 diff ，拥抱 fiber，客官可稍后来看
 
-|  | fre | preact X | vue 3 |  react |
-| ------ | ------ | ------ | ------ | ------ |
-| 尺寸 | 1kb | 3kb | 10kb | 33kb |
-| 组件化 | hooks | class | SFC | class + hooks |
-| 数据更新 | Fiber | vdom diff | Proxy + vdom + diff | Fiber |
+|  | 尺寸 | 组件化 | 状态更新 |
+| :------: | :------: | :------: | :------: |
+| fre | 1kb | hooks | Fiber |
+| preact | 3kb | class | vdom diff |
+| vue | 10kb | SFC | Proxy |
+| react | 33kb | class + hooks | Fiber |
 
 ### Introduction
 
