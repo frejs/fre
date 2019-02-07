@@ -28,7 +28,7 @@ yarn add fre -S
 ### Use
 
 ```JavaScript
-import { render, h, useState } from '../../packages/core'
+import { render, h, useState } from 'fre'
 
 function Counter() {
   const [count, setCount] = useState(0)
@@ -40,7 +40,7 @@ function Counter() {
   )
 }
 
-render(<Counter />, document.body)
+render(<Counter />, document.getElementById('app'))
 
 ```
 
@@ -57,50 +57,52 @@ render(<Counter />, document.body)
 所以，这次重构，真正使得 fre 成为一个`完整`的框架了，接下来就是优化 diff 等√
 
 ```javaScript
-import { render, h, useState } from '../../packages/core'
+import { render, useState, h } from "fre"
 
-function Counter() {
+function Sex() {
+  const [sex, setSex] = useState("boy")
+  return (
+    <div class="sex">
+      <button onClick={() => setSex(sex === "boy" ? "girl" : "boy")}>x</button>
+      <Counter sex={sex} />
+    </div>
+  )
+}
+
+function Counter(props) {
   const [count, setCount] = useState(0)
   return (
-    <div>
-      <h1>{count}</h1>
-      <Sex sex='boy' />
-      <button onClick={() => sex === 'boy' ? setSex('girl') : setSex('boy')}>x</button>
-    </div>
-  )
-}
-
-function Sex(props){
-  const [sex, setSex] = useState(props.sex)
-  return (
-    <div>
-      <h1>{count}</h1>
+    <div class="counter">
+      <h1>{props.sex}</h1>
       <button onClick={() => setCount(count + 1)}>+</button>
+      <h1>{count}</h1>
     </div>
   )
 }
 
-render(<Counter />, document.body)
+render(<Sex />, document.getElementById("app"))
 ```
 
-#### tagged template
+### props
 
-fre 提供 JSX-like 的 tagged template 语法，浏览器原生支持，无需编译
+虽然 hooks API 使得 state 在 function 内部受控，但是 props 仍然是这个组件从外部接受的√
 
-建议根据场景选择，webpack 下 JSX 比较合适，浏览器环境肯定要 tagged template（如后端语言的模板引擎）
+如下，sex 就是从父组件传下来的
 
 ```javascript
-html`
-  <div>
-    <h1>${count}</h1>
-    <button onclick=${() => setCount(count+1)>+</button>
-  </div>
-`
+function Counter(props) {
+  const [count, setCount] = useState(0)
+  return (
+    <div class="counter">
+      <h1>{props.sex}</h1>
+      <button onClick={() => setCount(count + 1)}>+</button>
+      <h1>{count}</h1>
+    </div>
+  )
+}
 ```
-
-和 jsx 一样，最终会被转换成 h 函数，进而生成 vdom tree
-
-性能不会差，可以粗略理解为 vue 的 compile 过程，如果使用 jsx ，将直接省略这个过程
+不过我认为，props 负责的事情，理应更多
+我正在思考，生命周期是否要交于 props 控制，或者 useEffects 会更好？
 
 #### JSX
 
@@ -132,4 +134,4 @@ fre 使用的是 preact 的 diff 方案，vdom 直接和 dom 比对，然后操�
 
 #### License
 
-_MIT_ Inspirated by vue & react & htm & hyperapp
+_MIT_ Inspirated by react / preact

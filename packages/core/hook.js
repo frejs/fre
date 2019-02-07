@@ -1,22 +1,28 @@
 import { rerender } from "./render"
 
-let context = []
+let context = {
+  cursor: 0,
+  hooks: [],
+  update: () => undefined
+}
 
 export class Hook {
-  cursor
+  cursor = 0
   hooks = []
 
-  constructor(fn) {
+  constructor(fn, props) {
     this.fn = fn
+    this.props = props
   }
 
-  render(...args) {
+  render() {
+    const prevContext = context
     try {
-      context.push(this)
+      context = this
       this.cursor = 0
-      return this.fn(...args)
+      return this.fn(this.props)
     } finally {
-      context.pop()
+      context = prevContext
     }
   }
 
@@ -26,19 +32,20 @@ export class Hook {
 }
 
 export function useState(initial) {
-  const component = context[context.length - 1]
-  const i = component.cursor++
-  if (!component.hooks[i]) {
-    component.hooks[i] = {
+  const i = context.cursor++
+  if (!context.hooks[i]) {
+    context.hooks[i] = {
       state: initial
     }
   }
 
+  const that = context
   return [
-    component.hooks[i].state,
+    context.hooks[i].state,
     v => {
-      component.hooks[i].state = v
-      component.update()
+      that.hooks[i].state =
+        typeof state === "function" ? state(context.hooks[i].state) : v
+        that.update()
     }
   ]
 }

@@ -1,24 +1,38 @@
 import { Hook } from "./hook"
 
+const hooks = new WeakMap()
+
 export function render(vdom, el) {
   let component
   if (typeof vdom.type === "function") {
-    component = new Hook(vdom.type)
+    component = new Hook(vdom.type, vdom.props)
   }
   component ? rerender(component, el) : rerender(vdom, el)
 }
 
-export function rerender(component, el) {
+export function rerender(component, parent) {
   let vdom = component.render ? component.render() : component
-
   if (typeof vdom.type === "function") {
-    component = new Hook(vdom.type)
+    const fn = vdom.type
+    let hook = hooks.get(fn)
+    if (!hook) {
+      hook = class extends Hook {
+        constructor() {
+          super(fn)
+        }
+      }
+      vdom.type = hook
+      hooks.set(fn, hook)
+    }
+    vdom.type = hook
+
+    console.log(vdom.type.render)
     vdom = component.render()
   }
 
   if (typeof vdom === "string" || typeof vdom === "number") {
     let dom = document.createTextNode(vdom)
-    el.appendChild(dom)
+    parent.appendChild(dom)
   } else {
     let dom = document.createElement(vdom.type)
 
@@ -26,15 +40,16 @@ export function rerender(component, el) {
     for (let name in vdom.props) {
       setAttrs(dom, name, vdom.props[name])
     }
-    if (component.el) {
-      component.el.innerHTML = null
-      component.el.appendChild(dom)
+    if (component.parent) {
+      let oldNode =
+        component.parent.childNodes[component.parent.childNodes.length - 1]
+      component.parent.appendChild(dom)
+      component.parent.removeChild(oldNode)
       return
     }
 
-    console.log(component)
-    component.el = el
-    el.appendChild(dom)
+    component.parent = parent
+    parent.appendChild(dom)
   }
 }
 
