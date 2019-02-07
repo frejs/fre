@@ -146,7 +146,6 @@ function updateHook(wipFiber) {
 }
 
 function createInstance(fiber) {
-  console.log(fiber)
   const instance = fiber.tag(fiber.props)
   instance.__fiber = fiber
   return instance
