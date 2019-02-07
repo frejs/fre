@@ -14,14 +14,12 @@
 - :telescope: All in one , just 1 KB -->
 
 ### 重构
-彻底重写 fre ，放弃 diff ，拥抱 fiber
+彻底重写 fre ，放弃 diff ，拥抱 fiber，客官可稍后来看
 
 |  | fre | preact X | vue 3 |  react |
-
+| ------ | ------ | ------ | ------ | ------ |
 | 尺寸 | 1kb | 3kb | 10kb | 33kb |
-
 | 组件化 | hooks | class | SFC | class + hooks |
-
 | 数据更新 | Fiber | vdom diff | Proxy + vdom + diff | Fiber |
 
 ### Introduction
