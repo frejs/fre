@@ -1,15 +1,15 @@
 import { render, useState, h } from "../../packages/core"
 
-function Sex() {
-  const [sex, setSex] = useState("boy")
-  return (
-    <div class="sex">
-      <h1>{sex}</h1>
-      <button onClick={() => setSex(sex === "boy" ? "girl" : "boy")}>x</button>
-      <Counter />
-    </div>
-  )
-}
+// function Sex() {
+//   const [sex, setSex] = useState("boy")
+//   return (
+//     <div class="sex">
+//       <h1>{sex}</h1>
+//       <button onClick={() => setSex(sex === "boy" ? "girl" : "boy")}>x</button>
+//       <Counter />
+//     </div>
+//   )
+// }
 
 function Counter() {
   const [count, setCount] = useState(0)
@@ -21,4 +21,4 @@ function Counter() {
   )
 }
 
-render(<Sex />, document.getElementById('app'))
+render(<Counter />, document.getElementById('app'))
