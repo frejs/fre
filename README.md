@@ -17,8 +17,11 @@
 彻底重写 fre ，放弃 diff ，拥抱 fiber
 
 |  | fre | preact X | vue 3 |  react |
+
 | 尺寸 | 1kb | 3kb | 10kb | 33kb |
+
 | 组件化 | hooks | class | SFC | class + hooks |
+
 | 数据更新 | Fiber | vdom diff | Proxy + vdom + diff | Fiber |
 
 ### Introduction
