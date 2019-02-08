@@ -1,22 +1,10 @@
-import { performWork, HOOK, updateQueue, currentWIP } from './reconciler'
-
-// export const useState = initial => scheduleUpdate.bind(null, initial)
+import { scheduleUpdate, currentInstance } from '../src/reconciler'
 
 export function useState(initial) {
-  let state
-  if (currentWIP === null) {
-    state = initial
-  }else{
-    state = initial
-  }
   let setter = v => {
-    updateQueue.push({
-      from: HOOK,
-      instance: currentWIP,
-      state: v
-    })
-    requestIdleCallback(performWork)
+    scheduleUpdate(v)
   }
-
+  let state = currentInstance ? currentInstance.state[0] : initial
+  state = !state ? initial : state
   return [state, setter]
 }

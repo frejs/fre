@@ -6,7 +6,8 @@ const isAttribute = name =>
 const isNew = (prev, next) => key => prev[key] !== next[key]
 const isGone = (prev, next) => key => !(key in next)
 
-export function updateProperties(dom, prevProps, nextProps) {
+export function updateDomProperties(dom, prevProps, nextProps) {
+  // Remove event listeners
   Object.keys(prevProps)
     .filter(isEvent)
     .filter(key => !(key in nextProps) || isNew(prevProps, nextProps)(key))
@@ -14,12 +15,16 @@ export function updateProperties(dom, prevProps, nextProps) {
       const eventType = name.toLowerCase().substring(2)
       dom.removeEventListener(eventType, prevProps[name])
     })
+
+  // Remove attributes
   Object.keys(prevProps)
     .filter(isAttribute)
     .filter(isGone(prevProps, nextProps))
     .forEach(name => {
       dom[name] = null
     })
+
+  // Set attributes
   Object.keys(nextProps)
     .filter(isAttribute)
     .filter(isNew(prevProps, nextProps))
@@ -27,6 +32,7 @@ export function updateProperties(dom, prevProps, nextProps) {
       dom[name] = nextProps[name]
     })
 
+  // Set style
   prevProps.style = prevProps.style || {}
   nextProps.style = nextProps.style || {}
   Object.keys(nextProps.style)
@@ -39,6 +45,8 @@ export function updateProperties(dom, prevProps, nextProps) {
     .forEach(key => {
       dom.style[key] = ''
     })
+
+  // Add event listeners
   Object.keys(nextProps)
     .filter(isEvent)
     .filter(isNew(prevProps, nextProps))
@@ -48,11 +56,11 @@ export function updateProperties(dom, prevProps, nextProps) {
     })
 }
 
-export function createElement(fiber) {
+export function createDomElement(fiber) {
   const isTextElement = fiber.tag === TEXT
   const dom = isTextElement
     ? document.createTextNode('')
     : document.createElement(fiber.tag)
-  updateProperties(dom, [], fiber.props)
+  updateDomProperties(dom, [], fiber.props)
   return dom
 }

@@ -1,19 +1,19 @@
-import { arrify,getRoot } from './util'
-import { createElement } from './dom'
+import { createDomElement, updateDomProperties } from './dom'
 
-const ROOT = 'root'
-export const HOOK = 'hook'
 const HOST = 'host'
-const PLACE = 'place'
-const UPDATE = 'update'
-const DELETE = 'delete'
+const HOOK = 'hook'
+const ROOT = 'root'
+
+const PLACE = 1
+const DELETE = 2
+const UPDATE = 3
+
 const ENOUGH_TIME = 1
 
-export let updateQueue = []
-
+const updateQueue = []
 let nextUnitOfWork = null
 let pendingCommit = null
-export let currentWIP = null
+export let currentInstance = null
 
 export function render(vdom, el) {
   updateQueue.push({
@@ -24,7 +24,16 @@ export function render(vdom, el) {
   requestIdleCallback(performWork)
 }
 
-export function performWork(deadline) {
+export function scheduleUpdate(state) {
+  updateQueue.push({
+    from: HOOK,
+    instance: currentInstance,
+    state: state
+  })
+  requestIdleCallback(performWork)
+}
+
+function performWork(deadline) {
   workLoop(deadline)
   if (nextUnitOfWork || updateQueue.length > 0) {
     requestIdleCallback(performWork)
@@ -43,50 +52,32 @@ function workLoop(deadline) {
   }
 }
 
-function commitAllWork(fiber) {
-  fiber.effects.forEach(f => {
-    commitWork(f)
-  })
-  nextUnitOfWork = null
-  pendingCommit = null
-}
-
-function commitWork(fiber) {
-  if (fiber.type == ROOT) {
-    return
-  }
-
-  let domParentFiber = fiber.parent
-  while (domParentFiber.type == HOOK) {
-    domParentFiber = domParentFiber.parent
-  }
-  const domParent = domParentFiber.dom
-  if (fiber.effectTag == PLACE && fiber.type == HOST) {
-    domParent.appendChild(fiber.dom)
-  } else if (fiber.effectTag == UPDATE) {
-    updateProperties(fiber.dom, fiber.alternate.props, fiber.props)
-  } else if (fiber.effectTag == DELETE) {
-    commitDeletion(fiber, domParent)
-  }
-}
-
 function resetNextUnitOfWork() {
   const update = updateQueue.shift()
   if (!update) {
     return
   }
+
   if (update.state) {
-    update.instance.state = update.state
+    update.instance.__fiber.state = update.state
   }
-  const root = update.from !== ROOT ? getRoot(update.instance.__fiber) : null
+  const root =
+    update.from !== ROOT ? getRoot(update.instance.__fiber) : null
 
   nextUnitOfWork = {
     type: ROOT,
-    dom: update.dom || update.instance.dom,
-    props: update.newProps || update.instance.props,
-    state: update.state,
+    base: update.dom || root.base,
+    props: update.newProps || root.props,
     alternate: root
   }
+}
+
+function getRoot(fiber) {
+  let node = fiber
+  while (node.parent) {
+    node = node.parent
+  }
+  return node
 }
 
 function performUnitOfWork(wipFiber) {
@@ -106,57 +97,43 @@ function performUnitOfWork(wipFiber) {
 
 function beginWork(wipFiber) {
   if (wipFiber.type == HOOK) {
-    updateHook(wipFiber)
+    updateHOOKComponent(wipFiber)
   } else {
-    updateHost(wipFiber)
+    updateHostComponent(wipFiber)
   }
 }
 
-function completeWork(fiber) {
-  if (fiber.type == HOOK) {
-    fiber.dom.__fiber = fiber
-  }
-  if (fiber.parent) {
-    const childEffects = fiber.effects || []
-    const thisEffect = fiber.effectTag != null ? [fiber] : []
-    const parentEffects = fiber.parent.effects || []
-    fiber.parent.effects = parentEffects.concat(childEffects, thisEffect)
-  } else {
-    pendingCommit = fiber
-  }
-}
-
-function updateHook(wipFiber) {
-  let instance = wipFiber.dom
-  if (instance == null) {
-    instance = wipFiber.dom = createInstance(wipFiber)
-  } else if (wipFiber.props == instance.props && !wipFiber.hooks) {
-    cloneChildFibers(wipFiber)
-    return
-  }
-  instance.props = wipFiber.props
-  instance.state = wipFiber.state
-  currentWIP = instance
-
-  const newChildElements = wipFiber.tag(wipFiber.props)
-  reconcileChildren(wipFiber, newChildElements)
-}
-
-function createInstance(fiber) {
-  const instance = new fiber.tag(fiber.props)
-  return instance
-}
-
-function updateHost(wipFiber) {
-  if (!wipFiber.dom) {
-    wipFiber.dom = createElement(wipFiber)
+function updateHostComponent(wipFiber) {
+  if (!wipFiber.base) {
+    wipFiber.base = createDomElement(wipFiber)
   }
 
   const newChildElements = wipFiber.props.children
-  reconcileChildren(wipFiber, newChildElements)
+  reconcileChildrenArray(wipFiber, newChildElements)
 }
 
-function reconcileChildren(wipFiber, newChildElements) {
+function updateHOOKComponent(wipFiber) {
+  let instance = wipFiber.base
+  if (instance == null) {
+    instance = wipFiber.base = createInstance(wipFiber)
+  } else if (wipFiber.props == instance.props && !wipFiber.state) {
+    cloneChildFibers(wipFiber)
+    return
+  }
+
+  instance.props = wipFiber.props
+  instance.state = [wipFiber.state]
+  currentInstance = instance
+  wipFiber.state = null
+  const newChildElements = wipFiber.tag(wipFiber.props)
+  reconcileChildrenArray(wipFiber, newChildElements)
+}
+
+function arrify(val) {
+  return val == null ? [] : Array.isArray(val) ? val : [val]
+}
+
+function reconcileChildrenArray(wipFiber, newChildElements) {
   const elements = arrify(newChildElements)
 
   let index = 0
@@ -166,15 +143,16 @@ function reconcileChildren(wipFiber, newChildElements) {
     const prevFiber = newFiber
     const element = index < elements.length && elements[index]
     const sameTag = oldFiber && element && element.tag == oldFiber.tag
+
     if (sameTag) {
       newFiber = {
         tag: oldFiber.tag,
         type: oldFiber.type,
-        dom: oldFiber.dom,
+        base: oldFiber.base,
         props: element.props,
         parent: wipFiber,
         alternate: oldFiber,
-        hooks: oldFiber.hooks,
+        state: oldFiber.state,
         effectTag: UPDATE
       }
     }
@@ -182,7 +160,8 @@ function reconcileChildren(wipFiber, newChildElements) {
     if (element && !sameTag) {
       newFiber = {
         tag: element.tag,
-        type: typeof element.tag === 'string' ? HOST : HOOK,
+        type:
+          typeof element.tag === 'string' ? HOST : HOOK,
         props: element.props,
         parent: wipFiber,
         effectTag: PLACE
@@ -209,14 +188,92 @@ function reconcileChildren(wipFiber, newChildElements) {
   }
 }
 
-function commitDeletion(fiber, domParent) {
+function createInstance(fiber) {
+  const instance = new fiber.tag(fiber.props)
+  instance.__fiber = fiber
+  return instance
+}
+
+
+function cloneChildFibers(parentFiber) {
+  const oldFiber = parentFiber.alternate
+  if (!oldFiber.child) {
+    return
+  }
+
+  let oldChild = oldFiber.child
+  let prevChild = null
+  while (oldChild) {
+    const newChild = {
+      tag: oldChild.tag,
+      type: oldChild.type,
+      base: oldChild.base,
+      props: oldChild.props,
+      state: oldChild.state,
+      alternate: oldChild,
+      parent: parentFiber
+    }
+    if (prevChild) {
+      prevChild.sibling = newChild
+    } else {
+      parentFiber.child = newChild
+    }
+    prevChild = newChild
+    oldChild = oldChild.sibling
+  }
+}
+
+function completeWork(fiber) {
+  if (fiber.type == HOOK) {
+    fiber.base.__fiber = fiber
+  }
+
+  if (fiber.parent) {
+    const childEffects = fiber.effects || []
+    const thisEffect = fiber.effectTag != null ? [fiber] : []
+    const parentEffects = fiber.parent.effects || []
+    fiber.parent.effects = parentEffects.concat(childEffects, thisEffect)
+  } else {
+    pendingCommit = fiber
+  }
+}
+
+function commitAllWork(fiber) {
+  fiber.effects.forEach(f => {
+    commitWork(f)
+  })
+  nextUnitOfWork = null
+  pendingCommit = null
+}
+
+function commitWork(fiber) {
+  if (fiber.type == ROOT) {
+    return
+  }
+
+  let domParentFiber = fiber.parent
+  while (domParentFiber.type == HOOK) {
+    domParentFiber = domParentFiber.parent
+  }
+  const domParent = domParentFiber.base
+
+  if (fiber.effectTag == PLACE && fiber.type == HOST) {
+    domParent.appendChild(fiber.base)
+  } else if (fiber.effectTag == UPDATE) {
+    updateDomProperties(fiber.base, fiber.alternate.props, fiber.props)
+  } else if (fiber.effectTag == DELETE) {
+    commitDELETE(fiber, domParent)
+  }
+}
+
+function commitDELETE(fiber, domParent) {
   let node = fiber
   while (true) {
     if (node.type == HOOK) {
       node = node.child
       continue
     }
-    domParent.removeChild(node.dom)
+    domParent.removeChild(node.base)
     while (node != fiber && !node.sibling) {
       node = node.parent
     }
