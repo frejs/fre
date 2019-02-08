@@ -1,18 +1,19 @@
-import { getRoot, arrify } from './util'
+import { arrify,getRoot } from './util'
 import { createElement } from './dom'
 
 const ROOT = 'root'
-const HOOK = 'hook'
+export const HOOK = 'hook'
 const HOST = 'host'
 const PLACE = 'place'
 const UPDATE = 'update'
 const DELETE = 'delete'
 const ENOUGH_TIME = 1
 
-let updateQueue = []
+export let updateQueue = []
 
 let nextUnitOfWork = null
 let pendingCommit = null
+export let currentWIP = null
 
 export function render(vdom, el) {
   updateQueue.push({
@@ -23,7 +24,7 @@ export function render(vdom, el) {
   requestIdleCallback(performWork)
 }
 
-function performWork(deadline) {
+export function performWork(deadline) {
   workLoop(deadline)
   if (nextUnitOfWork || updateQueue.length > 0) {
     requestIdleCallback(performWork)
@@ -46,7 +47,6 @@ function commitAllWork(fiber) {
   fiber.effects.forEach(f => {
     commitWork(f)
   })
-  fiber.dom._rootContainerFiber = fiber
   nextUnitOfWork = null
   pendingCommit = null
 }
@@ -75,18 +75,16 @@ function resetNextUnitOfWork() {
   if (!update) {
     return
   }
-  if (update.hooks) {
-    update.instance.__fiber.hooks = update.hooks
+  if (update.state) {
+    update.instance.state = update.state
   }
-  const root =
-    update.from == ROOT
-      ? update.dom._rootContainerFiber
-      : getRoot(update.instance.__fiber)
+  const root = update.from !== ROOT ? getRoot(update.instance.__fiber) : null
 
   nextUnitOfWork = {
     type: ROOT,
-    dom: update.dom || root.dom,
-    props: update.newProps || root.props,
+    dom: update.dom || update.instance.dom,
+    props: update.newProps || update.instance.props,
+    state: update.state,
     alternate: root
   }
 }
@@ -136,18 +134,16 @@ function updateHook(wipFiber) {
     cloneChildFibers(wipFiber)
     return
   }
-
   instance.props = wipFiber.props
-  instance.state = { ...instance.state, ...wipFiber.hooks }
-  wipFiber.hooks = null
+  instance.state = wipFiber.state
+  currentWIP = instance
 
-  const newChildElements = wipFiber.tag()
+  const newChildElements = wipFiber.tag(wipFiber.props)
   reconcileChildren(wipFiber, newChildElements)
 }
 
 function createInstance(fiber) {
-  const instance = fiber.tag(fiber.props)
-  instance.__fiber = fiber
+  const instance = new fiber.tag(fiber.props)
   return instance
 }
 
@@ -170,7 +166,6 @@ function reconcileChildren(wipFiber, newChildElements) {
     const prevFiber = newFiber
     const element = index < elements.length && elements[index]
     const sameTag = oldFiber && element && element.tag == oldFiber.tag
-
     if (sameTag) {
       newFiber = {
         tag: oldFiber.tag,
