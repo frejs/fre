@@ -6,6 +6,16 @@ function Counter() {
     <div class="counter">
       <h1>{count}</h1>
       <button onClick={() => setCount(count + 1)}>+</button>
+      <Sex />
+    </div>
+  )
+}
+
+function Sex(){
+  const [sex, setSex] = useState('boy')
+  return (
+    <div class="counter">
+      <h1>{sex}</h1>
     </div>
   )
 }

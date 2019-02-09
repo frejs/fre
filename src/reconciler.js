@@ -28,7 +28,7 @@ export function scheduleUpdate(state) {
   updateQueue.push({
     from: HOOK,
     instance: currentInstance,
-    state: state
+    state
   })
   requestIdleCallback(performWork)
 }
@@ -62,7 +62,9 @@ function resetNextUnitOfWork() {
     update.instance.__fiber.state = update.state
   }
   const root =
-    update.from !== ROOT ? getRoot(update.instance.__fiber) : null
+    update.from == ROOT
+      ? update.dom._rootContainerFiber
+      : getRoot(update.instance.__fiber)
 
   nextUnitOfWork = {
     type: ROOT,
@@ -108,33 +110,33 @@ function updateHostComponent(wipFiber) {
     wipFiber.base = createDomElement(wipFiber)
   }
 
-  const newChildElements = wipFiber.props.children
-  reconcileChildrenArray(wipFiber, newChildElements)
+  const newChildren = wipFiber.props.children
+  reconcileChildren(wipFiber, newChildren)
 }
 
 function updateHOOKComponent(wipFiber) {
+  let oldInstance
   let instance = wipFiber.base
   if (instance == null) {
     instance = wipFiber.base = createInstance(wipFiber)
   } else if (wipFiber.props == instance.props && !wipFiber.state) {
     cloneChildFibers(wipFiber)
-    return
   }
 
   instance.props = wipFiber.props
-  instance.state = [wipFiber.state]
-  currentInstance = instance
-  wipFiber.state = null
-  const newChildElements = wipFiber.tag(wipFiber.props)
-  reconcileChildrenArray(wipFiber, newChildElements)
+  instance.state = wipFiber.state
+  oldInstance = currentInstance || instance
+  if(oldInstance) currentInstance = oldInstance
+  const newChildren = wipFiber.tag(wipFiber.props)
+  reconcileChildren(wipFiber, newChildren)
 }
 
 function arrify(val) {
   return val == null ? [] : Array.isArray(val) ? val : [val]
 }
 
-function reconcileChildrenArray(wipFiber, newChildElements) {
-  const elements = arrify(newChildElements)
+function reconcileChildren(wipFiber, newChildren) {
+  const elements = arrify(newChildren)
 
   let index = 0
   let oldFiber = wipFiber.alternate ? wipFiber.alternate.child : null
@@ -160,8 +162,7 @@ function reconcileChildrenArray(wipFiber, newChildElements) {
     if (element && !sameTag) {
       newFiber = {
         tag: element.tag,
-        type:
-          typeof element.tag === 'string' ? HOST : HOOK,
+        type: typeof element.tag === 'string' ? HOST : HOOK,
         props: element.props,
         parent: wipFiber,
         effectTag: PLACE
@@ -193,7 +194,6 @@ function createInstance(fiber) {
   instance.__fiber = fiber
   return instance
 }
-
 
 function cloneChildFibers(parentFiber) {
   const oldFiber = parentFiber.alternate
@@ -242,6 +242,7 @@ function commitAllWork(fiber) {
   fiber.effects.forEach(f => {
     commitWork(f)
   })
+  fiber.base._rootContainerFiber = fiber
   nextUnitOfWork = null
   pendingCommit = null
 }
