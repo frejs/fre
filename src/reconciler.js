@@ -12,7 +12,6 @@ const UPDATE = 3
 const ENOUGH_TIME = 1
 
 const updateQueue = []
-let context = {}
 let nextUnitOfWork = null
 let pendingCommit = null
 export let currentInstance = null
@@ -25,13 +24,13 @@ export function render(vdom, el) {
   })
   requestIdleCallback(performWork)
 }
-
+let context = {}
 export function scheduleUpdate(instance, k, v) {
-  context[k] = v
+  instance.state[k] = v
   updateQueue.push({
     from: HOOK,
     instance,
-    state: context
+    state:instance.state
   })
   requestIdleCallback(performWork)
 }
@@ -126,7 +125,7 @@ function updateHOOKComponent(wipFiber) {
   }
 
   instance.props = wipFiber.props
-  instance.state = wipFiber.state
+  instance.state = wipFiber.state || {}
   currentInstance = instance
   resetCursor()
   const newChildren = wipFiber.tag(wipFiber.props)
