@@ -1,4 +1,5 @@
 import { createDomElement, updateDomProperties } from './dom'
+import { resetCursor } from './hooks'
 
 const HOST = 'host'
 const HOOK = 'hook'
@@ -11,6 +12,7 @@ const UPDATE = 3
 const ENOUGH_TIME = 1
 
 const updateQueue = []
+let context = {}
 let nextUnitOfWork = null
 let pendingCommit = null
 export let currentInstance = null
@@ -24,11 +26,12 @@ export function render(vdom, el) {
   requestIdleCallback(performWork)
 }
 
-export function scheduleUpdate(state) {
+export function scheduleUpdate(instance, k, v) {
+  context[k] = v
   updateQueue.push({
     from: HOOK,
-    instance: currentInstance,
-    state
+    instance,
+    state: context
   })
   requestIdleCallback(performWork)
 }
@@ -115,7 +118,6 @@ function updateHostComponent(wipFiber) {
 }
 
 function updateHOOKComponent(wipFiber) {
-  let oldInstance
   let instance = wipFiber.base
   if (instance == null) {
     instance = wipFiber.base = createInstance(wipFiber)
@@ -125,8 +127,8 @@ function updateHOOKComponent(wipFiber) {
 
   instance.props = wipFiber.props
   instance.state = wipFiber.state
-  oldInstance = currentInstance || instance
-  if(oldInstance) currentInstance = oldInstance
+  currentInstance = instance
+  resetCursor()
   const newChildren = wipFiber.tag(wipFiber.props)
   reconcileChildren(wipFiber, newChildren)
 }

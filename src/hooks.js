@@ -1,11 +1,20 @@
 import { scheduleUpdate, currentInstance } from '../src/reconciler'
-let hooks = new WeakMap() //Couter():[]
+let cursor = -1
 
+function update(k, v) {
+  scheduleUpdate(this, k, v)
+}
+export function resetCursor() {
+  cursor = 0
+}
 export function useState(initial) {
-  let setter = v => {
-    scheduleUpdate(v)
-  }
+  let key = cursor + 'hook'
+  cursor++
+  let setter = update.bind(currentInstance, key)
   let state = currentInstance ? currentInstance.state : initial
-  state = !state ? initial : state
-  return [state, setter]
+  if (typeof state === 'object' && key in state) {
+    return [state[key], setter]
+  }
+  let v = initial
+  return [v, setter]
 }
