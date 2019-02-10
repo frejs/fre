@@ -7,7 +7,6 @@ const isNew = (prev, next) => key => prev[key] !== next[key]
 const isGone = (prev, next) => key => !(key in next)
 
 export function updateDomProperties(dom, prevProps, nextProps) {
-  // Remove event listeners
   Object.keys(prevProps)
     .filter(isEvent)
     .filter(key => !(key in nextProps) || isNew(prevProps, nextProps)(key))
@@ -16,7 +15,6 @@ export function updateDomProperties(dom, prevProps, nextProps) {
       dom.removeEventListener(eventType, prevProps[name])
     })
 
-  // Remove attributes
   Object.keys(prevProps)
     .filter(isAttribute)
     .filter(isGone(prevProps, nextProps))
@@ -24,7 +22,6 @@ export function updateDomProperties(dom, prevProps, nextProps) {
       dom[name] = null
     })
 
-  // Set attributes
   Object.keys(nextProps)
     .filter(isAttribute)
     .filter(isNew(prevProps, nextProps))
@@ -32,7 +29,6 @@ export function updateDomProperties(dom, prevProps, nextProps) {
       dom[name] = nextProps[name]
     })
 
-  // Set style
   prevProps.style = prevProps.style || {}
   nextProps.style = nextProps.style || {}
   Object.keys(nextProps.style)
@@ -46,7 +42,6 @@ export function updateDomProperties(dom, prevProps, nextProps) {
       dom.style[key] = ''
     })
 
-  // Add event listeners
   Object.keys(nextProps)
     .filter(isEvent)
     .filter(isNew(prevProps, nextProps))

@@ -30,7 +30,7 @@ export function scheduleUpdate(instance, k, v) {
   updateQueue.push({
     from: HOOK,
     instance,
-    state:instance.state
+    state: instance.state
   })
   requestIdleCallback(performWork)
 }

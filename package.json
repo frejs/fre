@@ -1,10 +1,11 @@
 {
   "name": "fre",
-  "version": "0.5.0",
+  "version": "1.0.0-beta",
   "description": "",
   "main": "dist/fre.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup -c"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +15,7 @@
     "@babel/core": "^7.2.2",
     "@babel/plugin-proposal-class-properties": "^7.2.3",
     "@babel/plugin-transform-react-jsx": "^7.2.0",
-    "@babel/preset-react": "^7.0.0"
+    "@babel/preset-react": "^7.0.0",
+    "rollup": "^1.1.2"
   }
 }
