@@ -105,9 +105,17 @@ props 用于组件间通信，还支持渲染 children
 另外，正在考虑将生命周期放到 props 中，也可能是单独写一个生命周期的 hook
 
 ```javascript
+function App() {
+  const [sex, setSex] = useState('boy')
+  return (
+    <div>
+      <Sex sex={sex}/>
+      <button onClick={()=>{sex==='boy'?setSex('girl'):setSex('boy')}}></button>
+    </div>
+  )
+}
 function Sex(props){
-  const [sex, setSex] = React.useState(0)
-  return <div>{props.children}</div>
+  return <div>{props.sex}</div>
 }
 ```
 ### Fiber

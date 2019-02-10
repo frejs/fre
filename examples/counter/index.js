@@ -9,16 +9,17 @@ function Counter() {
       <button onClick={() => setUp(up + 1)}>+</button>
       <h1>{down}</h1>
       <button onClick={() => setDown(down -1)}>-</button>
-      <Count />
+      <Count count={up}/>
     </div>
   )
 }
 
-function Count() {
+function Count(props) {
   const [add, setAdd] = useState(0)
   const [cut, setCut] = useState(0)
   return (
     <div class="counter">
+      <h2>{props.count}</h2>
       <h1>{add}</h1>
       <button onClick={() => setAdd(add + 1)}>+</button>
       <h1>{cut}</h1>
