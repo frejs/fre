@@ -120,7 +120,7 @@ function Sex(props){
 
 fre 可以说是 fiber 的最小实现了，不过 fiber 是内部调度，用来替代 diff 的，用户无需关注
 
-fiber 中最关键的 requestIdleCallbak 默认兼容 ie11 ，使用[polyfill](https://github.com/aFarkas/requestIdleCallback)可兼容到 ie9+
+fiber 中最关键的 requestIdleCallbak 默认兼容 ie11 ，使用[ polyfill ](https://github.com/aFarkas/requestIdleCallback)可兼容到 ie9+
 
 #### JSX
 
@@ -139,7 +139,7 @@ webpack 需配置：
   ]
 }
 ```
-当然，如果运行于浏览器环境，推荐 [htm](https://github.com/developit/htm)
+当然，如果运行于浏览器环境，推荐[ htm ](https://github.com/developit/htm)
 
 #### License
 
