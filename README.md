@@ -118,9 +118,9 @@ function Sex(props){
 ```
 ### Fiber
 
-fre 可以说是 fiber 的最小实现了，不过 fiber 是内部算法，用来替代 diff 的，客观不需要关注它的实现
+fre 可以说是 fiber 的最小实现了，不过 fiber 是内部调度，用来替代 diff 的，用户无需关注
 
-包含时间切片，调度的极简实现，如需兼容 ie ，可使用 requestIdleCallback-polyfill：[戳我](https://github.com/aFarkas/requestIdleCallback)
+fiber 中最关键的 requestIdleCallbak 默认兼容 ie11 ，使用[polyfill](https://github.com/aFarkas/requestIdleCallback)可兼容到 ie9+
 
 #### JSX
 
