@@ -1,4 +1,4 @@
-import { createDomElement, updateDomProperties } from './dom'
+import { createElement, updateProperties } from './dom'
 import { resetCursor } from './hooks'
 
 const HOST = 'host'
@@ -109,7 +109,7 @@ function beginWork(wipFiber) {
 
 function updateHostComponent(wipFiber) {
   if (!wipFiber.base) {
-    wipFiber.base = createDomElement(wipFiber)
+    wipFiber.base = createElement(wipFiber)
   }
 
   const newChildren = wipFiber.props.children
@@ -261,7 +261,7 @@ function commitWork(fiber) {
   if (fiber.effectTag == PLACE && fiber.type == HOST) {
     domParent.appendChild(fiber.base)
   } else if (fiber.effectTag == UPDATE) {
-    updateDomProperties(fiber.base, fiber.alternate.props, fiber.props)
+    updateProperties(fiber.base, fiber.alternate.props, fiber.props)
   } else if (fiber.effectTag == DELETE) {
     commitDELETE(fiber, domParent)
   }

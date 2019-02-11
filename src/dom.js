@@ -1,45 +1,30 @@
 import { TEXT } from './h'
 
 const isEvent = name => name.startsWith('on')
-const isAttribute = name =>
-  !isEvent(name) && name != 'children' && name != 'style'
+const isText = name => name === 'nodeValue'
+const isAttribute = name => name === 'class' || name === 'id'
 const isNew = (prev, next) => key => prev[key] !== next[key]
-const isGone = (prev, next) => key => !(key in next)
 
-export function updateDomProperties(dom, prevProps, nextProps) {
-  Object.keys(prevProps)
-    .filter(isEvent)
-    .filter(key => !(key in nextProps) || isNew(prevProps, nextProps)(key))
-    .forEach(name => {
-      const eventType = name.toLowerCase().substring(2)
-      dom.removeEventListener(eventType, prevProps[name])
-    })
-
-  Object.keys(prevProps)
-    .filter(isAttribute)
-    .filter(isGone(prevProps, nextProps))
-    .forEach(name => {
-      dom[name] = null
-    })
-
+export function updateProperties(dom, prevProps, nextProps) {
   Object.keys(nextProps)
-    .filter(isAttribute)
+    .filter(isText)
     .filter(isNew(prevProps, nextProps))
     .forEach(name => {
       dom[name] = nextProps[name]
     })
 
-  prevProps.style = prevProps.style || {}
+    Object.keys(nextProps)
+    .filter(isAttribute)
+    .filter(isNew(prevProps, nextProps))
+    .forEach(name => {
+      dom.setAttribute(name,nextProps[name])
+    })   
+
   nextProps.style = nextProps.style || {}
   Object.keys(nextProps.style)
     .filter(isNew(prevProps.style, nextProps.style))
     .forEach(key => {
       dom.style[key] = nextProps.style[key]
-    })
-  Object.keys(prevProps.style)
-    .filter(isGone(prevProps.style, nextProps.style))
-    .forEach(key => {
-      dom.style[key] = ''
     })
 
   Object.keys(nextProps)
@@ -51,11 +36,11 @@ export function updateDomProperties(dom, prevProps, nextProps) {
     })
 }
 
-export function createDomElement(fiber) {
+export function createElement(fiber) {
   const isTextElement = fiber.tag === TEXT
   const dom = isTextElement
     ? document.createTextNode('')
     : document.createElement(fiber.tag)
-  updateDomProperties(dom, [], fiber.props)
+  updateProperties(dom, [], fiber.props)
   return dom
 }
