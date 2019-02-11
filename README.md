@@ -1,6 +1,6 @@
 <p align="center"><img src="http://wx2.sinaimg.cn/mw690/0060lm7Tly1ftpm5b3ihfj3096097aaj.jpg" alt="fre logo" width="180"></p>
 <h1 align="center">Fre</h1>
-<p align="center">:ghost: Fast 1kb JavaScript library with Fiber and hooks API</p>
+<p align="center">:ghost: Fast 1kb JavaScript library got Fiber and hooks API</p>
 <p align="center">
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/v/fre.svg?style=flat-square" alt="npm-v"></a>
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/dm/fre.svg?style=flat-square" alt="npm-d"></a>
@@ -66,7 +66,7 @@ function Counter() {
   )
 }
 
-ReactDOM.render(<Counter />, document.getElementById('root'))
+render(<Counter />, document.getElementById('root'))
 ```
 
 ### FunctionalComponent
@@ -86,7 +86,7 @@ function Counter() {
 }
 
 function Sex(props){
-  const [sex, setSex] = React.useState(0)
+  const [sex, setSex] = useState(0)
   return (
     <div>
       <h1>{up}</h1>
@@ -95,7 +95,7 @@ function Sex(props){
   )
 }
 
-ReactDOM.render(<Counter />, document.getElementById('root'))
+render(<Counter />, document.getElementById('root'))
 ```
 
 ### props

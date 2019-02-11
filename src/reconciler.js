@@ -123,7 +123,6 @@ function updateHOOKComponent(wipFiber) {
   } else if (wipFiber.props == instance.props && !wipFiber.state) {
     cloneChildFibers(wipFiber)
   }
-
   instance.props = wipFiber.props
   instance.state = wipFiber.state || {}
   currentInstance = instance
