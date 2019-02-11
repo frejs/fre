@@ -21,18 +21,17 @@ Fre (pronounced `/fri:/`, like free) is a tiny and perfect javascript library, I
 
 ### Compare
 
-|  | 尺寸 | 组件化 | 特性 |
-| :------: | :------: | :------: | :------: |
-| fre | 1kb | hooks | Fiber |
-| preact | 3kb | class | diff |
-| vue | 10kb | SFC | Proxy + diff |
-| react | 33kb | class + hooks | Fiber |
-
+|        | 尺寸 |    组件化     |     特性     |
+| :----: | :--: | :-----------: | :----------: |
+|  fre   | 1kb  |     hooks     |    Fiber     |
+| preact | 3kb  |     class     |     diff     |
+|  vue   | 10kb |      SFC      | Proxy + diff |
+| react  | 33kb | class + hooks |    Fiber     |
 
 ### Use
 
 ```JavaScript
-import { render, h, useState } from 'fre'
+import { h, render, useState } from 'fre'
 
 function Counter() {
   const [count, setCount] = useState(0)
@@ -51,8 +50,9 @@ render(<Counter />, document.getElementById('root'))
 ### Hooks API
 
 纯 hooks API，完全移除 class ，class 和 hooks 是水火不容的，没办法配合使用，所以 hooks 对 class 是替代关系，而不是替补关系
+所以现在的 react 可以说是两个框架，而 fre，hooks 是主角
 
-``` JavaScript
+```JavaScript
 function Counter() {
   const [up, setUp] = useState(0)
   const [down, setDown] = useState(0)
@@ -71,7 +71,7 @@ render(<Counter />, document.getElementById('root'))
 
 ### FunctionalComponent
 
-新的组件化方案，完全的 functional ，不解释，就是爽，组件通讯和 react 几乎一致
+新的组件化方案，完全的 functional，组件通讯和 react 几乎一致
 
 ```JavaScript
 function App() {
@@ -86,11 +86,12 @@ function App() {
 }
 
 function Sex(props){
-  const [sex, setSex] = useState(0)
+  const [sex, setSex] = useState('boy')
   return (
     <div>
-      <h1>{props.count}</h1>
-      <button onClick={() => {sex==='boy'?setSex('girl'):setSex('boy')}}>+</button>
+      <h2>{props.count}</h2>
+      <h1>{sex}</h1>
+      <button onClick={() => {sex==='boy'?setSex('girl'):setSex('boy')}}>x</button>
     </div>
   )
 }
@@ -107,20 +108,21 @@ function App() {
   const [sex, setSex] = useState('boy')
   return (
     <div>
-      <Sex sex={sex}/>
-      <button onClick={()=>{sex==='boy'?setSex('girl'):setSex('boy')}}></button>
+      <Sex sex={sex} />
+      <button onClick={() => {sex === 'boy' ? setSex('girl') : setSex('boy')}}/>
     </div>
   )
 }
-function Sex(props){
+function Sex(props) {
   return <div>{props.sex}</div>
 }
 ```
-### Fiber
+
+#### Fiber
 
 fre 可以说是 fiber 的最小实现了，不过 fiber 是内部调度，用来替代 diff 的，用户无需关注
 
-fiber 中最关键的 requestIdleCallbak 默认兼容 ie11 ，使用[ polyfill ](https://github.com/aFarkas/requestIdleCallback)可兼容到 ie9+
+fiber 中最关键的 `requestIdleCallbak` 默认兼容 ie11 ，使用 [polyfill](https://github.com/aFarkas/requestIdleCallback) 可兼容到 ie9+
 
 #### JSX
 
@@ -139,7 +141,8 @@ webpack 需配置：
   ]
 }
 ```
-当然，如果运行于浏览器环境，推荐[ htm ](https://github.com/developit/htm)
+
+当然，现在的 fre 更适合运行于浏览器环境，可以使用 [htm](https://github.com/developit/htm)
 
 #### License
 
