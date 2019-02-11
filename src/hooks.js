@@ -1,5 +1,5 @@
 import { scheduleUpdate, currentInstance } from '../src/reconciler'
-let cursor = -1
+let cursor = 0
 
 function update(k, v) {
   scheduleUpdate(this, k, v)
@@ -9,12 +9,12 @@ export function resetCursor() {
 }
 export function useState(initial) {
   let key = 'h' + cursor
-  cursor++
   let setter = update.bind(currentInstance, key)
+  if (currentInstance) cursor++
   let state = currentInstance ? currentInstance.state : initial
   if (typeof state === 'object' && key in state) {
     return [state[key], setter]
   }
-  let v = initial
-  return [v, setter]
+  state = initial
+  return [state, setter]
 }
