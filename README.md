@@ -74,13 +74,13 @@ render(<Counter />, document.getElementById('root'))
 新的组件化方案，完全的 functional ，不解释，就是爽，组件通讯和 react 几乎一致
 
 ```JavaScript
-function Counter() {
+function App() {
   const [count, setCount] = useState(0)
   return (
     <div>
       <h1>{count}</h1>
       <button onClick={() => setCount(count + 1)}>+</button>
-      <Sex />
+      <Sex count={count}/>
     </div>
   )
 }
@@ -89,20 +89,18 @@ function Sex(props){
   const [sex, setSex] = useState(0)
   return (
     <div>
-      <h1>{up}</h1>
+      <h1>{props.count}</h1>
       <button onClick={() => {sex==='boy'?setSex('girl'):setSex('boy')}}>+</button>
     </div>
   )
 }
 
-render(<Counter />, document.getElementById('root'))
+render(<App />, document.getElementById('root'))
 ```
 
 ### props
 
-props 用于组件间通信，还支持渲染 children
-
-另外，正在考虑将生命周期放到 props 中，也可能是单独写一个生命周期的 hook
+props 用于组件间通信，正在考虑将生命周期放到 props 中，也可能是单独写一个生命周期的 hook
 
 ```javascript
 function App() {
@@ -120,9 +118,9 @@ function Sex(props){
 ```
 ### Fiber
 
-fre 可以说是 fiber 的最小实现了，不过 fiber 是内部算法，用来替代 diff 的
+fre 可以说是 fiber 的最小实现了，不过 fiber 是内部算法，用来替代 diff 的，客观不需要关注它的实现
 
-包含时间切片，调度的极简实现，由于关键的 `requestIdeCallback` 兼容到 ie11，所以如果运行低版本 ie 中需要自行打补丁
+包含时间切片，调度的极简实现，如需兼容 ie ，可使用 requestIdleCallback-polyfill：[戳我](https://github.com/aFarkas/requestIdleCallback)
 
 #### JSX
 
