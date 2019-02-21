@@ -19,7 +19,7 @@ function sex(state, action) {
 }
 
 function Counter() {
-  const [counter, dispatch] = useReducer(count, { count: 1 })
+  const [counter, dispatch] = useReducer(count, { count: 0 })
   const [sexer, change] = useReducer(sex, { sex: 'boy' })
   return (
     <div>
