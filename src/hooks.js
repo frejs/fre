@@ -8,7 +8,7 @@ export function resetCursor() {
   cursor = 0
 }
 export function useState(initial) {
-  let key = 'h' + cursor
+  let key = '$' + cursor
   let setter = update.bind(currentInstance, key)
   if (currentInstance) cursor++
   let state = currentInstance ? currentInstance.state : initial
