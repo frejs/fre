@@ -1,20 +1,27 @@
 import { scheduleUpdate, currentInstance } from './reconciler'
 let cursor = 0
 
-function update(k, v) {
+function update(k, r, v) {
+  r ? (v = r(this.state[k], v)) : v
   scheduleUpdate(this, k, v)
 }
 export function resetCursor() {
   cursor = 0
 }
-export function useState(initial) {
+export function useState(initState) {
+  return useReducer(null, initState)
+}
+export function useReducer(reducer, initState) {
   let key = '$' + cursor
-  let setter = update.bind(currentInstance, key)
+  let setter = update.bind(currentInstance, key, reducer)
   if (currentInstance) cursor++
-  let state = currentInstance ? currentInstance.state : initial
+  let state
+  if (currentInstance) state = currentInstance.state
   if (typeof state === 'object' && key in state) {
     return [state[key], setter]
+  } else {
+    if (currentInstance) currentInstance.state[key] = initState
   }
-  state = initial
-  return [state, setter]
+  let value = initState
+  return [value, setter]
 }

@@ -24,9 +24,9 @@ export function render(vdom, el) {
   })
   requestIdleCallback(performWork)
 }
-let context = {}
+
 export function scheduleUpdate(instance, k, v) {
-  instance.state[k] = v
+  instance.state[k] =  v
   updateQueue.push({
     from: HOOK,
     instance,
@@ -123,7 +123,7 @@ function updateHOOKComponent(wipFiber) {
   } else if (wipFiber.props == instance.props && !wipFiber.state) {
     cloneChildFibers(wipFiber)
   }
-  instance.props = wipFiber.props
+  instance.props = wipFiber.props || {}
   instance.state = wipFiber.state || {}
   currentInstance = instance
   resetCursor()

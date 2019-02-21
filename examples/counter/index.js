@@ -28,15 +28,4 @@ function Count(props) {
   )
 }
 
-
-// function Sex() {
-//   const [sex, setSex] = useState('boy')
-//   return (
-//     <div>
-//       <h1>{sex}</h1>
-//       <button onClick={()=>{sex === 'boy' ? setSex('girl') : setSex('boy')}}>x</button>
-//     </div>
-//   )
-// }
-
-render(<Counter />, document.getElementById('app'))
+render(<Counter />, document.getElementById('root'))
