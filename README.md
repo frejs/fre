@@ -88,8 +88,8 @@ function Counter() {
   return (
     <div>
       {state.count}
-      <button onClick={() => dispatch({ type: 'increment' })}>+</button>
-      <button onClick={() => change({ type: 'girl' })}>x</button>
+      <button onClick={() => dispatch({ type: 'up' })}>+</button>
+      <button onClick={() => dispatch({ type: 'down' })}>+</button>
     </div>
   )
 }
