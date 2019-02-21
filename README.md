@@ -117,6 +117,16 @@ function Sex(props) {
   return <div>{props.sex}</div>
 }
 ```
+和 react 一样，props 默认包含了 children，用于渲染组件的所有子元素
+
+```javascript
+const Box = (props) => <div>{props.children}</div>
+const HelloBox = () => (
+  <Box>
+    <h1>Hello world !</h1>
+  </Box>
+)
+```
 
 #### Fiber
 

@@ -1,4 +1,4 @@
-import { scheduleUpdate, currentInstance } from '../src/reconciler'
+import { scheduleUpdate, currentInstance } from './reconciler'
 let cursor = 0
 
 function update(k, v) {
