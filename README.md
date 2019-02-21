@@ -49,8 +49,10 @@ render(<Counter />, document.getElementById('root'))
 
 ### Hooks API
 
-纯 hooks API，完全移除 class ，class 和 hooks 是水火不容的，没办法配合使用，所以 hooks 对 class 是替代关系，而不是替补关系
+纯 hooks API，完全移除 class ，class 和 hooks 是水火不容的，两者的 API 完全独立存在
 所以现在的 react 可以说是两个框架，而 fre，hooks 是主角
+
+#### useState
 
 ```JavaScript
 function Counter() {
@@ -62,6 +64,32 @@ function Counter() {
       <button onClick={() => setUp(up + 1)}>+</button>
       <h1>{down}</h1>
       <button onClick={() => setDown(down -1)}>-</button>
+    </div>
+  )
+}
+
+render(<Counter />, document.getElementById('root'))
+```
+useReducer 和 useState 几乎是一样的，需要外置外置 reducer (全局)
+
+#### useReducer
+```javascript
+function reducer(state, action) {
+  switch (action.type) {
+    case 'up':
+      return { count: state.count + 1 }
+    case 'down':
+      return { count: state.count - 1 }
+  }
+}
+
+function Counter() {
+  const [state, dispatch] = useReducer(count, { count: 1 })
+  return (
+    <div>
+      {state.count}
+      <button onClick={() => dispatch({ type: 'increment' })}>+</button>
+      <button onClick={() => change({ type: 'girl' })}>x</button>
     </div>
   )
 }
@@ -120,12 +148,13 @@ function Sex(props) {
 和 react 一样，props 默认包含了 children，用于渲染组件的所有子元素
 
 ```javascript
-const Box = (props) => <div>{props.children}</div>
 const HelloBox = () => (
   <Box>
     <h1>Hello world !</h1>
   </Box>
 )
+
+const Box = (props) => <div>{props.children}</div>
 ```
 
 #### Fiber
