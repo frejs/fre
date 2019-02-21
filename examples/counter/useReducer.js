@@ -1,8 +1,6 @@
 import { h, render, useReducer } from '../../src'
 
-const initialState = { count: 0 }
-
-function reducer(state, action) {
+function count(state, action) {
   switch (action.type) {
     case 'increment':
       return { count: state.count + 1 }
@@ -11,12 +9,24 @@ function reducer(state, action) {
   }
 }
 
+function sex(state, action) {
+  switch (action.type) {
+    case 'boy':
+      return { sex: 'boy' }
+    case 'girl':
+      return { sex: 'girl' }
+  }
+}
+
 function Counter() {
-  const [state, dispatch] = useReducer(reducer, initialState)
+  const [counter, dispatch] = useReducer(count, { count: 1 })
+  const [sexer, change] = useReducer(sex, { sex: 'boy' })
   return (
     <div>
-      {state.count}
+      {counter.count}
+      {sexer.sex}
       <button onClick={() => dispatch({ type: 'increment' })}>+</button>
+      <button onClick={() => change({ type: 'girl' })}>x</button>
     </div>
   )
 }
