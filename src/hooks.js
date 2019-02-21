@@ -3,7 +3,8 @@ let cursor = 0
 
 function update(k, r, v) {
   r ? (v = r(this.state[k], v)) : v
-  scheduleUpdate(this, k, v)
+  //这里实现不太准确，目的是确保每次只执行一次
+  setTimeout(() => scheduleUpdate(this, k, v))
 }
 export function resetCursor() {
   cursor = 0
