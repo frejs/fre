@@ -15,5 +15,8 @@
     "@babel/plugin-proposal-class-properties": "^7.2.3",
     "@babel/plugin-transform-react-jsx": "^7.2.0",
     "@babel/preset-react": "^7.0.0"
+  },
+  "dependencies": {
+    "fre": "^1.0.0-beta"
   }
 }

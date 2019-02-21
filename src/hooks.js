@@ -3,7 +3,7 @@ let cursor = 0
 
 function update(k, r, v) {
   r ? (v = r(this.state[k], v)) : v
-  //这里实现不太准确，目的是确保每次只执行一次
+  //这里实现不太理想，之后想办法搞成微任务
   setTimeout(() => scheduleUpdate(this, k, v))
 }
 export function resetCursor() {
@@ -25,4 +25,13 @@ export function useReducer(reducer, initState) {
   }
   let value = initState
   return [value, setter]
+}
+
+// 这个实现并不准确
+export function useEffect(effect, inputs) {
+  if (currentInstance) {
+    let key = '$' + cursor
+    currentInstance.effects[key] = effect
+    cursor++
+  }
 }

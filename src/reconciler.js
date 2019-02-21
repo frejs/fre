@@ -26,7 +26,7 @@ export function render(vdom, el) {
 }
 
 export function scheduleUpdate(instance, k, v) {
-  instance.state[k] =  v
+  instance.state[k] = v
   updateQueue.push({
     from: HOOK,
     instance,
@@ -52,6 +52,14 @@ function workLoop(deadline) {
   if (pendingCommit) {
     commitAllWork(pendingCommit)
   }
+  commitEffects(currentInstance.effects)
+}
+
+function commitEffects(effects) {
+  Object.keys(effects).forEach(key => {
+    let effect = effects[key]
+    effect()
+  })
 }
 
 function resetNextUnitOfWork() {
@@ -125,6 +133,7 @@ function updateHOOKComponent(wipFiber) {
   }
   instance.props = wipFiber.props || {}
   instance.state = wipFiber.state || {}
+  instance.effects = wipFiber.effects || {}
   currentInstance = instance
   resetCursor()
   const newChildren = wipFiber.tag(wipFiber.props)
