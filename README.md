@@ -97,6 +97,27 @@ function Counter() {
 render(<Counter />, document.getElementById('root'))
 ```
 
+#### useEffect
+useEffect 就是传入一个副作用函数，然后执行时机是 commit 结束
+
+这个 API 我在思考是否需要 useLifeCycle 替代
+```javascript
+function Counter() {
+  const [count, setCount] = useState(0)
+  useEffect(() => {
+    document.title = 'count is ' + count
+  })
+  return (
+    <div>
+      <h1>{count}</h1>
+      <button onClick={() => setCount(count + 1)}>+</button>
+    </div>
+  )
+}
+
+render(<Counter />, document.getElementById('root'))
+```
+
 ### FunctionalComponent
 
 新的组件化方案，完全的 functional，组件通讯和 react 几乎一致
