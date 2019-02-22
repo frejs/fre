@@ -1,6 +1,6 @@
 {
   "name": "fre",
-  "version": "1.0.0-beta",
+  "version": "1.0.0-beta3",
   "description": "",
   "main": "dist/fre.js",
   "scripts": {

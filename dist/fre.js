@@ -17,45 +17,30 @@
   }
 
   const isEvent = name => name.startsWith('on');
-  const isAttribute = name =>
-    !isEvent(name) && name != 'children' && name != 'style';
+  const isText = name => name === 'nodeValue';
+  const isAttribute = name => name === 'class' || name === 'id' || name === 'href' || name === 'target' || name === 'src';
   const isNew = (prev, next) => key => prev[key] !== next[key];
-  const isGone = (prev, next) => key => !(key in next);
 
-  function updateDomProperties(dom, prevProps, nextProps) {
-    Object.keys(prevProps)
-      .filter(isEvent)
-      .filter(key => !(key in nextProps) || isNew(prevProps, nextProps)(key))
-      .forEach(name => {
-        const eventType = name.toLowerCase().substring(2);
-        dom.removeEventListener(eventType, prevProps[name]);
-      });
-
-    Object.keys(prevProps)
-      .filter(isAttribute)
-      .filter(isGone(prevProps, nextProps))
-      .forEach(name => {
-        dom[name] = null;
-      });
-
+  function updateProperties(dom, prevProps, nextProps) {
     Object.keys(nextProps)
-      .filter(isAttribute)
+      .filter(isText)
       .filter(isNew(prevProps, nextProps))
       .forEach(name => {
         dom[name] = nextProps[name];
       });
 
-    prevProps.style = prevProps.style || {};
+      Object.keys(nextProps)
+      .filter(isAttribute)
+      .filter(isNew(prevProps, nextProps))
+      .forEach(name => {
+        dom.setAttribute(name,nextProps[name]);
+      });   
+
     nextProps.style = nextProps.style || {};
     Object.keys(nextProps.style)
       .filter(isNew(prevProps.style, nextProps.style))
       .forEach(key => {
         dom.style[key] = nextProps.style[key];
-      });
-    Object.keys(prevProps.style)
-      .filter(isGone(prevProps.style, nextProps.style))
-      .forEach(key => {
-        dom.style[key] = '';
       });
 
     Object.keys(nextProps)
@@ -67,33 +52,50 @@
       });
   }
 
-  function createDomElement(fiber) {
+  function createElement(fiber) {
     const isTextElement = fiber.tag === TEXT;
     const dom = isTextElement
       ? document.createTextNode('')
       : document.createElement(fiber.tag);
-    updateDomProperties(dom, [], fiber.props);
+    updateProperties(dom, [], fiber.props);
     return dom
   }
 
-  let cursor = -1;
+  let cursor = 0;
 
-  function update(k, v) {
-    scheduleUpdate(this, k, v);
+  function update(k, r, v) {
+    r ? (v = r(this.state[k], v)) : v;
+    //这里实现不太理想，之后想办法搞成微任务
+    setTimeout(() => scheduleUpdate(this, k, v));
   }
   function resetCursor() {
     cursor = 0;
   }
-  function useState(initial) {
-    let key = 'h' + cursor;
-    cursor++;
-    let setter = update.bind(currentInstance, key);
-    let state = currentInstance ? currentInstance.state : initial;
+  function useState(initState) {
+    return useReducer(null, initState)
+  }
+  function useReducer(reducer, initState) {
+    let key = '$' + cursor;
+    let setter = update.bind(currentInstance, key, reducer);
+    if (currentInstance) cursor++;
+    let state;
+    if (currentInstance) state = currentInstance.state;
     if (typeof state === 'object' && key in state) {
       return [state[key], setter]
+    } else {
+      if (currentInstance) currentInstance.state[key] = initState;
     }
-    let v = initial;
-    return [v, setter]
+    let value = initState;
+    return [value, setter]
+  }
+
+  // 这个实现并不准确
+  function useEffect(effect, inputs) {
+    if (currentInstance) {
+      let key = '$' + cursor;
+      currentInstance.effects[key] = effect;
+      cursor++;
+    }
   }
 
   const HOST = 'host';
@@ -119,6 +121,7 @@
     });
     requestIdleCallback(performWork);
   }
+
   function scheduleUpdate(instance, k, v) {
     instance.state[k] = v;
     updateQueue.push({
@@ -146,6 +149,14 @@
     if (pendingCommit) {
       commitAllWork(pendingCommit);
     }
+    commitEffects(currentInstance.effects);
+  }
+
+  function commitEffects(effects) {
+    Object.keys(effects).forEach(key => {
+      let effect = effects[key];
+      effect();
+    });
   }
 
   function resetNextUnitOfWork() {
@@ -203,7 +214,7 @@
 
   function updateHostComponent(wipFiber) {
     if (!wipFiber.base) {
-      wipFiber.base = createDomElement(wipFiber);
+      wipFiber.base = createElement(wipFiber);
     }
 
     const newChildren = wipFiber.props.children;
@@ -217,9 +228,9 @@
     } else if (wipFiber.props == instance.props && !wipFiber.state) {
       cloneChildFibers(wipFiber);
     }
-
-    instance.props = wipFiber.props;
+    instance.props = wipFiber.props || {};
     instance.state = wipFiber.state || {};
+    instance.effects = wipFiber.effects || {};
     currentInstance = instance;
     resetCursor();
     const newChildren = wipFiber.tag(wipFiber.props);
@@ -356,7 +367,7 @@
     if (fiber.effectTag == PLACE && fiber.type == HOST) {
       domParent.appendChild(fiber.base);
     } else if (fiber.effectTag == UPDATE) {
-      updateDomProperties(fiber.base, fiber.alternate.props, fiber.props);
+      updateProperties(fiber.base, fiber.alternate.props, fiber.props);
     } else if (fiber.effectTag == DELETE) {
       commitDELETE(fiber, domParent);
     }
@@ -383,6 +394,8 @@
   exports.h = h;
   exports.render = render;
   exports.useState = useState;
+  exports.useReducer = useReducer;
+  exports.useEffect = useEffect;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

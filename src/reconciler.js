@@ -51,8 +51,8 @@ function workLoop(deadline) {
   }
   if (pendingCommit) {
     commitAllWork(pendingCommit)
+    commitEffects(currentInstance.effects)
   }
-  commitEffects(currentInstance.effects)
 }
 
 function commitEffects(effects) {

@@ -2,7 +2,7 @@ import { TEXT } from './h'
 
 const isEvent = name => name.startsWith('on')
 const isText = name => name === 'nodeValue'
-const isAttribute = name => name === 'class' || name === 'id'
+const isAttribute = name => name === 'class' || name === 'id' || name === 'href' || name === 'target' || name === 'src'
 const isNew = (prev, next) => key => prev[key] !== next[key]
 
 export function updateProperties(dom, prevProps, nextProps) {
