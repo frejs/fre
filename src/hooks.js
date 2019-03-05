@@ -3,7 +3,7 @@ let cursor = 0
 
 function update(key, reducer, value) {
   reducer ? (value = reducer(this.state[key], value)) : value
-  setTimeout(() => scheduleUpdate(this, key, value))
+  requestAnimationFrame(() => scheduleUpdate(this, key, value))
 }
 export function resetCursor() {
   cursor = 0

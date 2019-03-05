@@ -2,7 +2,12 @@ import { TEXT } from './h'
 
 const isEvent = name => name.startsWith('on')
 const isText = name => name === 'nodeValue'
-const isAttribute = name => name === 'class' || name === 'id' || name === 'href' || name === 'target' || name === 'src'
+const isAttribute = name =>
+  name === 'class' ||
+  name === 'id' ||
+  name === 'href' ||
+  name === 'target' ||
+  name === 'src'
 const isNew = (prev, next) => key => prev[key] !== next[key]
 
 export function updateProperties(dom, prevProps, nextProps) {
@@ -13,12 +18,12 @@ export function updateProperties(dom, prevProps, nextProps) {
       dom[name] = nextProps[name]
     })
 
-    Object.keys(nextProps)
+  Object.keys(nextProps)
     .filter(isAttribute)
     .filter(isNew(prevProps, nextProps))
     .forEach(name => {
-      dom.setAttribute(name,nextProps[name])
-    })   
+      dom.setAttribute(name, nextProps[name])
+    })
 
   nextProps.style = nextProps.style || {}
   Object.keys(nextProps.style)

@@ -26,7 +26,7 @@ function Counter() {
       {counter.count}
       {sexer.sex}
       <button onClick={() => dispatch({ type: 'increment' })}>+</button>
-      <button onClick={() => change({ type: 'girl' })}>x</button>
+      <button onClick={() => sexer.sex==='boy'?change({ type: 'girl' }):change({ type: 'boy' })}>x</button>
     </div>
   )
 }
