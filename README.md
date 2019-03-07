@@ -70,9 +70,11 @@ function Counter() {
 
 render(<Counter />, document.getElementById('root'))
 ```
+
 useReducer 和 useState 几乎是一样的，需要外置外置 reducer (全局)
 
 #### useReducer
+
 ```javascript
 function reducer(state, action) {
   switch (action.type) {
@@ -98,19 +100,40 @@ render(<Counter />, document.getElementById('root'))
 ```
 
 #### useEffect
-useEffect 就是传入一个副作用函数，然后执行时机是 commit 结束
 
-这个 API 我在思考是否需要 useLifeCycle 替代
+useEffect 接受两个参数，第一个参数是一个副作用函数，第二个参数是个数组，通常为 props
+
+当第二个参数的某一项发生变化时，执行副作用函数，执行时机为 commit 结束
+
 ```javascript
-function Counter() {
+function Counter({ flag }) {
   const [count, setCount] = useState(0)
   useEffect(() => {
     document.title = 'count is ' + count
-  })
+  }, [flag])
   return (
     <div>
       <h1>{count}</h1>
       <button onClick={() => setCount(count + 1)}>+</button>
+    </div>
+  )
+}
+
+render(<Counter />, document.getElementById('root'))
+```
+
+#### useMemo
+
+useMemo 和 useEffect 参数一致，不同的是，第一个参数通常是组件函数，同步执行
+
+```javascript
+function Counter() {
+  const [count, setCount] = useState(0)
+  return (
+    <div>
+      <h1>{count}</h1>
+      <button onClick={() => setCount(count + 1)}>+</button>
+      {(useMemo(<Sex />), [])}
     </div>
   )
 }
@@ -158,7 +181,11 @@ function App() {
   return (
     <div>
       <Sex sex={sex} />
-      <button onClick={() => {sex === 'boy' ? setSex('girl') : setSex('boy')}}/>
+      <button
+        onClick={() => {
+          sex === 'boy' ? setSex('girl') : setSex('boy')
+        }}
+      />
     </div>
   )
 }
@@ -166,6 +193,7 @@ function Sex(props) {
   return <div>{props.sex}</div>
 }
 ```
+
 和 react 一样，props 默认包含了 children，用于渲染组件的所有子元素
 
 ```javascript
@@ -175,7 +203,7 @@ const HelloBox = () => (
   </Box>
 )
 
-const Box = (props) => <div>{props.children}</div>
+const Box = props => <div>{props.children}</div>
 ```
 
 #### Fiber
