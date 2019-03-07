@@ -1,5 +1,6 @@
 import { scheduleUpdate, currentInstance } from './reconciler'
 let cursor = 0
+let oldInputs = []
 
 function update(key, reducer, value) {
   reducer ? (value = reducer(this.state[key], value)) : value
@@ -28,7 +29,21 @@ export function useReducer(reducer, initState) {
 export function useEffect(effect, inputs) {
   if (currentInstance) {
     let key = '$' + cursor
-    currentInstance.effects[key] = effect
+    currentInstance.effects[key] = useMemo(effect, inputs)
     cursor++
+  }
+}
+
+export function useMemo(create, inputs) {
+  return function() {
+    if (currentInstance) {
+      let hasChaged = inputs.length
+        ? oldInputs.some((value, i) => inputs[i] !== value)
+        : true
+      if (hasChaged) {
+        create()
+      }
+      oldInputs = inputs
+    }
   }
 }

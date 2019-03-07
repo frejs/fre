@@ -4,7 +4,7 @@ function Counter() {
   const [count, setCount] = useState(0)
   useEffect(() => {
     document.title = 'count is ' + count
-  })
+  }, [1])
   return (
     <div>
       <h1>{count}</h1>
