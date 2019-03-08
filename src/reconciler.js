@@ -11,7 +11,7 @@ const UPDATE = 3
 
 const ENOUGH_TIME = 1
 
-const updateQueue = []
+let updateQueue = []
 let nextUnitOfWork = null
 let pendingCommit = null
 export let currentInstance = null
@@ -36,14 +36,14 @@ export function scheduleUpdate(instance, k, v) {
 }
 
 function performWork(deadline) {
-  workLoop(deadline)
   if (nextUnitOfWork || updateQueue.length > 0) {
+    workLoop(deadline)
     requestIdleCallback(performWork)
   }
 }
 
 function workLoop(deadline) {
-  if (!nextUnitOfWork) {
+  if (!nextUnitOfWork && updateQueue.length) {
     resetNextUnitOfWork()
   }
   while (nextUnitOfWork && deadline.timeRemaining() > ENOUGH_TIME) {
@@ -82,14 +82,6 @@ function resetNextUnitOfWork() {
     props: update.newProps || root.props,
     alternate: root
   }
-}
-
-function getRoot(fiber) {
-  let node = fiber
-  while (node.parent) {
-    node = node.parent
-  }
-  return node
 }
 
 function performUnitOfWork(wipFiber) {
@@ -254,6 +246,7 @@ function commitAllWork(fiber) {
   fiber.base._rootContainerFiber = fiber
   nextUnitOfWork = null
   pendingCommit = null
+  updateQueue.length = 0
 }
 
 function commitWork(fiber) {
@@ -292,4 +285,12 @@ function commitDELETE(fiber, domParent) {
     }
     node = node.sibling
   }
+}
+
+function getRoot(fiber) {
+  let node = fiber
+  while (node.parent) {
+    node = node.parent
+  }
+  return node
 }
