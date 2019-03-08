@@ -4,7 +4,7 @@ let oldInputs = []
 
 function update(key, reducer, value) {
   reducer ? (value = reducer(this.state[key], value)) : value
-  setTimeout(() => scheduleUpdate(this, key, value))
+  scheduleUpdate(this, key, value)
 }
 export function resetCursor() {
   cursor = 0

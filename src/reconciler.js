@@ -9,8 +9,6 @@ const PLACE = 1
 const DELETE = 2
 const UPDATE = 3
 
-const ENOUGH_TIME = 1
-
 let updateQueue = []
 let nextUnitOfWork = null
 let pendingCommit = null
@@ -36,22 +34,18 @@ export function scheduleUpdate(instance, k, v) {
 }
 
 function performWork(deadline) {
-  if (nextUnitOfWork || updateQueue.length > 0) {
-    workLoop(deadline)
-    requestIdleCallback(performWork)
-  }
-}
-
-function workLoop(deadline) {
   if (!nextUnitOfWork && updateQueue.length) {
     resetNextUnitOfWork()
   }
-  while (nextUnitOfWork && deadline.timeRemaining() > ENOUGH_TIME) {
+  while (nextUnitOfWork && deadline.timeRemaining() > 1) {
     nextUnitOfWork = performUnitOfWork(nextUnitOfWork)
   }
   if (pendingCommit) {
     commitAllWork(pendingCommit)
     commitEffects(currentInstance.effects)
+  }
+  if (nextUnitOfWork || updateQueue.length) {
+    requestIdleCallback(performWork)
   }
 }
 
@@ -132,12 +126,12 @@ function updateHOOKComponent(wipFiber) {
   reconcileChildren(wipFiber, newChildren)
 }
 
-function arrify(val) {
-  return val == null ? [] : Array.isArray(val) ? val : [val]
-}
-
 function reconcileChildren(wipFiber, newChildren) {
-  const elements = arrify(newChildren)
+  const elements = !newChildren
+    ? []
+    : Array.isArray(newChildren)
+    ? newChildren
+    : [newChildren]
 
   let index = 0
   let oldFiber = wipFiber.alternate ? wipFiber.alternate.child : null
