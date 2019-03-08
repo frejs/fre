@@ -1,4 +1,4 @@
-import { scheduleUpdate, currentInstance } from './reconciler'
+import { scheduleUpdate, currentInstance, resetInstance } from './reconciler'
 let cursor = 0
 let oldInputs = []
 
@@ -47,4 +47,3 @@ export function useMemo(create, inputs) {
     }
   }
 }
-

@@ -44,6 +44,10 @@ function performWork(deadline) {
     commitAllWork(pendingCommit)
     commitEffects(currentInstance.effects)
   }
+
+  if (nextUnitOfWork || updateQueue.length > 0) {
+    requestIdleCallback(performWork)
+  }
 }
 
 function resetNextUnitOfWork() {
