@@ -44,16 +44,6 @@ function performWork(deadline) {
     commitAllWork(pendingCommit)
     commitEffects(currentInstance.effects)
   }
-  if (nextUnitOfWork || updateQueue.length) {
-    requestIdleCallback(performWork)
-  }
-}
-
-function commitEffects(effects) {
-  Object.keys(effects).forEach(key => {
-    let effect = effects[key]
-    effect()
-  })
 }
 
 function resetNextUnitOfWork() {
@@ -240,7 +230,6 @@ function commitAllWork(fiber) {
   fiber.base._rootContainerFiber = fiber
   nextUnitOfWork = null
   pendingCommit = null
-  updateQueue.length = 0
 }
 
 function commitWork(fiber) {
@@ -287,4 +276,11 @@ function getRoot(fiber) {
     node = node.parent
   }
   return node
+}
+
+function commitEffects(effects) {
+  Object.keys(effects).forEach(key => {
+    let effect = effects[key]
+    effect()
+  })
 }
