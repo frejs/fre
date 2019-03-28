@@ -24,7 +24,7 @@ const runHigh = async () => {
 }
 const runLow = async () => {
   let i = 0
-  while (i < length) {
+  while (i < 100) {
     await sm.requestIdlePromise() //等待空闲时间
     await new Promise(res => setTimeout(res, 500))
     await lowTask(i)
