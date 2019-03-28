@@ -32,5 +32,5 @@ const runLow = async () => {
 }
 runLow()
 
-document.querySelector('#myButton').onclick = runHigh()
+document.querySelector('button').onclick = runHigh()
 ```
