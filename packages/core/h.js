@@ -1,3 +1,4 @@
+//和 react 不同的是，children 是作为第二个参数传入，而不是 props.children
 export function h (type, props) {
   let rest = []
   let children = []
