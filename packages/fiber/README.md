@@ -1,11 +1,12 @@
-### fre-fiber
+## fre-fiber
 
-fiber 的另类实现，包含两部分：
+从这次重构开始，不再跟进 react，此处为 fiber 的另类实现，包含两部分：
 
-##### scheduler
+### scheduler
 
 极小的优先级调度器实现，和 react 不同的是，fre 通过 promise 实现的调度
 
+它负责做的事情很简单，就是负责高优先级的任务尽可能快的执行，低优先级的任务有空就执行
 ```javascript
 const sm = new Scheduler()
 const call = key => sm.wrap(() => console.log(key))
@@ -34,3 +35,8 @@ runLow()
 
 document.querySelector('button').onclick = runHigh()
 ```
+### reconciler
+
+调和器的极小实现，也是 fre 的主逻辑，主要负责遍历链表、更新状态、操作 dom
+
+go on ...
