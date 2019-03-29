@@ -16,15 +16,15 @@ export class Scheduler {
   }
   wrap (fn) {
     this.lock()
-    let e = fn()
-    if (!!e && typeof e.then === 'function') {
+    let f = fn()
+    if (!!f && typeof f.then === 'function') {
       return e.then(res => {
         this.unlock()
         return res
       })
     } else {
       this.unlock()
-      return e
+      return f
     }
   }
   requestIdlePromise (options) {
