@@ -1,13 +1,13 @@
 export class Scheduler {
-  constructor (num = 1) {
-    this.num = num
+  constructor (amount = 1) {
+    this.amount = amount
     this.count = 0
     this.iC = new Set()
     this.PH = new Map()
     this.HP = new Map()
   }
   isIdle () {
-    return this.count < this.num
+    return this.count < this.amount
   }
   lock () {
     this.count++
