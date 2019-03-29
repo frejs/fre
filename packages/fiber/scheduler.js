@@ -4,7 +4,6 @@ export class Scheduler {
     this.count = 0
     this.iC = new Set()
     this.PH = new Map()
-    this.HP = new Map()
   }
   isIdle () {
     return this.count < this.amount
@@ -17,15 +16,15 @@ export class Scheduler {
   }
   wrap (fn) {
     this.lock()
-    let isPromise = fn()
-    try {
-      return isPromise.then(res => {
+    let f = fn()
+    if (!!f && typeof f.then === 'function') {
+      return e.then(res => {
         this.unlock()
         return res
       })
-    } finally {
+    } else {
       this.unlock()
-      return isPromise
+      return f
     }
   }
   requestIdlePromise (options) {
@@ -45,9 +44,8 @@ export class Scheduler {
       options.timer = timer
     }
 
-    this.iC.add(this)
+    this.iC.add(promise)
     tryIdleCall(this)
-
     return promise
   }
 
@@ -59,7 +57,6 @@ export class Scheduler {
     this.iC.forEach(promise => removeIdlePromise(this, promise))
     this.count = 0
     this.iC.clear()
-    this.HP = new Map()
     this.PH = new Map()
   }
 }
@@ -70,10 +67,9 @@ function removeIdlePromise (sm, promise) {
   if (sm.PH.has(promise)) {
     const handle = sm.PH.get(promise)
     sm.PH.delete(handle)
-    sm.HP.delete(promise)
   }
 
-  scheduler.iC.delete(promise)
+  sm.iC.delete(promise)
 }
 
 function tryIdleCall (sm) {
@@ -85,7 +81,7 @@ function tryIdleCall (sm) {
       return
     }
     setTimeout(() => {
-      if (sm.isIdle()) {
+      if (!sm.isIdle()) {
         sm.try = false
         return
       }
