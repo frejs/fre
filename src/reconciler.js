@@ -1,5 +1,6 @@
 import { createElement, updateProperties } from './dom'
 import { resetCursor } from './hooks'
+import { Scheduler } from './scheduler'
 
 const HOST = 'host'
 const HOOK = 'hook'
@@ -9,12 +10,14 @@ const PLACE = 1
 const DELETE = 2
 const UPDATE = 3
 
+const sm = new Scheduler
+
 let updateQueue = []
 let nextUnitOfWork = null
 let pendingCommit = null
 export let currentInstance = null
 
-export function render(vdom, el) {
+export function render (vdom, el) {
   updateQueue.push({
     from: ROOT,
     dom: el,
@@ -23,7 +26,7 @@ export function render(vdom, el) {
   requestIdleCallback(performWork)
 }
 
-export function scheduleUpdate(instance, k, v) {
+export function scheduleUpdate (instance, k, v) {
   instance.state[k] = v
   updateQueue.push({
     from: HOOK,
@@ -33,7 +36,7 @@ export function scheduleUpdate(instance, k, v) {
   requestIdleCallback(performWork)
 }
 
-function performWork(deadline) {
+function performWork (deadline) {
   if (!nextUnitOfWork && updateQueue.length) {
     resetNextUnitOfWork()
   }
@@ -50,7 +53,7 @@ function performWork(deadline) {
   }
 }
 
-function resetNextUnitOfWork() {
+function resetNextUnitOfWork () {
   const update = updateQueue.shift()
   if (!update) {
     return
@@ -72,7 +75,7 @@ function resetNextUnitOfWork() {
   }
 }
 
-function performUnitOfWork(wipFiber) {
+function performUnitOfWork (wipFiber) {
   beginWork(wipFiber)
   if (wipFiber.child) {
     return wipFiber.child
@@ -87,7 +90,7 @@ function performUnitOfWork(wipFiber) {
   }
 }
 
-function beginWork(wipFiber) {
+function beginWork (wipFiber) {
   if (wipFiber.type == HOOK) {
     updateHOOKComponent(wipFiber)
   } else {
@@ -95,7 +98,7 @@ function beginWork(wipFiber) {
   }
 }
 
-function updateHostComponent(wipFiber) {
+function updateHostComponent (wipFiber) {
   if (!wipFiber.base) {
     wipFiber.base = createElement(wipFiber)
   }
@@ -104,7 +107,7 @@ function updateHostComponent(wipFiber) {
   reconcileChildren(wipFiber, newChildren)
 }
 
-function updateHOOKComponent(wipFiber) {
+function updateHOOKComponent (wipFiber) {
   let instance = wipFiber.base
   if (instance == null) {
     instance = wipFiber.base = createInstance(wipFiber)
@@ -120,12 +123,12 @@ function updateHOOKComponent(wipFiber) {
   reconcileChildren(wipFiber, newChildren)
 }
 
-function reconcileChildren(wipFiber, newChildren) {
+function reconcileChildren (wipFiber, newChildren) {
   const elements = !newChildren
     ? []
     : Array.isArray(newChildren)
-    ? newChildren
-    : [newChildren]
+      ? newChildren
+      : [newChildren]
 
   let index = 0
   let oldFiber = wipFiber.alternate ? wipFiber.alternate.child : null
@@ -178,13 +181,13 @@ function reconcileChildren(wipFiber, newChildren) {
   }
 }
 
-function createInstance(fiber) {
+function createInstance (fiber) {
   const instance = new fiber.tag(fiber.props)
   instance.__fiber = fiber
   return instance
 }
 
-function cloneChildFibers(parentFiber) {
+function cloneChildFibers (parentFiber) {
   const oldFiber = parentFiber.alternate
   if (!oldFiber.child) {
     return
@@ -212,7 +215,7 @@ function cloneChildFibers(parentFiber) {
   }
 }
 
-function completeWork(fiber) {
+function completeWork (fiber) {
   if (fiber.type == HOOK) {
     fiber.base.__fiber = fiber
   }
@@ -227,7 +230,7 @@ function completeWork(fiber) {
   }
 }
 
-function commitAllWork(fiber) {
+function commitAllWork (fiber) {
   fiber.effects.forEach(f => {
     commitWork(f)
   })
@@ -236,7 +239,7 @@ function commitAllWork(fiber) {
   pendingCommit = null
 }
 
-function commitWork(fiber) {
+function commitWork (fiber) {
   if (fiber.type == ROOT) {
     return
   }
@@ -256,7 +259,7 @@ function commitWork(fiber) {
   }
 }
 
-function commitDELETE(fiber, domParent) {
+function commitDELETE (fiber, domParent) {
   let node = fiber
   while (true) {
     if (node.type == HOOK) {
@@ -274,7 +277,7 @@ function commitDELETE(fiber, domParent) {
   }
 }
 
-function getRoot(fiber) {
+function getRoot (fiber) {
   let node = fiber
   while (node.parent) {
     node = node.parent
@@ -282,7 +285,7 @@ function getRoot(fiber) {
   return node
 }
 
-function commitEffects(effects) {
+function commitEffects (effects) {
   Object.keys(effects).forEach(key => {
     let effect = effects[key]
     effect()
