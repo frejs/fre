@@ -40,4 +40,10 @@ document.querySelector('button').onclick = runHigh()
 
 调和器的极小实现，也是 fre 的主逻辑，主要负责遍历链表、更新状态、操作 dom
 
-go on ...
+重要概念：
+
+work 和 commit，两个阶段，work 会进行状态更新和 diff，commit 是操作 dom
+
+WIP 是 work in progress，正在进行的工作
+
+这个方法的两个方法，diff 和 dom 属性更新，将会在 core 包实现
