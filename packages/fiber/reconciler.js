@@ -60,7 +60,7 @@ function initNextUnitOfWork () {
   const root = update.from === ROOT ? update.dom : getRoot(upda.instance.fiber)
 
   nextUnitOfWork = {
-    type: ROOT,
+    tag: ROOT,
     base: update.dom || root.base,
     props: update.vdom.props || root.props,
     copy: root
@@ -81,7 +81,7 @@ function performUnitOfWork (WIP) {
 }
 
 function beginWork (WIP) {
-  WIP.type === HOOK ? updateHookComponent(WIP) : updateHostComponent(WIP)
+  WIP.tag === HOOK ? updateHookComponent(WIP) : updateHostComponent(WIP)
 }
 
 function updateHookComponent (WIP) {
@@ -120,9 +120,9 @@ function cloneChildFibers (parent) {
 
   while (oldChild) {
     const newChild = ({
-      type,
-      base,
       tag,
+      base,
+      type,
       props,
       state,
       copy,
