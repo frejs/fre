@@ -1,7 +1,6 @@
 import { Scheduler } from './index'
 let updateQueue = []
-let nextUnitOfWork = null
-let currentInstance = null
+let nextUnitOfWork,currentInstance,pendingCommit
 const [ROOT, HOST, HOOK, ADD, UPDATE, DELETE] = [
   'root',
   'host',
