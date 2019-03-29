@@ -30,7 +30,6 @@ export class Scheduler {
   requestIdlePromise (options) {
     options = options || {}
     let resolve
-
     const promise = new Promise(res => (resolve = res))
     const resolveOut = () => {
       removeIdlePromise(this, promise)
