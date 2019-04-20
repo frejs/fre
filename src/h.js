@@ -18,10 +18,8 @@ export function h (type, props) {
     }
   }
 
-  return typeof type === 'function'
-    ? type({ ...props, children })
-    : {
-      type,
-      props: { ...props, children }
-    }
+  return {
+    type,
+    props: { ...props, children }
+  }
 }

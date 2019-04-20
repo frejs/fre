@@ -14,7 +14,7 @@ const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
 let updateQueue = []
 let nextWork = null
 let pendingCommit = null
-let currentFiber = null
+let currentInstance = null
 
 export function render (vdom, container) {
   updateQueue.push({
@@ -25,11 +25,11 @@ export function render (vdom, container) {
   defer(workLoop)
 }
 
-export function scheduleWork (instance, k, v) {
-  // instance.state[k] = v
+export function scheduleWork (instance) {
   updateQueue.push({
     from: HOOK,
-    instance
+    instance,
+    state: instance.state
   })
   defer(workLoop)
 }
@@ -51,6 +51,7 @@ function resetWork () {
   if (!update) return
 
   if (update.state) {
+    // 更新阶段
     update.instance.fiber.state = update.state
   }
   const root =
@@ -89,16 +90,15 @@ function updateHost (WIP) {
 }
 
 function updateHOOK (WIP) {
-  currentFiber = WIP
   let instance = WIP.base
   if (instance == null) {
     instance = WIP.base = createInstance(WIP)
-  } else if (WIP.props == instance.props && !WIP.state) {
+  } else if (WIP.props == WIP.props && !WIP.state) {
     cloneChildFibers(WIP)
   }
   instance.props = WIP.props || {}
   instance.state = WIP.state || {}
-  instance.patches = WIP.patches || []
+  currentInstance = instance
   resetCursor()
   const newChildren = WIP.type(WIP.props)
   reconcileChildren(WIP, newChildren)
@@ -118,7 +118,6 @@ function reconcileChildren (WIP, newChildren) {
     const sameType = oldFiber && child && child.type == oldFiber.type
 
     if (sameType) {
-      // 更新
       newFiber = {
         tag: oldFiber.tag,
         base: oldFiber.base,
@@ -126,13 +125,12 @@ function reconcileChildren (WIP, newChildren) {
         alternate: oldFiber,
         patchTag: UPDATE,
         type: oldFiber.type,
-        props: child.props,
+        props: child.props || { value: child.value },
         state: oldFiber.state
       }
     }
 
     if (child && !sameType) {
-      // 初次
       newFiber = {
         tag: typeof child.type === 'string' ? HOST : HOOK,
         type: child.type,
@@ -170,12 +168,11 @@ function createInstance (fiber) {
 
 function cloneChildFibers (parentFiber) {
   const oldFiber = parentFiber.alternate
-  if (!oldFiber.child) {
-    return
-  }
+  if (!oldFiber.child) return
 
   let oldChild = oldFiber.child
   let prevChild = null
+
   while (oldChild) {
     const newChild = {
       type: oldChild.type,
@@ -263,6 +260,6 @@ function getRoot (fiber) {
   return node
 }
 
-export function getCurrentFiber () {
-  return currentFiber || null
+export function getCurrentInstance () {
+  return currentInstance || null
 }
