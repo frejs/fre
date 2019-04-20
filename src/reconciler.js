@@ -62,7 +62,8 @@ function resetWork () {
     tag: ROOT,
     base: update.base || root.base,
     props: update.props || root.props,
-    children: update.children
+    children: update.children || root.children,
+    alternate: root
   }
 }
 
@@ -107,43 +108,45 @@ function updateHOOK (wipFiber) {
 }
 
 function reconcileChildren (WIP, newChildren) {
-  const elements = arrayfy(newChildren)
+  const childs = arrayfy(newChildren)
 
   let index = 0
   let oldFiber = WIP.alternate ? WIP.alternate.child : null
   let newFiber = null
-  while (index < elements.length || oldFiber != null) {
-    const prevFiber = newFiber
-    const element = index < elements.length && elements[index]
-    const sameType = oldFiber && element && element.type == oldFiber.type
 
-    if (sameType) {
+  while (index < childs.length || oldFiber != null) {
+    const prevFiber = newFiber
+    const child = index < childs.length && childs[index]
+
+    const sameType = oldFiber && child && child.type == oldFiber.type
+
+    if (sameType) { //更新逻辑
       newFiber = {
-        type: oldFiber.type,
         tag: oldFiber.tag,
         base: oldFiber.base,
-        props: element.props,
         parent: WIP,
         alternate: oldFiber,
+        patchTag: UPDATE,
+        type: oldFiber.type,
+        props: element.props,
         state: oldFiber.state,
-        effectTag: UPDATE
       }
     }
 
-    if (element && !sameType) {
+    if (child && !sameType) { //初次逻辑
       newFiber = {
-        type: element.type,
         tag: typeof element.type === 'string' ? HOST : HOOK,
-        props: element.props,
+        type: child.type,
+        props: child.props,
         parent: WIP,
         effectTag: PLACE
       }
     }
 
     if (oldFiber && !sameType) {
-      oldFiber.effectTag = DELETE
-      WIP.effects = WIP.effects || []
-      WIP.effects.push(oldFiber)
+      oldFiber.patchTag = DELETE
+      WIP.patches = WIP.patches || []
+      WIP.patches.push(oldFiber)
     }
 
     if (oldFiber) {
@@ -152,7 +155,7 @@ function reconcileChildren (WIP, newChildren) {
 
     if (index == 0) {
       WIP.child = newFiber
-    } else if (prevFiber && element) {
+    } else if (prevFiber && child) {
       prevFiber.sibling = newFiber
     }
 
