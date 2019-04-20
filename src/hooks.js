@@ -2,20 +2,21 @@ import { scheduleWork, getCurrentFiber } from './reconciler'
 let cursor = 0
 let oldInputs = []
 
-function update (key, reducer, value) {
+function update(key, reducer, value) {
   console.log(this)
   // reducer ? (value = reducer(this.state[key], value)) : value
   scheduleWork(this, key, value)
 }
-export function resetCursor () {
+export function resetCursor() {
   cursor = 0
 }
-export function useState (initState) {
+export function useState(initState) {
   return useReducer(null, initState)
 }
-export function useReducer (reducer, initState) {
+export function useReducer(reducer, initState) {
   let key = '$' + cursor
   let currentFiber = getCurrentFiber()
+  
   let setter = update.bind(currentFiber, key, reducer)
   if (currentFiber) cursor++
   let state
@@ -28,7 +29,7 @@ export function useReducer (reducer, initState) {
   let value = initState
   return [value, setter]
 }
-export function useEffect (effect, inputs) {
+export function useEffect(effect, inputs) {
   if (currentFiber) {
     let key = '$' + cursor
     currentFiber.effects[key] = useMemo(effect, inputs)
@@ -36,8 +37,8 @@ export function useEffect (effect, inputs) {
   }
 }
 
-export function useMemo (create, inputs) {
-  return function () {
+export function useMemo(create, inputs) {
+  return function() {
     if (currentFiber) {
       let hasChaged = inputs.length
         ? oldInputs.some((value, i) => inputs[i] !== value)

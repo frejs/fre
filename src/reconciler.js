@@ -89,6 +89,7 @@ function updateHost (WIP) {
 }
 
 function updateHOOK (WIP) {
+  currentFiber = WIP
   let instance = WIP.base
   if (instance == null) {
     instance = WIP.base = createInstance(WIP)
@@ -263,5 +264,5 @@ function getRoot (fiber) {
 }
 
 export function getCurrentFiber () {
-  return nextWork || {}
+  return currentFiber || null
 }
