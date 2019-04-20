@@ -208,13 +208,9 @@ const Box = props => <div>{props.children}</div>
 
 #### Fiber
 
-fre 可以说是 fiber 的最小实现了，不过 fiber 是内部调度，用来替代 diff 的，用户无需关注
+fre 的 fiber 是营养不良的，它只是使用了类似的遍历方式（链表），却并没有实现优先级调度
 
-值得一提，fre 的 fiber 是阉割版，和 react 不同，fre 中没有高低优先级的调度，所有渲染任务均为低优先级
-
-但这并不意味着失去了 fiber 的意义，fiber 在 fre 中，更重要的是替代 diff 算法，减小维护难度
-
-fiber 中最关键的 `requestIdleCallbak` 默认兼容 ie11 ，使用 [polyfill](https://github.com/aFarkas/requestIdleCallback) 可兼容到 ie9+
+内部仍然是通过 micro task 调度更新的
 
 #### JSX
 
