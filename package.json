@@ -16,6 +16,8 @@
     "@babel/plugin-proposal-class-properties": "^7.2.3",
     "@babel/plugin-transform-react-jsx": "^7.2.0",
     "@babel/preset-react": "^7.0.0",
-    "rollup": "^1.1.2"
+    "rollup": "^1.1.2",
+    "rollup-plugin-cleanup": "^3.1.1",
+    "rollup-plugin-license": "^0.8.1"
   }
 }
