@@ -14,34 +14,34 @@ export function useState (initState) {
   return useReducer(null, initState)
 }
 export function useReducer (reducer, initState) {
-  let currentFiber = getCurrentInstance()
+  let current = getCurrentInstance()
   let key = '$' + cursor
-  let setter = update.bind(currentFiber, key, reducer)
-  if (!currentFiber) {
+  let setter = update.bind(current, key, reducer)
+  if (!current) {
     return [initState, setter]
   } else {
     cursor++
-    let state = currentFiber.state
+    let state = current.state
     if (typeof state === 'object' && key in state) {
       return [state[key], setter]
     } else {
-      currentFiber.state[key] = initState
+      current.state[key] = initState
     }
     let value = initState
     return [value, setter]
   }
 }
 export function useEffect (effect, inputs) {
-  if (currentFiber) {
+  if (current) {
     let key = '$' + cursor
-    currentFiber.effects[key] = useMemo(effect, inputs)
+    current.effects[key] = useMemo(effect, inputs)
     cursor++
   }
 }
 
 export function useMemo (create, inputs) {
   return function () {
-    if (currentFiber) {
+    if (current) {
       let hasChaged = inputs.length
         ? oldInputs.some((value, i) => inputs[i] !== value)
         : true
