@@ -17,7 +17,6 @@ let pendingCommit = null
 export let currentInstance = null
 
 export function render (vdom, container) {
-  console.log(vdom)
   updateQueue.push({
     from: ROOT,
     base: container,
@@ -86,7 +85,7 @@ function performWork (WIP) {
 function updateHost (WIP) {
   if (!WIP.base) WIP.base = createElement(WIP)
 
-  const newChildren = WIP.children
+  const newChildren = WIP.props.children
   reconcileChildren(WIP, newChildren)
 }
 
@@ -99,7 +98,7 @@ function updateHOOK (wipFiber) {
   }
   instance.props = wipFiber.props || {}
   instance.state = wipFiber.state || {}
-  instance.effects = wipFiber.effects || {}
+  instance.patches = wipFiber.patches || {}
   currentInstance = instance
   resetCursor()
   const newChildren = wipFiber.type(wipFiber.props)
@@ -128,7 +127,7 @@ function reconcileChildren (WIP, newChildren) {
         alternate: oldFiber,
         patchTag: UPDATE,
         type: oldFiber.type,
-        props: element.props,
+        props: child.props,
         state: oldFiber.state
       }
     }
@@ -136,11 +135,11 @@ function reconcileChildren (WIP, newChildren) {
     if (child && !sameType) {
       // 初次逻辑
       newFiber = {
-        tag: typeof element.type === 'string' ? HOST : HOOK,
+        tag: typeof child.type === 'string' ? HOST : HOOK,
         type: child.type,
         props: child.props,
         parent: WIP,
-        effectTag: PLACE
+        patchTag: PLACE
       }
     }
 
@@ -204,17 +203,17 @@ function completeWork (fiber) {
   }
 
   if (fiber.parent) {
-    const childEffects = fiber.effects || []
-    const thisEffect = fiber.effectTag != null ? [fiber] : []
-    const parentEffects = fiber.parent.effects || []
-    fiber.parent.effects = parentEffects.concat(childEffects, thisEffect)
+    const childpatches = fiber.patches || []
+    const thisEffect = fiber.patchTag != null ? [fiber] : []
+    const parentpatches = fiber.parent.patches || []
+    fiber.parent.patches = parentpatches.concat(childpatches, thisEffect)
   } else {
     pendingCommit = fiber
   }
 }
 
 function commitAllWork (WIP) {
-  WIP.effects.forEach(f => commitWork(f))
+  WIP.patches.forEach(f => commitWork(f))
   WIP.base.rootFiber = WIP
 
   nextWork = null
@@ -230,11 +229,11 @@ function commitWork (fiber) {
   }
   const domParent = domParentFiber.base
 
-  if (fiber.effectTag == PLACE && fiber.tag == HOST) {
+  if (fiber.patchTag == PLACE && fiber.tag == HOST) {
     domParent.appendChild(fiber.base)
-  } else if (fiber.effectTag == UPDATE) {
+  } else if (fiber.patchTag == UPDATE) {
     updateProperties(fiber.base, fiber.alternate.props, fiber.props)
-  } else if (fiber.effectTag == DELETE) {
+  } else if (fiber.patchTag == DELETE) {
     commitDELETE(fiber, domParent)
   }
 }
@@ -264,10 +263,3 @@ function getRoot (fiber) {
   }
   return node
 }
-
-// function commitEffects (effects) {
-//   Object.keys(effects).forEach(key => {
-//     let effect = effects[key]
-//     effect()
-//   })
-// }
