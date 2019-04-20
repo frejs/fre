@@ -199,10 +199,10 @@ function completeWork (fiber) {
   }
 
   if (fiber.parent) {
-    const childpatches = fiber.patches || []
-    const thisEffect = fiber.patchTag != null ? [fiber] : []
-    const parentpatches = fiber.parent.patches || []
-    fiber.parent.patches = parentpatches.concat(childpatches, thisEffect)
+    const childPatches = fiber.patches || []
+    const selfPatch = fiber.patchTag ? [fiber] : []
+    const parentPatches = fiber.parent.patches || []
+    fiber.parent.patches = parentPatches.concat(childPatches, selfPatch)
   } else {
     pendingCommit = fiber
   }
