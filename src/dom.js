@@ -10,7 +10,15 @@ const isAttribute = name =>
   name === 'src'
 const isNew = (prev, next) => key => prev[key] !== next[key]
 
-export function updateProperties(dom, prevProps, nextProps) {
+export function updateProperties (dom, prevProps, nextProps) {
+  Object.keys(prevProps)
+    .filter(isEvent)
+    .filter(key => !(key in nextProps) || isNew(prevProps, nextProps)(key))
+    .forEach(name => {
+      const eventType = name.toLowerCase().substring(2)
+      dom.removeEventListener(eventType, prevProps[name])
+    })
+
   Object.keys(nextProps)
     .filter(isText)
     .filter(isNew(prevProps, nextProps))
@@ -41,7 +49,7 @@ export function updateProperties(dom, prevProps, nextProps) {
     })
 }
 
-export function createElement(fiber) {
+export function createElement (fiber) {
   const isTextElement = fiber.tag === TEXT
   const dom = isTextElement
     ? document.createTextNode('')

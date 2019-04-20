@@ -1,6 +1,5 @@
 import { createElement, updateProperties } from './dom'
 import { resetCursor } from './hooks'
-import { Scheduler } from './scheduler'
 
 const HOST = 'host'
 const HOOK = 'hook'
@@ -9,8 +8,6 @@ const ROOT = 'root'
 const PLACE = 1
 const DELETE = 2
 const UPDATE = 3
-
-const sm = new Scheduler
 
 let updateQueue = []
 let nextUnitOfWork = null
