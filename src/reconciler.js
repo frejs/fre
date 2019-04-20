@@ -15,11 +15,12 @@ let nextWork = null
 let pendingCommit = null
 export let currentInstance = null
 
-export function render (vdom, el) {
+export function render (vdom, container) {
   updateQueue.push({
     from: ROOT,
-    base: el,
-    props: { children: vdom }
+    base: container,
+    props: {},
+    children: vdom
   })
   requestAnimationFrame(workLoop)
 }
@@ -55,34 +56,30 @@ function resetWork () {
     update.instance.fiber.state = update.state
   }
   const root =
-    update.from == ROOT
-      ? update.base.rootFiber
-      : getRoot(update.instance.fiber)
+    update.from == ROOT ? update.base.rootFiber : getRoot(update.instance.fiber)
 
   nextWork = {
     tag: ROOT,
     base: update.base || root.base,
     props: update.props || root.props,
-    alternate: root
+    children: update.children
   }
 }
 
-function performWork (wipFiber) {
-  if (wipFiber.tag == HOOK) {
-    updateHOOK(wipFiber)
+function performWork (WIP) {
+  if (WIP.tag == HOOK) {
+    updateHOOK(WIP)
   } else {
-    updateHost(wipFiber)
+    updateHost(WIP)
   }
-  if (wipFiber.child) {
-    return wipFiber.child
+  if (WIP.child) {
+    return WIP.child
   }
-  let uow = wipFiber
-  while (uow) {
-    completeWork(uow)
-    if (uow.sibling) {
-      return uow.sibling
-    }
-    uow = uow.parent
+  let wip = WIP
+  while (wip) {
+    completeWork(wip)
+    if (wip.sibling) return wip.sibling
+    wip = wip.parent
   }
 }
 
@@ -219,7 +216,6 @@ function completeWork (fiber) {
 }
 
 function commitAllWork (fiber) {
-  console.log(fiber)
   fiber.effects.forEach(f => {
     commitWork(f)
   })
@@ -274,9 +270,9 @@ function getRoot (fiber) {
   return node
 }
 
-function commitEffects (effects) {
-  Object.keys(effects).forEach(key => {
-    let effect = effects[key]
-    effect()
-  })
-}
+// function commitEffects (effects) {
+//   Object.keys(effects).forEach(key => {
+//     let effect = effects[key]
+//     effect()
+//   })
+// }
