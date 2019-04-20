@@ -2,8 +2,8 @@ export class Scheduler {
   constructor (amount = 1) {
     this.amount = amount
     this.count = 0
-    this.set = new Set
-    this.map = new Map
+    this.iC = new Set()
+    this.PH = new Map()
   }
   isIdle () {
     return this.count < this.amount
@@ -30,6 +30,7 @@ export class Scheduler {
   requestIdlePromise (options) {
     options = options || {}
     let resolve
+
     const promise = new Promise(res => (resolve = res))
     const resolveOut = () => {
       removeIdlePromise(this, promise)
@@ -43,7 +44,7 @@ export class Scheduler {
       options.timer = timer
     }
 
-    this.set.add(promise)
+    this.iC.add(promise)
     tryIdleCall(this)
     return promise
   }
@@ -53,26 +54,26 @@ export class Scheduler {
   }
 
   clear () {
-    this.set.forEach(promise => removeIdlePromise(this, promise))
+    this.iC.forEach(promise => removeIdlePromise(this, promise))
     this.count = 0
-    this.set.clear()
-    this.map = new Map
+    this.iC.clear()
+    this.PH = new Map()
   }
 }
 
 function removeIdlePromise (sm, promise) {
   if (!promise) return
   if (promise.timer) clearTimeout(promise.timer)
-  if (sm.map.has(promise)) {
-    const handle = sm.map.get(promise)
-    sm.map.delete(handle)
+  if (sm.PH.has(promise)) {
+    const handle = sm.PH.get(promise)
+    sm.PH.delete(handle)
   }
 
-  sm.set.delete(promise)
+  sm.iC.delete(promise)
 }
 
 function tryIdleCall (sm) {
-  if (sm.try || sm.set.size === 0) return
+  if (sm.try || sm.iC.size === 0) return
   sm.try = true
   setTimeout(() => {
     if (!sm.isIdle()) {
@@ -91,8 +92,8 @@ function tryIdleCall (sm) {
 }
 
 function resolveOneIdeleCall (sm) {
-  if (sm.set.size === 0) return
-  const iterator = sm.set.values()
+  if (sm.iC.size === 0) return
+  const iterator = sm.iC.values()
   const oldestPromise = iterator.next().value
 
   oldestPromise.effect()

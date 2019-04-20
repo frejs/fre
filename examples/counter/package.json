@@ -1,0 +1,22 @@
+{
+  "name": "counter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "parcel index.html"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.2.3",
+    "@babel/plugin-transform-react-jsx": "^7.2.0",
+    "@babel/preset-react": "^7.0.0"
+  },
+  "dependencies": {
+    "fre": "^1.0.0-beta"
+  }
+}

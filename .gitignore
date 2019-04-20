@@ -2,7 +2,7 @@
 /.idea/
 /.cache/
 yarn-error.log
-/ignore/
+.ignore/
 packages/.fre/
 examples/counter/node_modules/
 examples/counter/.cache/
