@@ -50,10 +50,10 @@ export function updateProperties (dom, prevProps, nextProps) {
 }
 
 export function createElement (fiber) {
-  const isTextElement = fiber.tag === TEXT
-  const dom = isTextElement
-    ? document.createTextNode('')
-    : document.createElement(fiber.tag)
-  updateProperties(dom, [], fiber.props)
-  return dom
+  const element =
+    fiber.type === 'text'
+      ? document.createTextNode('')
+      : document.createElement(fiber.type)
+  updateProperties(element, [], fiber.props)
+  return element
 }

@@ -1,6 +1,6 @@
 import { createElement, updateProperties } from './dom'
 import { resetCursor } from './hooks'
-import { defer } from './util'
+import { defer, arrayfy } from './util'
 
 const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
   'host',
@@ -83,13 +83,11 @@ function performWork (WIP) {
   }
 }
 
-function updateHost (wipFiber) {
-  if (!wipFiber.base) {
-    wipFiber.base = createElement(wipFiber)
-  }
+function updateHost (WIP) {
+  if (!WIP.base) WIP.base = createElement(WIP)
 
-  const newChildren = wipFiber.props.children
-  reconcileChildren(wipFiber, newChildren)
+  const newChildren = WIP.children
+  reconcileChildren(WIP, newChildren)
 }
 
 function updateHOOK (wipFiber) {
@@ -108,15 +106,11 @@ function updateHOOK (wipFiber) {
   reconcileChildren(wipFiber, newChildren)
 }
 
-function reconcileChildren (wipFiber, newChildren) {
-  const elements = !newChildren
-    ? []
-    : Array.isArray(newChildren)
-      ? newChildren
-      : [newChildren]
+function reconcileChildren (WIP, newChildren) {
+  const elements = arrayfy(newChildren)
 
   let index = 0
-  let oldFiber = wipFiber.alternate ? wipFiber.alternate.child : null
+  let oldFiber = WIP.alternate ? WIP.alternate.child : null
   let newFiber = null
   while (index < elements.length || oldFiber != null) {
     const prevFiber = newFiber
@@ -129,7 +123,7 @@ function reconcileChildren (wipFiber, newChildren) {
         tag: oldFiber.tag,
         base: oldFiber.base,
         props: element.props,
-        parent: wipFiber,
+        parent: WIP,
         alternate: oldFiber,
         state: oldFiber.state,
         effectTag: UPDATE
@@ -141,15 +135,15 @@ function reconcileChildren (wipFiber, newChildren) {
         type: element.type,
         tag: typeof element.type === 'string' ? HOST : HOOK,
         props: element.props,
-        parent: wipFiber,
+        parent: WIP,
         effectTag: PLACE
       }
     }
 
     if (oldFiber && !sameType) {
       oldFiber.effectTag = DELETE
-      wipFiber.effects = wipFiber.effects || []
-      wipFiber.effects.push(oldFiber)
+      WIP.effects = WIP.effects || []
+      WIP.effects.push(oldFiber)
     }
 
     if (oldFiber) {
@@ -157,7 +151,7 @@ function reconcileChildren (wipFiber, newChildren) {
     }
 
     if (index == 0) {
-      wipFiber.child = newFiber
+      WIP.child = newFiber
     } else if (prevFiber && element) {
       prevFiber.sibling = newFiber
     }
