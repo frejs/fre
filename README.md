@@ -1,6 +1,6 @@
 <p align="center"><img src="http://wx2.sinaimg.cn/mw690/0060lm7Tly1ftpm5b3ihfj3096097aaj.jpg" alt="fre logo" width="180"></p>
 <h1 align="center">Fre</h1>
-<p align="center">:ghost: Fast 1kb JavaScript library got Fiber scheduler and hooks API</p>
+<p align="center">:ghost: Fast 1kb React-like hooks API JavaScript library</p>
 <p align="center">
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/v/fre.svg?style=flat-square" alt="npm-v"></a>
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/dm/fre.svg?style=flat-square" alt="npm-d"></a>
@@ -9,7 +9,7 @@
 
 ### Feature
 
-- :tada: hooks API , really functionalComponents
+- :tada: hooks API , really functionalComponent
 - :confetti_ball: Fiber scheduler instead of diff algorithm
 - :telescope: All in one , just 1 KB
 
@@ -21,12 +21,12 @@ Fre (pronounced `/fri:/`, like free) is a tiny and perfect javascript library, I
 
 ### Compare
 
-|        | 尺寸 |    组件化     |     特性     |
-| :----: | :--: | :-----------: | :----------: |
-|  fre   | 1kb  |     hooks     |    Fiber     |
-| preact | 3kb  |     class     |     diff     |
-|  vue   | 10kb |      SFC      | Proxy + diff |
-| react  | 33kb | class + hooks |    Fiber     |
+|        | 尺寸 |    组件化     |     特性     |                        路由                        |
+| :----: | :--: | :-----------: | :----------: | :------------------------------------------------: |
+|  fre   | 1kb  |     hooks     |    Fiber     | [use-routes](https://github.com/132yse/use-routes) |
+| preact | 3kb  |     class     |     diff     |                        ...                         |
+|  vue   | 10kb |      SFC      | Proxy + diff |                     vue-router                     |
+| react  | 33kb | class + hooks |    Fiber     |             react-router / use-routes              |
 
 ### Use
 
