@@ -1,5 +1,7 @@
-const isEvent = name => name.startsWith('on')
+const isEvent = name => name[0] === 'o' && name[1] === 'n'
 const isText = name => name === 'value'
+const isOther = name =>
+  name !== 'value' && name[0] !== 'o' && name[1] !== 'n' && name !== 'children'
 const isNew = (prev, next) => key => prev[key] !== next[key]
 
 export function updateProperties (dom, prevProps, nextProps) {
@@ -9,7 +11,7 @@ export function updateProperties (dom, prevProps, nextProps) {
     .forEach(name => (dom['nodeValue'] = nextProps[name]))
 
   Object.keys(nextProps)
-    .filter(!isEvent && !isText)
+    .filter(isOther)
     .filter(isNew(prevProps, nextProps))
     .forEach(name => dom.setAttribute(name, nextProps[name]))
 
