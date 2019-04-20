@@ -1,42 +1,44 @@
-import { scheduleWork, currentInstance } from './reconciler'
+import { scheduleWork, getCurrentFiber } from './reconciler'
 let cursor = 0
 let oldInputs = []
 
-function update(key, reducer, value) {
-  reducer ? (value = reducer(this.state[key], value)) : value
+function update (key, reducer, value) {
+  console.log(this)
+  // reducer ? (value = reducer(this.state[key], value)) : value
   scheduleWork(this, key, value)
 }
-export function resetCursor() {
+export function resetCursor () {
   cursor = 0
 }
-export function useState(initState) {
+export function useState (initState) {
   return useReducer(null, initState)
 }
-export function useReducer(reducer, initState) {
+export function useReducer (reducer, initState) {
   let key = '$' + cursor
-  let setter = update.bind(currentInstance, key, reducer)
-  if (currentInstance) cursor++
+  let currentFiber = getCurrentFiber()
+  let setter = update.bind(currentFiber, key, reducer)
+  if (currentFiber) cursor++
   let state
-  if (currentInstance) state = currentInstance.state
+  if (currentFiber) state = currentFiber.state
   if (typeof state === 'object' && key in state) {
     return [state[key], setter]
   } else {
-    if (currentInstance) currentInstance.state[key] = initState
+    if (currentFiber) currentFiber.state[key] = initState
   }
   let value = initState
   return [value, setter]
 }
-export function useEffect(effect, inputs) {
-  if (currentInstance) {
+export function useEffect (effect, inputs) {
+  if (currentFiber) {
     let key = '$' + cursor
-    currentInstance.effects[key] = useMemo(effect, inputs)
+    currentFiber.effects[key] = useMemo(effect, inputs)
     cursor++
   }
 }
 
-export function useMemo(create, inputs) {
-  return function() {
-    if (currentInstance) {
+export function useMemo (create, inputs) {
+  return function () {
+    if (currentFiber) {
       let hasChaged = inputs.length
         ? oldInputs.some((value, i) => inputs[i] !== value)
         : true

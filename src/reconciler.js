@@ -14,7 +14,7 @@ const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
 let updateQueue = []
 let nextWork = null
 let pendingCommit = null
-export let currentInstance = null
+let currentFiber = null
 
 export function render (vdom, container) {
   updateQueue.push({
@@ -26,12 +26,10 @@ export function render (vdom, container) {
 }
 
 export function scheduleWork (instance, k, v) {
-  console.log(instance)
-  instance.state[k] = v
+  // instance.state[k] = v
   updateQueue.push({
     from: HOOK,
-    instance,
-    state: instance.state
+    instance
   })
   defer(workLoop)
 }
@@ -90,20 +88,19 @@ function updateHost (WIP) {
   reconcileChildren(WIP, newChildren)
 }
 
-function updateHOOK (wipFiber) {
-  let instance = wipFiber.base
+function updateHOOK (WIP) {
+  let instance = WIP.base
   if (instance == null) {
-    instance = wipFiber.base = createInstance(wipFiber)
-  } else if (wipFiber.props == instance.props && !wipFiber.state) {
-    cloneChildFibers(wipFiber)
+    instance = WIP.base = createInstance(WIP)
+  } else if (WIP.props == instance.props && !WIP.state) {
+    cloneChildFibers(WIP)
   }
-  instance.props = wipFiber.props || {}
-  instance.state = wipFiber.state || {}
-  instance.patches = wipFiber.patches || {}
-  currentInstance = instance
+  instance.props = WIP.props || {}
+  instance.state = WIP.state || {}
+  instance.patches = WIP.patches || []
   resetCursor()
-  const newChildren = wipFiber.type(wipFiber.props)
-  reconcileChildren(wipFiber, newChildren)
+  const newChildren = WIP.type(WIP.props)
+  reconcileChildren(WIP, newChildren)
 }
 
 function reconcileChildren (WIP, newChildren) {
@@ -263,4 +260,8 @@ function getRoot (fiber) {
     node = node.parent
   }
   return node
+}
+
+export function getCurrentFiber () {
+  return nextWork || {}
 }
