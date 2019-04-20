@@ -17,6 +17,7 @@ let pendingCommit = null
 export let currentInstance = null
 
 export function render (vdom, container) {
+  console.log(vdom)
   updateQueue.push({
     from: ROOT,
     base: container,
@@ -141,6 +142,7 @@ function reconcileChildren (WIP, newChildren) {
         parent: WIP,
         patchTag: PLACE
       }
+      // console.log(newFiber)
     }
 
     if (oldFiber && !sameType) {

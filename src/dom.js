@@ -1,7 +1,7 @@
 import { TEXT } from './h'
 
 const isEvent = name => name.startsWith('on')
-const isText = name => name === 'nodeValue'
+const isText = name => name === 'value'
 const isAttribute = name =>
   name === 'class' ||
   name === 'id' ||

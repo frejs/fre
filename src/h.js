@@ -1,5 +1,3 @@
-// h 函数，和 react 不同的是，children 不再放到 props 里，而是作为第二个参数传入
-
 export function h (type, props) {
   let rest = []
   let children = []
@@ -15,6 +13,7 @@ export function h (type, props) {
       }
     } else if (node === null || node === true || node === false) {
     } else {
+      if (typeof node !== 'object') node = { type: 'text', value: node }
       children.push(node)
     }
   }
@@ -23,7 +22,6 @@ export function h (type, props) {
     ? type({ ...props, children })
     : {
       type,
-      props: { ...props, children },
-      key: props && props.key
+      props: { ...props, children }
     }
 }
