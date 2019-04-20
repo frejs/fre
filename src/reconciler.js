@@ -26,6 +26,7 @@ export function render (vdom, container) {
 }
 
 export function scheduleWork (instance, k, v) {
+  console.log(instance)
   instance.state[k] = v
   updateQueue.push({
     from: HOOK,
@@ -119,7 +120,7 @@ function reconcileChildren (WIP, newChildren) {
     const sameType = oldFiber && child && child.type == oldFiber.type
 
     if (sameType) {
-      // 更新逻辑
+      // 更新
       newFiber = {
         tag: oldFiber.tag,
         base: oldFiber.base,
@@ -133,7 +134,7 @@ function reconcileChildren (WIP, newChildren) {
     }
 
     if (child && !sameType) {
-      // 初次逻辑
+      // 初次
       newFiber = {
         tag: typeof child.type === 'string' ? HOST : HOOK,
         type: child.type,
