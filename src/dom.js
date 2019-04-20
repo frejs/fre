@@ -1,43 +1,28 @@
-import { TEXT } from './h'
-
-const isEvent = name => name.startsWith('on')
-const isText = name => name === 'nodeValue'
-const isAttribute = name =>
-  name === 'class' ||
-  name === 'id' ||
-  name === 'href' ||
-  name === 'target' ||
-  name === 'src'
+const isEvent = name => name[0] === 'o' && name[1] === 'n'
+const isText = name => name === 'value'
+const isOther = name =>
+  name !== 'value' && name[0] !== 'o' && name[1] !== 'n' && name !== 'children'
 const isNew = (prev, next) => key => prev[key] !== next[key]
 
 export function updateProperties (dom, prevProps, nextProps) {
-  Object.keys(prevProps)
-    .filter(isEvent)
-    .filter(key => !(key in nextProps) || isNew(prevProps, nextProps)(key))
-    .forEach(name => {
-      const eventType = name.toLowerCase().substring(2)
-      dom.removeEventListener(eventType, prevProps[name])
-    })
-
   Object.keys(nextProps)
     .filter(isText)
     .filter(isNew(prevProps, nextProps))
-    .forEach(name => {
-      dom[name] = nextProps[name]
-    })
+    .forEach(name => (dom['nodeValue'] = nextProps[name]))
 
   Object.keys(nextProps)
-    .filter(isAttribute)
+    .filter(isOther)
     .filter(isNew(prevProps, nextProps))
     .forEach(name => {
       dom.setAttribute(name, nextProps[name])
     })
 
-  nextProps.style = nextProps.style || {}
-  Object.keys(nextProps.style)
-    .filter(isNew(prevProps.style, nextProps.style))
-    .forEach(key => {
-      dom.style[key] = nextProps.style[key]
+  // 移除原有事件
+  Object.keys(prevProps)
+    .filter(isEvent)
+    .forEach(name => {
+      const eventType = name.toLowerCase().substring(2)
+      dom.removeEventListener(eventType, prevProps[name])
     })
 
   Object.keys(nextProps)
@@ -50,10 +35,10 @@ export function updateProperties (dom, prevProps, nextProps) {
 }
 
 export function createElement (fiber) {
-  const isTextElement = fiber.tag === TEXT
-  const dom = isTextElement
-    ? document.createTextNode('')
-    : document.createElement(fiber.tag)
-  updateProperties(dom, [], fiber.props)
-  return dom
+  const element =
+    fiber.type === 'text'
+      ? document.createTextNode('')
+      : document.createElement(fiber.type)
+  updateProperties(element, [], fiber.props)
+  return element
 }

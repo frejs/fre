@@ -1,43 +1,50 @@
-import { scheduleUpdate, currentInstance, resetInstance } from './reconciler'
+import { scheduleWork, getCurrentInstance } from './reconciler'
 let cursor = 0
 let oldInputs = []
 
-function update(key, reducer, value) {
+function update (key, reducer, value) {
   reducer ? (value = reducer(this.state[key], value)) : value
-  scheduleUpdate(this, key, value)
+  this.state[key] = value
+  scheduleWork(this)
 }
-export function resetCursor() {
+export function resetCursor () {
   cursor = 0
 }
-export function useState(initState) {
+export function useState (initState) {
   return useReducer(null, initState)
 }
-export function useReducer(reducer, initState) {
+export function useReducer (reducer, initState) {
+  let current = getCurrentInstance()
   let key = '$' + cursor
-  let setter = update.bind(currentInstance, key, reducer)
-  if (currentInstance) cursor++
-  let state
-  if (currentInstance) state = currentInstance.state
-  if (typeof state === 'object' && key in state) {
-    return [state[key], setter]
+  let setter = update.bind(current, key, reducer)
+  if (!current) {
+    return [initState, setter]
   } else {
-    if (currentInstance) currentInstance.state[key] = initState
+    cursor++
+    let state = current.state
+    if (typeof state === 'object' && key in state) {
+      return [state[key], setter]
+    } else {
+      current.state[key] = initState
+    }
+    let value = initState
+    return [value, setter]
   }
-  let value = initState
-  return [value, setter]
 }
-export function useEffect(effect, inputs) {
-  if (currentInstance) {
+export function useEffect (effect, inputs) {
+  let current = getCurrentInstance()
+  if (current) {
     let key = '$' + cursor
-    currentInstance.effects[key] = useMemo(effect, inputs)
+    current.effects[key] = useMemo(effect, inputs)
     cursor++
   }
 }
 
-export function useMemo(create, inputs) {
-  return function() {
-    if (currentInstance) {
-      let hasChaged = inputs.length
+export function useMemo (create, inputs) {
+  return function () {
+    let current = getCurrentInstance()
+    if (current) {
+      let hasChaged = inputs
         ? oldInputs.some((value, i) => inputs[i] !== value)
         : true
       if (hasChaged) {

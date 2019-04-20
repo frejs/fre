@@ -1,167 +1,149 @@
 import { createElement, updateProperties } from './dom'
 import { resetCursor } from './hooks'
+import { defer, arrayfy } from './util'
 
-const HOST = 'host'
-const HOOK = 'hook'
-const ROOT = 'root'
-
-const PLACE = 1
-const DELETE = 2
-const UPDATE = 3
+const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
+  'host',
+  'hook',
+  'root',
+  'place',
+  'delete',
+  'update'
+]
 
 let updateQueue = []
-let nextUnitOfWork = null
+let nextWork = null
 let pendingCommit = null
-export let currentInstance = null
+let currentInstance = null
 
-export function render (vdom, el) {
+export function render (vdom, container) {
   updateQueue.push({
     from: ROOT,
-    dom: el,
-    newProps: { children: vdom }
+    base: container,
+    props: { children: vdom }
   })
-  requestIdleCallback(performWork)
+  defer(workLoop)
 }
 
-export function scheduleUpdate (instance, k, v) {
-  instance.state[k] = v
+export function scheduleWork (instance) {
   updateQueue.push({
     from: HOOK,
     instance,
     state: instance.state
   })
-  requestIdleCallback(performWork)
+  defer(workLoop)
 }
 
-function performWork (deadline) {
-  if (!nextUnitOfWork && updateQueue.length) {
-    resetNextUnitOfWork()
+function workLoop () {
+  if (!nextWork && updateQueue.length) {
+    resetWork()
   }
-  while (nextUnitOfWork && deadline.timeRemaining() > 1) {
-    nextUnitOfWork = performUnitOfWork(nextUnitOfWork)
+  while (nextWork) {
+    nextWork = performWork(nextWork)
   }
   if (pendingCommit) {
     commitAllWork(pendingCommit)
-    commitEffects(currentInstance.effects)
-  }
-
-  if (nextUnitOfWork || updateQueue.length > 0) {
-    requestIdleCallback(performWork)
   }
 }
 
-function resetNextUnitOfWork () {
+function resetWork () {
   const update = updateQueue.shift()
-  if (!update) {
-    return
-  }
+  if (!update) return
 
   if (update.state) {
-    update.instance.__fiber.state = update.state
+    update.instance.fiber.state = update.state
   }
   const root =
-    update.from == ROOT
-      ? update.dom._rootContainerFiber
-      : getRoot(update.instance.__fiber)
+    update.from == ROOT ? update.base.rootFiber : getRoot(update.instance.fiber)
 
-  nextUnitOfWork = {
-    type: ROOT,
-    base: update.dom || root.base,
-    props: update.newProps || root.props,
+  nextWork = {
+    tag: ROOT,
+    base: update.base || root.base,
+    props: update.props || root.props,
     alternate: root
   }
 }
 
-function performUnitOfWork (wipFiber) {
-  beginWork(wipFiber)
-  if (wipFiber.child) {
-    return wipFiber.child
-  }
-  let uow = wipFiber
-  while (uow) {
-    completeWork(uow)
-    if (uow.sibling) {
-      return uow.sibling
-    }
-    uow = uow.parent
-  }
-}
-
-function beginWork (wipFiber) {
-  if (wipFiber.type == HOOK) {
-    updateHOOKComponent(wipFiber)
+function performWork (WIP) {
+  if (WIP.tag == HOOK) {
+    updateHOOK(WIP)
   } else {
-    updateHostComponent(wipFiber)
+    updateHost(WIP)
+  }
+  if (WIP.child) {
+    return WIP.child
+  }
+  let wip = WIP
+  while (wip) {
+    completeWork(wip)
+    if (wip.sibling) return wip.sibling
+    wip = wip.parent
   }
 }
 
-function updateHostComponent (wipFiber) {
-  if (!wipFiber.base) {
-    wipFiber.base = createElement(wipFiber)
-  }
+function updateHost (WIP) {
+  if (!WIP.base) WIP.base = createElement(WIP)
 
-  const newChildren = wipFiber.props.children
-  reconcileChildren(wipFiber, newChildren)
+  const newChildren = WIP.props.children
+  reconcileChildren(WIP, newChildren)
 }
 
-function updateHOOKComponent (wipFiber) {
-  let instance = wipFiber.base
+function updateHOOK (WIP) {
+  let instance = WIP.base
   if (instance == null) {
-    instance = wipFiber.base = createInstance(wipFiber)
-  } else if (wipFiber.props == instance.props && !wipFiber.state) {
-    cloneChildFibers(wipFiber)
+    instance = WIP.base = createInstance(WIP)
+  } else if (WIP.props == WIP.props && !WIP.state) {
+    cloneChildFibers(WIP)
   }
-  instance.props = wipFiber.props || {}
-  instance.state = wipFiber.state || {}
-  instance.effects = wipFiber.effects || {}
+  instance.props = WIP.props || {}
+  instance.state = WIP.state || {}
+  instance.effects = WIP.effects || {}
   currentInstance = instance
   resetCursor()
-  const newChildren = wipFiber.tag(wipFiber.props)
-  reconcileChildren(wipFiber, newChildren)
+  const newChildren = WIP.type(WIP.props)
+  reconcileChildren(WIP, newChildren)
 }
 
-function reconcileChildren (wipFiber, newChildren) {
-  const elements = !newChildren
-    ? []
-    : Array.isArray(newChildren)
-      ? newChildren
-      : [newChildren]
+function reconcileChildren (WIP, newChildren) {
+  const childs = arrayfy(newChildren)
 
   let index = 0
-  let oldFiber = wipFiber.alternate ? wipFiber.alternate.child : null
+  let oldFiber = WIP.alternate ? WIP.alternate.child : null
   let newFiber = null
-  while (index < elements.length || oldFiber != null) {
-    const prevFiber = newFiber
-    const element = index < elements.length && elements[index]
-    const sameTag = oldFiber && element && element.tag == oldFiber.tag
 
-    if (sameTag) {
+  while (index < childs.length || oldFiber != null) {
+    const prevFiber = newFiber
+    const child = index < childs.length && childs[index]
+
+    const sameType = oldFiber && child && child.type == oldFiber.type
+
+    if (sameType) {
       newFiber = {
         tag: oldFiber.tag,
-        type: oldFiber.type,
         base: oldFiber.base,
-        props: element.props,
-        parent: wipFiber,
+        parent: WIP,
         alternate: oldFiber,
-        state: oldFiber.state,
-        effectTag: UPDATE
+        patchTag: UPDATE,
+        type: oldFiber.type,
+        props: child.props || { value: child.value },
+        state: oldFiber.state
       }
     }
 
-    if (element && !sameTag) {
+    if (child && !sameType) {
       newFiber = {
-        tag: element.tag,
-        type: typeof element.tag === 'string' ? HOST : HOOK,
-        props: element.props,
-        parent: wipFiber,
-        effectTag: PLACE
+        tag: typeof child.type === 'string' ? HOST : HOOK,
+        type: child.type,
+        props: child.props || { value: child.value },
+        parent: WIP,
+        patchTag: PLACE
       }
     }
 
-    if (oldFiber && !sameTag) {
-      oldFiber.effectTag = DELETE
-      wipFiber.effects = wipFiber.effects || []
-      wipFiber.effects.push(oldFiber)
+    if (oldFiber && !sameType) {
+      oldFiber.patchTag = DELETE
+      WIP.patches = WIP.patches || []
+      WIP.patches.push(oldFiber)
     }
 
     if (oldFiber) {
@@ -169,8 +151,8 @@ function reconcileChildren (wipFiber, newChildren) {
     }
 
     if (index == 0) {
-      wipFiber.child = newFiber
-    } else if (prevFiber && element) {
+      WIP.child = newFiber
+    } else if (prevFiber && child) {
       prevFiber.sibling = newFiber
     }
 
@@ -179,23 +161,22 @@ function reconcileChildren (wipFiber, newChildren) {
 }
 
 function createInstance (fiber) {
-  const instance = new fiber.tag(fiber.props)
-  instance.__fiber = fiber
+  const instance = new fiber.type(fiber.props)
+  instance.fiber = fiber
   return instance
 }
 
 function cloneChildFibers (parentFiber) {
   const oldFiber = parentFiber.alternate
-  if (!oldFiber.child) {
-    return
-  }
+  if (!oldFiber.child) return
 
   let oldChild = oldFiber.child
   let prevChild = null
+
   while (oldChild) {
     const newChild = {
-      tag: oldChild.tag,
       type: oldChild.type,
+      tag: oldChild.tag,
       base: oldChild.base,
       props: oldChild.props,
       state: oldChild.state,
@@ -213,53 +194,51 @@ function cloneChildFibers (parentFiber) {
 }
 
 function completeWork (fiber) {
-  if (fiber.type == HOOK) {
-    fiber.base.__fiber = fiber
+  if (fiber.tag == HOOK) {
+    fiber.base.fiber = fiber
   }
 
   if (fiber.parent) {
-    const childEffects = fiber.effects || []
-    const thisEffect = fiber.effectTag != null ? [fiber] : []
-    const parentEffects = fiber.parent.effects || []
-    fiber.parent.effects = parentEffects.concat(childEffects, thisEffect)
+    const childpatches = fiber.patches || []
+    const thisEffect = fiber.patchTag != null ? [fiber] : []
+    const parentpatches = fiber.parent.patches || []
+    fiber.parent.patches = parentpatches.concat(childpatches, thisEffect)
   } else {
     pendingCommit = fiber
   }
 }
 
-function commitAllWork (fiber) {
-  fiber.effects.forEach(f => {
-    commitWork(f)
-  })
-  fiber.base._rootContainerFiber = fiber
-  nextUnitOfWork = null
+function commitAllWork (WIP) {
+  WIP.patches.forEach(f => commitWork(f))
+  commitEffects(currentInstance.effects)
+  WIP.base.rootFiber = WIP
+
+  nextWork = null
   pendingCommit = null
 }
 
 function commitWork (fiber) {
-  if (fiber.type == ROOT) {
-    return
-  }
+  if (fiber.tag == ROOT) return
 
-  let domParentFiber = fiber.parent
-  while (domParentFiber.type == HOOK) {
-    domParentFiber = domParentFiber.parent
+  let parentFiber = fiber.parent
+  while (parentFiber.tag == HOOK) {
+    parentFiber = parentFiber.parent
   }
-  const domParent = domParentFiber.base
+  const parentNode = parentFiber.base
 
-  if (fiber.effectTag == PLACE && fiber.type == HOST) {
-    domParent.appendChild(fiber.base)
-  } else if (fiber.effectTag == UPDATE) {
+  if (fiber.patchTag == PLACE && fiber.tag == HOST) {
+    parentNode.appendChild(fiber.base)
+  } else if (fiber.patchTag == UPDATE && fiber.tag == HOST) {
     updateProperties(fiber.base, fiber.alternate.props, fiber.props)
-  } else if (fiber.effectTag == DELETE) {
-    commitDELETE(fiber, domParent)
+  } else if (fiber.patchTag == DELETE) {
+    commitDELETE(fiber, parentNode)
   }
 }
 
 function commitDELETE (fiber, domParent) {
   let node = fiber
   while (true) {
-    if (node.type == HOOK) {
+    if (node.tag == HOOK) {
       node = node.child
       continue
     }
@@ -280,6 +259,10 @@ function getRoot (fiber) {
     node = node.parent
   }
   return node
+}
+
+export function getCurrentInstance () {
+  return currentInstance || null
 }
 
 function commitEffects (effects) {
