@@ -2,14 +2,7 @@ import { createElement, updateProperties } from './dom'
 import { resetCursor } from './hooks'
 import { defer, arrayfy } from './util'
 
-const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
-  'host',
-  'hook',
-  'root',
-  'place',
-  'delete',
-  'update'
-]
+const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = ['host','hook','root','place','delete','update']
 
 let updateQueue = []
 let nextWork = null
