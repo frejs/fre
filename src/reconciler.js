@@ -1,5 +1,6 @@
 import { createElement, updateProperties } from './dom'
 import { resetCursor } from './hooks'
+import { defer } from './util'
 
 const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
   'host',
@@ -22,7 +23,7 @@ export function render (vdom, container) {
     props: {},
     children: vdom
   })
-  requestAnimationFrame(workLoop)
+  defer(workLoop)
 }
 
 export function scheduleWork (instance, k, v) {
@@ -32,7 +33,7 @@ export function scheduleWork (instance, k, v) {
     instance,
     state: instance.state
   })
-  requestAnimationFrame(workLoop)
+  defer(workLoop)
 }
 
 function workLoop () {
@@ -44,7 +45,6 @@ function workLoop () {
   }
   if (pendingCommit) {
     commitAllWork(pendingCommit)
-    // commitEffects(currentInstance.effects)
   }
 }
 
@@ -215,19 +215,16 @@ function completeWork (fiber) {
   }
 }
 
-function commitAllWork (fiber) {
-  fiber.effects.forEach(f => {
-    commitWork(f)
-  })
-  fiber.base.rootFiber = fiber
+function commitAllWork (WIP) {
+  WIP.effects.forEach(f => commitWork(f))
+  WIP.base.rootFiber = WIP
+
   nextWork = null
   pendingCommit = null
 }
 
 function commitWork (fiber) {
-  if (fiber.tag == ROOT) {
-    return
-  }
+  if (fiber.tag == ROOT) return
 
   let domParentFiber = fiber.parent
   while (domParentFiber.tag == HOOK) {
