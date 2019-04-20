@@ -223,18 +223,18 @@ function commitAllWork (WIP) {
 function commitWork (fiber) {
   if (fiber.tag == ROOT) return
 
-  let domParentFiber = fiber.parent
-  while (domParentFiber.tag == HOOK) {
-    domParentFiber = domParentFiber.parent
+  let parentFiber = fiber.parent
+  while (parentFiber.tag == HOOK) {
+    parentFiber = parentFiber.parent
   }
-  const domParent = domParentFiber.base
+  const parentNode = parentFiber.base
 
   if (fiber.patchTag == PLACE && fiber.tag == HOST) {
-    domParent.appendChild(fiber.base)
+    parentNode.appendChild(fiber.base)
   } else if (fiber.patchTag == UPDATE) {
     updateProperties(fiber.base, fiber.alternate.props, fiber.props)
   } else if (fiber.patchTag == DELETE) {
-    commitDELETE(fiber, domParent)
+    commitDELETE(fiber, parentNode)
   }
 }
 
