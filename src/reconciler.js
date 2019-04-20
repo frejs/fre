@@ -17,11 +17,11 @@ let pendingCommit = null
 export let currentInstance = null
 
 export function render (vdom, container) {
+  console.log(vdom)
   updateQueue.push({
     from: ROOT,
     base: container,
-    props: {},
-    children: vdom
+    props: { children: vdom }
   })
   defer(workLoop)
 }
@@ -62,7 +62,6 @@ function resetWork () {
     tag: ROOT,
     base: update.base || root.base,
     props: update.props || root.props,
-    children: update.children || root.children,
     alternate: root
   }
 }
@@ -120,7 +119,8 @@ function reconcileChildren (WIP, newChildren) {
 
     const sameType = oldFiber && child && child.type == oldFiber.type
 
-    if (sameType) { //更新逻辑
+    if (sameType) {
+      // 更新逻辑
       newFiber = {
         tag: oldFiber.tag,
         base: oldFiber.base,
@@ -129,11 +129,12 @@ function reconcileChildren (WIP, newChildren) {
         patchTag: UPDATE,
         type: oldFiber.type,
         props: element.props,
-        state: oldFiber.state,
+        state: oldFiber.state
       }
     }
 
-    if (child && !sameType) { //初次逻辑
+    if (child && !sameType) {
+      // 初次逻辑
       newFiber = {
         tag: typeof element.type === 'string' ? HOST : HOOK,
         type: child.type,

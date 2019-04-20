@@ -1,4 +1,4 @@
-//h 函数，和 react 不同的是，children 不再放到 props 里，而是作为第二个参数传入
+// h 函数，和 react 不同的是，children 不再放到 props 里，而是作为第二个参数传入
 
 export function h (type, props) {
   let rest = []
@@ -20,11 +20,10 @@ export function h (type, props) {
   }
 
   return typeof type === 'function'
-    ? type(props || {}, children)
+    ? type({ ...props, children })
     : {
       type,
-      props: props || {},
-      children,
+      props: { ...props, children },
       key: props && props.key
     }
 }
