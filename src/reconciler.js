@@ -227,7 +227,7 @@ function commitWork (fiber) {
 
   if (fiber.patchTag == PLACE && fiber.tag == HOST) {
     parentNode.appendChild(fiber.base)
-  } else if (fiber.patchTag == UPDATE) {
+  } else if (fiber.patchTag == UPDATE && fiber.tag == HOST) {
     updateProperties(fiber.base, fiber.alternate.props, fiber.props)
   } else if (fiber.patchTag == DELETE) {
     commitDELETE(fiber, parentNode)

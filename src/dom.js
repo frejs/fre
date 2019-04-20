@@ -8,14 +8,15 @@ export function updateProperties (dom, prevProps, nextProps) {
   // 更新文字内容
   Object.keys(nextProps)
     .filter(isText)
-    .filter(isNew)
+    .filter(isNew(prevProps, nextProps))
     .forEach(name => (dom['nodeValue'] = nextProps[name]))
 
   Object.keys(nextProps)
     .filter(isOther)
-    .filter(isNew)
     .filter(isNew(prevProps, nextProps))
-    .forEach(name => dom.setAttribute(name, nextProps[name]))
+    .forEach(name => {
+      dom.setAttribute(name, nextProps[name])
+    })
 
   // 移除原有事件
   Object.keys(prevProps)
