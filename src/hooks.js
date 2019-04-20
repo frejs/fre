@@ -3,7 +3,7 @@ let cursor = 0
 let oldInputs = []
 
 function update (key, reducer, value) {
-  reducer ? (value = reducer(this.state[key], value)) : value
+  value = reducer ? reducer(this.state[key], value) : value
   this.state[key] = value
   scheduleWork(this)
 }
