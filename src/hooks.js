@@ -32,6 +32,7 @@ export function useReducer (reducer, initState) {
   }
 }
 export function useEffect (effect, inputs) {
+  let current = getCurrentInstance()
   if (current) {
     let key = '$' + cursor
     current.effects[key] = useMemo(effect, inputs)
@@ -41,8 +42,9 @@ export function useEffect (effect, inputs) {
 
 export function useMemo (create, inputs) {
   return function () {
+    let current = getCurrentInstance()
     if (current) {
-      let hasChaged = inputs.length
+      let hasChaged = inputs
         ? oldInputs.some((value, i) => inputs[i] !== value)
         : true
       if (hasChaged) {

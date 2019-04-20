@@ -1,7 +1,10 @@
 import { h, render, useState, useEffect } from '../../src'
 
-function Counter() {
+function Counter () {
   const [count, setCount] = useState(0)
+  useEffect(() => {
+    document.title = count
+  })
   return (
     <div>
       <h1>{count}</h1>

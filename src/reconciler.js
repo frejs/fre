@@ -51,7 +51,6 @@ function resetWork () {
   if (!update) return
 
   if (update.state) {
-    // 更新阶段
     update.instance.fiber.state = update.state
   }
   const root =
@@ -98,6 +97,7 @@ function updateHOOK (WIP) {
   }
   instance.props = WIP.props || {}
   instance.state = WIP.state || {}
+  instance.effects = WIP.effects || {}
   currentInstance = instance
   resetCursor()
   const newChildren = WIP.type(WIP.props)
@@ -210,6 +210,7 @@ function completeWork (fiber) {
 
 function commitAllWork (WIP) {
   WIP.patches.forEach(f => commitWork(f))
+  commitEffects(currentInstance.effects)
   WIP.base.rootFiber = WIP
 
   nextWork = null
@@ -262,4 +263,11 @@ function getRoot (fiber) {
 
 export function getCurrentInstance () {
   return currentInstance || null
+}
+
+function commitEffects (effects) {
+  Object.keys(effects).forEach(key => {
+    let effect = effects[key]
+    effect()
+  })
 }
