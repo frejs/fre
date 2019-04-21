@@ -147,18 +147,29 @@ render(<Counter />, document.getElementById('root'))
 
 #### useContext
 
-context 可以当作是更安全的全局对象，因为 API 变得非常简洁，所以可以替代状态管理
+context 可以当作是更安全的全局对象，它全局 create 一次，然后可以用于所有组件
 
-useContext 是 fre 第一个与 react 不兼容的 hook，原因是 react 的 context 依赖于 Provider 等 class 组件相关，这在纯 hooks 环境中完全没有必要
+但是一个组件的 context 发生变化，并不会影响其他组件
 
 ```js
-import { createContext, useContext } from 'fre'
+import { createContext, useContext, render, h } from 'fre'
 
 createContext('counter', 0)
 
-function Counter() {
+function App () {
   const [count, setCount] = useContext('counter')
 
+  return (
+    <div>
+      <h1>{count}</h1>
+      <button onClick={() => setCount(count + 1)}>+</button>
+      <Other />
+    </div>
+  )
+}
+
+function Other () {
+  const [count, setCount] = useContext('counter')
   return (
     <div>
       <h1>{count}</h1>
@@ -166,6 +177,8 @@ function Counter() {
     </div>
   )
 }
+
+render(<App />, document.getElementById('root'))
 ```
 
 p.s. to do ^
