@@ -8,15 +8,11 @@ function updateProperty (element, name, value, newValue) {
       element[name][key] = style
     })
   } else if (name[0] === 'o' && name[1] === 'n') {
-    if (
-      !((element.events || (element.events = {}))[
-        (name = name.slice(2).toLowerCase())
-      ] = newValue)
-    ) {
+    name = name.slice(2).toLowerCase()
+    if (value) {
       element.removeEventListener(name, value)
-    } else if (!value) {
-      element.addEventListener(name, newValue)
     }
+    element.addEventListener(name, newValue)
   } else {
     element.setAttribute(name, newValue)
   }
