@@ -23,8 +23,7 @@
         );
       }
     }
-    props = { ...props, children };
-    return { type, props }
+    return { type, props: { ...props, children } }
   }
 
   const defer =
