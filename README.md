@@ -143,7 +143,7 @@ render(<Counter />, document.getElementById('root'))
 
 #### useContext
 
-Context 是 fre 第一个与 react 不兼容的 API，原因是 react 的 context 依赖于 Provider 等组建相关，但在纯 hooks 环境中完全没有必要
+Context 是 fre 第一个与 react 不兼容的 API，原因是 react 的 context 依赖于 Provider 等组件相关，但在纯 hooks 环境中完全没有必要
 
 ```js
 import { createContext, useContext } from 'fre'
