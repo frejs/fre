@@ -26,7 +26,7 @@ Fre (pronounced `/fri:/`, like free) is a tiny and perfect javascript library, I
 |  fre   | 1kb  |     hooks     |    Fiber     | [use-routes](https://github.com/132yse/use-routes) |
 | preact | 3kb  |     class     |     diff     |                        ...                         |
 |  vue   | 10kb |      SFC      | Proxy + diff |                     vue-router                     |
-| react  | 33kb | class + hooks |    Fiber     |             react-router / use-routes              |
+| react  | 33kb | class + hooks |    Fiber     |                    react-router                    |
 
 ### Use
 
@@ -71,9 +71,9 @@ function Counter() {
 render(<Counter />, document.getElementById('root'))
 ```
 
-useReducer 和 useState 几乎是一样的，需要外置外置 reducer (全局)
-
 #### useReducer
+
+useReducer 和 useState 几乎是一样的，需要外置外置 reducer (全局)
 
 ```javascript
 function reducer(state, action) {
