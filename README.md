@@ -30,6 +30,10 @@ Fre (pronounced `/fri:/`, like free) is a tiny and perfect javascript library, I
 
 ### Use
 
+```shell
+yarn add fre
+```
+
 ```JavaScript
 import { h, render, useState } from 'fre'
 
