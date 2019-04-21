@@ -153,7 +153,7 @@ import { createContext, useContext } from 'fre'
 createContext('counter', 0)
 
 function Counter() {
-  const [ count, setCount ] = useContext('counter')
+  const [count, setCount] = useContext('counter')
 
   return (
     <div>
@@ -163,6 +163,7 @@ function Counter() {
   )
 }
 ```
+
 p.s. to do ^
 
 ### FunctionalComponent
@@ -193,22 +194,20 @@ function Sex(props){
 }
 
 render(<App />, document.getElementById('root'))
-````
+```
 
 ### props
 
-props 用于组件间通信，正在考虑将生命周期放到 props 中，也可能是单独写一个生命周期的 hook
+props 用于组件间通信
 
-```javascript
+```js
 function App() {
   const [sex, setSex] = useState('boy')
   return (
     <div>
       <Sex sex={sex} />
       <button
-        onClick={() => {
-          sex === 'boy' ? setSex('girl') : setSex('boy')
-        }}
+        onClick={() => (sex === 'boy' ? setSex('girl') : setSex('boy'))}
       />
     </div>
   )
