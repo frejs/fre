@@ -1,4 +1,4 @@
-import { createElement, updateProperties } from './dom'
+import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { defer, arrayfy } from './util'
 
@@ -118,7 +118,7 @@ function reconcileChildren (WIP, newChildren) {
         alternate: oldFiber,
         patchTag: UPDATE,
         type: oldFiber.type,
-        props: child.props || { value: child.value },
+        props: child.props || { nodeValue: child.nodeValue },
         state: oldFiber.state
       }
     }
@@ -127,7 +127,7 @@ function reconcileChildren (WIP, newChildren) {
       newFiber = {
         tag: typeof child.type === 'string' ? HOST : HOOK,
         type: child.type,
-        props: child.props || { value: child.value },
+        props: child.props || { nodeValue: child.nodeValue },
         parent: WIP,
         patchTag: PLACE
       }
@@ -222,7 +222,7 @@ function commitWork (fiber) {
   if (fiber.patchTag == PLACE && fiber.tag == HOST) {
     parentNode.appendChild(fiber.base)
   } else if (fiber.patchTag == UPDATE && fiber.tag == HOST) {
-    updateProperties(fiber.base, fiber.alternate.props, fiber.props)
+    updateElement(fiber.base, fiber.alternate.props, fiber.props)
   } else if (fiber.patchTag == DELETE) {
     commitDELETE(fiber, parentNode)
   }

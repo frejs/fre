@@ -8,15 +8,15 @@ export function h (type, props) {
   while (rest.length) {
     let node = rest.pop()
     if (node && node.pop) {
-      for (length = node.length; length--;) {
-        rest.push(node[length])
-      }
+      for (length = node.length; length--;) rest.push(node[length])
     } else if (node === null || node === true || node === false) {
     } else {
-      if (typeof node !== 'object') node = { type: 'text', value: node }
-      children.push(node)
+      children.push(
+        typeof node !== 'object' ? { type: 'text', nodeValue: node } : node
+      )
     }
   }
 
-  return { type, props: { ...props, children } }
+  props = { ...props, children }
+  return { type, props }
 }
