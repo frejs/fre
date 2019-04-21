@@ -3,7 +3,7 @@ import {isNew} from './util'
 function updateProperty (element, name, value, newValue) {
   if (name === 'children' || name === 'key') {
   } else if (name === 'style') {
-    Object.keys({ ...value, ...newValue }).forEach(key => {
+    Object.keys(newValue).forEach(key => {
       let style = !newValue || !newValue[key] ? '' : newValue[key]
       element[name][key] = style
     })

@@ -1,5 +1,5 @@
 /**
- * by 132yse Copyright 2019-04-20
+ * by 132yse Copyright 2019-04-21
  */
 
 (function (global, factory) {
@@ -16,45 +16,52 @@
     while (rest.length) {
       let node = rest.pop();
       if (node && node.pop) {
-        for (length = node.length; length--;) {
-          rest.push(node[length]);
-        }
+        for (length = node.length; length--;) rest.push(node[length]);
       } else if (node === null || node === true || node === false) ; else {
-        if (typeof node !== 'object') node = { type: 'text', value: node };
-        children.push(node);
+        children.push(
+          typeof node !== 'object' ? { type: 'text', nodeValue: node } : node
+        );
       }
     }
-    return { type, props: { ...props, children } }
+    props = { ...props, children };
+    return { type, props }
   }
 
-  const isEvent = name => name[0] === 'o' && name[1] === 'n';
-  const isText = name => name === 'value';
-  const isOther = name =>
-    name !== 'value' && name[0] !== 'o' && name[1] !== 'n' && name !== 'children';
+  const defer =
+    typeof Promise === 'function' ? cb => Promise.resolve().then(cb) : setTimeout;
+  const arrayfy = array =>
+    !array ? [] : Array.isArray(array) ? array : [array];
   const isNew = (prev, next) => key => prev[key] !== next[key];
-  function updateProperties (dom, prevProps, nextProps) {
-    Object.keys(nextProps)
-      .filter(isText)
-      .filter(isNew(prevProps, nextProps))
-      .forEach(name => (dom['nodeValue'] = nextProps[name]));
-    Object.keys(nextProps)
-      .filter(isOther)
-      .filter(isNew(prevProps, nextProps))
-      .forEach(name => {
-        dom.setAttribute(name, nextProps[name]);
+
+  function updateProperty (element, name, value, newValue) {
+    if (name === 'children' || name === 'key') ; else if (name === 'style') {
+      Object.keys(newValue).forEach(key => {
+        let style = !newValue || !newValue[key] ? '' : newValue[key];
+        element[name][key] = style;
       });
-    Object.keys(prevProps)
-      .filter(isEvent)
-      .forEach(name => {
-        const eventType = name.toLowerCase().substring(2);
-        dom.removeEventListener(eventType, prevProps[name]);
-      });
-    Object.keys(nextProps)
-      .filter(isEvent)
-      .filter(isNew(prevProps, nextProps))
-      .forEach(name => {
-        const eventType = name.toLowerCase().substring(2);
-        dom.addEventListener(eventType, nextProps[name]);
+    } else if (name[0] === 'o' && name[1] === 'n') {
+      if (
+        !((element.events || (element.events = {}))[
+          (name = name.slice(2).toLowerCase())
+        ] = newValue)
+      ) {
+        element.removeEventListener(name, value);
+      } else if (!value) {
+        element.addEventListener(name, newValue);
+      }
+    } else {
+      element.setAttribute(name, newValue);
+    }
+  }
+  function updateElement (element, props, newProps) {
+    Object.keys(newProps)
+      .filter(isNew(props, newProps))
+      .forEach(key => {
+        if (key === 'value' || key === 'nodeValue') {
+          element[key] = newProps[key];
+        } else {
+          updateProperty(element, key, props[key], newProps[key]);
+        }
       });
   }
   function createElement (fiber) {
@@ -62,14 +69,14 @@
       fiber.type === 'text'
         ? document.createTextNode('')
         : document.createElement(fiber.type);
-    updateProperties(element, [], fiber.props);
+    updateElement(element, [], fiber.props);
     return element
   }
 
   let cursor = 0;
   let oldInputs = [];
   function update (key, reducer, value) {
-    reducer ? (value = reducer(this.state[key], value)) : value;
+    value = reducer ? reducer(this.state[key], value) : value;
     this.state[key] = value;
     scheduleWork(this);
   }
@@ -120,19 +127,7 @@
     }
   }
 
-  const defer =
-    typeof Promise === 'function' ? cb => Promise.resolve().then(cb) : setTimeout;
-  const arrayfy = array =>
-    !array ? [] : Array.isArray(array) ? array : [array];
-
-  const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
-    'host',
-    'hook',
-    'root',
-    'place',
-    'delete',
-    'update'
-  ];
+  const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = ['host','hook','root','place','delete','update'];
   let updateQueue = [];
   let nextWork = null;
   let pendingCommit = null;
@@ -232,7 +227,7 @@
           alternate: oldFiber,
           patchTag: UPDATE,
           type: oldFiber.type,
-          props: child.props || { value: child.value },
+          props: child.props || { nodeValue: child.nodeValue },
           state: oldFiber.state
         };
       }
@@ -240,7 +235,7 @@
         newFiber = {
           tag: typeof child.type === 'string' ? HOST : HOOK,
           type: child.type,
-          props: child.props || { value: child.value },
+          props: child.props || { nodeValue: child.nodeValue },
           parent: WIP,
           patchTag: PLACE
         };
@@ -295,10 +290,10 @@
       fiber.base.fiber = fiber;
     }
     if (fiber.parent) {
-      const childpatches = fiber.patches || [];
-      const thisEffect = fiber.patchTag != null ? [fiber] : [];
-      const parentpatches = fiber.parent.patches || [];
-      fiber.parent.patches = parentpatches.concat(childpatches, thisEffect);
+      const childPatches = fiber.patches || [];
+      const selfPatch = fiber.patchTag ? [fiber] : [];
+      const parentPatches = fiber.parent.patches || [];
+      fiber.parent.patches = parentPatches.concat(childPatches, selfPatch);
     } else {
       pendingCommit = fiber;
     }
@@ -320,7 +315,7 @@
     if (fiber.patchTag == PLACE && fiber.tag == HOST) {
       parentNode.appendChild(fiber.base);
     } else if (fiber.patchTag == UPDATE && fiber.tag == HOST) {
-      updateProperties(fiber.base, fiber.alternate.props, fiber.props);
+      updateElement(fiber.base, fiber.alternate.props, fiber.props);
     } else if (fiber.patchTag == DELETE) {
       commitDELETE(fiber, parentNode);
     }
