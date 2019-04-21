@@ -39,15 +39,11 @@
         element[name][key] = style;
       });
     } else if (name[0] === 'o' && name[1] === 'n') {
-      if (
-        !((element.events || (element.events = {}))[
-          (name = name.slice(2).toLowerCase())
-        ] = newValue)
-      ) {
+      name = name.slice(2).toLowerCase();
+      if (value) {
         element.removeEventListener(name, value);
-      } else if (!value) {
-        element.addEventListener(name, newValue);
       }
+      element.addEventListener(name, newValue);
     } else {
       element.setAttribute(name, newValue);
     }
@@ -74,6 +70,7 @@
 
   let cursor = 0;
   let oldInputs = [];
+  let context = {};
   function update (key, reducer, value) {
     value = reducer ? reducer(this.state[key], value) : value;
     this.state[key] = value;
@@ -124,6 +121,12 @@
         oldInputs = inputs;
       }
     }
+  }
+  function createContext (name, value) {
+    context[name] = value;
+  }
+  function useContext (name) {
+    return useReducer(null, context[name])
   }
 
   const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = ['host','hook','root','place','delete','update'];
@@ -359,6 +362,8 @@
   exports.useReducer = useReducer;
   exports.useEffect = useEffect;
   exports.useMemo = useMemo;
+  exports.createContext = createContext;
+  exports.useContext = useContext;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
