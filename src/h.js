@@ -17,6 +17,5 @@ export function h (type, props) {
     }
   }
 
-  props = { ...props, children }
-  return { type, props }
+  return { type, props: { ...props, children } }
 }
