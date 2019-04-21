@@ -141,6 +141,28 @@ function Counter() {
 render(<Counter />, document.getElementById('root'))
 ```
 
+#### useContext
+
+Context 是 fre 第一个与 react 不兼容的 API，原因是 react 的 context 依赖于 Provider 等组建相关，但在纯 hooks 环境中完全没有必要
+
+```js
+import { createContext, useContext } from 'fre'
+
+createContext('counter', 0)
+
+function Counter() {
+  const [ count, setCount ] = useContext('counter')
+
+  return (
+    <div>
+      <h1>{count}</h1>
+      <button onClick={() => setCount(count + 1)}>+</button>
+    </div>
+  )
+}
+```
+p.s. to do ^
+
 ### FunctionalComponent
 
 新的组件化方案，完全的 functional，组件通讯和 react 几乎一致
@@ -169,7 +191,7 @@ function Sex(props){
 }
 
 render(<App />, document.getElementById('root'))
-```
+````
 
 ### props
 
