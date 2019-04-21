@@ -1,6 +1,7 @@
 import { scheduleWork, getCurrentInstance } from './reconciler'
 let cursor = 0
 let oldInputs = []
+let context = {}
 
 function update (key, reducer, value) {
   value = reducer ? reducer(this.state[key], value) : value
@@ -53,4 +54,12 @@ export function useMemo (create, inputs) {
       oldInputs = inputs
     }
   }
+}
+
+export function createContext (name, value) {
+  context[name] = value
+}
+
+export function useContext (name) {
+  return useReducer(null, context[name])
 }

@@ -1,8 +1,8 @@
-import { createContext, useContext } from 'fre'
+import { createContext, useContext, render, h } from '../../src'
 
 createContext('counter', 0)
 
-function Counter() {
+function Counter () {
   const [count, setCount] = useContext('counter')
 
   return (

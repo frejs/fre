@@ -1,6 +1,13 @@
 import { h } from './h'
 import { render } from './reconciler'
-import { useState, useReducer, useEffect, useMemo } from './hooks'
+import {
+  useState,
+  useReducer,
+  useEffect,
+  useMemo,
+  createContext,
+  useContext
+} from './hooks'
 
 export {
   h,
@@ -8,5 +15,7 @@ export {
   useState,
   useReducer,
   useEffect,
-  useMemo
+  useMemo,
+  createContext,
+  useContext
 }
