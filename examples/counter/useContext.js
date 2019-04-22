@@ -1,10 +1,9 @@
 import { createContext, useContext, render, h } from '../../src'
 
-createContext('counter', 0)
+const ctx = createContext(0)
 
 function App () {
-  const [count, setCount] = useContext('counter')
-
+  const [count, setCount] = useContext(ctx)
   return (
     <div>
       <h1>{count}</h1>
@@ -15,7 +14,7 @@ function App () {
 }
 
 function Other () {
-  const [count, setCount] = useContext('counter')
+  const [count, setCount] = useContext(context)
   return (
     <div>
       <h1>{count}</h1>

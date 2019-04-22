@@ -1,12 +1,12 @@
 import { scheduleWork, getCurrentInstance } from './reconciler'
 let cursor = 0
 let oldInputs = []
-let context = {}
 
 function update (key, reducer, value) {
-  value = reducer ? reducer(this.state[key], value) : value
-  this.state[key] = value
-  scheduleWork(this)
+  const current = this ? this : getCurrentInstance()
+  value = reducer ? reducer(current.state[key], value) : value
+  current.state[key] = value
+  scheduleWork(current)
 }
 export function resetCursor () {
   cursor = 0
@@ -56,10 +56,23 @@ export function useMemo (create, inputs) {
   }
 }
 
-export function createContext (name, value) {
-  context[name] = value
+export function createContext (initContext = {}) {
+  let context = initContext
+  let setters = []
+  const update = newContext => setters.forEach(fn => fn(newContext))
+
+  const subscribe = fn => setters.push(fn)
+
+  const unSubscribe = fn => (setters = setters.filter(f => f !== fn))
+
+  return { context, update, subscribe, unSubscribe }
 }
 
-export function useContext (name) {
-  return useReducer(null, context[name])
+export function useContext (ctx) {
+  const [context, setContext] = useState(ctx.context)
+
+  ctx.subscribe(setContext)
+  useEffect(() => ctx.unSubscribe(setContext))
+
+  return [context, ctx.update]
 }
