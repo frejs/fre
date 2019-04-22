@@ -1,7 +1,7 @@
 <p align="right"><strong>只可亵玩♂ 不可生产</strong></p>
 <p align="center"><img src="http://wx2.sinaimg.cn/mw690/0060lm7Tly1ftpm5b3ihfj3096097aaj.jpg" alt="fre logo" width="180"></p>
 <h1 align="center">Fre</h1>
-<p align="center">:ghost: Fast 1kb React-like hooks API JavaScript library</p>
+<p align="center">:ghost: Fast 1kb React-like hooks API js library</p>
 <p align="center">
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/v/fre.svg?style=flat-square" alt="npm-v"></a>
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/dm/fre.svg?style=flat-square" alt="npm-d"></a>
@@ -16,7 +16,7 @@
 
 ### Introduction
 
-Fre (pronounced `/fri:/`, like free) is a tiny and perfect javascript library, It means freedom ~
+Fre (pronounced `/fri:/`, like free) is a tiny and perfect js library, It means freedom ~
 
 其实，free 是一部动漫名，也是我最喜欢的番没有之一，haru 是我儿子！ [参见 c 站](https://www.clicli.top/search/free)
 
@@ -35,7 +35,7 @@ Fre (pronounced `/fri:/`, like free) is a tiny and perfect javascript library, I
 yarn add fre
 ```
 
-```JavaScript
+```js
 import { h, render, useState } from 'fre'
 
 function Counter() {
@@ -66,7 +66,7 @@ useState 是最基本的 API，它传入一个初始值，每次函数执行都�
 
 可 use 多次，use 的内容可以是对象或数组
 
-```JavaScript
+```js
 function Counter() {
   const [up, setUp] = useState(0)
   const [down, setDown] = useState(0)
@@ -87,7 +87,7 @@ render(<Counter />, document.getElementById('root'))
 
 useReducer 和 useState 几乎是一样的，需要外置外置 reducer (全局)
 
-```javascript
+```js
 function reducer(state, action) {
   switch (action.type) {
     case 'up':
@@ -117,7 +117,7 @@ useEffect 接受两个参数，第一个参数是一个副作用函数，第二�
 
 当第二个参数的某一项发生变化时，执行副作用函数，执行时机为一轮 commit 结束
 
-```javascript
+```js
 function Counter({ flag }) {
   const [count, setCount] = useState(0)
   useEffect(() => {
@@ -138,7 +138,7 @@ render(<Counter />, document.getElementById('root'))
 
 useMemo 和 useEffect 参数一致，不同的是，第一个参数通常是组件函数，马上同步执行
 
-```javascript
+```js
 function Counter() {
   const [count, setCount] = useState(0)
   return (
@@ -183,7 +183,7 @@ function Other() {
 
 新的组件化方案，完全的 functional，组件通讯和 react 几乎一致
 
-```JavaScript
+```js
 function App() {
   const [count, setCount] = useState(0)
   return (
@@ -232,7 +232,7 @@ function Sex(props) {
 
 和 react 一样，props 默认包含了 children，用于渲染组件的所有子元素
 
-```javascript
+```js
 const HelloBox = () => (
   <Box>
     <h1>Hello world !</h1>
@@ -266,13 +266,13 @@ fre 的 fiber 是营养不良的，它只是使用了类似的遍历方式（链
 
 默认也对外暴露了 h 函数，可以选用 JSX
 
-```JavaScript
+```js
 import { h } from 'fre'
 ```
 
 webpack 需配置：
 
-```JavaScript
+```js
 {
   "plugins": [
     ["transform-react-jsx", { "pragma":"h" }]
