@@ -54,13 +54,17 @@ render(<Counter />, document.getElementById('root'))
 
 ### Hooks API
 
-react hooks API 在实现上是个奇迹，这也是我写 fre 的原因（对骚♂ API 的痴迷）
+react hooks API 在实现上是个奇迹，这也是我写 fre 的原因（对骚 ♂ API 的痴迷）
 
 hooks API 创造了新的组件化方案，react 由于兼容 class ，所以很多实现上并不纯粹
 
 fre 的世界里，hooks 是主角~
 
 #### useState
+
+useState 是最基本的 API，它传入一个初始值，每次函数执行都能拿到新值
+
+可 use 多次，use 的内容可以是对象或数组
 
 ```JavaScript
 function Counter() {
@@ -111,7 +115,7 @@ render(<Counter />, document.getElementById('root'))
 
 useEffect 接受两个参数，第一个参数是一个副作用函数，第二个参数是个数组，通常为 props
 
-当第二个参数的某一项发生变化时，执行副作用函数，执行时机为 commit 结束
+当第二个参数的某一项发生变化时，执行副作用函数，执行时机为一轮 commit 结束
 
 ```javascript
 function Counter({ flag }) {
@@ -132,7 +136,7 @@ render(<Counter />, document.getElementById('root'))
 
 #### useMemo
 
-useMemo 和 useEffect 参数一致，不同的是，第一个参数通常是组件函数，同步执行
+useMemo 和 useEffect 参数一致，不同的是，第一个参数通常是组件函数，马上同步执行
 
 ```javascript
 function Counter() {
@@ -151,7 +155,7 @@ render(<Counter />, document.getElementById('root'))
 
 #### useContext
 
-context 是在外部 create ，内部 use 的 state，它和全局对象的区别在于，如果多个组件同时 useContext，那么这些组件都会 rerender
+context 是在外部 create ，内部 use 的 state，它和全局变量的区别在于，如果多个组件同时 useContext，那么这些组件都会 rerender
 
 而，如果多个组件同时 useState 同一个全局变量，则只有触发 setState 的当前组件 rerender
 
@@ -207,7 +211,7 @@ render(<App />, document.getElementById('root'))
 
 ### props
 
-props 用于组件间通信
+props 用于组件间通信，和 react 行为一致
 
 ```js
 function App() {
@@ -236,6 +240,20 @@ const HelloBox = () => (
 )
 
 const Box = props => <div>{props.children}</div>
+```
+
+值得一提，hooks 的世界里，不存在 HOC 和 extends，但是天生支持 render props/children
+
+```js
+const HelloBox = () => (
+  <Box>
+    {value => {
+      return <h1>{value}</h1>
+    }}
+  </Box>
+)
+
+const Box = props => <div>{props.children('hello world!')}</div>
 ```
 
 #### Fiber
