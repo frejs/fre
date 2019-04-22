@@ -1,5 +1,5 @@
 /**
- * by 132yse Copyright 2019-04-21
+ * by 132yse Copyright 2019-04-22
  */
 
 (function (global, factory) {
@@ -23,7 +23,7 @@
         );
       }
     }
-    return { type, props: { ...props, children } }
+    return { type, props: { ...props, children }}
   }
 
   const defer =
@@ -70,11 +70,11 @@
 
   let cursor = 0;
   let oldInputs = [];
-  let context = {};
   function update (key, reducer, value) {
-    value = reducer ? reducer(this.state[key], value) : value;
-    this.state[key] = value;
-    scheduleWork(this);
+    const current = this ? this : getCurrentInstance();
+    value = reducer ? reducer(current.state[key], value) : value;
+    current.state[key] = value;
+    scheduleWork(current);
   }
   function resetCursor () {
     cursor = 0;
@@ -122,11 +122,19 @@
       }
     }
   }
-  function createContext (name, value) {
-    context[name] = value;
+  function createContext (initContext = {}) {
+    let context = initContext;
+    let setters = [];
+    const update = newContext => setters.forEach(fn => fn(newContext));
+    const subscribe = fn => setters.push(fn);
+    const unSubscribe = fn => (setters = setters.filter(f => f !== fn));
+    return { context, update, subscribe, unSubscribe }
   }
-  function useContext (name) {
-    return useReducer(null, context[name])
+  function useContext (ctx) {
+    const [context, setContext] = useState(ctx.context);
+    ctx.subscribe(setContext);
+    useEffect(() => ctx.unSubscribe(setContext));
+    return [context, ctx.update]
   }
 
   const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = ['host','hook','root','place','delete','update'];

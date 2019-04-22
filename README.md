@@ -153,8 +153,6 @@ context 是在外部 create ，内部 use 的 state，它和全局对象的区�
 而，如果多个组件同时 useState 同一个全局变量，则只有触发 setState 的当前组件 rerender
 
 ```js
-import { createContext, useContext, render, h } from 'fre'
-
 const ctx = createContext(0)
 
 function App() {
@@ -172,8 +170,6 @@ function Other() {
   const count = useContext(context)[0]
   return <h1>{count}</h1>
 }
-
-render(<App />, document.getElementById('root'))
 ```
 
 ### FunctionalComponent
