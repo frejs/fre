@@ -54,8 +54,11 @@ render(<Counter />, document.getElementById('root'))
 
 ### Hooks API
 
-纯 hooks API，完全移除 class ，class 和 hooks 是水火不容的，两者的 API 完全独立存在
-所以现在的 react 可以说是两个框架，而 fre，hooks 是主角
+react hooks API 在实现上是个奇迹，这也是我写 fre 的原因（对骚♂ API 的痴迷）
+
+hooks API 创造了新的组件化方案，react 由于兼容 class ，所以很多实现上并不纯粹
+
+fre 的世界里，hooks 是主角~
 
 #### useState
 
