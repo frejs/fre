@@ -149,7 +149,7 @@ render(<Counter />, document.getElementById('root'))
 
 context 是在外部 create ，内部 use 的 state，它和全局对象的区别在于，如果多个组件同时 useContext，那么这些组件都会 rerender
 
-而，如果多个组件同时 useState，只有触发 setState 的当前组件 rerender
+而，如果多个组件同时 useState 同一个全局变量，则只有触发 setState 的当前组件 rerender
 
 ```js
 import { createContext, useContext, render, h } from 'fre'
