@@ -137,14 +137,21 @@
     return [context, ctx.update]
   }
 
-  const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = ['host','hook','root','place','delete','update'];
+  const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
+    'host',
+    'hook',
+    'root',
+    'place',
+    'delete',
+    'update'
+  ];
   let updateQueue = [];
   let nextWork = null;
   let pendingCommit = null;
   let currentInstance = null;
   function render (vdom, container) {
     updateQueue.push({
-      from: ROOT,
+      tag: ROOT,
       base: container,
       props: { children: vdom }
     });
@@ -152,7 +159,7 @@
   }
   function scheduleWork (instance) {
     updateQueue.push({
-      from: HOOK,
+      tag: HOOK,
       instance,
       state: instance.state
     });
@@ -176,7 +183,7 @@
       update.instance.fiber.state = update.state;
     }
     const root =
-      update.from == ROOT ? update.base.rootFiber : getRoot(update.instance.fiber);
+      update.tag == ROOT ? update.base.rootFiber : getRoot(update.instance.fiber);
     nextWork = {
       tag: ROOT,
       base: update.base || root.base,
@@ -217,41 +224,25 @@
     reconcileChildren(WIP, newChildren);
   }
   function reconcileChildren (WIP, newChildren) {
-    const childs = arrayfy(newChildren);
-    let keyed = {};
-    let index = 0;
+    newChildren = arrayfy(newChildren);
     let oldFiber = WIP.alternate ? WIP.alternate.child : null;
     let newFiber = null;
-    while (index < childs.length || oldFiber != null) {
+    let n = 0;
+    while (n < newChildren.length || oldFiber != null) {
+      const child = newChildren[n];
       const prevFiber = newFiber;
-      const child = index < childs.length && childs[index];
-      if (child.props && child.props.key) keyed[child.props.key] = child;
       const sameType = oldFiber && child && child.type == oldFiber.type;
       if (sameType) {
-        if (keyed[oldFiber.props.key]) {
-          newFiber = {
-            tag: oldFiber.tag,
-            base: oldFiber.base,
-            parent: WIP,
-            alternate: oldFiber,
-            patchTag: null,
-            type: oldFiber.type,
-            props: child.props || { nodeValue: child.nodeValue },
-            state: oldFiber.state
-          };
-          delete keyed[oldFiber.props.key];
-        } else {
-          newFiber = {
-            tag: oldFiber.tag,
-            base: oldFiber.base,
-            parent: WIP,
-            alternate: oldFiber,
-            patchTag: UPDATE,
-            type: oldFiber.type,
-            props: child.props || { nodeValue: child.nodeValue },
-            state: oldFiber.state
-          };
-        }
+        newFiber = {
+          tag: oldFiber.tag,
+          base: oldFiber.base,
+          parent: WIP,
+          alternate: oldFiber,
+          patchTag: UPDATE,
+          type: oldFiber.type,
+          props: child.props || { nodeValue: child.nodeValue },
+          state: oldFiber.state
+        };
       }
       if (child && !sameType) {
         newFiber = {
@@ -267,15 +258,13 @@
         WIP.patches = WIP.patches || [];
         WIP.patches.push(oldFiber);
       }
-      if (oldFiber) {
-        oldFiber = oldFiber.sibling;
-      }
-      if (index == 0) {
+      if (oldFiber) oldFiber = oldFiber.sibling;
+      if (n == 0) {
         WIP.child = newFiber;
       } else if (prevFiber && child) {
         prevFiber.sibling = newFiber;
       }
-      index++;
+      n++;
     }
   }
   function createInstance (fiber) {

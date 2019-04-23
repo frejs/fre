@@ -18,7 +18,7 @@ let currentInstance = null
 
 export function render (vdom, container) {
   updateQueue.push({
-    from: ROOT,
+    tag: ROOT,
     base: container,
     props: { children: vdom }
   })
@@ -27,7 +27,7 @@ export function render (vdom, container) {
 
 export function scheduleWork (instance) {
   updateQueue.push({
-    from: HOOK,
+    tag: HOOK,
     instance,
     state: instance.state
   })
@@ -54,7 +54,7 @@ function resetWork () {
     update.instance.fiber.state = update.state
   }
   const root =
-    update.from == ROOT ? update.base.rootFiber : getRoot(update.instance.fiber)
+    update.tag == ROOT ? update.base.rootFiber : getRoot(update.instance.fiber)
 
   nextWork = {
     tag: ROOT,
