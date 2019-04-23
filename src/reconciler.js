@@ -95,11 +95,14 @@ function updateHOOK (WIP) {
   instance.props = WIP.props || {}
   instance.state = WIP.state || {}
   instance.effects = WIP.effects || {}
-  instance.effects = WIP.patches || []
   currentInstance = instance
   resetCursor()
   const newChildren = WIP.type(WIP.props)
   reconcileChildren(WIP, newChildren)
+}
+
+function getKey (node) {
+  return ((node || {}).props || {}).key
 }
 
 function reconcileChildren (WIP, newChildren) {
@@ -110,9 +113,24 @@ function reconcileChildren (WIP, newChildren) {
 
   while (n < newChildren.length || oldFiber != null) {
     const child = newChildren[n]
-    const prevChild = newChildren[n - 1] || {}
     const prevFiber = newFiber
     const sameType = oldFiber && child && child.type == oldFiber.type
+
+    if (child && !sameType) {
+      newFiber = {
+        tag: typeof child.type === 'string' ? HOST : HOOK,
+        type: child.type,
+        props: child.props || { nodeValue: child.nodeValue },
+        parent: WIP,
+        patchTag: PLACE
+      }
+    }
+
+    if (oldFiber && !sameType) {
+      oldFiber.patchTag = DELETE
+      WIP.patches = WIP.patches || []
+      WIP.patches.push(oldFiber)
+    }
 
     if (sameType) {
       newFiber = {
@@ -127,21 +145,6 @@ function reconcileChildren (WIP, newChildren) {
       }
     }
 
-    if (child && !sameType) {
-      newFiber = {
-        tag: typeof child.type === 'string' ? HOST : HOOK,
-        type: child.type,
-        props: child.props || { nodeValue: child.nodeValue },
-        parent: WIP,
-        patchTag: PLACE
-      }
-    }
-
-    if (oldFiber && !sameType) {
-      oldFiber.patchTag = DELETE
-      WIP.patches.push(oldFiber)
-    }
-
     if (oldFiber) oldFiber = oldFiber.sibling
 
     if (n == 0) {
@@ -151,6 +154,7 @@ function reconcileChildren (WIP, newChildren) {
     }
 
     n++
+    console.log(WIP)
   }
 }
 

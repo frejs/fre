@@ -10,7 +10,7 @@ function Counter () {
       {arr.map(item => (
         <li key={item}>{item}</li>
       ))}
-      <button onClick={() => setArr(['B', 'C', 'D'])}>+</button>
+      <button onClick={() => setArr(['B', 'C'])}>+</button>
     </div>
   )
 }
