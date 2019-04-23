@@ -2,7 +2,14 @@ import { createElement, updateElement } from './element'
 import { resetCursor } from './hooks'
 import { defer, arrayfy } from './util'
 
-const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = ['host','hook','root','place','delete','update']
+const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
+  'host',
+  'hook',
+  'root',
+  'place',
+  'delete',
+  'update'
+]
 
 let updateQueue = []
 let nextWork = null
@@ -88,6 +95,7 @@ function updateHOOK (WIP) {
   instance.props = WIP.props || {}
   instance.state = WIP.state || {}
   instance.effects = WIP.effects || {}
+  instance.effects = WIP.patches || []
   currentInstance = instance
   resetCursor()
   const newChildren = WIP.type(WIP.props)
@@ -95,43 +103,27 @@ function updateHOOK (WIP) {
 }
 
 function reconcileChildren (WIP, newChildren) {
-  const childs = arrayfy(newChildren)
-  let keyed = {}
-  let index = 0
+  newChildren = arrayfy(newChildren)
   let oldFiber = WIP.alternate ? WIP.alternate.child : null
   let newFiber = null
+  let n = 0
 
-  while (index < childs.length || oldFiber != null) {
+  while (n < newChildren.length || oldFiber != null) {
+    const child = newChildren[n]
+    const prevChild = newChildren[n - 1] || {}
     const prevFiber = newFiber
-    const child = index < childs.length && childs[index]
-    if (child.props && child.props.key) keyed[child.props.key] = child
-
     const sameType = oldFiber && child && child.type == oldFiber.type
-    if (sameType) { 
-      if (keyed[oldFiber.props.key]) {
-        // 有 key 的情况
-        newFiber = {
-          tag: oldFiber.tag,
-          base: oldFiber.base,
-          parent: WIP,
-          alternate: oldFiber,
-          patchTag: null, // 直接重复利用
-          type: oldFiber.type,
-          props: child.props || { nodeValue: child.nodeValue },
-          state: oldFiber.state
-        }
-        delete keyed[oldFiber.props.key]
-      } else { //没有 key，插入
-        newFiber = {
-          tag: oldFiber.tag,
-          base: oldFiber.base,
-          parent: WIP,
-          alternate: oldFiber,
-          patchTag: UPDATE,
-          type: oldFiber.type,
-          props: child.props || { nodeValue: child.nodeValue },
-          state: oldFiber.state
-        }
+
+    if (sameType) {
+      newFiber = {
+        tag: oldFiber.tag,
+        base: oldFiber.base,
+        parent: WIP,
+        alternate: oldFiber,
+        patchTag: UPDATE,
+        type: oldFiber.type,
+        props: child.props || { nodeValue: child.nodeValue },
+        state: oldFiber.state
       }
     }
 
@@ -147,21 +139,18 @@ function reconcileChildren (WIP, newChildren) {
 
     if (oldFiber && !sameType) {
       oldFiber.patchTag = DELETE
-      WIP.patches = WIP.patches || []
       WIP.patches.push(oldFiber)
     }
 
-    if (oldFiber) {
-      oldFiber = oldFiber.sibling
-    }
+    if (oldFiber) oldFiber = oldFiber.sibling
 
-    if (index == 0) {
+    if (n == 0) {
       WIP.child = newFiber
     } else if (prevFiber && child) {
       prevFiber.sibling = newFiber
     }
 
-    index++
+    n++
   }
 }
 
