@@ -2,14 +2,7 @@ import { createElement, updateElement } from './element'
 import { resetCursor } from './hooks'
 import { defer, arrayfy } from './util'
 
-const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
-  'host',
-  'hook',
-  'root',
-  'place',
-  'delete',
-  'update'
-]
+const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = ['host','hook','root','place','delete','update']
 
 let updateQueue = []
 let nextWork = null
@@ -114,7 +107,7 @@ function reconcileChildren (WIP, newChildren) {
     if (child.props && child.props.key) keyed[child.props.key] = child
 
     const sameType = oldFiber && child && child.type == oldFiber.type
-    if (sameType) {
+    if (sameType) { 
       if (keyed[oldFiber.props.key]) {
         // 有 key 的情况
         newFiber = {
@@ -122,13 +115,13 @@ function reconcileChildren (WIP, newChildren) {
           base: oldFiber.base,
           parent: WIP,
           alternate: oldFiber,
-          patchTag: null, // 不需要任何操作
+          patchTag: null, // 直接重复利用
           type: oldFiber.type,
           props: child.props || { nodeValue: child.nodeValue },
           state: oldFiber.state
         }
         delete keyed[oldFiber.props.key]
-      } else {
+      } else { //没有 key，插入
         newFiber = {
           tag: oldFiber.tag,
           base: oldFiber.base,

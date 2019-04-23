@@ -137,14 +137,7 @@
     return [context, ctx.update]
   }
 
-  const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
-    'host',
-    'hook',
-    'root',
-    'place',
-    'delete',
-    'update'
-  ];
+  const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = ['host','hook','root','place','delete','update'];
   let updateQueue = [];
   let nextWork = null;
   let pendingCommit = null;
