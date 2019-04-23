@@ -2,7 +2,14 @@ import { createElement, updateElement } from './element'
 import { resetCursor } from './hooks'
 import { defer, arrayfy } from './util'
 
-const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = ['host','hook','root','place','delete','update']
+const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
+  'host',
+  'hook',
+  'root',
+  'place',
+  'delete',
+  'update'
+]
 
 let updateQueue = []
 let nextWork = null
@@ -58,11 +65,8 @@ function resetWork () {
 }
 
 function performWork (WIP) {
-  if (WIP.tag == HOOK) {
-    updateHOOK(WIP)
-  } else {
-    updateHost(WIP)
-  }
+  WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
+
   if (WIP.child) {
     return WIP.child
   }
@@ -99,7 +103,7 @@ function updateHOOK (WIP) {
 
 function reconcileChildren (WIP, newChildren) {
   const childs = arrayfy(newChildren)
-
+  let keyed = {}
   let index = 0
   let oldFiber = WIP.alternate ? WIP.alternate.child : null
   let newFiber = null
@@ -107,19 +111,34 @@ function reconcileChildren (WIP, newChildren) {
   while (index < childs.length || oldFiber != null) {
     const prevFiber = newFiber
     const child = index < childs.length && childs[index]
+    if (child.props && child.props.key) keyed[child.props.key] = child
 
     const sameType = oldFiber && child && child.type == oldFiber.type
-
     if (sameType) {
-      newFiber = {
-        tag: oldFiber.tag,
-        base: oldFiber.base,
-        parent: WIP,
-        alternate: oldFiber,
-        patchTag: UPDATE,
-        type: oldFiber.type,
-        props: child.props || { nodeValue: child.nodeValue },
-        state: oldFiber.state
+      if (keyed[oldFiber.props.key]) {
+        // 有 key 的情况
+        newFiber = {
+          tag: oldFiber.tag,
+          base: oldFiber.base,
+          parent: WIP,
+          alternate: oldFiber,
+          patchTag: null, // 不需要任何操作
+          type: oldFiber.type,
+          props: child.props || { nodeValue: child.nodeValue },
+          state: oldFiber.state
+        }
+        delete keyed[oldFiber.props.key]
+      } else {
+        newFiber = {
+          tag: oldFiber.tag,
+          base: oldFiber.base,
+          parent: WIP,
+          alternate: oldFiber,
+          patchTag: UPDATE,
+          type: oldFiber.type,
+          props: child.props || { nodeValue: child.nodeValue },
+          state: oldFiber.state
+        }
       }
     }
 

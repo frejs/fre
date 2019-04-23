@@ -1,5 +1,5 @@
 /**
- * by 132yse Copyright 2019-04-22
+ * by 132yse Copyright 2019-04-23
  */
 
 (function (global, factory) {
@@ -137,7 +137,14 @@
     return [context, ctx.update]
   }
 
-  const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = ['host','hook','root','place','delete','update'];
+  const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
+    'host',
+    'hook',
+    'root',
+    'place',
+    'delete',
+    'update'
+  ];
   let updateQueue = [];
   let nextWork = null;
   let pendingCommit = null;
@@ -185,11 +192,7 @@
     };
   }
   function performWork (WIP) {
-    if (WIP.tag == HOOK) {
-      updateHOOK(WIP);
-    } else {
-      updateHost(WIP);
-    }
+    WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP);
     if (WIP.child) {
       return WIP.child
     }
@@ -222,24 +225,40 @@
   }
   function reconcileChildren (WIP, newChildren) {
     const childs = arrayfy(newChildren);
+    let keyed = {};
     let index = 0;
     let oldFiber = WIP.alternate ? WIP.alternate.child : null;
     let newFiber = null;
     while (index < childs.length || oldFiber != null) {
       const prevFiber = newFiber;
       const child = index < childs.length && childs[index];
+      if (child.props && child.props.key) keyed[child.props.key] = child;
       const sameType = oldFiber && child && child.type == oldFiber.type;
       if (sameType) {
-        newFiber = {
-          tag: oldFiber.tag,
-          base: oldFiber.base,
-          parent: WIP,
-          alternate: oldFiber,
-          patchTag: UPDATE,
-          type: oldFiber.type,
-          props: child.props || { nodeValue: child.nodeValue },
-          state: oldFiber.state
-        };
+        if (keyed[oldFiber.props.key]) {
+          newFiber = {
+            tag: oldFiber.tag,
+            base: oldFiber.base,
+            parent: WIP,
+            alternate: oldFiber,
+            patchTag: null,
+            type: oldFiber.type,
+            props: child.props || { nodeValue: child.nodeValue },
+            state: oldFiber.state
+          };
+          delete keyed[oldFiber.props.key];
+        } else {
+          newFiber = {
+            tag: oldFiber.tag,
+            base: oldFiber.base,
+            parent: WIP,
+            alternate: oldFiber,
+            patchTag: UPDATE,
+            type: oldFiber.type,
+            props: child.props || { nodeValue: child.nodeValue },
+            state: oldFiber.state
+          };
+        }
       }
       if (child && !sameType) {
         newFiber = {
