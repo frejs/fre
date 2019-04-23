@@ -10,9 +10,9 @@
 
 ### Feature
 
-- :tada: hooks API , really functionalComponent
-- :confetti_ball: Fiber scheduler instead of diff algorithm
-- :telescope: All in one , just 1 KB
+- :tada: hooks API , really functionalComponent , also render props
+- :confetti_ball: Fiber scheduler and keyed diff algorithm
+- :telescope: All in one , just 1 KB , no dependences
 
 ### Introduction
 
