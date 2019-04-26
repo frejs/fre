@@ -93,7 +93,6 @@ function updateHOOK (WIP) {
   instance.props = WIP.props || {}
   instance.state = WIP.state || {}
   instance.effects = WIP.effects || {}
-  instance.children = WIP.children || {}
   currentInstance = instance
   resetCursor()
   const newChildren = WIP.type(WIP.props)
@@ -111,45 +110,59 @@ function reconcileChildren (WIP, newChildren) {
   const oldFibers = WIP.children
   const newFibers = fiberize(newChildren, WIP)
   console.log(oldFibers, newFibers)
-  let oldFiber = WIP.alternate ? WIP.alternate.child : null
+
+  let reused = {}
+  delete WIP.child
+
+  for (let o in oldFibers) {
+    let newFiber = newFibers[o]
+    let oldFiber = oldFibers[o]
+    if (newFiber && oldFiber.type === newFiber.type) {
+      reused[o] = oldFiber
+      if (newFiber.key) {
+        oldFiber.key = newFiber.key
+      }
+      continue
+    }
+  }
+
   let prevFiber = null
 
-  for (let k in newFibers) {
-    const child = newFibers[k]
-    const sameType = oldFiber && child && child.type == oldFiber.type
-    if (sameType) {
-      child = {
-        tag: oldFiber.tag,
-        base: oldFiber.base,
-        parent: WIP,
-        alternate: oldFiber,
-        patchTag: UPDATE,
-        type: oldFiber.type,
-        props: child.props || { nodeValue: child.nodeValue },
-        state: oldFiber.state,
-        children: child.children
+  for (let n in newFibers) {
+    let newFiber = newFibers[n]
+    let oldFiber = reused[n]
+    const sameNode =
+      oldFiber &&
+      newFiber &&
+      newFiber.type == oldFiber.type &&
+      newFiber.key == oldFiber.key
+    let alternate = null
+
+    if (oldFiber) {
+      if (sameNode) {
+        alternate = new Fiber(oldFiber)
+        newFiber = { ...oldFiber, ...newFiber }
+        newFiber.alternate = alternate
       }
+    } else {
+      newFiber = new Fiber(newFiber)
     }
 
-    if (child && !sameType) {
-      child = new Fiber(child)
-    }
+    newFibers[n] = newFiber
+    newFiber.parent = WIP
 
-    newFibers[k] = child
-    child.parent = WIP
-
-    if (oldFiber && !sameType) {
-      oldFiber.patchTag = DELETE
-      WIP.patches = WIP.patches || []
-      WIP.patches.push(oldFiber)
-    }
+    // if (oldFiber && !sameType) {
+    //   oldFiber.patchTag = DELETE
+    //   WIP.patches = WIP.patches || []
+    //   WIP.patches.push(oldFiber)
+    // }
 
     if (prevFiber) {
-      prevFiber.sibling = child // 这里进行赋值的
+      prevFiber.sibling = newFiber // 这里进行赋值的
     } else {
-      WIP.child = child // 这里进行赋值
+      WIP.child = newFiber // 这里进行赋值
     }
-    prevFiber = child
+    prevFiber = newFiber
   }
 }
 
@@ -163,7 +176,6 @@ function Fiber (vnode) {
   this.patchTag = PLACE
   this.tag = typeof vnode.type === 'function' ? HOOK : HOST
   vnode.props = vnode.props || { nodeValue: vnode.nodeValue }
-  this.children = oldFibers
   return { ...this, ...vnode }
 }
 
