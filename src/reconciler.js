@@ -67,9 +67,7 @@ function resetWork () {
 function performWork (WIP) {
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
 
-  if (WIP.child) {
-    return WIP.child
-  }
+  if (WIP.child) return WIP.child
   let wip = WIP
   while (wip) {
     completeWork(wip)
@@ -106,9 +104,6 @@ function reconcileChildren (WIP, newChildren) {
   newChildren = arrayfy(newChildren)
   let oldFiber = WIP.alternate ? WIP.alternate.child : null
   let newFiber = null
-  let key = ((oldFiber||{}).props||{}).children
-
-  console.log(hashfy(newChildren),hashfy(arrayfy(key)))
   let n = 0
 
   while (n < newChildren.length || oldFiber != null) {
@@ -191,10 +186,7 @@ function cloneChildFibers (parentFiber) {
 }
 
 function completeWork (fiber) {
-  if (fiber.tag == HOOK) {
-    fiber.base.fiber = fiber
-  }
-
+  if (fiber.tag == HOOK) fiber.base.fiber = fiber
   if (fiber.parent) {
     const childPatches = fiber.patches || []
     const selfPatch = fiber.patchTag ? [fiber] : []
