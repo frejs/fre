@@ -110,13 +110,13 @@ function reconcileChildren (WIP, newChildren) {
   console.log(oldFibers)
   const newFibers = fiberize(newChildren, WIP)
   let oldFiber = WIP.alternate ? WIP.alternate.child : null
-  let prevFiber
+  let prevFiber = null
 
   for (let k in newFibers) {
     const child = newFibers[k]
     const sameType = oldFiber && child && child.type == oldFiber.type
     if (sameType) {
-      child = {
+      newFiber = {
         tag: oldFiber.tag,
         base: oldFiber.base,
         parent: WIP,
@@ -124,7 +124,8 @@ function reconcileChildren (WIP, newChildren) {
         patchTag: UPDATE,
         type: oldFiber.type,
         props: child.props || { nodeValue: child.nodeValue },
-        state: oldFiber.state
+        state: oldFiber.state,
+        children: child.children
       }
     }
 
@@ -142,11 +143,10 @@ function reconcileChildren (WIP, newChildren) {
     }
 
     if (prevFiber) {
-      WIP.sibling = child // 这里进行赋值的
+      prevFiber.sibling = child // 这里进行赋值的
     } else {
       WIP.child = child // 这里进行赋值
     }
-
     prevFiber = child
   }
 }
