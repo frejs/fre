@@ -110,15 +110,13 @@ function reconcileChildren (WIP, newChildren) {
   console.log(oldFibers)
   const newFibers = fiberize(newChildren, WIP)
   let oldFiber = WIP.alternate ? WIP.alternate.child : null
-  let newFiber = null
+  let prevFiber
 
   for (let k in newFibers) {
     const child = newFibers[k]
-    const prevFiber = newFiber
     const sameType = oldFiber && child && child.type == oldFiber.type
     if (sameType) {
-      console.log(child)
-      newFiber = {
+      child = {
         tag: oldFiber.tag,
         base: oldFiber.base,
         parent: WIP,
@@ -126,21 +124,16 @@ function reconcileChildren (WIP, newChildren) {
         patchTag: UPDATE,
         type: oldFiber.type,
         props: child.props || { nodeValue: child.nodeValue },
-        state: oldFiber.state,
-        children: child.children
+        state: oldFiber.state
       }
     }
 
     if (child && !sameType) {
-      newFiber = {
-        tag: typeof child.type === 'string' ? HOST : HOOK,
-        type: child.type,
-        props: child.props || { nodeValue: child.nodeValue },
-        parent: WIP,
-        children: {},
-        patchTag: PLACE
-      }
+      child = new Fiber(child)
     }
+
+    newFibers[k] = child
+    child.parent = WIP
 
     if (oldFiber && !sameType) {
       oldFiber.patchTag = DELETE
@@ -148,13 +141,13 @@ function reconcileChildren (WIP, newChildren) {
       WIP.patches.push(oldFiber)
     }
 
-    if (oldFiber) oldFiber = oldFiber.sibling
-
     if (prevFiber) {
-      prevFiber.sibling = newFiber // 这里进行赋值的
+      WIP.sibling = child // 这里进行赋值的
     } else {
-      WIP.child = newFiber // 这里进行赋值
+      WIP.child = child // 这里进行赋值
     }
+
+    prevFiber = child
   }
 }
 
@@ -165,12 +158,10 @@ function createInstance (fiber) {
 }
 
 function Fiber (vnode) {
-  for (var i in vnode) {
-    if (hasOwnProperty.call(vnode, i)) {
-      this[i] = vnode[i]
-    }
-  }
-  return this
+  this.patchTag = PLACE
+  this.tag = typeof vnode.type === 'function' ? HOOK : HOST
+  vnode.props = vnode.props || { nodeValue: vnode.nodeValue }
+  return { ...this, ...vnode }
 }
 
 function cloneChildFibers (parentFiber) {
