@@ -100,15 +100,17 @@ function updateHOOK (WIP) {
   reconcileChildren(WIP, newChildren)
 }
 
+let oldFibers = {}
+
 function fiberize (children, WIP) {
-  return (WIP.children = hashfy(children))
+  oldFibers = hashfy(children)
+  return (WIP.children = oldFibers)
 }
 
 function reconcileChildren (WIP, newChildren) {
-  // B C D、A B C
   const oldFibers = WIP.children
-  console.log(oldFibers)
   const newFibers = fiberize(newChildren, WIP)
+  console.log(oldFibers, newFibers)
   let oldFiber = WIP.alternate ? WIP.alternate.child : null
   let prevFiber = null
 
@@ -116,7 +118,7 @@ function reconcileChildren (WIP, newChildren) {
     const child = newFibers[k]
     const sameType = oldFiber && child && child.type == oldFiber.type
     if (sameType) {
-      newFiber = {
+      child = {
         tag: oldFiber.tag,
         base: oldFiber.base,
         parent: WIP,
@@ -161,6 +163,7 @@ function Fiber (vnode) {
   this.patchTag = PLACE
   this.tag = typeof vnode.type === 'function' ? HOOK : HOST
   vnode.props = vnode.props || { nodeValue: vnode.nodeValue }
+  this.children = oldFibers
   return { ...this, ...vnode }
 }
 
