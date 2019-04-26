@@ -15,6 +15,7 @@ let updateQueue = []
 let nextWork = null
 let pendingCommit = null
 let currentInstance = null
+let oldFibers = null
 
 export function render (vdom, container) {
   updateQueue.push({
@@ -98,19 +99,13 @@ function updateHOOK (WIP) {
   const newChildren = WIP.type(WIP.props)
   reconcileChildren(WIP, newChildren)
 }
-
-let oldFibers = {}
-
 function fiberize (children, WIP) {
-  oldFibers = hashfy(children)
-  return (WIP.children = oldFibers)
+  return (WIP.children = hashfy(children))
 }
 
 function reconcileChildren (WIP, newChildren) {
-  const oldFibers = WIP.children
+  console.log(oldFibers)
   const newFibers = fiberize(newChildren, WIP)
-  console.log(oldFibers, newFibers)
-
   let reused = {}
   delete WIP.child
 
@@ -140,12 +135,12 @@ function reconcileChildren (WIP, newChildren) {
 
     if (oldFiber) {
       if (sameNode) {
-        alternate = new Fiber(oldFiber)
+        alternate = new Fiber(oldFiber, UPDATE)
         newFiber = { ...oldFiber, ...newFiber }
         newFiber.alternate = alternate
       }
     } else {
-      newFiber = new Fiber(newFiber)
+      newFiber = new Fiber(newFiber, PLACE)
     }
 
     newFibers[n] = newFiber
@@ -172,8 +167,8 @@ function createInstance (fiber) {
   return instance
 }
 
-function Fiber (vnode) {
-  this.patchTag = PLACE
+function Fiber (vnode, patchTag) {
+  this.patchTag = patchTag
   this.tag = typeof vnode.type === 'function' ? HOOK : HOST
   vnode.props = vnode.props || { nodeValue: vnode.nodeValue }
   return { ...this, ...vnode }
@@ -209,20 +204,19 @@ function cloneChildFibers (parentFiber) {
 function completeWork (fiber) {
   if (fiber.tag == HOOK) fiber.base.fiber = fiber
   if (fiber.parent) {
-    const childPatches = fiber.patches || []
-    const selfPatch = fiber.patchTag ? [fiber] : []
-    const parentPatches = fiber.parent.patches || []
-    fiber.parent.patches = parentPatches.concat(childPatches, selfPatch)
+    fiber.parent.patches = (fiber.parent.patches || []).concat(
+      fiber.patches || [],
+      fiber.patchTag ? [fiber] : []
+    )
   } else {
     pendingCommit = fiber
   }
 }
 
 function commitAllWork (WIP) {
-  WIP.patches.forEach(f => commitWork(f))
+  WIP.patches.forEach(p => commitWork(p))
   commitEffects(currentInstance.effects)
   WIP.base.rootFiber = WIP
-
   nextWork = null
   pendingCommit = null
 }
