@@ -1,10 +1,7 @@
 import { h, render, useState, useEffect } from '../../src'
 
 function Counter () {
-  const [arr, setArr] = useState(['B','C'])
-  // useEffect(() => {
-  //   document.title = count
-  // })
+  const [arr, setArr] = useState(['B', 'C'])
   return (
     <div>
       {arr.map(item => (

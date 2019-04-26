@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './element'
 import { resetCursor } from './hooks'
-import { defer, arrayfy } from './util'
+import { defer, arrayfy, hashfy } from './util'
 
 const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
   'host',
@@ -106,6 +106,9 @@ function reconcileChildren (WIP, newChildren) {
   newChildren = arrayfy(newChildren)
   let oldFiber = WIP.alternate ? WIP.alternate.child : null
   let newFiber = null
+  let key = ((oldFiber||{}).props||{}).children
+
+  console.log(hashfy(newChildren),hashfy(arrayfy(key)))
   let n = 0
 
   while (n < newChildren.length || oldFiber != null) {
