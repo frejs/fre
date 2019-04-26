@@ -106,17 +106,18 @@ function fiberize (children, WIP) {
 
 function reconcileChildren (WIP, newChildren) {
   // B C D、A B C
+  const oldFibers = WIP.children
+  console.log(oldFibers)
   const newFibers = fiberize(newChildren, WIP)
   let oldFiber = WIP.alternate ? WIP.alternate.child : null
   let newFiber = null
-  let n = 0
 
   for (let k in newFibers) {
     const child = newFibers[k]
     const prevFiber = newFiber
     const sameType = oldFiber && child && child.type == oldFiber.type
-
     if (sameType) {
+      console.log(child)
       newFiber = {
         tag: oldFiber.tag,
         base: oldFiber.base,
@@ -125,7 +126,8 @@ function reconcileChildren (WIP, newChildren) {
         patchTag: UPDATE,
         type: oldFiber.type,
         props: child.props || { nodeValue: child.nodeValue },
-        state: oldFiber.state
+        state: oldFiber.state,
+        children: child.children
       }
     }
 
@@ -135,6 +137,7 @@ function reconcileChildren (WIP, newChildren) {
         type: child.type,
         props: child.props || { nodeValue: child.nodeValue },
         parent: WIP,
+        children: {},
         patchTag: PLACE
       }
     }
@@ -159,6 +162,15 @@ function createInstance (fiber) {
   const instance = new fiber.type(fiber.props)
   instance.fiber = fiber
   return instance
+}
+
+function Fiber (vnode) {
+  for (var i in vnode) {
+    if (hasOwnProperty.call(vnode, i)) {
+      this[i] = vnode[i]
+    }
+  }
+  return this
 }
 
 function cloneChildFibers (parentFiber) {
