@@ -93,21 +93,26 @@ function updateHOOK (WIP) {
   instance.props = WIP.props || {}
   instance.state = WIP.state || {}
   instance.effects = WIP.effects || {}
+  instance.children = WIP.children || {}
   currentInstance = instance
   resetCursor()
   const newChildren = WIP.type(WIP.props)
   reconcileChildren(WIP, newChildren)
 }
 
+function fiberize (children, WIP) {
+  return (WIP.children = hashfy(children))
+}
+
 function reconcileChildren (WIP, newChildren) {
   // B C D、A B C
-  newChildren = arrayfy(newChildren)
+  const newFibers = fiberize(newChildren, WIP)
   let oldFiber = WIP.alternate ? WIP.alternate.child : null
   let newFiber = null
   let n = 0
 
-  while (n < newChildren.length || oldFiber != null) {
-    const child = newChildren[n]
+  for (let k in newFibers) {
+    const child = newFibers[k]
     const prevFiber = newFiber
     const sameType = oldFiber && child && child.type == oldFiber.type
 
@@ -142,13 +147,11 @@ function reconcileChildren (WIP, newChildren) {
 
     if (oldFiber) oldFiber = oldFiber.sibling
 
-    if (n == 0) {
-      WIP.child = newFiber
-    } else if (prevFiber && child) {
-      prevFiber.sibling = newFiber
+    if (prevFiber) {
+      prevFiber.sibling = newFiber // 这里进行赋值的
+    } else {
+      WIP.child = newFiber // 这里进行赋值
     }
-
-    n++
   }
 }
 

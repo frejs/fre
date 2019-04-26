@@ -10,7 +10,7 @@ export const hashfy = arr => {
   // 将数组变成 hash 对象
   let res = {},
       i = 0
-  arr.forEach(item => {
+  arrayfy(arr).forEach(item => {
     let key = ((item || {}).props || {}).key
     key ? (res['.' + key] = item) : (res['.' + i] = item) && i++
   })
