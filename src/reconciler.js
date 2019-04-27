@@ -61,13 +61,13 @@ function resetWork () {
     tag: ROOT,
     base: update.base || root.base,
     props: update.props || root.props,
-    alternate: root
+    alternate: root,
+    children: {}
   }
 }
 
 function performWork (WIP) {
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
-
   if (WIP.child) return WIP.child
   let wip = WIP
   while (wip) {
@@ -104,7 +104,7 @@ function fiberize (children, WIP) {
 }
 
 function reconcileChildren (WIP, newChildren) {
-  console.log(oldFibers)
+  // console.log(WIP.children, newFibers)
   const newFibers = fiberize(newChildren, WIP)
   let reused = {}
   delete WIP.child
@@ -136,7 +136,7 @@ function reconcileChildren (WIP, newChildren) {
     if (oldFiber) {
       if (sameNode) {
         alternate = new Fiber(oldFiber, UPDATE)
-        newFiber = { ...oldFiber, ...newFiber }
+        newFiber = { ...alternate, ...newFiber }
         newFiber.alternate = alternate
       }
     } else {
@@ -153,6 +153,7 @@ function reconcileChildren (WIP, newChildren) {
     }
     prevFiber = newFiber
   }
+  // console.log(WIP.children)
 }
 
 function createInstance (fiber) {
