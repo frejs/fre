@@ -57,12 +57,13 @@ function resetWork () {
   const root =
     update.tag == ROOT ? update.base.rootFiber : getRoot(update.instance.fiber)
 
+    console.log(root)
+
   nextWork = {
     tag: ROOT,
     base: update.base || root.base,
     props: update.props || root.props,
-    alternate: root,
-    children: {}
+    alternate: root
   }
 }
 
