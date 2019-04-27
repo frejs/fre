@@ -57,8 +57,6 @@ function resetWork () {
   const root =
     update.tag == ROOT ? update.base.rootFiber : getRoot(update.instance.fiber)
 
-    console.log(root)
-
   nextWork = {
     tag: ROOT,
     base: update.base || root.base,
@@ -242,11 +240,8 @@ function commitDELETE (fiber, domParent) {
 }
 
 function getRoot (fiber) {
-  let node = fiber
-  while (node.parent) {
-    node = node.parent
-  }
-  return node
+  while (fiber.parent) fiber = fiber.parent
+  return fiber
 }
 
 export function getCurrentInstance () {
