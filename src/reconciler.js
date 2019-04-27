@@ -146,16 +146,10 @@ function reconcileChildren (WIP, newChildren) {
     newFibers[n] = newFiber
     newFiber.parent = WIP
 
-    // if (oldFiber && !sameType) {
-    //   oldFiber.patchTag = DELETE
-    //   WIP.patches = WIP.patches || []
-    //   WIP.patches.push(oldFiber)
-    // }
-
     if (prevFiber) {
-      prevFiber.sibling = newFiber // 这里进行赋值的
+      prevFiber.sibling = newFiber
     } else {
-      WIP.child = newFiber // 这里进行赋值
+      WIP.child = newFiber
     }
     prevFiber = newFiber
   }
