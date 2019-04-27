@@ -174,30 +174,18 @@ function Fiber (vnode, patchTag) {
   return { ...this, ...vnode }
 }
 
-function cloneChildFibers (parentFiber) {
-  const oldFiber = parentFiber.alternate
-  if (!oldFiber.child) return
-
-  let oldChild = oldFiber.child
-  let prevChild = null
-
-  while (oldChild) {
-    const newChild = {
-      type: oldChild.type,
-      tag: oldChild.tag,
-      base: oldChild.base,
-      props: oldChild.props,
-      state: oldChild.state,
-      alternate: oldChild,
-      parent: parentFiber
+function cloneChildFibers (fiber) {
+  let prev = fiber.alternate
+  if (prev && prev.child) {
+    let pc = prev.children
+    let cc = (fiber.children = {})
+    fiber.child = prev.child
+    fiber.lastChild = prev.lastChild
+    for (let i in pc) {
+      let a = pc[i]
+      a.return = fiber
+      cc[i] = a
     }
-    if (prevChild) {
-      prevChild.sibling = newChild
-    } else {
-      parentFiber.child = newChild
-    }
-    prevChild = newChild
-    oldChild = oldChild.sibling
   }
 }
 
