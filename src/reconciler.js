@@ -27,7 +27,6 @@ export function render (vdom, container) {
 }
 
 export function scheduleWork (fiber) {
-  fiber.patches = []
   microtasks.push(fiber)
   defer(workLoop)
 }
@@ -39,6 +38,7 @@ function workLoop () {
     nextWork = update
   }
   while (nextWork) {
+    nextWork.patches = []
     nextWork = performWork(nextWork)
   }
   if (pendingCommit) {
@@ -85,7 +85,6 @@ function reconcileChildren (WIP, newChildren) {
   const oldFibers = WIP.children
   const newFibers = fiberize(newChildren, WIP)
   let reused = {}
-  delete WIP.child
 
   for (let o in oldFibers) {
     let newFiber = newFibers[o]
@@ -98,7 +97,6 @@ function reconcileChildren (WIP, newChildren) {
       continue
     }
   }
-
   let prevFiber = null
   let alternate = null
 
@@ -120,7 +118,6 @@ function reconcileChildren (WIP, newChildren) {
         patchTag: PLACE
       })
     }
-
     newFibers[n] = newFiber
     newFiber.parent = WIP
 
@@ -146,21 +143,6 @@ function Fiber (vnode, data) {
   merge(this, vnode)
 }
 
-function cloneChildFibers (fiber) {
-  let prev = fiber.alternate
-  if (prev && prev.child) {
-    let pc = prev.children
-    let cc = (fiber.children = {})
-    fiber.child = prev.child
-    fiber.lastChild = prev.lastChild
-    for (let i in pc) {
-      let a = pc[i]
-      a.return = fiber
-      cc[i] = a
-    }
-  }
-}
-
 function completeWork (fiber) {
   if (fiber.tag == HOOK) fiber.base.fiber = fiber
   if (fiber.parent) {
@@ -174,7 +156,6 @@ function completeWork (fiber) {
 }
 
 function commitAllWork (WIP) {
-  console.log(WIP.patches)
   WIP.patches.forEach(p => commitWork(p))
   commitEffects(currentFiber.effects)
   WIP.base.rootFiber = WIP
@@ -191,8 +172,12 @@ function commitWork (fiber) {
     parentFiber = parentFiber.parent
   }
   const parentNode = parentFiber.base
+  let dom = fiber.base // A
 
   if (fiber.patchTag == PLACE && fiber.tag == HOST) {
+    // console.log(fiber)
+    // console.log(parentNode, fiber.base)
+    // parentNode.insertBefore(A,B)
     parentNode.appendChild(fiber.base)
   } else if (fiber.patchTag == UPDATE && fiber.tag == HOST) {
     updateElement(fiber.base, fiber.alternate.props, fiber.props)
