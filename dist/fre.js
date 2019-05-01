@@ -1,5 +1,5 @@
 /**
- * by 132yse Copyright 2019-04-23
+ * by 132yse Copyright 2019-04-27
  */
 
 (function (global, factory) {
@@ -23,7 +23,7 @@
         );
       }
     }
-    return { type, props: { ...props, children }}
+    return { type, props: { ...props, children }, key: (props || {}).key || null }
   }
 
   const defer =
@@ -31,6 +31,15 @@
   const arrayfy = array =>
     !array ? [] : Array.isArray(array) ? array : [array];
   const isNew = (prev, next) => key => prev[key] !== next[key];
+  const hashfy = arr => {
+    let res = {},
+        i = 0;
+    arrayfy(arr).forEach(item => {
+      let key = ((item || {}).props || {}).key;
+      key ? (res['.' + key] = item) : (res['.' + i] = item) && i++;
+    });
+    return res
+  };
 
   function updateProperty (element, name, value, newValue) {
     if (name === 'children' || name === 'key') ; else if (name === 'style') {
@@ -149,6 +158,7 @@
   let nextWork = null;
   let pendingCommit = null;
   let currentInstance = null;
+  let oldFibers = null;
   function render (vdom, container) {
     updateQueue.push({
       tag: ROOT,
@@ -193,9 +203,7 @@
   }
   function performWork (WIP) {
     WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP);
-    if (WIP.child) {
-      return WIP.child
-    }
+    if (WIP.child) return WIP.child
     let wip = WIP;
     while (wip) {
       completeWork(wip);
@@ -223,48 +231,51 @@
     const newChildren = WIP.type(WIP.props);
     reconcileChildren(WIP, newChildren);
   }
+  function fiberize (children, WIP) {
+    return (WIP.children = hashfy(children))
+  }
   function reconcileChildren (WIP, newChildren) {
-    newChildren = arrayfy(newChildren);
-    let oldFiber = WIP.alternate ? WIP.alternate.child : null;
-    let newFiber = null;
-    let n = 0;
-    while (n < newChildren.length || oldFiber != null) {
-      const child = newChildren[n];
-      const prevFiber = newFiber;
-      const sameType = oldFiber && child && child.type == oldFiber.type;
-      if (sameType) {
-        newFiber = {
-          tag: oldFiber.tag,
-          base: oldFiber.base,
-          parent: WIP,
-          alternate: oldFiber,
-          patchTag: UPDATE,
-          type: oldFiber.type,
-          props: child.props || { nodeValue: child.nodeValue },
-          state: oldFiber.state
-        };
+    const newFibers = fiberize(newChildren, WIP);
+    let reused = {};
+    delete WIP.child;
+    for (let o in oldFibers) {
+      let newFiber = newFibers[o];
+      let oldFiber = oldFibers[o];
+      if (newFiber && oldFiber.type === newFiber.type) {
+        reused[o] = oldFiber;
+        if (newFiber.key) {
+          oldFiber.key = newFiber.key;
+        }
+        continue
       }
-      if (child && !sameType) {
-        newFiber = {
-          tag: typeof child.type === 'string' ? HOST : HOOK,
-          type: child.type,
-          props: child.props || { nodeValue: child.nodeValue },
-          parent: WIP,
-          patchTag: PLACE
-        };
+    }
+    let prevFiber = null;
+    for (let n in newFibers) {
+      let newFiber = newFibers[n];
+      let oldFiber = reused[n];
+      const sameNode =
+        oldFiber &&
+        newFiber &&
+        newFiber.type == oldFiber.type &&
+        newFiber.key == oldFiber.key;
+      let alternate = null;
+      if (oldFiber) {
+        if (sameNode) {
+          alternate = new Fiber(oldFiber, UPDATE);
+          newFiber = { ...alternate, ...newFiber };
+          newFiber.alternate = alternate;
+        }
+      } else {
+        newFiber = new Fiber(newFiber, PLACE);
       }
-      if (oldFiber && !sameType) {
-        oldFiber.patchTag = DELETE;
-        WIP.patches = WIP.patches || [];
-        WIP.patches.push(oldFiber);
-      }
-      if (oldFiber) oldFiber = oldFiber.sibling;
-      if (n == 0) {
-        WIP.child = newFiber;
-      } else if (prevFiber && child) {
+      newFibers[n] = newFiber;
+      newFiber.parent = WIP;
+      if (prevFiber) {
         prevFiber.sibling = newFiber;
+      } else {
+        WIP.child = newFiber;
       }
-      n++;
+      prevFiber = newFiber;
     }
   }
   function createInstance (fiber) {
@@ -272,45 +283,39 @@
     instance.fiber = fiber;
     return instance
   }
-  function cloneChildFibers (parentFiber) {
-    const oldFiber = parentFiber.alternate;
-    if (!oldFiber.child) return
-    let oldChild = oldFiber.child;
-    let prevChild = null;
-    while (oldChild) {
-      const newChild = {
-        type: oldChild.type,
-        tag: oldChild.tag,
-        base: oldChild.base,
-        props: oldChild.props,
-        state: oldChild.state,
-        alternate: oldChild,
-        parent: parentFiber
-      };
-      if (prevChild) {
-        prevChild.sibling = newChild;
-      } else {
-        parentFiber.child = newChild;
+  function Fiber (vnode, patchTag) {
+    this.patchTag = patchTag;
+    this.tag = typeof vnode.type === 'function' ? HOOK : HOST;
+    vnode.props = vnode.props || { nodeValue: vnode.nodeValue };
+    return { ...this, ...vnode }
+  }
+  function cloneChildFibers (fiber) {
+    let prev = fiber.alternate;
+    if (prev && prev.child) {
+      let pc = prev.children;
+      let cc = (fiber.children = {});
+      fiber.child = prev.child;
+      fiber.lastChild = prev.lastChild;
+      for (let i in pc) {
+        let a = pc[i];
+        a.return = fiber;
+        cc[i] = a;
       }
-      prevChild = newChild;
-      oldChild = oldChild.sibling;
     }
   }
   function completeWork (fiber) {
-    if (fiber.tag == HOOK) {
-      fiber.base.fiber = fiber;
-    }
+    if (fiber.tag == HOOK) fiber.base.fiber = fiber;
     if (fiber.parent) {
-      const childPatches = fiber.patches || [];
-      const selfPatch = fiber.patchTag ? [fiber] : [];
-      const parentPatches = fiber.parent.patches || [];
-      fiber.parent.patches = parentPatches.concat(childPatches, selfPatch);
+      fiber.parent.patches = (fiber.parent.patches || []).concat(
+        fiber.patches || [],
+        fiber.patchTag ? [fiber] : []
+      );
     } else {
       pendingCommit = fiber;
     }
   }
   function commitAllWork (WIP) {
-    WIP.patches.forEach(f => commitWork(f));
+    WIP.patches.forEach(p => commitWork(p));
     commitEffects(currentInstance.effects);
     WIP.base.rootFiber = WIP;
     nextWork = null;
@@ -349,11 +354,8 @@
     }
   }
   function getRoot (fiber) {
-    let node = fiber;
-    while (node.parent) {
-      node = node.parent;
-    }
-    return node
+    while (fiber.parent) fiber = fiber.parent;
+    return fiber
   }
   function getCurrentInstance () {
     return currentInstance || null
@@ -365,14 +367,14 @@
     });
   }
 
+  exports.createContext = createContext;
   exports.h = h;
   exports.render = render;
-  exports.useState = useState;
-  exports.useReducer = useReducer;
+  exports.useContext = useContext;
   exports.useEffect = useEffect;
   exports.useMemo = useMemo;
-  exports.createContext = createContext;
-  exports.useContext = useContext;
+  exports.useReducer = useReducer;
+  exports.useState = useState;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

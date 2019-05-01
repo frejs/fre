@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './element'
 import { resetCursor } from './hooks'
-import { defer, arrayfy, hashfy } from './util'
+import { defer, hashfy } from './util'
 
 const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
   'host',
@@ -14,7 +14,7 @@ const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
 let updateQueue = []
 let nextWork = null
 let pendingCommit = null
-let currentInstance = null
+let currentFiber = null
 let oldFibers = null
 
 export function render (vdom, container) {
@@ -90,10 +90,10 @@ function updateHOOK (WIP) {
   } else if (WIP.props == WIP.props && !WIP.state) {
     cloneChildFibers(WIP)
   }
-  instance.props = WIP.props || {}
-  instance.state = WIP.state || {}
-  instance.effects = WIP.effects || {}
-  currentInstance = instance
+  WIP.props = WIP.props || {}
+  WIP.state = WIP.state || {}
+  WIP.effects = WIP.effects || {}
+  currentFiber = WIP
   resetCursor()
   const newChildren = WIP.type(WIP.props)
   reconcileChildren(WIP, newChildren)
@@ -103,7 +103,6 @@ function fiberize (children, WIP) {
 }
 
 function reconcileChildren (WIP, newChildren) {
-  // console.log(WIP.children, newFibers)
   const newFibers = fiberize(newChildren, WIP)
   let reused = {}
   delete WIP.child
@@ -152,7 +151,6 @@ function reconcileChildren (WIP, newChildren) {
     }
     prevFiber = newFiber
   }
-  // console.log(WIP.children)
 }
 
 function createInstance (fiber) {
@@ -197,7 +195,7 @@ function completeWork (fiber) {
 
 function commitAllWork (WIP) {
   WIP.patches.forEach(p => commitWork(p))
-  commitEffects(currentInstance.effects)
+  commitEffects(currentFiber.effects)
   WIP.base.rootFiber = WIP
   nextWork = null
   pendingCommit = null
@@ -244,8 +242,8 @@ function getRoot (fiber) {
   return fiber
 }
 
-export function getCurrentInstance () {
-  return currentInstance || null
+export function getCurrentFiber () {
+  return currentFiber || null
 }
 
 function commitEffects (effects) {

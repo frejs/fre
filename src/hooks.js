@@ -1,4 +1,4 @@
-import { scheduleWork, getCurrentInstance } from './reconciler'
+import { scheduleWork, getCurrentFiber } from './reconciler'
 let cursor = 0
 let oldInputs = []
 
@@ -15,14 +15,15 @@ export function useState (initState) {
   return useReducer(null, initState)
 }
 export function useReducer (reducer, initState) {
-  let current = getCurrentInstance()
+  let current = getCurrentFiber()
+  console.log(current)
   let key = '$' + cursor
   let setter = update.bind(current, key, reducer)
   if (!current) {
     return [initState, setter]
   } else {
     cursor++
-    let state = current.state
+    let state = current.state || {}
     if (typeof state === 'object' && key in state) {
       return [state[key], setter]
     } else {
