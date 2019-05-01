@@ -84,7 +84,6 @@ function fiberize (children, WIP) {
 
 function reconcileChildren (WIP, newChildren) {
   const oldFibers = WIP.children
-  console.log(oldFibers)
   const newFibers = fiberize(newChildren, WIP)
   let reused = {}
   delete WIP.child
