@@ -14,7 +14,7 @@ function App () {
 }
 
 function Other () {
-  const [count, setCount] = useContext(context)
+  const [count, setCount] = useContext(ctx)
   return (
     <div>
       <h1>{count}</h1>

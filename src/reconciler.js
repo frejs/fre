@@ -139,6 +139,7 @@ function createInstance (fiber) {
 function Fiber (vnode, data) {
   this.patchTag = data.patchTag
   this.tag = data.tag || typeof vnode.type === 'function' ? HOOK : HOST
+  console.log(vnode.nodeValue)
   vnode.props = vnode.props || { nodeValue: vnode.nodeValue }
   merge(this, vnode)
 }
@@ -203,11 +204,6 @@ function commitDELETE (fiber, domParent) {
     }
     node = node.sibling
   }
-}
-
-function getRoot (fiber) {
-  while (fiber.parent) fiber = fiber.parent
-  return fiber
 }
 
 export function getCurrentFiber () {

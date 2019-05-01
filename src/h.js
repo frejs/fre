@@ -12,7 +12,9 @@ export function h (type, props) {
     } else if (node === null || node === true || node === false) {
     } else {
       children.push(
-        typeof node !== 'object' ? { type: 'text', nodeValue: node } : node
+        typeof node !== 'object'
+          ? { type: 'text', props: { nodeValue: node } }
+          : node
       )
     }
   }
