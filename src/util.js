@@ -6,8 +6,9 @@ export const arrayfy = array =>
 
 export const isNew = (prev, next) => key => prev[key] !== next[key]
 
+export const isSame = (a, b) => a.type == b.type && a.key == b.key
+
 export const hashfy = arr => {
-  // 将数组变成 hash 对象
   let out = {}
   let i = 0
   arrayfy(arr).forEach(item => {
@@ -19,10 +20,4 @@ export const hashfy = arr => {
 
 export const merge = (a, b) => {
   for (var i in b) a[i] = b[i]
-}
-
-export const isSame = (a, b) => {
-  if (a.type == b.type && a.key == b.key) {
-    return true
-  }
 }

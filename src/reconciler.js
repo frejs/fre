@@ -171,14 +171,15 @@ function commitWork (fiber) {
   while (parentFiber.tag == HOOK) {
     parentFiber = parentFiber.parent
   }
-  const parentNode = parentFiber.base
-  let dom = fiber.base // A
-
+  const parent = parentFiber.base
+  let dom = fiber.base
+  let after = (fiber.sibling || {}).base
   if (fiber.patchTag == PLACE && fiber.tag == HOST) {
-    // console.log(fiber)
-    // console.log(parentNode, fiber.base)
-    // parentNode.insertBefore(A,B)
-    parentNode.appendChild(fiber.base)
+    try {
+      parent.insertBefore(dom, after)
+    } catch {
+      parent.appendChild(dom)
+    }
   } else if (fiber.patchTag == UPDATE && fiber.tag == HOST) {
     updateElement(fiber.base, fiber.alternate.props, fiber.props)
   } else if (fiber.patchTag == DELETE) {
