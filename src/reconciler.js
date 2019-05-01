@@ -33,7 +33,9 @@ export function scheduleWork (fiber) {
 
 function workLoop () {
   if (!nextWork && microtasks.length) {
-    resetWork()
+    const update = microtasks.shift()
+    if (!update) return
+    nextWork = update
   }
   while (nextWork) {
     nextWork = performWork(nextWork)
@@ -43,28 +45,14 @@ function workLoop () {
   }
 }
 
-function resetWork () {
-  const update = microtasks.shift()
-  if (!update) return
-  const root =
-    update.tag == ROOT ? update.base.rootFiber : getRoot(update)
-
-  nextWork = {
-    tag: ROOT,
-    base: update.base || root.base,
-    props: update.props || root.props,
-    alternate: root
-  }
-}
-
 function performWork (WIP) {
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
-  let wip = WIP
-  while (wip) {
-    completeWork(wip)
-    if (wip.sibling) return wip.sibling
-    wip = wip.parent
+
+  while (WIP) {
+    completeWork(WIP)
+    if (WIP.sibling) return WIP.sibling
+    WIP = WIP.parent
   }
 }
 
@@ -96,6 +84,7 @@ function fiberize (children, WIP) {
 
 function reconcileChildren (WIP, newChildren) {
   const oldFibers = WIP.children
+  console.log(oldFibers)
   const newFibers = fiberize(newChildren, WIP)
   let reused = {}
   delete WIP.child
