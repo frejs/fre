@@ -3,7 +3,7 @@ let cursor = 0
 let oldInputs = []
 
 function update (key, reducer, value) {
-  const current = this ? this : getCurrentInstance()
+  const current = this ? this : getCurrentFiber()
   value = reducer ? reducer(current.state[key], value) : value
   current.state[key] = value
   scheduleWork(current)
@@ -16,7 +16,6 @@ export function useState (initState) {
 }
 export function useReducer (reducer, initState) {
   let current = getCurrentFiber()
-  console.log(current)
   let key = '$' + cursor
   let setter = update.bind(current, key, reducer)
   if (!current) {
@@ -34,7 +33,7 @@ export function useReducer (reducer, initState) {
   }
 }
 export function useEffect (effect, inputs) {
-  let current = getCurrentInstance()
+  let current = getCurrentFiber()
   if (current) {
     let key = '$' + cursor
     current.effects[key] = useMemo(effect, inputs)
@@ -44,7 +43,7 @@ export function useEffect (effect, inputs) {
 
 export function useMemo (create, inputs) {
   return function () {
-    let current = getCurrentInstance()
+    let current = getCurrentFiber()
     if (current) {
       let hasChaged = inputs
         ? oldInputs.some((value, i) => inputs[i] !== value)

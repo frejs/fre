@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './element'
 import { resetCursor } from './hooks'
-import { defer, hashfy } from './util'
+import { defer, hashfy, merge } from './util'
 
 const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
   'host',
@@ -11,23 +11,24 @@ const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
   'update'
 ]
 
-let updateQueue = []
+let microtasks = []
 let nextWork = null
 let pendingCommit = null
 let currentFiber = null
 let oldFibers = null
 
 export function render (vdom, container) {
-  updateQueue.push({
+  let fiber = {
     tag: ROOT,
     base: container,
     props: { children: vdom }
-  })
+  }
+  microtasks.push(fiber)
   defer(workLoop)
 }
 
 export function scheduleWork (instance) {
-  updateQueue.push({
+  microtasks.push({
     tag: HOOK,
     instance,
     state: instance.state
@@ -36,7 +37,7 @@ export function scheduleWork (instance) {
 }
 
 function workLoop () {
-  if (!nextWork && updateQueue.length) {
+  if (!nextWork && microtasks.length) {
     resetWork()
   }
   while (nextWork) {
@@ -48,7 +49,7 @@ function workLoop () {
 }
 
 function resetWork () {
-  const update = updateQueue.shift()
+  const update = microtasks.shift()
   if (!update) return
 
   if (update.state) {
@@ -133,12 +134,16 @@ function reconcileChildren (WIP, newChildren) {
 
     if (oldFiber) {
       if (sameNode) {
-        alternate = new Fiber(oldFiber, UPDATE)
+        alternate = new Fiber(oldFiber, {
+          patchTag: UPDATE
+        })
         newFiber = { ...alternate, ...newFiber }
         newFiber.alternate = alternate
       }
     } else {
-      newFiber = new Fiber(newFiber, PLACE)
+      newFiber = new Fiber(newFiber, {
+        patchTag: PLACE
+      })
     }
 
     newFibers[n] = newFiber
@@ -159,11 +164,11 @@ function createInstance (fiber) {
   return instance
 }
 
-function Fiber (vnode, patchTag) {
-  this.patchTag = patchTag
-  this.tag = typeof vnode.type === 'function' ? HOOK : HOST
+function Fiber (vnode, data) {
+  this.patchTag = data.patchTag
+  this.tag = data.tag || typeof vnode.type === 'function' ? HOOK : HOST
   vnode.props = vnode.props || { nodeValue: vnode.nodeValue }
-  return { ...this, ...vnode }
+  merge(this, vnode)
 }
 
 function cloneChildFibers (fiber) {
