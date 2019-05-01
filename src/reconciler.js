@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './element'
 import { resetCursor } from './hooks'
-import { defer, hashfy, merge } from './util'
+import { defer, hashfy, merge, isSame } from './util'
 
 const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
   'host',
@@ -27,6 +27,7 @@ export function render (vdom, container) {
 }
 
 export function scheduleWork (fiber) {
+  fiber.patches = []
   microtasks.push(fiber)
   defer(workLoop)
 }
@@ -67,8 +68,6 @@ function updateHOOK (WIP) {
   let instance = WIP.base
   if (instance == null) {
     instance = WIP.base = createInstance(WIP)
-  } else if (WIP.props == WIP.props && !WIP.state) {
-    cloneChildFibers(WIP)
   }
   WIP.props = WIP.props || {}
   WIP.state = WIP.state || {}
@@ -101,23 +100,19 @@ function reconcileChildren (WIP, newChildren) {
   }
 
   let prevFiber = null
+  let alternate = null
 
   for (let n in newFibers) {
     let newFiber = newFibers[n]
     let oldFiber = reused[n]
-    const sameNode =
-      oldFiber &&
-      newFiber &&
-      newFiber.type == oldFiber.type &&
-      newFiber.key == oldFiber.key
-    let alternate = null
 
     if (oldFiber) {
-      if (sameNode) {
+      if (isSame(oldFiber, newFiber)) {
         alternate = new Fiber(oldFiber, {
           patchTag: UPDATE
         })
         newFiber = { ...alternate, ...newFiber }
+        newFiber.patchTag = UPDATE
         newFiber.alternate = alternate
       }
     } else {
@@ -169,19 +164,21 @@ function cloneChildFibers (fiber) {
 function completeWork (fiber) {
   if (fiber.tag == HOOK) fiber.base.fiber = fiber
   if (fiber.parent) {
-    fiber.parent.patches = (fiber.parent.patches || []).concat(
-      fiber.patches || [],
-      fiber.patchTag ? [fiber] : []
-    )
+    const childPatches = fiber.patches || []
+    const selfPatches = fiber.patchTag ? [fiber] : []
+    const parentPatches = fiber.parent.patches || []
+    fiber.parent.patches = parentPatches.concat(childPatches, selfPatches)
   } else {
     pendingCommit = fiber
   }
 }
 
 function commitAllWork (WIP) {
+  console.log(WIP.patches)
   WIP.patches.forEach(p => commitWork(p))
   commitEffects(currentFiber.effects)
   WIP.base.rootFiber = WIP
+  WIP.patches = []
   nextWork = null
   pendingCommit = null
 }

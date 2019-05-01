@@ -20,3 +20,9 @@ export const hashfy = arr => {
 export const merge = (a, b) => {
   for (var i in b) a[i] = b[i]
 }
+
+export const isSame = (a, b) => {
+  if (a.type == b.type && a.key == b.key) {
+    return true
+  }
+}
