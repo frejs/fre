@@ -11,8 +11,8 @@ export const hashfy = arr => {
   let out = {}
   let i = 0
   arrayfy(arr).forEach(item => {
-    let key = '.' + ((item || {}).props || {}).key
-    key ? (out[key] = item) : (out[i] = item) && i++
+    let key = ((item || {}).props || {}).key
+    key ? (out['.' + key] = item) : (out['.' + i] = item) && i++
   })
   return out
 }

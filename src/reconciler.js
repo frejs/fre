@@ -15,24 +15,19 @@ let microtasks = []
 let nextWork = null
 let pendingCommit = null
 let currentFiber = null
-let oldFibers = null
 
 export function render (vdom, container) {
-  let fiber = {
+  let rootFiber = {
     tag: ROOT,
     base: container,
     props: { children: vdom }
   }
-  microtasks.push(fiber)
+  microtasks.push(rootFiber)
   defer(workLoop)
 }
 
-export function scheduleWork (instance) {
-  microtasks.push({
-    tag: HOOK,
-    instance,
-    state: instance.state
-  })
+export function scheduleWork (fiber) {
+  microtasks.push(fiber)
   defer(workLoop)
 }
 
@@ -104,6 +99,7 @@ function fiberize (children, WIP) {
 }
 
 function reconcileChildren (WIP, newChildren) {
+  const oldFibers = WIP.children
   const newFibers = fiberize(newChildren, WIP)
   let reused = {}
   delete WIP.child
