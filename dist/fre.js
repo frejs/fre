@@ -311,7 +311,7 @@
     } else if (fiber.patchTag == UPDATE && fiber.tag == HOST) {
       updateElement(fiber.base, fiber.alternate.props, fiber.props);
     } else if (fiber.patchTag == DELETE) {
-      commitDELETE(fiber, parentNode);
+      commitDELETE(fiber, parent);
     }
   }
   function commitDELETE (fiber, domParent) {
