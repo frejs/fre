@@ -46,12 +46,8 @@ function workLoop () {
 function resetWork () {
   const update = microtasks.shift()
   if (!update) return
-
-  if (update.state) {
-    update.instance.fiber.state = update.state
-  }
   const root =
-    update.tag == ROOT ? update.base.rootFiber : getRoot(update.instance.fiber)
+    update.tag == ROOT ? update.base.rootFiber : getRoot(update)
 
   nextWork = {
     tag: ROOT,
