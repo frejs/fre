@@ -95,6 +95,10 @@ function reconcileChildren (WIP, newChildren) {
         oldFiber.key = newFiber.key
       }
       continue
+    } else if (!newFiber) {
+      oldFiber.patchTag = DELETE
+      WIP.patches = WIP.patches || []
+      WIP.patches.push(oldFiber)
     }
   }
   let prevFiber = null
@@ -139,13 +143,11 @@ function createInstance (fiber) {
 function Fiber (vnode, data) {
   this.patchTag = data.patchTag
   this.tag = data.tag || typeof vnode.type === 'function' ? HOOK : HOST
-  console.log(vnode.nodeValue)
   vnode.props = vnode.props || { nodeValue: vnode.nodeValue }
   merge(this, vnode)
 }
 
 function completeWork (fiber) {
-  if (fiber.tag == HOOK) fiber.base.fiber = fiber
   if (fiber.parent) {
     const childPatches = fiber.patches || []
     const selfPatches = fiber.patchTag ? [fiber] : []
@@ -159,7 +161,6 @@ function completeWork (fiber) {
 function commitAllWork (WIP) {
   WIP.patches.forEach(p => commitWork(p))
   commitEffects(currentFiber.effects)
-  WIP.base.rootFiber = WIP
   WIP.patches = []
   nextWork = null
   pendingCommit = null
@@ -176,32 +177,33 @@ function commitWork (fiber) {
   let dom = fiber.base
   let after = (fiber.sibling || {}).base
   if (fiber.patchTag == PLACE && fiber.tag == HOST) {
-    try {
-      parent.insertBefore(dom, after)
-    } catch {
+    if (fiber.key) {
+      try {
+        parent.insertBefore(dom, after)
+      } catch {
+        parent.appendChild(dom)
+      }
+    } else {
       parent.appendChild(dom)
     }
   } else if (fiber.patchTag == UPDATE && fiber.tag == HOST) {
     updateElement(fiber.base, fiber.alternate.props, fiber.props)
   } else if (fiber.patchTag == DELETE) {
-    commitDELETE(fiber, parent)
+    deleteElement(fiber, parent)
   }
 }
 
-function commitDELETE (fiber, domParent) {
+function deleteElement (fiber, parent) {
   let node = fiber
   while (true) {
     if (node.tag == HOOK) {
       node = node.child
       continue
     }
-    domParent.removeChild(node.base)
-    while (node != fiber && !node.sibling) {
-      node = node.parent
-    }
-    if (node == fiber) {
-      return
-    }
+    parent.removeChild(node.base)
+    node.patches = []
+    while (node != fiber && !node.sibling) node = node.parent
+    if (node == fiber) return
     node = node.sibling
   }
 }

@@ -1,13 +1,15 @@
 import { h, render, useState, useEffect } from '../../src'
 
 function Counter () {
-  const [arr, setArr] = useState(['B', 'C'])
+  const [arr, setArr] = useState(['A', 'B'])
   return (
     <div>
-      {arr.map(item => (
-        <li key={item}>{item}</li>
-      ))}
-      <button onClick={() => setArr(['B', 'A', 'C'])}>+</button>
+      <ul>
+        {arr.map(item => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+      <button onClick={() => setArr(['A'])}>+</button>
     </div>
   )
 }

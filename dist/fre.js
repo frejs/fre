@@ -19,7 +19,9 @@
         for (length = node.length; length--;) rest.push(node[length]);
       } else if (node === null || node === true || node === false) ; else {
         children.push(
-          typeof node !== 'object' ? { type: 'text', nodeValue: node } : node
+          typeof node !== 'object'
+            ? { type: 'text', props: { nodeValue: node } }
+            : node
         );
       }
     }
@@ -271,6 +273,7 @@
   function Fiber (vnode, data) {
     this.patchTag = data.patchTag;
     this.tag = data.tag || typeof vnode.type === 'function' ? HOOK : HOST;
+    console.log(vnode.nodeValue);
     vnode.props = vnode.props || { nodeValue: vnode.nodeValue };
     merge(this, vnode);
   }
