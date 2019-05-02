@@ -9,7 +9,7 @@ function Counter () {
           <li key={item}>{item}</li>
         ))}
       </ul>
-      <button onClick={() => setArr(['A'])}>+</button>
+      <button onClick={() => setArr(['B','A'])}>+</button>
     </div>
   )
 }

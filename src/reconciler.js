@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './element'
 import { resetCursor } from './hooks'
-import { defer, hashfy, merge, isSame } from './util'
+import { defer, hashfy, merge, isSame, extend, megre } from './util'
 
 const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
   'host',
@@ -27,6 +27,7 @@ export function render (vdom, container) {
 }
 
 export function scheduleWork (fiber) {
+  fiber.patches = []
   microtasks.push(fiber)
   defer(workLoop)
 }
@@ -42,14 +43,13 @@ function workLoop () {
     nextWork = performWork(nextWork)
   }
   if (pendingCommit) {
-    commitAllWork(pendingCommit)
+    commitWork(pendingCommit)
   }
 }
 
 function performWork (WIP) {
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
-
   while (WIP) {
     completeWork(WIP)
     if (WIP.sibling) return WIP.sibling
@@ -113,7 +113,7 @@ function reconcileChildren (WIP, newChildren) {
         alternate = new Fiber(oldFiber, {
           patchTag: UPDATE
         })
-        newFiber = { ...alternate, ...newFiber }
+        newFiber = megre(alternate, newFiber)
         newFiber.patchTag = UPDATE
         newFiber.alternate = alternate
       }
@@ -144,12 +144,12 @@ function Fiber (vnode, data) {
   this.patchTag = data.patchTag
   this.tag = data.tag || typeof vnode.type === 'function' ? HOOK : HOST
   vnode.props = vnode.props || { nodeValue: vnode.nodeValue }
-  merge(this, vnode)
+  extend(this, vnode)
 }
 
 function completeWork (fiber) {
   if (fiber.parent) {
-    const childPatches = fiber.patches || []
+    let childPatches = fiber.patches || []
     const selfPatches = fiber.patchTag ? [fiber] : []
     const parentPatches = fiber.parent.patches || []
     fiber.parent.patches = parentPatches.concat(childPatches, selfPatches)
@@ -158,15 +158,15 @@ function completeWork (fiber) {
   }
 }
 
-function commitAllWork (WIP) {
-  WIP.patches.forEach(p => commitWork(p))
+function commitWork (WIP) {
+  WIP.patches.forEach(p => commit(p))
   commitEffects(currentFiber.effects)
   WIP.patches = []
   nextWork = null
   pendingCommit = null
 }
 
-function commitWork (fiber) {
+function commit (fiber) {
   if (fiber.tag == ROOT) return
 
   let parentFiber = fiber.parent

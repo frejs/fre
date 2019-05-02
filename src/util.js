@@ -18,6 +18,15 @@ export const hashfy = arr => {
   return out
 }
 
-export const merge = (a, b) => {
+export const extend = (a, b) => {
   for (var i in b) a[i] = b[i]
+}
+
+export const megre = (a, b) => {
+  let out = {}
+
+  for (var i in a) out[i] = a[i]
+  for (var i in b) out[i] = b[i]
+
+  return out
 }
