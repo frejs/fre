@@ -83,7 +83,7 @@ function fiberize (children, WIP) {
 function reconcileChildren (WIP, newChildren) {
   const oldFibers = WIP.children
   const newFibers = fiberize(newChildren, WIP)
-  let reused = new Object()
+  let reused = {}
 
   for (let o in oldFibers) {
     let newFiber = newFibers[o]
@@ -99,6 +99,7 @@ function reconcileChildren (WIP, newChildren) {
       WIP.patches.push(oldFiber)
     }
   }
+
   let prevFiber = null
   let alternate = null
 
