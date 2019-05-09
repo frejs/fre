@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './element'
 import { resetCursor } from './hooks'
-import { defer, hashfy, merge, isSame, extend, megre } from './util'
+import { defer, hashfy, isSame, extend, megre } from './util'
 
 const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
   'host',
@@ -27,7 +27,6 @@ export function render (vdom, container) {
 }
 
 export function scheduleWork (fiber) {
-  fiber.patches = []
   microtasks.push(fiber)
   defer(workLoop)
 }
@@ -39,7 +38,6 @@ function workLoop () {
     nextWork = update
   }
   while (nextWork) {
-    nextWork.patches = []
     nextWork = performWork(nextWork)
   }
   if (pendingCommit) {
@@ -161,7 +159,6 @@ function completeWork (fiber) {
 function commitWork (WIP) {
   WIP.patches.forEach(p => commit(p))
   commitEffects(currentFiber.effects)
-  WIP.patches = []
   nextWork = null
   pendingCommit = null
 }
@@ -169,6 +166,7 @@ function commitWork (WIP) {
 let once = true
 
 function commit (fiber) {
+  console.log(fiber.patches)
   if (fiber.tag == ROOT) return
 
   let parentFiber = fiber.parent
@@ -189,6 +187,7 @@ function commit (fiber) {
   }
   if (dom != parent.lastChild) once = false
   fiber.patches = []
+  parentFiber.patches = []
 }
 
 function deleteElement (fiber, parent) {
