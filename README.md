@@ -264,6 +264,12 @@ fre 的 Fiber 架构是 react Fiber 的最小实现，但是并没能实现对�
 
 内部仍然是通过 micro task 调度更新的
 
+#### hash.diff
+
+fre 用了一个非常精彩的 hash diff 机制，实现了和 react 对等的排位算法
+
+这也是 fre 最精彩的机制之一
+
 #### JSX
 
 默认也对外暴露了 h 函数，可以选用 JSX
