@@ -1,7 +1,7 @@
 import { h, render, useState, useEffect } from '../../src'
 
 function Counter () {
-  const [arr, setArr] = useState(['A'])
+  const [arr, setArr] = useState(['B'])
   return (
     <div>
       <ul>

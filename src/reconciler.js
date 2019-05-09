@@ -102,7 +102,6 @@ function reconcileChildren (WIP, newChildren) {
   }
   let prevFiber = null
   let alternate = null
-  let forward = null
 
   for (let n in newFibers) {
     let newFiber = newFibers[n]
@@ -180,15 +179,16 @@ function commit (fiber) {
   let dom = fiber.base
 
   let after = once ? null : fiber.sibling ? fiber.sibling.base : null
-  if (fiber.patchTag == PLACE && fiber.tag == HOST) {
+  if (fiber.tag == HOOK) {
+  } else if (fiber.patchTag == PLACE) {
     parent.insertBefore(dom, after)
-  } else if (fiber.patchTag == UPDATE && fiber.tag == HOST) {
-    // A B C D -> B A C D -> B C A D -> B D C A -> B D A C
+  } else if (fiber.patchTag == UPDATE) {
     updateElement(fiber.base, fiber.alternate.props, fiber.props)
   } else if (fiber.patchTag == DELETE) {
     deleteElement(fiber, parent)
   }
   if (dom != parent.lastChild) once = false
+  fiber.patches = []
 }
 
 function deleteElement (fiber, parent) {
@@ -205,6 +205,8 @@ function deleteElement (fiber, parent) {
     node = node.sibling
   }
 }
+
+function clearPatches (fiber) {}
 
 export function getCurrentFiber () {
   return currentFiber || null
