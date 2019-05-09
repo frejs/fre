@@ -84,7 +84,7 @@ function fiberize (children, WIP) {
 function reconcileChildren (WIP, newChildren) {
   const oldFibers = WIP.children
   const newFibers = fiberize(newChildren, WIP)
-  let reused = new Object
+  let reused = new Object()
 
   for (let o in oldFibers) {
     let newFiber = newFibers[o]
@@ -102,6 +102,7 @@ function reconcileChildren (WIP, newChildren) {
   }
   let prevFiber = null
   let alternate = null
+  let forward = null
 
   for (let n in newFibers) {
     let newFiber = newFibers[n]
@@ -126,15 +127,12 @@ function reconcileChildren (WIP, newChildren) {
 
     if (prevFiber) {
       prevFiber.sibling = newFiber
-      newFiber.forward = prevFiber
-      // console.log(prevFiber,newFiber.forward)
     } else {
       WIP.child = newFiber
     }
+
     prevFiber = newFiber
   }
-
-  if (prevFiber) prevFiber.subling = null
 }
 
 function createInstance (fiber) {
@@ -169,6 +167,8 @@ function commitWork (WIP) {
   pendingCommit = null
 }
 
+let once = true
+
 function commit (fiber) {
   if (fiber.tag == ROOT) return
 
@@ -178,23 +178,17 @@ function commit (fiber) {
   }
   const parent = parentFiber.base
   let dom = fiber.base
-  let after = (fiber.sibling || {}).base
+
+  let after = once ? null : fiber.sibling ? fiber.sibling.base : null
   if (fiber.patchTag == PLACE && fiber.tag == HOST) {
-    if (fiber.key) {
-      try {
-        parent.insertBefore(dom, after)
-      } catch {
-        parent.appendChild(dom)
-      }
-    } else {
-      parent.appendChild(dom)
-    }
+    parent.insertBefore(dom, after)
   } else if (fiber.patchTag == UPDATE && fiber.tag == HOST) {
     // A B C D -> B A C D -> B C A D -> B D C A -> B D A C
     updateElement(fiber.base, fiber.alternate.props, fiber.props)
   } else if (fiber.patchTag == DELETE) {
     deleteElement(fiber, parent)
   }
+  if (dom != parent.lastChild) once = false
 }
 
 function deleteElement (fiber, parent) {
