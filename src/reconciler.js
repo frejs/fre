@@ -115,6 +115,10 @@ function reconcileChildren (WIP, newChildren) {
         newFiber.patchTag = UPDATE
         newFiber = megre(alternate, newFiber)
         newFiber.alternate = alternate
+        // A B -> B A 
+        if (newFiber.key === 'B') { //想办法实现
+          newFiber.patchTag = PLACE
+        }
       }
     } else {
       newFiber = new Fiber(newFiber, {
