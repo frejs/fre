@@ -260,7 +260,7 @@ const Box = props => <div>{props.children('hello world!')}</div>
 
 #### Fiber
 
-fre 的 fiber 是营养不良的，它只是使用了类似的遍历方式（链表），却并没有实现优先级调度
+fre 的 Fiber 架构是 react Fiber 的最小实现，但是并没能实现对等的调度方案
 
 内部仍然是通过 micro task 调度更新的
 

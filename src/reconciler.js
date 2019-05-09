@@ -71,10 +71,11 @@ function updateHOOK (WIP) {
   WIP.props = WIP.props || {}
   WIP.state = WIP.state || {}
   WIP.effects = WIP.effects || {}
-  const newChildren = WIP.type(WIP.props)
-  reconcileChildren(WIP, newChildren)
   currentFiber = WIP
   resetCursor()
+  const newChildren = WIP.type(WIP.props)
+  reconcileChildren(WIP, newChildren)
+  currentFiber.patches = WIP.patches
 }
 function fiberize (children, WIP) {
   return (WIP.children = hashfy(children))
@@ -183,7 +184,7 @@ function commitWork (WIP) {
 }
 
 let once = true
-let lastAfter
+let last
 
 function commit (fiber) {
   if (fiber.tag == ROOT) return
@@ -198,9 +199,9 @@ function commit (fiber) {
   let after = once ? null : fiber.sibling ? fiber.sibling.base : null
   if (fiber.tag == HOOK) {
   } else if (fiber.patchTag == PLACE) {
-    if (dom == lastAfter) return
+    if (dom == last) return
     parent.insertBefore(dom, after)
-    lastAfter = after
+    last = after
   } else if (fiber.patchTag == UPDATE) {
     updateElement(fiber.base, fiber.alternate.props, fiber.props)
   } else if (fiber.patchTag == DELETE) {

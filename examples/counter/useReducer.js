@@ -2,9 +2,9 @@ import { h, render, useReducer } from '../../src'
 
 function count(state, action) {
   switch (action.type) {
-    case 'increment':
+    case 'add':
       return { count: state.count + 1 }
-    case 'decrement':
+    case 'cut':
       return { count: state.count - 1 }
   }
 }
@@ -25,7 +25,7 @@ function Counter() {
     <div>
       {counter.count}
       {sexer.sex}
-      <button onClick={() => dispatch({ type: 'increment' })}>+</button>
+      <button onClick={() => dispatch({ type: 'add' })}>+</button>
       <button onClick={() => sexer.sex==='boy'?change({ type: 'girl' }):change({ type: 'boy' })}>x</button>
     </div>
   )
