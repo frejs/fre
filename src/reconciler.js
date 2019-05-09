@@ -206,8 +206,6 @@ function deleteElement (fiber, parent) {
   }
 }
 
-function clearPatches (fiber) {}
-
 export function getCurrentFiber () {
   return currentFiber || null
 }
