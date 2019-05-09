@@ -2,13 +2,14 @@ import { createElement, updateElement } from './element'
 import { resetCursor } from './hooks'
 import { defer, hashfy, isSame, extend, megre } from './util'
 
-const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE] = [
+const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE, NOWORK] = [
   'host',
   'hook',
   'root',
   'place',
   'delete',
-  'update'
+  'update',
+  'nowork'
 ]
 
 let microtasks = []
@@ -70,10 +71,10 @@ function updateHOOK (WIP) {
   WIP.props = WIP.props || {}
   WIP.state = WIP.state || {}
   WIP.effects = WIP.effects || {}
-  currentFiber = WIP
-  resetCursor()
   const newChildren = WIP.type(WIP.props)
   reconcileChildren(WIP, newChildren)
+  currentFiber = WIP
+  resetCursor()
 }
 function fiberize (children, WIP) {
   return (WIP.children = hashfy(children))
@@ -110,8 +111,8 @@ function reconcileChildren (WIP, newChildren) {
         alternate = new Fiber(oldFiber, {
           patchTag: UPDATE
         })
-        newFiber = megre(alternate, newFiber)
         newFiber.patchTag = UPDATE
+        newFiber = megre(alternate, newFiber)
         newFiber.alternate = alternate
       }
     } else {
@@ -130,6 +131,7 @@ function reconcileChildren (WIP, newChildren) {
 
     prevFiber = newFiber
   }
+  if (prevFiber) prevFiber.sibling = null
 }
 
 function createInstance (fiber) {
@@ -166,7 +168,6 @@ function commitWork (WIP) {
 let once = true
 
 function commit (fiber) {
-  console.log(fiber.patches)
   if (fiber.tag == ROOT) return
 
   let parentFiber = fiber.parent
@@ -186,8 +187,7 @@ function commit (fiber) {
     deleteElement(fiber, parent)
   }
   if (dom != parent.lastChild) once = false
-  fiber.patches = []
-  parentFiber.patches = []
+  parentFiber.patches = fiber.patches = []
 }
 
 function deleteElement (fiber, parent) {
