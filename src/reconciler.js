@@ -84,12 +84,19 @@ function reconcileChildren (WIP, newChildren) {
   const oldFibers = WIP.children
   const newFibers = fiberize(newChildren, WIP)
   let reused = {}
+  let o = 0
+  let n = 0
 
-  for (let o in oldFibers) {
-    let newFiber = newFibers[o]
-    let oldFiber = oldFibers[o]
+  for (let key in oldFibers) {
+    let newFiber = newFibers[key]
+    let oldFiber = oldFibers[key]
     if (newFiber && oldFiber.type === newFiber.type) {
-      reused[o] = oldFiber
+      if (oldFiber.key) {
+        oldFiber.index = o
+        o++
+      }
+
+      reused[key] = oldFiber
       if (newFiber.key) {
         oldFiber.key = newFiber.key
       }
@@ -103,20 +110,24 @@ function reconcileChildren (WIP, newChildren) {
   let prevFiber = null
   let alternate = null
 
-  for (let n in newFibers) {
-    let newFiber = newFibers[n]
-    let oldFiber = reused[n]
+  for (let key in newFibers) {
+    let newFiber = newFibers[key]
+    let oldFiber = reused[key]
 
     if (oldFiber) {
       if (isSame(oldFiber, newFiber)) {
         alternate = new Fiber(oldFiber, {
           patchTag: UPDATE
         })
+
+        if (newFiber.key) {
+          newFiber.index = n
+          n++
+        }
         newFiber.patchTag = UPDATE
         newFiber = megre(alternate, newFiber)
         newFiber.alternate = alternate
-        // A B -> B A 
-        if (newFiber.key === 'B') { //想办法实现
+        if (oldFiber.index != newFiber.index) {
           newFiber.patchTag = PLACE
         }
       }
@@ -125,7 +136,7 @@ function reconcileChildren (WIP, newChildren) {
         patchTag: PLACE
       })
     }
-    newFibers[n] = newFiber
+    newFibers[key] = newFiber
     newFiber.parent = WIP
 
     if (prevFiber) {
@@ -185,6 +196,7 @@ function commit (fiber) {
   let after = once ? null : fiber.sibling ? fiber.sibling.base : null
   if (fiber.tag == HOOK) {
   } else if (fiber.patchTag == PLACE) {
+    console.log(dom, after)
     parent.insertBefore(dom, after)
   } else if (fiber.patchTag == UPDATE) {
     updateElement(fiber.base, fiber.alternate.props, fiber.props)
