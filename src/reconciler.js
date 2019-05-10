@@ -188,18 +188,23 @@ let last
 
 function commit (fiber) {
   if (fiber.tag == ROOT) return
-
   let parentFiber = fiber.parent
   while (parentFiber.tag == HOOK) {
     parentFiber = parentFiber.parent
   }
   const parent = parentFiber.base
   let dom = fiber.base
+  let point
+  let next = dom.nextSibling
+  let start = parent.firstElementChild
 
   let after = once ? null : fiber.sibling ? fiber.sibling.base : null
   if (fiber.tag == HOOK) {
   } else if (fiber.patchTag == PLACE) {
     if (dom == last) return
+    if (!once && after == next && next !== null) {
+      after = start
+    }
     parent.insertBefore(dom, after)
     last = after
   } else if (fiber.patchTag == UPDATE) {

@@ -4,7 +4,6 @@ let oldInputs = []
 
 function update (key, reducer, value) {
   const current = this ? this : getCurrentFiber()
-  console.log(current)
   value = reducer ? reducer(current.state[key], value) : value
   current.state[key] = value
   scheduleWork(current)
@@ -28,7 +27,6 @@ export function useReducer (reducer, initState) {
       return [state[key], setter]
     } else {
       current.state[key] = initState
-      console.log(current)
     }
     let value = initState
     return [value, setter]
