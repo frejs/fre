@@ -87,18 +87,11 @@ function reconcileChildren (WIP, newChildren) {
   const oldFibers = WIP.children
   const newFibers = fiberize(newChildren, WIP)
   let reused = {}
-  // let o = 0
-  // let n = 0
 
   for (let key in oldFibers) {
     let newFiber = newFibers[key]
     let oldFiber = oldFibers[key]
     if (newFiber && oldFiber.type === newFiber.type) {
-      // if (oldFiber.key) {
-      //   oldFiber.index = o
-      //   o++
-      // }
-
       reused[key] = oldFiber
       if (newFiber.key) {
         oldFiber.key = newFiber.key
@@ -123,10 +116,6 @@ function reconcileChildren (WIP, newChildren) {
           patchTag: UPDATE
         })
 
-        // if (newFiber.key) {
-        //   newFiber.index = n
-        //   n++
-        // }
         newFiber.patchTag = UPDATE
         newFiber = megre(alternate, newFiber)
         newFiber.alternate = alternate
@@ -198,13 +187,15 @@ function commit (fiber) {
 
   if (fiber.tag == HOOK) {
   } else if (fiber.patchTag == PLACE) {
+    let insertPoint = fiber.insertPoint ? fiber.insertPoint.base : null
     let after = once
       ? null
       : fiber.insertPoint.base.nextSibling || parent.firstChild
-
+    console.log(dom, after)
     if (after == dom) return
-    parent.insertBefore(dom, after)
+    if (after === null && dom === parent.lastChild) return
 
+    parent.insertBefore(dom, after)
   } else if (fiber.patchTag == UPDATE) {
     updateElement(fiber.base, fiber.alternate.props, fiber.props)
   } else if (fiber.patchTag == DELETE) {
