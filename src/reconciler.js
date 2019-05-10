@@ -1,3 +1,5 @@
+// inspired by @RubyLouvre/anu
+
 import { createElement, updateElement } from './element'
 import { resetCursor } from './hooks'
 import { defer, hashfy, isSame, extend, megre } from './util'
