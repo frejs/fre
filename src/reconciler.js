@@ -206,8 +206,10 @@ function commit (fiber) {
   if (fiber.tag == HOOK) {
   } else if (fiber.patchTag == PLACE) {
     if (dom == last) return
-    if (!once && start && after == next && next != null) after = start
-  
+    if (!once && start && after == next && next != null) {
+      // if (dom == start.nextSibling) return
+      after = start
+    }
     parent.insertBefore(dom, after)
     last = after
   } else if (fiber.patchTag == UPDATE) {
