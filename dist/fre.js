@@ -1,5 +1,5 @@
 /**
- * by 132yse Copyright 2019-05-09
+ * by 132yse Copyright 2019-05-10
  */
 
 (function (global, factory) {
@@ -93,7 +93,6 @@
   let oldInputs = [];
   function update (key, reducer, value) {
     const current = this ? this : getCurrentFiber();
-    console.log(current);
     value = reducer ? reducer(current.state[key], value) : value;
     current.state[key] = value;
     scheduleWork(current);
@@ -117,7 +116,6 @@
         return [state[key], setter]
       } else {
         current.state[key] = initState;
-        console.log(current);
       }
       let value = initState;
       return [value, setter]
@@ -320,6 +318,8 @@
   }
   let once = true;
   let last;
+  let first;
+  let start;
   function commit (fiber) {
     if (fiber.tag == ROOT) return
     let parentFiber = fiber.parent;
@@ -328,9 +328,15 @@
     }
     const parent = parentFiber.base;
     let dom = fiber.base;
+    let next = dom.nextSibling;
+    if (!first && parent.firstElementChild) {
+      start = parent.firstElementChild;
+      first = true;
+    }
     let after = once ? null : fiber.sibling ? fiber.sibling.base : null;
     if (fiber.tag == HOOK) ; else if (fiber.patchTag == PLACE) {
       if (dom == last) return
+      if (!once && start && after == next && next != null) after = start;
       parent.insertBefore(dom, after);
       last = after;
     } else if (fiber.patchTag == UPDATE) {
