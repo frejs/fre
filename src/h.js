@@ -5,7 +5,6 @@ export function h (type, props) {
   let length = arguments.length
 
   while (length-- > 2) rest.push(arguments[length])
-
   while (rest.length) {
     let node = rest.pop()
     if (node && node.pop) {
@@ -19,7 +18,6 @@ export function h (type, props) {
       )
     }
   }
-
   return {
     type,
     props: megre(props, { children }),

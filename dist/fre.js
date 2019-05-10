@@ -8,26 +8,6 @@
   (global = global || self, factory(global.fre = {}));
 }(this, function (exports) { 'use strict';
 
-  function h (type, props) {
-    let rest = [];
-    let children = [];
-    let length = arguments.length;
-    while (length-- > 2) rest.push(arguments[length]);
-    while (rest.length) {
-      let node = rest.pop();
-      if (node && node.pop) {
-        for (length = node.length; length--;) rest.push(node[length]);
-      } else if (node === null || node === true || node === false) ; else {
-        children.push(
-          typeof node !== 'object'
-            ? { type: 'text', props: { nodeValue: node } }
-            : node
-        );
-      }
-    }
-    return { type, props: { ...props, children }, key: (props || {}).key || null }
-  }
-
   const defer =
     typeof Promise === 'function' ? cb => Promise.resolve().then(cb) : setTimeout;
   const arrayfy = array =>
@@ -52,6 +32,30 @@
     for (var i in b) out[i] = b[i];
     return out
   };
+
+  function h (type, props) {
+    let rest = [];
+    let children = [];
+    let length = arguments.length;
+    while (length-- > 2) rest.push(arguments[length]);
+    while (rest.length) {
+      let node = rest.pop();
+      if (node && node.pop) {
+        for (length = node.length; length--;) rest.push(node[length]);
+      } else if (node === null || node === true || node === false) ; else {
+        children.push(
+          typeof node !== 'object'
+            ? { type: 'text', props: { nodeValue: node } }
+            : node
+        );
+      }
+    }
+    return {
+      type,
+      props: megre(props, { children }),
+      key: (props || {}).key || null
+    }
+  }
 
   function updateProperty (element, name, value, newValue) {
     if (name === 'children' || name === 'key') ; else if (name === 'style') {
@@ -297,9 +301,11 @@
   }
   function commitWork (WIP) {
     WIP.patches.forEach(p => commit(p));
-    commitEffects(currentFiber.effects);
-    nextWork = null;
-    pendingCommit = null;
+    for (let key in currentFiber.effects) {
+      let effect = currentFiber.effects[key];
+      effect();
+    }
+    nextWork = pendingCommit = null;
   }
   let once = true;
   function commit (fiber) {
@@ -310,26 +316,20 @@
     }
     const parent = parentFiber.base;
     let dom = fiber.base;
-    if (fiber.tag == HOOK) ; else if (fiber.patchTag == PLACE) {
-      let after = once
-        ? null
-        : fiber.insertPoint
-          ? fiber.insertPoint.base.nextSibling
-          : parent.firstChild;
-      parent.insertBefore(dom, after);
-    } else if (fiber.patchTag == REPLACE) {
-      let after = once
-        ? null
-        : fiber.insertPoint
-          ? fiber.insertPoint.base.nextSibling || parent.firstChild
-          : null;
-      if (after == dom) return
-      if (after === null && dom === parent.lastChild) return
-      parent.insertBefore(dom, after);
-    } else if (fiber.patchTag == UPDATE) {
+    if (fiber.tag == HOOK) ; else if (fiber.patchTag == UPDATE) {
       updateElement(fiber.base, fiber.alternate.props, fiber.props);
     } else if (fiber.patchTag == DELETE) {
       deleteElement(fiber, parent);
+    } else {
+      let after = once
+        ? null
+        : fiber.insertPoint
+          ? fiber.patchTag == PLACE
+            ? fiber.insertPoint.base.nextSibling
+            : fiber.insertPoint.base.nextSibling || parent.firstChild
+          : null;
+      if (after == dom) return
+      parent.insertBefore(dom, after);
     }
     if (dom != parent.lastChild) once = false;
     parentFiber.patches = fiber.patches = [];
@@ -350,12 +350,6 @@
   }
   function getCurrentFiber () {
     return currentFiber || null
-  }
-  function commitEffects (effects) {
-    Object.keys(effects).forEach(key => {
-      let effect = effects[key];
-      effect();
-    });
   }
 
   exports.createContext = createContext;
