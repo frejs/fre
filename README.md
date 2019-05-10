@@ -290,4 +290,5 @@ webpack 需配置：
 
 #### License
 
-_MIT_ ©132yse
+_MIT_ ©132yse inspired by [anu](https://github.com/RubyLouvre/anu)
+

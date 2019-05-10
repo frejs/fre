@@ -1,5 +1,3 @@
-// inspired by @jorgebucaran/hyperapp
-
 export function h (type, props) {
   let rest = []
   let children = []
