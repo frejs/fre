@@ -187,7 +187,6 @@ function commit (fiber) {
 
   if (fiber.tag == HOOK) {
   } else if (fiber.patchTag == PLACE) {
-    let insertPoint = fiber.insertPoint ? fiber.insertPoint.base : null
     let after = once
       ? null
       : fiber.insertPoint.base.nextSibling || parent.firstChild
