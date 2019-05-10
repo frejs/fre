@@ -158,15 +158,7 @@
     return [context, ctx.update]
   }
 
-  const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [
-    0,
-    1,
-    2,
-    3,
-    5,
-    7,
-    11
-  ];
+  const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6];
   let microtasks = [];
   let nextWork = null;
   let pendingCommit = null;
