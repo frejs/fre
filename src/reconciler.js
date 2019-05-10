@@ -160,9 +160,12 @@ function completeWork (fiber) {
 
 function commitWork (WIP) {
   WIP.patches.forEach(p => commit(p))
-  commitEffects(currentFiber.effects)
-  nextWork = null
-  pendingCommit = null
+
+  for (let key in currentFiber.effects) {
+    let effect = currentFiber.effects[key]
+    effect()
+  }
+  nextWork = pendingCommit = null
 }
 
 let once = true
@@ -213,11 +216,4 @@ function deleteElement (fiber, parent) {
 
 export function getCurrentFiber () {
   return currentFiber || null
-}
-
-function commitEffects (effects) {
-  Object.keys(effects).forEach(key => {
-    let effect = effects[key]
-    effect()
-  })
 }
