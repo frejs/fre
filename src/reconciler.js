@@ -2,14 +2,14 @@ import { createElement, updateElement } from './element'
 import { resetCursor } from './hooks'
 import { defer, hashfy, isSame, extend, megre } from './util'
 
-const [HOST, HOOK, ROOT, PLACE, DELETE, UPDATE, NOWORK] = [
-  'host',
-  'hook',
-  'root',
-  'place',
-  'delete',
-  'update',
-  'nowork'
+const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [
+  0,
+  1,
+  2,
+  3,
+  5,
+  7,
+  11
 ]
 
 let microtasks = []
@@ -120,7 +120,7 @@ function reconcileChildren (WIP, newChildren) {
         newFiber = megre(alternate, newFiber)
         newFiber.alternate = alternate
         if (oldFiber.key) {
-          newFiber.patchTag = PLACE
+          newFiber.patchTag = REPLACE
         }
       }
     } else {
@@ -174,7 +174,6 @@ function commitWork (WIP) {
 }
 
 let once = true
-let last
 
 function commit (fiber) {
   if (fiber.tag == ROOT) return
@@ -189,8 +188,17 @@ function commit (fiber) {
   } else if (fiber.patchTag == PLACE) {
     let after = once
       ? null
-      : fiber.insertPoint.base.nextSibling || parent.firstChild
-    console.log(dom, after)
+      : fiber.insertPoint
+        ? fiber.insertPoint.base.nextSibling
+        : parent.firstChild
+
+    parent.insertBefore(dom, after)
+  } else if (fiber.patchTag == REPLACE) {
+    let after = once
+      ? null
+      : fiber.insertPoint
+        ? fiber.insertPoint.base.nextSibling || parent.firstChild
+        : null
     if (after == dom) return
     if (after === null && dom === parent.lastChild) return
 
