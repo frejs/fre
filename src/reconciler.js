@@ -177,28 +177,20 @@ function commit (fiber) {
   let dom = fiber.base
 
   if (fiber.tag == HOOK) {
-  } else if (fiber.patchTag == PLACE) {
-    let after = once
-      ? null
-      : fiber.insertPoint
-        ? fiber.insertPoint.base.nextSibling
-        : parent.firstChild
-
-    parent.insertBefore(dom, after)
-  } else if (fiber.patchTag == REPLACE) {
-    let after = once
-      ? null
-      : fiber.insertPoint
-        ? fiber.insertPoint.base.nextSibling || parent.firstChild
-        : null
-    if (after == dom) return
-    if (after === null && dom === parent.lastChild) return
-
-    parent.insertBefore(dom, after)
   } else if (fiber.patchTag == UPDATE) {
     updateElement(fiber.base, fiber.alternate.props, fiber.props)
   } else if (fiber.patchTag == DELETE) {
     deleteElement(fiber, parent)
+  } else {
+    let after = once
+      ? null
+      : fiber.insertPoint
+        ? fiber.patchTag == PLACE
+          ? fiber.insertPoint.base.nextSibling
+          : fiber.insertPoint.base.nextSibling || parent.firstChild
+        : null
+    if (after == dom) return
+    parent.insertBefore(dom, after)
   }
   if (dom != parent.lastChild) once = false
   parentFiber.patches = fiber.patches = []
