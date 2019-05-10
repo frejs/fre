@@ -1,21 +1,6 @@
 import { h, render, useState, useEffect } from '../../src'
 
-function App () {
-  const [arr, setArr] = useState(['A','B','C','D'])
-  return (
-    <div>
-      <ul>
-        {arr.map(item => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
-      <button onClick={() => setArr(['B','A','D','C'])}>+</button>
-    </div>
-  )
-}
-
-// 这种情况不支持
-// A B C D -> C D A B
+// A B C D -> B A D C √
 
 // function App () {
 //   const [arr, setArr] = useState(['A','B','C','D'])
@@ -26,12 +11,26 @@ function App () {
 //           <li key={item}>{item}</li>
 //         ))}
 //       </ul>
-//       <button onClick={() => setArr(['B','C','D','A','E'])}>+</button>
+//       <button onClick={() => setArr(['B','A','D','C'])}>+</button>
 //     </div>
 //   )
 // }
 
-// render(<App />, document.getElementById('root'))
+// A B C D -> C D A B √
+
+function App () {
+  const [arr, setArr] = useState(['A','B','C','D'])
+  return (
+    <div>
+      <ul>
+        {arr.map(item => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+      <button onClick={() => setArr(['B','C','D','A','E'])}>+</button>
+    </div>
+  )
+}
 
 // function App () {
 //   const [arr, setArr] = useState(['A','B','C','D'])

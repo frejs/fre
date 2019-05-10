@@ -185,6 +185,8 @@ function commitWork (WIP) {
 
 let once = true
 let last
+let first
+let start
 
 function commit (fiber) {
   if (fiber.tag == ROOT) return
@@ -194,17 +196,18 @@ function commit (fiber) {
   }
   const parent = parentFiber.base
   let dom = fiber.base
-  let point
   let next = dom.nextSibling
-  let start = parent.firstElementChild
+  if (!first && parent.firstElementChild) {
+    start = parent.firstElementChild
+    first = true
+  }
 
   let after = once ? null : fiber.sibling ? fiber.sibling.base : null
   if (fiber.tag == HOOK) {
   } else if (fiber.patchTag == PLACE) {
     if (dom == last) return
-    if (!once && after == next && next !== null) {
-      after = start
-    }
+    if (!once && start && after == next && next != null) after = start
+  
     parent.insertBefore(dom, after)
     last = after
   } else if (fiber.patchTag == UPDATE) {
