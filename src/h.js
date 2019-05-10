@@ -1,3 +1,4 @@
+import { megre } from './util'
 export function h (type, props) {
   let rest = []
   let children = []
@@ -19,5 +20,9 @@ export function h (type, props) {
     }
   }
 
-  return { type, props: { ...props, children }, key: (props || {}).key || null }
+  return {
+    type,
+    props: megre(props, { children }),
+    key: (props || {}).key || null
+  }
 }
