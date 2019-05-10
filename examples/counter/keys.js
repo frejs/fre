@@ -46,4 +46,18 @@ import { h, render, useState, useEffect } from '../../src'
 //   )
 // }
 
+// function App () {
+//   const [arr, setArr] = useState(['A','B','C','D','E','F'])
+//   return (
+//     <div>
+//       <ul>
+//         {arr.map(item => (
+//           <li key={item}>{item}</li>
+//         ))}
+//       </ul>
+//       <button onClick={() => setArr(['B','A','D','C','F','E'])}>+</button>
+//     </div>
+//   )
+// }
+
 render(<App />, document.getElementById('root'))
