@@ -10,9 +10,9 @@
 
 ### Feature
 
-- :tada: hooks API , really functionalComponent , also render props
-- :confetti_ball: Fiber scheduler and keyed diff algorithm
-- :telescope: All in one , just 1 KB , no dependences
+- :tada: hooks API , really functionalComponent , also supports render props
+- :confetti_ball: Fiber Reconciler and hash keyed diff algorithm
+- :telescope: Tiny in one , just 1 KB , no dependences
 
 ### Introduction
 
@@ -264,7 +264,7 @@ fre 的 Fiber 架构是 react Fiber 的最小实现，但是并没能实现对�
 
 #### hash.diff
 
-fre 用了一个非常精彩的 hash diff 机制，实现了和 react 对等的排位算法
+fre 用了一个非常精彩的 hash keyed diff 机制，实现了和 react 对等的排位算法
 
 这也是 fre 最精彩的机制之一
 
