@@ -58,7 +58,9 @@ function performWork (WIP) {
 
 function updateHost (WIP) {
   if (!WIP.base) WIP.base = createElement(WIP)
-
+  let parent = WIP.parent || {}
+  WIP.insertPoint = parent.oldPoint
+  parent.oldPoint = WIP
   const newChildren = WIP.props.children
   reconcileChildren(WIP, newChildren)
 }
@@ -85,17 +87,17 @@ function reconcileChildren (WIP, newChildren) {
   const oldFibers = WIP.children
   const newFibers = fiberize(newChildren, WIP)
   let reused = {}
-  let o = 0
-  let n = 0
+  // let o = 0
+  // let n = 0
 
   for (let key in oldFibers) {
     let newFiber = newFibers[key]
     let oldFiber = oldFibers[key]
     if (newFiber && oldFiber.type === newFiber.type) {
-      if (oldFiber.key) {
-        oldFiber.index = o
-        o++
-      }
+      // if (oldFiber.key) {
+      //   oldFiber.index = o
+      //   o++
+      // }
 
       reused[key] = oldFiber
       if (newFiber.key) {
@@ -110,7 +112,6 @@ function reconcileChildren (WIP, newChildren) {
 
   let prevFiber = null
   let alternate = null
-  let index
 
   for (let key in newFibers) {
     let newFiber = newFibers[key]
@@ -122,14 +123,14 @@ function reconcileChildren (WIP, newChildren) {
           patchTag: UPDATE
         })
 
-        if (newFiber.key) {
-          newFiber.index = n
-          n++
-        }
+        // if (newFiber.key) {
+        //   newFiber.index = n
+        //   n++
+        // }
         newFiber.patchTag = UPDATE
         newFiber = megre(alternate, newFiber)
         newFiber.alternate = alternate
-        if (oldFiber.index != newFiber.index) {
+        if (oldFiber.key) {
           newFiber.patchTag = PLACE
         }
       }
@@ -167,10 +168,10 @@ function Fiber (vnode, data) {
 
 function completeWork (fiber) {
   if (fiber.parent) {
-    let childPatches = fiber.patches || []
-    const selfPatches = fiber.patchTag ? [fiber] : []
-    const parentPatches = fiber.parent.patches || []
-    fiber.parent.patches = parentPatches.concat(childPatches, selfPatches)
+    fiber.parent.patches = (fiber.parent.patches || []).concat(
+      fiber.patches || [],
+      fiber.patchTag ? [fiber] : []
+    )
   } else {
     pendingCommit = fiber
   }
@@ -185,8 +186,6 @@ function commitWork (WIP) {
 
 let once = true
 let last
-let first
-let start
 
 function commit (fiber) {
   if (fiber.tag == ROOT) return
@@ -196,22 +195,16 @@ function commit (fiber) {
   }
   const parent = parentFiber.base
   let dom = fiber.base
-  let next = dom.nextSibling
-  if (!first && parent.firstElementChild) {
-    start = parent.firstElementChild
-    first = true
-  }
 
-  let after = once ? null : fiber.sibling ? fiber.sibling.base : null
   if (fiber.tag == HOOK) {
   } else if (fiber.patchTag == PLACE) {
-    if (dom == last) return
-    if (!once && start && after == next && next != null) {
-      // if (dom == start.nextSibling) return
-      after = start
-    }
+    let after = once
+      ? null
+      : fiber.insertPoint.base.nextSibling || parent.firstChild
+
+    if (after == dom) return
     parent.insertBefore(dom, after)
-    last = after
+
   } else if (fiber.patchTag == UPDATE) {
     updateElement(fiber.base, fiber.alternate.props, fiber.props)
   } else if (fiber.patchTag == DELETE) {
