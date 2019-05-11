@@ -28,8 +28,7 @@ export function useReducer (reducer, initState) {
     } else {
       current.state[key] = initState
     }
-    let value = initState
-    return [value, setter]
+    return [initState, setter]
   }
 }
 export function useEffect (effect, inputs) {
