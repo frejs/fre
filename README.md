@@ -258,9 +258,9 @@ const Box = props => <div>{props.children('hello world!')}</div>
 
 #### Fiber
 
-fre 的 Fiber 架构是 Fiber reconciler 的最小实现，fre Fiber 仅仅是采用了链表的遍历形式，并没能实现对等的调度方案
+fre 的 Fiber 架构是 Fiber scheduler 的最小实现
 
-内部仍然是通过 micro task 控制更新的
+复现了链表的遍历，和一个超小的优先级调度
 
 #### hash.keyed diff
 
