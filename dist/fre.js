@@ -132,9 +132,10 @@
     return function () {
       let current = getCurrentFiber();
       if (current) {
-        let hasChaged = inputs
-          ? oldInputs.some((value, i) => inputs[i] !== value)
-          : true;
+        let hasChaged =
+          inputs && inputs.length
+            ? oldInputs.some((value, i) => inputs[i] !== value)
+            : true;
         if (hasChaged) {
           create();
         }
