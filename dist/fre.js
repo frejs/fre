@@ -8,8 +8,6 @@
   (global = global || self, factory(global.fre = {}));
 }(this, function (exports) { 'use strict';
 
-  const defer =
-    typeof Promise === 'function' ? cb => Promise.resolve().then(cb) : setTimeout;
   const arrayfy = array =>
     !array ? [] : Array.isArray(array) ? array : [array];
   const isNew = (prev, next) => key => prev[key] !== next[key];
@@ -32,6 +30,16 @@
     for (var i in b) out[i] = b[i];
     return out
   };
+  const ric =
+    requestIdleCallback ||
+    ((cb, start = Date.now()) =>
+      setTimeout(() => {
+        cb({
+          didTimeout: false,
+          timeRemaining: () => Math.max(0, 50 - (Date.now() - start))
+        });
+      }, 1));
+  const raf = requestAnimationFrame || setTimeout;
 
   function h (type, props) {
     let rest = [];
@@ -159,7 +167,7 @@
   }
 
   const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6];
-  let microtasks = [];
+  let updateQueue = [];
   let nextWork = null;
   let pendingCommit = null;
   let currentFiber = null;
@@ -170,25 +178,24 @@
       base: container,
       props: { children: vdom }
     };
-    microtasks.push(rootFiber);
-    defer(workLoop);
+    updateQueue.push(rootFiber);
+    ric(workLoop);
   }
   function scheduleWork (fiber) {
-    microtasks.push(fiber);
-    defer(workLoop);
+    updateQueue.push(fiber);
+    ric(workLoop);
   }
-  function workLoop () {
-    if (!nextWork && microtasks.length) {
-      const update = microtasks.shift();
+  function workLoop (deadline) {
+    if (!nextWork && updateQueue.length) {
+      const update = updateQueue.shift();
       if (!update) return
       nextWork = update;
     }
-    while (nextWork) {
+    while (nextWork && deadline.timeRemaining() > 1) {
       nextWork = performWork(nextWork);
     }
-    if (pendingCommit) {
-      commitWork(pendingCommit);
-    }
+    if (nextWork || updateQueue.length > 0) ric(workLoop);
+    if (pendingCommit) raf(() => commitWork(pendingCommit));
   }
   function performWork (WIP) {
     WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP);
