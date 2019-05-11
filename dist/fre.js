@@ -126,11 +126,7 @@
   }
   function useEffect (effect, inputs) {
     let current = getCurrentFiber();
-    if (current) {
-      let key = '$' + cursor;
-      current.effects[key] = useMemo(effect, inputs);
-      cursor++;
-    }
+    if (current) current.effect = useMemo(effect, inputs);
   }
   function useMemo (create, inputs) {
     return function () {
@@ -166,6 +162,7 @@
   let nextWork = null;
   let pendingCommit = null;
   let currentFiber = null;
+  let isRecycling = true;
   function render (vdom, container) {
     let rootFiber = {
       tag: ROOT,
@@ -300,13 +297,9 @@
   }
   function commitWork (WIP) {
     WIP.patches.forEach(p => commit(p));
-    for (let key in currentFiber.effects) {
-      let effect = currentFiber.effects[key];
-      effect();
-    }
+    currentFiber.effect && currentFiber.effect();
     nextWork = pendingCommit = null;
   }
-  let once = true;
   function commit (fiber) {
     if (fiber.tag == ROOT) return
     let parentFiber = fiber.parent;
@@ -320,7 +313,7 @@
     } else if (fiber.patchTag == DELETE) {
       deleteElement(fiber, parent);
     } else {
-      let after = once
+      let after = isRecycling
         ? null
         : fiber.insertPoint
           ? fiber.patchTag == PLACE
@@ -330,7 +323,7 @@
       if (after == dom) return
       parent.insertBefore(dom, after);
     }
-    if (dom != parent.lastChild) once = false;
+    if (dom != parent.lastChild) isRecycling = false;
     parentFiber.patches = fiber.patches = [];
   }
   function deleteElement (fiber, parent) {
