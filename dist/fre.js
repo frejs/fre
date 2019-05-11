@@ -8,8 +8,7 @@
   (global = global || self, factory(global.fre = {}));
 }(this, function (exports) { 'use strict';
 
-  const arrayfy = array =>
-    !array ? [] : Array.isArray(array) ? array : [array];
+  const arrayfy = array => !array ? [] : Array.isArray(array) ? array : [array];
   const isNew = (prev, next) => key => prev[key] !== next[key];
   const isSame = (a, b) => a.type == b.type && a.key == b.key;
   const hashfy = arr => {
@@ -17,9 +16,9 @@
     let i = 0;
     arrayfy(arr).forEach(item => {
       let key = ((item || {}).props || {}).key;
-      key ? (out['.' + key] = item) : (out['.' + i] = item) && i++;
+      key ? out['.' + key] = item : (out['.' + i] = item) && i++;
     });
-    return out
+    return out;
   };
   const extend = (a, b) => {
     for (var i in b) a[i] = b[i];
@@ -28,20 +27,17 @@
     let out = {};
     for (var i in a) out[i] = a[i];
     for (var i in b) out[i] = b[i];
-    return out
+    return out;
   };
-  const ric =
-    requestIdleCallback ||
-    ((cb, start = Date.now()) =>
-      setTimeout(() => {
-        cb({
-          didTimeout: false,
-          timeRemaining: () => Math.max(0, 50 - (Date.now() - start))
-        });
-      }, 1));
+  const ric = requestIdleCallback || ((cb, start = Date.now()) => setTimeout(() => {
+    cb({
+      didTimeout: false,
+      timeRemaining: () => Math.max(0, 50 - (Date.now() - start))
+    });
+  }, 1));
   const raf = requestAnimationFrame || setTimeout;
 
-  function h (type, props) {
+  function h(type, props) {
     let rest = [];
     let children = [];
     let length = arguments.length;
@@ -51,21 +47,24 @@
       if (node && node.pop) {
         for (length = node.length; length--;) rest.push(node[length]);
       } else if (node === null || node === true || node === false) ; else {
-        children.push(
-          typeof node !== 'object'
-            ? { type: 'text', props: { nodeValue: node } }
-            : node
-        );
+        children.push(typeof node !== 'object' ? {
+          type: 'text',
+          props: {
+            nodeValue: node
+          }
+        } : node);
       }
     }
     return {
       type,
-      props: megre(props, { children }),
+      props: megre(props, {
+        children
+      }),
       key: (props || {}).key || null
-    }
+    };
   }
 
-  function updateProperty (element, name, value, newValue) {
+  function updateProperty(element, name, value, newValue) {
     if (name === 'children' || name === 'key') ; else if (name === 'style') {
       Object.keys(newValue).forEach(key => {
         let style = !newValue || !newValue[key] ? '' : newValue[key];
@@ -81,89 +80,87 @@
       element.setAttribute(name, newValue);
     }
   }
-  function updateElement (element, props, newProps) {
-    Object.keys(newProps)
-      .filter(isNew(props, newProps))
-      .forEach(key => {
-        if (key === 'value' || key === 'nodeValue') {
-          element[key] = newProps[key];
-        } else {
-          updateProperty(element, key, props[key], newProps[key]);
-        }
-      });
+  function updateElement(element, props, newProps) {
+    Object.keys(newProps).filter(isNew(props, newProps))
+    .forEach(key => {
+      if (key === 'value' || key === 'nodeValue') {
+        element[key] = newProps[key];
+      } else {
+        updateProperty(element, key, props[key], newProps[key]);
+      }
+    });
   }
-  function createElement (fiber) {
-    const element =
-      fiber.type === 'text'
-        ? document.createTextNode('')
-        : document.createElement(fiber.type);
+  function createElement(fiber) {
+    const element = fiber.type === 'text' ? document.createTextNode('') : document.createElement(fiber.type);
     updateElement(element, [], fiber.props);
-    return element
+    return element;
   }
 
   let cursor = 0;
   let oldInputs = [];
-  function update (key, reducer, value) {
+  function update(key, reducer, value) {
     const current = this ? this : getCurrentFiber();
     value = reducer ? reducer(current.state[key], value) : value;
     current.state[key] = value;
     scheduleWork(current);
   }
-  function resetCursor () {
+  function resetCursor() {
     cursor = 0;
   }
-  function useState (initState) {
-    return useReducer(null, initState)
+  function useState(initState) {
+    return useReducer(null, initState);
   }
-  function useReducer (reducer, initState) {
+  function useReducer(reducer, initState) {
     let current = getCurrentFiber();
     let key = '$' + cursor;
     let setter = update.bind(current, key, reducer);
     if (!current) {
-      return [initState, setter]
+      return [initState, setter];
     } else {
       cursor++;
       let state = current.state || {};
       if (typeof state === 'object' && key in state) {
-        return [state[key], setter]
+        return [state[key], setter];
       } else {
         current.state[key] = initState;
       }
-      return [initState, setter]
+      return [initState, setter];
     }
   }
-  function useEffect (effect, inputs) {
+  function useEffect(effect, inputs) {
     let current = getCurrentFiber();
     if (current) current.effect = useMemo(effect, inputs);
   }
-  function useMemo (create, inputs) {
+  function useMemo(create, inputs) {
     return function () {
       let current = getCurrentFiber();
       if (current) {
-        let hasChaged =
-          inputs && inputs.length
-            ? oldInputs.some((value, i) => inputs[i] !== value)
-            : true;
+        let hasChaged = inputs && inputs.length ? oldInputs.some((value, i) => inputs[i] !== value) : true;
         if (hasChaged) {
           create();
         }
         oldInputs = inputs;
       }
-    }
+    };
   }
-  function createContext (initContext = {}) {
+  function createContext(initContext = {}) {
     let context = initContext;
     let setters = [];
     const update = newContext => setters.forEach(fn => fn(newContext));
     const subscribe = fn => setters.push(fn);
-    const unSubscribe = fn => (setters = setters.filter(f => f !== fn));
-    return { context, update, subscribe, unSubscribe }
+    const unSubscribe = fn => setters = setters.filter(f => f !== fn);
+    return {
+      context,
+      update,
+      subscribe,
+      unSubscribe
+    };
   }
-  function useContext (ctx) {
+  function useContext(ctx) {
     const [context, setContext] = useState(ctx.context);
     ctx.subscribe(setContext);
     useEffect(() => ctx.unSubscribe(setContext));
-    return [context, ctx.update]
+    return [context, ctx.update];
   }
 
   const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6];
@@ -172,23 +169,25 @@
   let pendingCommit = null;
   let currentFiber = null;
   let isRecycling = true;
-  function render (vdom, container) {
+  function render(vdom, container) {
     let rootFiber = {
       tag: ROOT,
       base: container,
-      props: { children: vdom }
+      props: {
+        children: vdom
+      }
     };
     updateQueue.push(rootFiber);
     ric(workLoop);
   }
-  function scheduleWork (fiber) {
+  function scheduleWork(fiber) {
     updateQueue.push(fiber);
     ric(workLoop);
   }
-  function workLoop (deadline) {
+  function workLoop(deadline) {
     if (!nextWork && updateQueue.length) {
       const update = updateQueue.shift();
-      if (!update) return
+      if (!update) return;
       nextWork = update;
     }
     while (nextWork && deadline.timeRemaining() > 1) {
@@ -197,16 +196,16 @@
     if (nextWork || updateQueue.length > 0) ric(workLoop);
     if (pendingCommit) raf(() => commitWork(pendingCommit));
   }
-  function performWork (WIP) {
+  function performWork(WIP) {
     WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP);
-    if (WIP.child) return WIP.child
+    if (WIP.child) return WIP.child;
     while (WIP) {
       completeWork(WIP);
-      if (WIP.sibling) return WIP.sibling
+      if (WIP.sibling) return WIP.sibling;
       WIP = WIP.parent;
     }
   }
-  function updateHost (WIP) {
+  function updateHost(WIP) {
     if (!WIP.base) WIP.base = createElement(WIP);
     let parent = WIP.parent || {};
     WIP.insertPoint = parent.oldPoint;
@@ -214,7 +213,7 @@
     const newChildren = WIP.props.children;
     reconcileChildren(WIP, newChildren);
   }
-  function updateHOOK (WIP) {
+  function updateHOOK(WIP) {
     let instance = WIP.base;
     if (instance == null) {
       instance = WIP.base = createInstance(WIP);
@@ -228,10 +227,10 @@
     reconcileChildren(WIP, newChildren);
     currentFiber.patches = WIP.patches;
   }
-  function fiberize (children, WIP) {
-    return (WIP.children = hashfy(children))
+  function fiberize(children, WIP) {
+    return WIP.children = hashfy(children);
   }
-  function reconcileChildren (WIP, newChildren) {
+  function reconcileChildren(WIP, newChildren) {
     const oldFibers = WIP.children;
     const newFibers = fiberize(newChildren, WIP);
     let reused = {};
@@ -243,7 +242,7 @@
         if (newFiber.key) {
           oldFiber.key = newFiber.key;
         }
-        continue
+        continue;
       } else {
         oldFiber.patchTag = DELETE;
         WIP.patches.push(oldFiber);
@@ -282,34 +281,33 @@
     }
     if (prevFiber) prevFiber.sibling = null;
   }
-  function createInstance (fiber) {
+  function createInstance(fiber) {
     const instance = new fiber.type(fiber.props);
     instance.fiber = fiber;
-    return instance
+    return instance;
   }
-  function Fiber (vnode, data) {
+  function Fiber(vnode, data) {
     this.patchTag = data.patchTag;
     this.tag = data.tag || typeof vnode.type === 'function' ? HOOK : HOST;
-    vnode.props = vnode.props || { nodeValue: vnode.nodeValue };
+    vnode.props = vnode.props || {
+      nodeValue: vnode.nodeValue
+    };
     extend(this, vnode);
   }
-  function completeWork (fiber) {
+  function completeWork(fiber) {
     if (fiber.parent) {
-      fiber.parent.patches = (fiber.parent.patches || []).concat(
-        fiber.patches || [],
-        fiber.patchTag ? [fiber] : []
-      );
+      fiber.parent.patches = (fiber.parent.patches || []).concat(fiber.patches || [], fiber.patchTag ? [fiber] : []);
     } else {
       pendingCommit = fiber;
     }
   }
-  function commitWork (WIP) {
+  function commitWork(WIP) {
     WIP.patches.forEach(p => commit(p));
     currentFiber.effect && currentFiber.effect();
     nextWork = pendingCommit = null;
   }
-  function commit (fiber) {
-    if (fiber.tag == ROOT) return
+  function commit(fiber) {
+    if (fiber.tag == ROOT) return;
     let parentFiber = fiber.parent;
     while (parentFiber.tag == HOOK) {
       parentFiber = parentFiber.parent;
@@ -321,35 +319,29 @@
     } else if (fiber.patchTag == DELETE) {
       deleteElement(fiber, parent);
     } else {
-      let after = isRecycling
-        ? null
-        : fiber.insertPoint
-          ? fiber.patchTag == PLACE
-            ? fiber.insertPoint.base.nextSibling
-            : fiber.insertPoint.base.nextSibling || parent.firstChild
-          : null;
-      if (after == dom) return
+      let after = isRecycling ? null : fiber.insertPoint ? fiber.patchTag == PLACE ? fiber.insertPoint.base.nextSibling : fiber.insertPoint.base.nextSibling || parent.firstChild : null;
+      if (after == dom) return;
       parent.insertBefore(dom, after);
     }
     if (dom != parent.lastChild) isRecycling = false;
     parentFiber.patches = fiber.patches = [];
   }
-  function deleteElement (fiber, parent) {
+  function deleteElement(fiber, parent) {
     let node = fiber;
     while (true) {
       if (node.tag == HOOK) {
         node = node.child;
-        continue
+        continue;
       }
       parent.removeChild(node.base);
       node.patches = [];
       while (node != fiber && !node.sibling) node = node.parent;
-      if (node == fiber) return
+      if (node == fiber) return;
       node = node.sibling;
     }
   }
-  function getCurrentFiber () {
-    return currentFiber || null
+  function getCurrentFiber() {
+    return currentFiber || null;
   }
 
   exports.createContext = createContext;
