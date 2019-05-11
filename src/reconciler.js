@@ -8,6 +8,7 @@ let microtasks = []
 let nextWork = null
 let pendingCommit = null
 let currentFiber = null
+let isRecycling = true
 
 export function render (vdom, container) {
   let rootFiber = {
@@ -160,15 +161,9 @@ function completeWork (fiber) {
 
 function commitWork (WIP) {
   WIP.patches.forEach(p => commit(p))
-
-  for (let key in currentFiber.effects) {
-    let effect = currentFiber.effects[key]
-    effect()
-  }
+  currentFiber.effect()
   nextWork = pendingCommit = null
 }
-
-let once = true
 
 function commit (fiber) {
   if (fiber.tag == ROOT) return
@@ -185,7 +180,7 @@ function commit (fiber) {
   } else if (fiber.patchTag == DELETE) {
     deleteElement(fiber, parent)
   } else {
-    let after = once
+    let after = isRecycling
       ? null
       : fiber.insertPoint
         ? fiber.patchTag == PLACE
@@ -195,7 +190,7 @@ function commit (fiber) {
     if (after == dom) return
     parent.insertBefore(dom, after)
   }
-  if (dom != parent.lastChild) once = false
+  if (dom != parent.lastChild) isRecycling = false
   parentFiber.patches = fiber.patches = []
 }
 

@@ -33,11 +33,7 @@ export function useReducer (reducer, initState) {
 }
 export function useEffect (effect, inputs) {
   let current = getCurrentFiber()
-  if (current) {
-    let key = '$' + cursor
-    current.effects[key] = useMemo(effect, inputs)
-    cursor++
-  }
+  if (current) current.effect = useMemo(effect, inputs)
 }
 
 export function useMemo (create, inputs) {
