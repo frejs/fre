@@ -174,7 +174,7 @@ function App() {
 }
 
 function Other() {
-  const count = useContext(context)[0]
+  const count = useContext(ctx)[0]
   return <h1>{count}</h1>
 }
 ```
