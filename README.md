@@ -10,9 +10,9 @@
 
 ### Feature
 
-- :tada: hooks API , really functionalComponent , also supports render props
+- :tada: really functionalComponent, hooks API, render props
 - :confetti_ball: Fiber Reconciler and hash keyed diff algorithm
-- :telescope: Tiny in one , just 1 KB , no dependences
+- :telescope: minimal but wonderful , just 1 KB , no dependences
 
 ### Introduction
 
@@ -258,13 +258,13 @@ const Box = props => <div>{props.children('hello world!')}</div>
 
 #### Fiber
 
-fre 的 Fiber 架构是 react Fiber 的最小实现，但是并没能实现对等的调度方案
+fre 的 Fiber 架构是 Fiber reconciler 的最小实现，fre Fiber 仅仅是采用了链表的遍历形式，并没能实现对等的调度方案
 
-内部仍然是通过 micro task 调度更新的
+内部仍然是通过 micro task 控制更新的
 
-#### hash.diff
+#### hash.keyed diff
 
-fre 用了一个非常精彩的 hash keyed diff 机制，实现了和 react 对等的排位算法
+fre 实现了一个非常精彩的 hash keyed diff 算法，和 react 的排位算法对等，但实现不同
 
 这也是 fre 最精彩的机制之一
 
@@ -286,7 +286,7 @@ webpack 需配置：
 }
 ```
 
-当然，现在的 fre 更适合运行于浏览器环境，可以使用 [htm](https://github.com/developit/htm)
+当然，如果是想要用于浏览器环境，可以使用 [htm](https://github.com/developit/htm)
 
 #### License
 
