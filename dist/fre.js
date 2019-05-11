@@ -1,5 +1,5 @@
 /**
- * by 132yse Copyright 2019-05-10
+ * by 132yse Copyright 2019-05-11
  */
 
 (function (global, factory) {
@@ -121,8 +121,7 @@
       } else {
         current.state[key] = initState;
       }
-      let value = initState;
-      return [value, setter]
+      return [initState, setter]
     }
   }
   function useEffect (effect, inputs) {
