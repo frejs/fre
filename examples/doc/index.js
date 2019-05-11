@@ -1,4 +1,5 @@
 import HTMLString from './README.md'
+import './md.css'
 import './style.css'
 import { h, render, useEffect } from 'fre'
 
