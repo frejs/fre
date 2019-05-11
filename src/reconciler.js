@@ -4,7 +4,7 @@ import { raf, ric, hashfy, isSame, extend, megre } from './util'
 
 const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
 
-let microtasks = []
+let updateQueue = []
 let nextWork = null
 let pendingCommit = null
 let currentFiber = null
@@ -16,18 +16,18 @@ export function render (vdom, container) {
     base: container,
     props: { children: vdom }
   }
-  microtasks.push(rootFiber)
+  updateQueue.push(rootFiber)
   ric(workLoop)
 }
 
 export function scheduleWork (fiber) {
-  microtasks.push(fiber)
+  updateQueue.push(fiber)
   ric(workLoop)
 }
 
 function workLoop (deadline) {
-  if (!nextWork && microtasks.length) {
-    const update = microtasks.shift()
+  if (!nextWork && updateQueue.length) {
+    const update = updateQueue.shift()
     if (!update) return
     nextWork = update
   }
@@ -35,7 +35,7 @@ function workLoop (deadline) {
     nextWork = performWork(nextWork)
   }
 
-  if (nextWork || microtasks.length > 0) ric(workLoop)
+  if (nextWork || updateQueue.length > 0) ric(workLoop)
   if (pendingCommit) raf(() => commitWork(pendingCommit))
 }
 
