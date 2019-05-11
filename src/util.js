@@ -1,6 +1,3 @@
-export const defer =
-  typeof Promise === 'function' ? cb => Promise.resolve().then(cb) : setTimeout
-
 export const arrayfy = array =>
   !array ? [] : Array.isArray(array) ? array : [array]
 
@@ -30,3 +27,15 @@ export const megre = (a, b) => {
 
   return out
 }
+
+export const ric =
+  requestIdleCallback ||
+  ((cb, start = Date.now()) =>
+    setTimeout(() => {
+      cb({
+        didTimeout: false,
+        timeRemaining: () => Math.max(0, 50 - (Date.now() - start))
+      })
+    }, 1))
+
+export const raf = requestAnimationFrame || setTimeout

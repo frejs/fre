@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './element'
 import { resetCursor } from './hooks'
-import { defer, hashfy, isSame, extend, megre } from './util'
+import { raf, ric, hashfy, isSame, extend, megre } from './util'
 
 const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
 
@@ -17,26 +17,26 @@ export function render (vdom, container) {
     props: { children: vdom }
   }
   microtasks.push(rootFiber)
-  defer(workLoop)
+  ric(workLoop)
 }
 
 export function scheduleWork (fiber) {
   microtasks.push(fiber)
-  defer(workLoop)
+  ric(workLoop)
 }
 
-function workLoop () {
+function workLoop (deadline) {
   if (!nextWork && microtasks.length) {
     const update = microtasks.shift()
     if (!update) return
     nextWork = update
   }
-  while (nextWork) {
+  while (nextWork && deadline.timeRemaining() > 1) {
     nextWork = performWork(nextWork)
   }
-  if (pendingCommit) {
-    commitWork(pendingCommit)
-  }
+
+  if (nextWork || microtasks.length > 0) ric(workLoop)
+  if (pendingCommit) raf(() => commitWork(pendingCommit))
 }
 
 function performWork (WIP) {
