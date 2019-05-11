@@ -10,12 +10,11 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
-  "dependencies": {
-    "jest": "^24.7.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "rollup": "^1.10.1",
     "rollup-plugin-cleanup": "^3.1.1",
-    "rollup-plugin-license": "^0.8.1"
+    "rollup-plugin-license": "^0.8.1",
+    "jest": "^24.7.1"
   }
 }
