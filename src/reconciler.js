@@ -161,7 +161,7 @@ function completeWork (fiber) {
 
 function commitWork (WIP) {
   WIP.patches.forEach(p => commit(p))
-  currentFiber.effect()
+  currentFiber.effect && currentFiber.effect()
   nextWork = pendingCommit = null
 }
 

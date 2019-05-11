@@ -28,19 +28,19 @@ import { h, render, useState, useEffect } from '../../src'
 //     </div>
 //   )
 // }
-// function App () {
-//   const [arr, setArr] = useState(['A', 'B', 'C', 'D', 'E','F'])
-//   return (
-//     <div>
-//       <ul>
-//         {arr.map(item => (
-//           <li key={item}>{item}</li>
-//         ))}
-//       </ul>
-//       <button onClick={() => setArr(['E','F','C', 'D', 'A', 'B'])}>+</button>
-//     </div>
-//   )
-// }
+function App () {
+  const [arr, setArr] = useState(['A', 'B', 'C', 'D', 'E','F'])
+  return (
+    <div>
+      <ul>
+        {arr.map(item => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+      <button onClick={() => setArr(['E','F','C', 'D', 'A', 'B'])}>+</button>
+    </div>
+  )
+}
 
 // A B C D -> C D A B √
 
