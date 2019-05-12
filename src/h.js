@@ -1,4 +1,4 @@
-import { megre } from './util'
+import { merge } from './util'
 export function h (type, props) {
   let rest = []
   let children = []
@@ -20,7 +20,7 @@ export function h (type, props) {
   }
   return {
     type,
-    props: megre(props, { children }),
+    props: merge(props, { children }),
     key: (props || {}).key || null
   }
 }

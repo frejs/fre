@@ -1,6 +1,7 @@
 import { scheduleWork, getCurrentFiber } from './reconciler'
 let cursor = 0
 let oldInputs = []
+let mounted = false
 
 function update (key, reducer, value) {
   const current = this ? this : getCurrentFiber()
@@ -40,13 +41,16 @@ export function useMemo (create, inputs) {
   return function () {
     let current = getCurrentFiber()
     if (current) {
-      let hasChaged =
-        inputs && inputs.length
-          ? oldInputs.some((value, i) => inputs[i] !== value)
-          : true
-      if (hasChaged) {
-        create()
+      let hasChaged = inputs
+        ? oldInputs.some((value, i) => inputs[i] !== value)
+        : true
+      if (inputs && inputs.length === 0 && !mounted) {
+        // 空数组只执行一次
+        hasChaged = true
+        mounted = true
       }
+
+      if (hasChaged) create()
       oldInputs = inputs
     }
   }
