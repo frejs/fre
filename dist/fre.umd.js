@@ -20,9 +20,6 @@
     });
     return out
   };
-  const extend = (a, b) => {
-    for (var i in b) a[i] = b[i];
-  };
   const merge = (a, b) => {
     let out = {};
     for (var i in a) out[i] = a[i];
@@ -39,37 +36,35 @@
   const rAF = requestAnimationFrame || setTimeout;
 
   function h (type, props) {
-    let rest = [];
-    let children = [];
-    let length = arguments.length;
-    while (length-- > 2) rest.push(arguments[length]);
+    for (var vnode, rest = [], children = [], i = arguments.length; i-- > 2;) {
+      rest.push(arguments[i]);
+    }
     while (rest.length) {
-      let node = rest.pop();
-      if (node && node.pop) {
-        for (length = node.length; length--;) rest.push(node[length]);
-      } else if (node === null || node === true || node === false) ; else if (typeof node === 'function') {
-        children = node;
+      if ((vnode = rest.pop()) && vnode.pop) {
+        for (length = vnode.length; length--;) rest.push(vnode[length]);
+      } else if (vnode === null || vnode === true || vnode === false) ; else if (typeof vnode === 'function') {
+        children = vnode;
       } else {
         children.push(
-          typeof node !== 'object'
-            ? { type: 'text', props: { nodeValue: node } }
-            : node
+          typeof vnode === 'object'
+            ? vnode
+            : { type: 'text', props: { nodeValue: vnode } }
         );
       }
     }
     return {
       type,
       props: merge(props, { children }),
-      key: (props || {}).key || null
+      key: (props || {}).key
     }
   }
 
   function updateProperty (element, name, value, newValue) {
     if (name === 'children' || name === 'key') ; else if (name === 'style') {
-      Object.keys(newValue).forEach(key => {
+      for (key in newValue) {
         let style = !newValue || !newValue[key] ? '' : newValue[key];
         element[name][key] = style;
-      });
+      }
     } else if (name[0] === 'o' && name[1] === 'n') {
       name = name.slice(2).toLowerCase();
       if (value) {
@@ -284,7 +279,7 @@
     this.patchTag = data.patchTag;
     this.tag = data.tag || typeof vnode.type === 'function' ? HOOK : HOST;
     vnode.props = vnode.props || { nodeValue: vnode.nodeValue };
-    extend(this, vnode);
+    return merge(vnode, this)
   }
   function completeWork (fiber) {
     if (fiber.parent) {

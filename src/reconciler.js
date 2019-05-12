@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './element'
 import { resetCursor } from './hooks'
-import { rAF, rIC, hashfy, isSame, merge } from './util'
+import { rAF, rIC, hashfy, isSame, extend, merge } from './util'
 
 const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
 
@@ -8,7 +8,6 @@ let updateQueue = []
 let nextWork = null
 let pendingCommit = null
 let currentFiber = null
-let isRecycling = true
 
 export function render (vdom, container) {
   let rootFiber = {
@@ -138,7 +137,7 @@ function Fiber (vnode, data) {
   this.patchTag = data.patchTag
   this.tag = data.tag || typeof vnode.type === 'function' ? HOOK : HOST
   vnode.props = vnode.props || { nodeValue: vnode.nodeValue }
-  return merge(vnode, this)
+  extend(this, vnode)
 }
 
 function completeWork (fiber) {
@@ -154,7 +153,6 @@ function completeWork (fiber) {
 
 function commitWork (WIP) {
   WIP.patches.forEach(p => commit(p))
-  isRecycling = false
   currentFiber.effect && currentFiber.effect()
   nextWork = pendingCommit = null
 }
@@ -166,18 +164,17 @@ function commit (fiber) {
   }
   const parent = parentFiber.base
   let dom = fiber.base
-  if (fiber.tag == HOOK) {
+  if (fiber.tag == HOOK || fiber.tag === ROOT) {
   } else if (fiber.patchTag == UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props)
   } else if (fiber.patchTag == DELETE) {
     parent.removeChild(dom)
   } else {
-    let after = isRecycling
-      ? null
-      : fiber.insertPoint
-        ? fiber.patchTag == PLACE
-          ? fiber.insertPoint.base.nextSibling
-          : fiber.insertPoint.base.nextSibling || parent.firstChild
+    const { insertPoint, patchTag } = fiber
+    let after = insertPoint
+        ? patchTag == PLACE
+          ? insertPoint.base.nextSibling
+          : insertPoint.base.nextSibling || parent.firstChild
         : null
     if (after == dom) return
     parent.insertBefore(dom, after)
