@@ -16,7 +16,18 @@
 
 ### Introduction
 
-Fre (pronounced `/fri:/`, like free) is a tiny and perfect js library, It means [Free!](https://www.clicli.us/search/free) ~ 
+Fre (pronounced `/fri:/`, like free) is a tiny and perfect js library, It means freedom ~
+
+其实，free 是一部动漫名，也是我最喜欢的番没有之一，haru 是我儿子！ [参见 c 站](https://www.clicli.top/search/free)
+
+### Compare
+
+|        | 尺寸 |    组件化     |     特性     |                        路由                        |
+| :----: | :--: | :-----------: | :----------: | :------------------------------------------------: |
+|  fre   | 1kb  |     hooks     |    Fiber     | [use-routes](https://github.com/132yse/use-routes) |
+| preact | 3kb  |     class     |     diff     |                        ...                         |
+|  vue   | 10kb |      SFC      | Proxy + diff |                     vue-router                     |
+| react  | 33kb | class + hooks |    Fiber     |                    react-router                    |
 
 ### Use
 
@@ -43,13 +54,17 @@ render(<Counter />, document.getElementById('root'))
 
 ### Hooks API
 
-react hooks API is a miracle, and fre will make it become a leading role
+react hooks API 在实现上是个奇迹，这也是我写 fre 的原因（对骚 ♂ API 的痴迷）
+
+hooks API 创造了新的组件化方案，react 由于兼容 class ，所以很多实现上并不纯粹
+
+fre 的世界里，hooks 是主角~
 
 #### useState
 
-`useState` is a base API, It will receive initial state adn return a Array
+useState 是最基本的 API，它传入一个初始值，每次函数执行都能拿到新值
 
-You can use it many times, new state is available when component is rerender
+可 use 多次，use 的内容可以是对象或数组
 
 ```js
 function Counter() {
@@ -70,7 +85,7 @@ render(<Counter />, document.getElementById('root'))
 
 #### useReducer
 
-`useReducer` and `useState` are almost the same，but `useReducer` needs a global reducer
+useReducer 和 useState 几乎是一样的，需要外置外置 reducer (全局)
 
 ```js
 function reducer(state, action) {
@@ -98,9 +113,9 @@ render(<Counter />, document.getElementById('root'))
 
 #### useEffect
 
-`useEffect` takes two parameters, the first is a effect callback and the second is an array, usually props
+useEffect 接受两个参数，第一个参数是一个副作用函数，第二个参数是个数组，通常为 props
 
-When the array changes, the effect callback will run after commitWork
+当第二个参数的某一项发生变化时，执行副作用函数，执行时机为一轮 commit 结束
 
 ```js
 function Counter({ flag }) {
@@ -121,7 +136,7 @@ render(<Counter />, document.getElementById('root'))
 
 #### useMemo
 
-`useMemo` has the same parameters as `useEffect`, but `useMemo` will be ran immediately.
+useMemo 和 useEffect 参数一致，不同的是，第一个参数通常是组件函数，马上同步执行
 
 ```js
 function Counter() {
@@ -140,9 +155,9 @@ render(<Counter />, document.getElementById('root'))
 
 #### useContext
 
-Context is the state of external create, internal use
+context 是在外部 create ，内部 use 的 state，它和全局变量的区别在于，如果多个组件同时 useContext，那么这些组件都会 rerender
 
-When it changes, all components that own `useContext` will rerender
+而，如果多个组件同时 useState 同一个全局变量，则只有触发 setState 的当前组件 rerender
 
 ```js
 const ctx = createContext(0)
@@ -166,7 +181,7 @@ function Other() {
 
 ### FunctionalComponent
 
-functionalComponent is a new components scheme
+新的组件化方案，完全的 functional，组件通讯和 react 几乎一致
 
 ```js
 function App() {
@@ -196,7 +211,7 @@ render(<App />, document.getElementById('root'))
 
 ### props
 
-Props are used for component communication
+props 用于组件间通信，和 react 行为一致
 
 ```js
 function App() {
@@ -214,7 +229,8 @@ function Sex(props) {
   return <div>{props.sex}</div>
 }
 ```
-Props contains children to render all the child elements of itself
+
+和 react 一样，props 默认包含了 children，用于渲染组件的所有子元素
 
 ```js
 const HelloBox = () => (
@@ -226,7 +242,7 @@ const HelloBox = () => (
 const Box = props => <div>{props.children}</div>
 ```
 
-Hooks do not support HOC and extends, but render props/children are supported by default
+值得一提，hooks 的世界里，不存在 HOC 和 extends，但是天生支持 render props/children
 
 ```js
 const HelloBox = () => (
@@ -242,25 +258,27 @@ const Box = props => <div>{props.children('hello world!')}</div>
 
 #### Fiber
 
-Fiber is a priority scheduling scheme. 
+fre 的 Fiber 架构是 Fiber scheduler 的最小实现
 
-It uses the traversal form of linked list to achieve time slicing
+复现了链表的遍历，和一个超小的优先级调度
 
 #### hash.keyed diff
 
-Fre implements a compact diff algorithm 
+fre 实现了一个非常精彩的 hash keyed diff 算法，和 react 的排位算法对等，但实现不同
 
-It uses hash to mark locations for easy comparison
+这也是 fre 最精彩的机制之一
 
 #### JSX
 
-The default export h function needs to be configured
+默认也对外暴露了 h 函数，可以选用 JSX
 
 ```js
 import { h } from 'fre'
 ```
 
-```json
+webpack 需配置：
+
+```js
 {
   "plugins": [
     ["transform-react-jsx", { "pragma":"h" }]
@@ -268,7 +286,7 @@ import { h } from 'fre'
 }
 ```
 
-If it is a browser environment, recommend to use [htm](https://github.com/developit/htm)
+当然，如果是想要用于浏览器环境，可以使用 [htm](https://github.com/developit/htm)
 
 #### License
 
