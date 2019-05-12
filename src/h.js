@@ -14,9 +14,9 @@ export function h (type, props) {
       children = node
     } else {
       children.push(
-        typeof node !== 'object'
-          ? { type: 'text', props: { nodeValue: node } }
-          : node
+        typeof node === 'object'
+          ? node
+          : { type: 'text', props: { nodeValue: node } }
       )
     }
   }

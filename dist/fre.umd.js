@@ -1,1 +1,344 @@
-!function(t,n){"object"==typeof exports&&"undefined"!=typeof module?n(exports):"function"==typeof define&&define.amd?define(["exports"],n):(t=t||self,n(t.fre={}))}(this,function(t){"use strict";function n(t,n){let e=[],o=[],i=arguments.length;for(;i-- >2;)e.push(arguments[i]);for(;e.length;){let t=e.pop();if(t&&t.pop)for(i=t.length;i--;)e.push(t[i]);else null===t||!0===t||!1===t||("function"==typeof t?o=t:o.push("object"!=typeof t?{type:"text",props:{nodeValue:t}}:t))}return{type:t,props:V(n,{children:o}),key:(n||{}).key||null}}function e(t,n,e,o){"children"===n||"key"===n||("style"===n?Object.keys(o).forEach(e=>{let i=o&&o[e]?o[e]:"";t[n][e]=i}):"o"===n[0]&&"n"===n[1]?(n=n.slice(2).toLowerCase(),e&&t.removeEventListener(n,e),t.addEventListener(n,o)):t.setAttribute(n,o))}function o(t,n,o){Object.keys(o).filter(w(n,o)).forEach(i=>{"value"===i||"nodeValue"===i?t[i]=o[i]:e(t,i,n[i],o[i])})}function i(t){const n="text"===t.type?document.createTextNode(""):document.createElement(t.type);return o(n,[],t.props),n}function u(t,n,e){const o=this?this:j();e=n?n(o.state[t],e):e,o.state[t]=e,d(o)}function c(){O=0}function r(t){return f(null,t)}function f(t,n){let e=j(),o="$"+O,i=u.bind(e,o,t);if(e){O++;let t=e.state||{};return"object"==typeof t&&o in t?[t[o],i]:(e.state[o]=n,[n,i])}return[n,i]}function s(t,n){let e=j();e&&(e.effect=a(t,n))}function a(t,n){return()=>{let e=j();if(e){let o=!n||(e.oldInputs||[]).some((t,e)=>n[e]!==t);!n||n.length||e.isMounted||(o=!0,e.isMounted=!0),o&&t(),e.oldInputs=n}}}function p(t={}){let n=[];return{context:t,update:t=>n.forEach(n=>n(t)),subscribe:t=>n.push(t),unSubscribe:t=>n=n.filter(n=>n!==t)}}function l(t){const[n,e]=r(t.context);return t.subscribe(e),s(()=>t.unSubscribe(e)),[n,t.update]}function h(t,n){let e={tag:D,base:n,props:{children:t}};$.push(e),I(y)}function d(t){$.push(t),I(y)}function y(t){if(!z&&$.length){const t=$.shift();if(!t)return;z=t}for(;z&&t.timeRemaining()>1;)z=g(z);(z||$.length>0)&&I(y),G&&L(()=>E(G))}function g(t){if(t.tag==q?m(t):b(t),t.child)return t.child;for(;t;){if(v(t),t.sibling)return t.sibling;t=t.parent}}function b(t){t.base||(t.base=i(t));let n=t.parent||{};t.insertPoint=n.oldPoint,n.oldPoint=t,k(t,t.props.children)}function m(t){t.props=t.props||{},t.state=t.state||{},H=t,c(),k(t,t.type(t.props)),H.patches=t.patches}function T(t,n){return n.children=S(t)}function k(t,n){const e=t.children,o=T(n,t);let i={};for(let n in e){let u=o[n],c=e[n];u&&c.type===u.type?(i[n]=c,u.key&&(c.key=u.key)):(c.patchTag=N,t.patches.push(c))}let u=null,c=null;for(let n in o){let e=o[n],r=i[n];r?M(r,e)&&(c=new x(r,{patchTag:F}),e.patchTag=F,(e=V(c,e)).alternate=c,r.key&&(e.patchTag=B)):e=new x(e,{patchTag:_}),o[n]=e,e.parent=t,u?u.sibling=e:t.child=e,u=e}u&&(u.sibling=null)}function x(t,n){this.patchTag=n.patchTag,this.tag=n.tag||"function"==typeof t.type?q:R,t.props=t.props||{nodeValue:t.nodeValue},A(this,t)}function v(t){t.parent?t.parent.patches=(t.parent.patches||[]).concat(t.patches||[],t.patchTag?[t]:[]):G=t}function E(t){t.patches.forEach(t=>P(t)),J=!1,H.effect&&H.effect(),z=G=null}function P(t){let n=t.parent;for(;n.tag==q;)n=n.parent;const e=n.base;let i=t.base;if(t.tag==q);else if(t.patchTag==F)o(i,t.alternate.props,t.props);else if(t.patchTag==N)e.removeChild(i);else{let n=J?null:t.insertPoint?t.patchTag==_?t.insertPoint.base.nextSibling:t.insertPoint.base.nextSibling||e.firstChild:null;if(n==i)return;e.insertBefore(i,n)}n.patches=t.patches=[]}function j(){return H||null}const C=t=>t?Array.isArray(t)?t:[t]:[],w=(t,n)=>e=>t[e]!==n[e],M=(t,n)=>t.type==n.type&&t.key==n.key,S=t=>{let n={};let e=0;C(t).forEach(t=>{let o=((t||{}).props||{}).key;o?n["."+o]=t:(n["."+e]=t)&&e++});return n},A=(t,n)=>{for(var e in n)t[e]=n[e]},V=(t,n)=>{let e={};for(var o in t)e[o]=t[o];for(var o in n)e[o]=n[o];return e},I=requestIdleCallback||((t,n=Date.now())=>setTimeout(()=>{t({timeRemaining:()=>Math.max(0,50-(Date.now()-n))})},1)),L=requestAnimationFrame||setTimeout;let O=0;const[R,q,D,_,B,F,N]=[0,1,2,3,4,5,6];let $=[],z=null,G=null,H=null,J=!0;t.createContext=p,t.h=n,t.render=h,t.useContext=l,t.useEffect=s,t.useMemo=a,t.useReducer=f,t.useState=r,Object.defineProperty(t,"__esModule",{value:!0})});
+/**
+ * by 132yse Copyright 2019-05-12
+ */
+
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+  typeof define === 'function' && define.amd ? define(['exports'], factory) :
+  (global = global || self, factory(global.fre = {}));
+}(this, function (exports) { 'use strict';
+
+  const arrayfy = arr => (!arr ? [] : Array.isArray(arr) ? arr : [arr]);
+  const isNew = (o, n) => k => o[k] !== n[k];
+  const isSame = (a, b) => a.type == b.type && a.key == b.key;
+  const hashfy = arr => {
+    let out = {};
+    let i = 0;
+    arrayfy(arr).forEach(item => {
+      let key = ((item || {}).props || {}).key;
+      key ? (out['.' + key] = item) : (out['.' + i] = item) && i++;
+    });
+    return out
+  };
+  const extend = (a, b) => {
+    for (var i in b) a[i] = b[i];
+  };
+  const merge = (a, b) => {
+    let out = {};
+    for (var i in a) out[i] = a[i];
+    for (var i in b) out[i] = b[i];
+    return out
+  };
+  const rIC =
+    requestIdleCallback ||
+    function (cb, ed = Date.now()) {
+      setTimeout(() => {
+        cb({ timeRemaining: () => Math.max(0, 50 - (Date.now() - ed)) });
+      }, 1);
+    };
+  const rAF = requestAnimationFrame || setTimeout;
+
+  function h (type, props) {
+    let rest = [];
+    let children = [];
+    let length = arguments.length;
+    while (length-- > 2) rest.push(arguments[length]);
+    while (rest.length) {
+      let node = rest.pop();
+      if (node && node.pop) {
+        for (length = node.length; length--;) rest.push(node[length]);
+      } else if (node === null || node === true || node === false) ; else if (typeof node === 'function') {
+        children = node;
+      } else {
+        children.push(
+          typeof node !== 'object'
+            ? { type: 'text', props: { nodeValue: node } }
+            : node
+        );
+      }
+    }
+    return {
+      type,
+      props: merge(props, { children }),
+      key: (props || {}).key || null
+    }
+  }
+
+  function updateProperty (element, name, value, newValue) {
+    if (name === 'children' || name === 'key') ; else if (name === 'style') {
+      Object.keys(newValue).forEach(key => {
+        let style = !newValue || !newValue[key] ? '' : newValue[key];
+        element[name][key] = style;
+      });
+    } else if (name[0] === 'o' && name[1] === 'n') {
+      name = name.slice(2).toLowerCase();
+      if (value) {
+        element.removeEventListener(name, value);
+      }
+      element.addEventListener(name, newValue);
+    } else {
+      element.setAttribute(name, newValue);
+    }
+  }
+  function updateElement (element, props, newProps) {
+    Object.keys(newProps)
+      .filter(isNew(props, newProps))
+      .forEach(key => {
+        if (key === 'value' || key === 'nodeValue') {
+          element[key] = newProps[key];
+        } else {
+          updateProperty(element, key, props[key], newProps[key]);
+        }
+      });
+  }
+  function createElement (fiber) {
+    const element =
+      fiber.type === 'text'
+        ? document.createTextNode('')
+        : document.createElement(fiber.type);
+    updateElement(element, [], fiber.props);
+    return element
+  }
+
+  let cursor = 0;
+  function update (key, reducer, value) {
+    const current = this ? this : getCurrentFiber();
+    value = reducer ? reducer(current.state[key], value) : value;
+    current.state[key] = value;
+    scheduleWork(current);
+  }
+  function resetCursor () {
+    cursor = 0;
+  }
+  function useState (initState) {
+    return useReducer(null, initState)
+  }
+  function useReducer (reducer, initState) {
+    let current = getCurrentFiber();
+    let key = '$' + cursor;
+    let setter = update.bind(current, key, reducer);
+    if (!current) {
+      return [initState, setter]
+    } else {
+      cursor++;
+      let state = current.state || {};
+      if (typeof state === 'object' && key in state) {
+        return [state[key], setter]
+      } else {
+        current.state[key] = initState;
+      }
+      return [initState, setter]
+    }
+  }
+  function useEffect (cb, inputs) {
+    let current = getCurrentFiber();
+    if (current) current.effect = useMemo(cb, inputs);
+  }
+  function useMemo (cb, inputs) {
+    return () => {
+      let current = getCurrentFiber();
+      if (current) {
+        let hasChaged = inputs
+          ? (current.oldInputs || []).some((v, i) => inputs[i] !== v)
+          : true;
+        if (inputs && !inputs.length && !current.isMounted) {
+          hasChaged = true;
+          current.isMounted = true;
+        }
+        if (hasChaged) cb();
+        current.oldInputs = inputs;
+      }
+    }
+  }
+  function createContext (initContext = {}) {
+    let context = initContext;
+    let setters = [];
+    const update = newContext => setters.forEach(fn => fn(newContext));
+    const subscribe = fn => setters.push(fn);
+    const unSubscribe = fn => (setters = setters.filter(f => f !== fn));
+    return { context, update, subscribe, unSubscribe }
+  }
+  function useContext (ctx) {
+    const [context, setContext] = useState(ctx.context);
+    ctx.subscribe(setContext);
+    useEffect(() => ctx.unSubscribe(setContext));
+    return [context, ctx.update]
+  }
+
+  const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6];
+  let updateQueue = [];
+  let nextWork = null;
+  let pendingCommit = null;
+  let currentFiber = null;
+  let isRecycling = true;
+  function render (vdom, container) {
+    let rootFiber = {
+      tag: ROOT,
+      base: container,
+      props: { children: vdom }
+    };
+    updateQueue.push(rootFiber);
+    rIC(workLoop);
+  }
+  function scheduleWork (fiber) {
+    updateQueue.push(fiber);
+    rIC(workLoop);
+  }
+  function workLoop (deadline) {
+    if (!nextWork && updateQueue.length) {
+      const update = updateQueue.shift();
+      if (!update) return
+      nextWork = update;
+    }
+    while (nextWork && deadline.timeRemaining() > 1) {
+      nextWork = performWork(nextWork);
+    }
+    if (nextWork || updateQueue.length > 0) {
+      rIC(workLoop);
+    }
+    if (pendingCommit) {
+      rAF(() => commitWork(pendingCommit));
+    }
+  }
+  function performWork (WIP) {
+    WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP);
+    if (WIP.child) return WIP.child
+    while (WIP) {
+      completeWork(WIP);
+      if (WIP.sibling) return WIP.sibling
+      WIP = WIP.parent;
+    }
+  }
+  function updateHost (WIP) {
+    if (!WIP.base) WIP.base = createElement(WIP);
+    let parent = WIP.parent || {};
+    WIP.insertPoint = parent.oldPoint;
+    parent.oldPoint = WIP;
+    const newChildren = WIP.props.children;
+    reconcileChildren(WIP, newChildren);
+  }
+  function updateHOOK (WIP) {
+    WIP.props = WIP.props || {};
+    WIP.state = WIP.state || {};
+    currentFiber = WIP;
+    resetCursor();
+    const newChildren = WIP.type(WIP.props);
+    reconcileChildren(WIP, newChildren);
+    currentFiber.patches = WIP.patches;
+  }
+  function fiberize (children, WIP) {
+    return (WIP.children = hashfy(children))
+  }
+  function reconcileChildren (WIP, newChildren) {
+    const oldFibers = WIP.children;
+    const newFibers = fiberize(newChildren, WIP);
+    let reused = {};
+    for (let k in oldFibers) {
+      let newFiber = newFibers[k];
+      let oldFiber = oldFibers[k];
+      if (newFiber && oldFiber.type === newFiber.type) {
+        reused[k] = oldFiber;
+        if (newFiber.key) {
+          oldFiber.key = newFiber.key;
+        }
+        continue
+      } else {
+        oldFiber.patchTag = DELETE;
+        WIP.patches.push(oldFiber);
+      }
+    }
+    let prevFiber = null;
+    let alternate = null;
+    for (let k in newFibers) {
+      let newFiber = newFibers[k];
+      let oldFiber = reused[k];
+      if (oldFiber) {
+        if (isSame(oldFiber, newFiber)) {
+          alternate = new Fiber(oldFiber, {
+            patchTag: UPDATE
+          });
+          newFiber.patchTag = UPDATE;
+          newFiber = merge(alternate, newFiber);
+          newFiber.alternate = alternate;
+          if (oldFiber.key) {
+            newFiber.patchTag = REPLACE;
+          }
+        }
+      } else {
+        newFiber = new Fiber(newFiber, {
+          patchTag: PLACE
+        });
+      }
+      newFibers[k] = newFiber;
+      newFiber.parent = WIP;
+      if (prevFiber) {
+        prevFiber.sibling = newFiber;
+      } else {
+        WIP.child = newFiber;
+      }
+      prevFiber = newFiber;
+    }
+    if (prevFiber) prevFiber.sibling = null;
+  }
+  function Fiber (vnode, data) {
+    this.patchTag = data.patchTag;
+    this.tag = data.tag || typeof vnode.type === 'function' ? HOOK : HOST;
+    vnode.props = vnode.props || { nodeValue: vnode.nodeValue };
+    extend(this, vnode);
+  }
+  function completeWork (fiber) {
+    if (fiber.parent) {
+      fiber.parent.patches = (fiber.parent.patches || []).concat(
+        fiber.patches || [],
+        fiber.patchTag ? [fiber] : []
+      );
+    } else {
+      pendingCommit = fiber;
+    }
+  }
+  function commitWork (WIP) {
+    WIP.patches.forEach(p => commit(p));
+    isRecycling = false;
+    currentFiber.effect && currentFiber.effect();
+    nextWork = pendingCommit = null;
+  }
+  function commit (fiber) {
+    let parentFiber = fiber.parent;
+    while (parentFiber.tag == HOOK) {
+      parentFiber = parentFiber.parent;
+    }
+    const parent = parentFiber.base;
+    let dom = fiber.base;
+    if (fiber.tag == HOOK) ; else if (fiber.patchTag == UPDATE) {
+      updateElement(dom, fiber.alternate.props, fiber.props);
+    } else if (fiber.patchTag == DELETE) {
+      parent.removeChild(dom);
+    } else {
+      let after = isRecycling
+        ? null
+        : fiber.insertPoint
+          ? fiber.patchTag == PLACE
+            ? fiber.insertPoint.base.nextSibling
+            : fiber.insertPoint.base.nextSibling || parent.firstChild
+          : null;
+      if (after == dom) return
+      parent.insertBefore(dom, after);
+    }
+    parentFiber.patches = fiber.patches = [];
+  }
+  function getCurrentFiber () {
+    return currentFiber || null
+  }
+
+  exports.createContext = createContext;
+  exports.h = h;
+  exports.render = render;
+  exports.useContext = useContext;
+  exports.useEffect = useEffect;
+  exports.useMemo = useMemo;
+  exports.useReducer = useReducer;
+  exports.useState = useState;
+
+  Object.defineProperty(exports, '__esModule', { value: true });
+
+}));
