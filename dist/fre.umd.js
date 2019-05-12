@@ -297,21 +297,21 @@
   }
   function commitWork (WIP) {
     WIP.patches.forEach(p => commit(p));
+    isRecycling = false;
     currentFiber.effect && currentFiber.effect();
     nextWork = pendingCommit = null;
   }
   function commit (fiber) {
-    if (fiber.tag !== HOST) return
     let parentFiber = fiber.parent;
     while (parentFiber.tag == HOOK) {
       parentFiber = parentFiber.parent;
     }
     const parent = parentFiber.base;
     let dom = fiber.base;
-    if (fiber.patchTag == UPDATE) {
+    if (fiber.tag == HOOK) ; else if (fiber.patchTag == UPDATE) {
       updateElement(dom, fiber.alternate.props, fiber.props);
     } else if (fiber.patchTag == DELETE) {
-      deleteElement(fiber, parent);
+      parent.removeChild(dom);
     } else {
       let after = isRecycling
         ? null
@@ -323,22 +323,7 @@
       if (after == dom) return
       parent.insertBefore(dom, after);
     }
-    if (dom != parent.lastChild) isRecycling = false;
     parentFiber.patches = fiber.patches = [];
-  }
-  function deleteElement (fiber, parent) {
-    let node = fiber;
-    while (true) {
-      if (node.tag == HOOK) {
-        node = node.child;
-        continue
-      }
-      parent.removeChild(node.base);
-      node.patches = [];
-      while (node != fiber && !node.sibling) node = node.parent;
-      if (node == fiber) return
-      node = node.sibling;
-    }
   }
   function getCurrentFiber () {
     return currentFiber || null
