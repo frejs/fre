@@ -103,7 +103,7 @@ function reconcileChildren (WIP, newChildren) {
 
     if (oldFiber) {
       if (isSame(oldFiber, newFiber)) {
-        alternate = new Fiber(oldFiber, {
+        alternate = createFiber(oldFiber, {
           patchTag: UPDATE
         })
 
@@ -115,7 +115,7 @@ function reconcileChildren (WIP, newChildren) {
         }
       }
     } else {
-      newFiber = new Fiber(newFiber, {
+      newFiber = createFiber(newFiber, {
         patchTag: PLACE
       })
     }
@@ -133,11 +133,10 @@ function reconcileChildren (WIP, newChildren) {
   if (prevFiber) prevFiber.sibling = null
 }
 
-function Fiber (vnode, data) {
-  this.patchTag = data.patchTag
-  this.tag = data.tag || typeof vnode.type === 'function' ? HOOK : HOST
+function createFiber (vnode, data) {
+  data.tag = typeof vnode.type === 'function' ? HOOK : HOST
   vnode.props = vnode.props || { nodeValue: vnode.nodeValue }
-  merge(vnode, this)
+  return merge(vnode, data)
 }
 
 function completeWork (fiber) {
