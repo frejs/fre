@@ -31,10 +31,7 @@ export const rIC =
   requestIdleCallback ||
   ((cb, start = Date.now()) =>
     setTimeout(() => {
-      cb({
-        didTimeout: false,
-        timeRemaining: () => Math.max(0, 50 - (Date.now() - start))
-      })
+      cb({ timeRemaining: () => Math.max(0, 50 - (Date.now() - start)) })
     }, 1))
 
 export const rAF = requestAnimationFrame || setTimeout
