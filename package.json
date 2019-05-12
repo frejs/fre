@@ -1,6 +1,6 @@
 {
   "name": "fre",
-  "version": "1.3.4",
+  "version": "1.3.5",
   "description": "",
   "source": "src/index.js",
   "main": "dist/fre.js",

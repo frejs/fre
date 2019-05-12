@@ -99,7 +99,11 @@ render(<Counter />, document.getElementById('root'))
 
 `useEffect` takes two parameters, the first is a effect callback and the second is an array, usually props
 
-When the array changes, the effect callback will run after commitWork
+When the array changes, the effect callback will run after commitWork, such as `pureComponentDidUpdate`
+
+if the array is empty, it means use once, such as `componentDidMount`
+
+if the second is undefined, it means use every time , such as `componentDidUpdate`
 
 ```js
 function Counter({ flag }) {
