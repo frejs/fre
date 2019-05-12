@@ -4,7 +4,7 @@ export const isNew = (o, n) => k => o[k] !== n[k]
 
 export const isSame = (a, b) => a.type == b.type && a.key == b.key
 
-export const hashfy = arr => {
+export function hashfy (arr) {
   let out = {}
   let i = 0
   arrayfy(arr).forEach(item => {
@@ -14,7 +14,7 @@ export const hashfy = arr => {
   return out
 }
 
-export const merge = (a, b) => {
+export function merge (a, b) {
   let out = {}
 
   for (var i in a) out[i] = a[i]
