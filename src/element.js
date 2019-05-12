@@ -38,12 +38,3 @@ export function createElement (fiber) {
   updateElement(element, [], fiber.props)
   return element
 }
-
-// export function deleteElement (fiber, parent) {
-    
-//     parent.removeChild(node.base)
-//     // while (node != fiber && !node.sibling) node = node.parent
-//     // if (node == fiber) return
-//     // node = node.sibling
-//   }
-// }

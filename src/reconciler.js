@@ -1,4 +1,4 @@
-import { createElement, updateElement, deleteElement } from './element'
+import { createElement, updateElement } from './element'
 import { resetCursor } from './hooks'
 import { rAF, rIC, hashfy, isSame, extend, merge } from './util'
 
@@ -166,7 +166,7 @@ function commit (fiber) {
   }
   const parent = parentFiber.base
   let dom = fiber.base
-  if (fiber.patchTag == HOOK || fiber.tag === ROOT) {
+  if (fiber.tag == HOOK || fiber.tag === ROOT) {
   } else if (fiber.patchTag == UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props)
   } else if (fiber.patchTag == DELETE) {
@@ -182,7 +182,7 @@ function commit (fiber) {
     if (after == dom) return
     parent.insertBefore(dom, after)
   }
-  parentFiber.patches = fiber.patches = fiber.parent.patches = []
+  parentFiber.patches = fiber.patches = []
 }
 
 export function getCurrentFiber () {

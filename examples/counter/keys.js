@@ -73,7 +73,7 @@ import { h, render, useState, useEffect } from '../../src'
 // }
 
 // function App () {
-//   const [arr, setArr] = useState(['A','B','C','D'])
+//   const [arr, setArr] = useState(['A', 'B'])
 //   return (
 //     <div>
 //       <ul>
@@ -81,23 +81,9 @@ import { h, render, useState, useEffect } from '../../src'
 //           <li key={item}>{item}</li>
 //         ))}
 //       </ul>
-//       <button onClick={() => setArr(['C','D','A','B'])}>+</button>
+//       <button onClick={() => setArr(['B'])}>+</button>
 //     </div>
 //   )
 // }
-
-function App () {
-  const [arr, setArr] = useState(['A', 'B'])
-  return (
-    <div>
-      <ul>
-        {arr.map(item => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
-      <button onClick={() => setArr(['B'])}>+</button>
-    </div>
-  )
-}
 
 render(<App />, document.getElementById('root'))
