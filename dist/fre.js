@@ -8,9 +8,8 @@
   (global = global || self, factory(global.fre = {}));
 }(this, function (exports) { 'use strict';
 
-  const arrayfy = array =>
-    !array ? [] : Array.isArray(array) ? array : [array];
-  const isNew = (prev, next) => key => prev[key] !== next[key];
+  const arrayfy = arr => (!arr ? [] : Array.isArray(arr) ? arr : [arr]);
+  const isNew = (o, n) => k => o[k] !== n[k];
   const isSame = (a, b) => a.type == b.type && a.key == b.key;
   const hashfy = arr => {
     let out = {};
@@ -50,7 +49,9 @@
       let node = rest.pop();
       if (node && node.pop) {
         for (length = node.length; length--;) rest.push(node[length]);
-      } else if (node === null || node === true || node === false) ; else {
+      } else if (node === null || node === true || node === false) ; else if (typeof node === 'function') {
+        children = node;
+      } else {
         children.push(
           typeof node !== 'object'
             ? { type: 'text', props: { nodeValue: node } }
@@ -102,8 +103,6 @@
   }
 
   let cursor = 0;
-  let oldInputs = [];
-  let mounted = false;
   function update (key, reducer, value) {
     const current = this ? this : getCurrentFiber();
     value = reducer ? reducer(current.state[key], value) : value;
@@ -133,23 +132,23 @@
       return [initState, setter]
     }
   }
-  function useEffect (effect, inputs) {
+  function useEffect (cb, inputs) {
     let current = getCurrentFiber();
-    if (current) current.effect = useMemo(effect, inputs);
+    if (current) current.effect = useMemo(cb, inputs);
   }
-  function useMemo (create, inputs) {
+  function useMemo (cb, inputs) {
     return function () {
       let current = getCurrentFiber();
       if (current) {
         let hasChaged = inputs
-          ? oldInputs.some((value, i) => inputs[i] !== value)
+          ? (current.oldInputs || []).some((v, i) => inputs[i] !== v)
           : true;
-        if (inputs && inputs.length === 0 && !mounted) {
+        if (inputs && !inputs.length && !current.isMounted) {
           hasChaged = true;
-          mounted = true;
+          current.isMounted = true;
         }
-        if (hasChaged) create();
-        oldInputs = inputs;
+        if (hasChaged) cb();
+        current.oldInputs = inputs;
       }
     }
   }
@@ -223,7 +222,6 @@
     }
     WIP.props = WIP.props || {};
     WIP.state = WIP.state || {};
-    WIP.effects = WIP.effects || {};
     currentFiber = WIP;
     resetCursor();
     const newChildren = WIP.type(WIP.props);
@@ -237,11 +235,11 @@
     const oldFibers = WIP.children;
     const newFibers = fiberize(newChildren, WIP);
     let reused = {};
-    for (let key in oldFibers) {
-      let newFiber = newFibers[key];
-      let oldFiber = oldFibers[key];
+    for (let k in oldFibers) {
+      let newFiber = newFibers[k];
+      let oldFiber = oldFibers[k];
       if (newFiber && oldFiber.type === newFiber.type) {
-        reused[key] = oldFiber;
+        reused[k] = oldFiber;
         if (newFiber.key) {
           oldFiber.key = newFiber.key;
         }
@@ -253,9 +251,9 @@
     }
     let prevFiber = null;
     let alternate = null;
-    for (let key in newFibers) {
-      let newFiber = newFibers[key];
-      let oldFiber = reused[key];
+    for (let k in newFibers) {
+      let newFiber = newFibers[k];
+      let oldFiber = reused[k];
       if (oldFiber) {
         if (isSame(oldFiber, newFiber)) {
           alternate = new Fiber(oldFiber, {
@@ -273,7 +271,7 @@
           patchTag: PLACE
         });
       }
-      newFibers[key] = newFiber;
+      newFibers[k] = newFiber;
       newFiber.parent = WIP;
       if (prevFiber) {
         prevFiber.sibling = newFiber;
