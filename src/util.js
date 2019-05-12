@@ -29,9 +29,9 @@ export const merge = (a, b) => {
 
 export const rIC =
   requestIdleCallback ||
-  ((cb, start = Date.now()) =>
+  ((cb, ed = Date.now()) =>
     setTimeout(() => {
-      cb({ timeRemaining: () => Math.max(0, 50 - (Date.now() - start)) })
+      cb({ timeRemaining: () => Math.max(0, 50 - (Date.now() - ed)) })
     }, 1))
 
 export const rAF = requestAnimationFrame || setTimeout
