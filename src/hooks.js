@@ -49,7 +49,6 @@ export function useMemo (create, inputs) {
         hasChaged = true
         mounted = true
       }
-
       if (hasChaged) create()
       oldInputs = inputs
     }

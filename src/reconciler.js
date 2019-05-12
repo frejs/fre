@@ -8,7 +8,7 @@ let updateQueue = []
 let nextWork = null
 let pendingCommit = null
 let currentFiber = null
-export let isRecycling = true
+let isRecycling = true
 
 export function render (vdom, container) {
   let rootFiber = {
