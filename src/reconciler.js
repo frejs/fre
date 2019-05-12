@@ -159,7 +159,7 @@ function commitWork (WIP) {
 }
 
 function commit (fiber) {
-  if (fiber.tag == ROOT || fiber.tag == HOOK) return
+  if (fiber.tag !== HOST) return
   let parentFiber = fiber.parent
   while (parentFiber.tag == HOOK) {
     parentFiber = parentFiber.parent
@@ -168,7 +168,7 @@ function commit (fiber) {
   let dom = fiber.base
 
   if (fiber.patchTag == UPDATE) {
-    updateElement(fiber.base, fiber.alternate.props, fiber.props)
+    updateElement(dom, fiber.alternate.props, fiber.props)
   } else if (fiber.patchTag == DELETE) {
     deleteElement(fiber, parent)
   } else {
