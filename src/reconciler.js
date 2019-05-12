@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './element'
 import { resetCursor } from './hooks'
-import { rAF, rIC, hashfy, isSame, extend, merge } from './util'
+import { rAF, rIC, hashfy, isSame, merge } from './util'
 
 const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
 
@@ -138,7 +138,7 @@ function Fiber (vnode, data) {
   this.patchTag = data.patchTag
   this.tag = data.tag || typeof vnode.type === 'function' ? HOOK : HOST
   vnode.props = vnode.props || { nodeValue: vnode.nodeValue }
-  extend(this, vnode)
+  return merge(vnode, this)
 }
 
 function completeWork (fiber) {

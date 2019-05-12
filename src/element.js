@@ -3,10 +3,10 @@ import { isNew } from './util'
 function updateProperty (element, name, value, newValue) {
   if (name === 'children' || name === 'key') {
   } else if (name === 'style') {
-    Object.keys(newValue).forEach(key => {
+    for (key in newValue) {
       let style = !newValue || !newValue[key] ? '' : newValue[key]
       element[name][key] = style
-    })
+    }
   } else if (name[0] === 'o' && name[1] === 'n') {
     name = name.slice(2).toLowerCase()
     if (value) {
