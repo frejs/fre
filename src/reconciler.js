@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './element'
 import { resetCursor } from './hooks'
-import { raf, ric, hashfy, isSame, extend, megre } from './util'
+import { rAF, rIC, hashfy, isSame, extend, megre } from './util'
 
 const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
 
@@ -17,12 +17,12 @@ export function render (vdom, container) {
     props: { children: vdom }
   }
   updateQueue.push(rootFiber)
-  ric(workLoop)
+  rIC(workLoop)
 }
 
 export function scheduleWork (fiber) {
   updateQueue.push(fiber)
-  ric(workLoop)
+  rIC(workLoop)
 }
 
 function workLoop (deadline) {
@@ -35,8 +35,8 @@ function workLoop (deadline) {
     nextWork = performWork(nextWork)
   }
 
-  if (nextWork || updateQueue.length > 0) ric(workLoop)
-  if (pendingCommit) raf(() => commitWork(pendingCommit))
+  if (nextWork || updateQueue.length > 0) rIC(workLoop)
+  if (pendingCommit) rAF(() => commitWork(pendingCommit))
 }
 
 function performWork (WIP) {

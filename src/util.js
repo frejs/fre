@@ -28,7 +28,7 @@ export const megre = (a, b) => {
   return out
 }
 
-export const ric =
+export const rIC =
   requestIdleCallback ||
   ((cb, start = Date.now()) =>
     setTimeout(() => {
@@ -38,4 +38,4 @@ export const ric =
       })
     }, 1))
 
-export const raf = requestAnimationFrame || setTimeout
+export const rAF = requestAnimationFrame || setTimeout
