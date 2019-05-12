@@ -2,21 +2,21 @@
   "name": "fre",
   "version": "1.3.5",
   "description": "",
-  "source": "src/index.js",
   "main": "dist/fre.js",
-  "module": "dist/fre.mjs",
-  "unpkg": "dist/foo.umd.js",
+  "unpkg": "dist/fre.umd.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rollup -c"
+    "build:umd": "cross-env NODE_ENV=umd rollup -c ",
+    "build:cjs": "cross-env NODE_ENV=cjs rollup -c ",
+    "build": "yarn build:cjs&&yarn build:umd"
   },
   "keywords": [],
   "author": "132yse",
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
+    "cross-env": "^5.2.0",
     "jest": "^24.7.1",
-    "microbundle": "^0.11.0",
     "rollup": "^1.10.1",
     "rollup-plugin-cleanup": "^3.1.1",
     "rollup-plugin-license": "^0.8.1"
