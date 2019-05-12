@@ -80,11 +80,11 @@ function reconcileChildren (WIP, newChildren) {
   const newFibers = fiberize(newChildren, WIP)
   let reused = {}
 
-  for (let key in oldFibers) {
-    let newFiber = newFibers[key]
-    let oldFiber = oldFibers[key]
+  for (let k in oldFibers) {
+    let newFiber = newFibers[k]
+    let oldFiber = oldFibers[k]
     if (newFiber && oldFiber.type === newFiber.type) {
-      reused[key] = oldFiber
+      reused[k] = oldFiber
       if (newFiber.key) {
         oldFiber.key = newFiber.key
       }
@@ -98,9 +98,9 @@ function reconcileChildren (WIP, newChildren) {
   let prevFiber = null
   let alternate = null
 
-  for (let key in newFibers) {
-    let newFiber = newFibers[key]
-    let oldFiber = reused[key]
+  for (let k in newFibers) {
+    let newFiber = newFibers[k]
+    let oldFiber = reused[k]
 
     if (oldFiber) {
       if (isSame(oldFiber, newFiber)) {
@@ -120,7 +120,7 @@ function reconcileChildren (WIP, newChildren) {
         patchTag: PLACE
       })
     }
-    newFibers[key] = newFiber
+    newFibers[k] = newFiber
     newFiber.parent = WIP
 
     if (prevFiber) {

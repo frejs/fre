@@ -1,7 +1,6 @@
-export const arrayfy = array =>
-  !array ? [] : Array.isArray(array) ? array : [array]
+export const arrayfy = arr => (!arr ? [] : Array.isArray(arr) ? arr : [arr])
 
-export const isNew = (prev, next) => key => prev[key] !== next[key]
+export const isNew = (o, n) => k => o[k] !== n[k]
 
 export const isSame = (a, b) => a.type == b.type && a.key == b.key
 
