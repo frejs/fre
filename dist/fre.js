@@ -9,7 +9,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 const arrayfy = arr => (!arr ? [] : Array.isArray(arr) ? arr : [arr]);
 const isNew = (o, n) => k => o[k] !== n[k];
 const isSame = (a, b) => a.type == b.type && a.key == b.key;
-const hashfy = arr => {
+function hashfy (arr) {
   let out = {};
   let i = 0;
   arrayfy(arr).forEach(item => {
@@ -17,16 +17,13 @@ const hashfy = arr => {
     key ? (out['.' + key] = item) : (out['.' + i] = item) && i++;
   });
   return out
-};
-const extend = (a, b) => {
-  for (var i in b) a[i] = b[i];
-};
-const merge = (a, b) => {
+}
+function merge (a, b) {
   let out = {};
   for (var i in a) out[i] = a[i];
   for (var i in b) out[i] = b[i];
   return out
-};
+}
 const rIC =
   requestIdleCallback ||
   function (cb, ed = Date.now()) {
@@ -209,34 +206,30 @@ function updateHost (WIP) {
   let parent = WIP.parent || {};
   WIP.insertPoint = parent.oldPoint;
   parent.oldPoint = WIP;
-  const newChildren = WIP.props.children;
-  reconcileChildren(WIP, newChildren);
+  const children = WIP.props.children;
+  reconcileChildren(WIP, children);
 }
 function updateHOOK (WIP) {
   WIP.props = WIP.props || {};
   WIP.state = WIP.state || {};
   currentFiber = WIP;
   resetCursor();
-  const newChildren = WIP.type(WIP.props);
-  reconcileChildren(WIP, newChildren);
+  const children = WIP.type(WIP.props);
+  reconcileChildren(WIP, children);
   currentFiber.patches = WIP.patches;
 }
 function fiberize (children, WIP) {
   return (WIP.children = hashfy(children))
 }
-function reconcileChildren (WIP, newChildren) {
+function reconcileChildren (WIP, children) {
   const oldFibers = WIP.children;
-  const newFibers = fiberize(newChildren, WIP);
+  const newFibers = fiberize(children, WIP);
   let reused = {};
   for (let k in oldFibers) {
     let newFiber = newFibers[k];
     let oldFiber = oldFibers[k];
     if (newFiber && oldFiber.type === newFiber.type) {
       reused[k] = oldFiber;
-      if (newFiber.key) {
-        oldFiber.key = newFiber.key;
-      }
-      continue
     } else {
       oldFiber.patchTag = DELETE;
       WIP.patches.push(oldFiber);
@@ -249,7 +242,7 @@ function reconcileChildren (WIP, newChildren) {
     let oldFiber = reused[k];
     if (oldFiber) {
       if (isSame(oldFiber, newFiber)) {
-        alternate = new Fiber(oldFiber, {
+        alternate = createFiber(oldFiber, {
           patchTag: UPDATE
         });
         newFiber.patchTag = UPDATE;
@@ -260,7 +253,7 @@ function reconcileChildren (WIP, newChildren) {
         }
       }
     } else {
-      newFiber = new Fiber(newFiber, {
+      newFiber = createFiber(newFiber, {
         patchTag: PLACE
       });
     }
@@ -275,11 +268,10 @@ function reconcileChildren (WIP, newChildren) {
   }
   if (prevFiber) prevFiber.sibling = null;
 }
-function Fiber (vnode, data) {
-  this.patchTag = data.patchTag;
-  this.tag = data.tag || typeof vnode.type === 'function' ? HOOK : HOST;
+function createFiber (vnode, data) {
+  data.tag = typeof vnode.type === 'function' ? HOOK : HOST;
   vnode.props = vnode.props || { nodeValue: vnode.nodeValue };
-  extend(this, vnode);
+  return merge(vnode, data)
 }
 function completeWork (fiber) {
   if (fiber.parent) {
@@ -303,17 +295,17 @@ function commit (fiber) {
   }
   const parent = parentFiber.base;
   let dom = fiber.base;
-  if (fiber.tag == HOOK || fiber.tag === ROOT) ; else if (fiber.patchTag == UPDATE) {
+  if (fiber.tag == HOOK) ; else if (fiber.patchTag == UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props);
   } else if (fiber.patchTag == DELETE) {
     parent.removeChild(dom);
   } else {
     const { insertPoint, patchTag } = fiber;
     let after = insertPoint
-        ? patchTag == PLACE
-          ? insertPoint.base.nextSibling
-          : insertPoint.base.nextSibling || parent.firstChild
-        : null;
+      ? patchTag == PLACE
+        ? insertPoint.base.nextSibling
+        : insertPoint.base.nextSibling || parent.firstChild
+      : null;
     if (after == dom) return
     parent.insertBefore(dom, after);
   }

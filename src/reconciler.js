@@ -84,10 +84,10 @@ function reconcileChildren (WIP, children) {
     let oldFiber = oldFibers[k]
     if (newFiber && oldFiber.type === newFiber.type) {
       reused[k] = oldFiber
-      if (newFiber.key) {
-        oldFiber.key = newFiber.key
-      }
-      continue
+      // if (newFiber.key) {
+      //   oldFiber.key = newFiber.key
+      // }
+      // continue
     } else {
       oldFiber.patchTag = DELETE
       WIP.patches.push(oldFiber)
@@ -127,7 +127,6 @@ function reconcileChildren (WIP, children) {
     } else {
       WIP.child = newFiber
     }
-
     prevFiber = newFiber
   }
   if (prevFiber) prevFiber.sibling = null
