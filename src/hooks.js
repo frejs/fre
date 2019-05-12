@@ -1,7 +1,7 @@
 import { scheduleWork, getCurrentFiber } from './reconciler'
 let cursor = 0
 let oldInputs = []
-let mounted = false
+let isMounted
 
 function update (key, reducer, value) {
   const current = this ? this : getCurrentFiber()
@@ -32,24 +32,24 @@ export function useReducer (reducer, initState) {
     return [initState, setter]
   }
 }
-export function useEffect (effect, inputs) {
+export function useEffect (cb, inputs) {
   let current = getCurrentFiber()
-  if (current) current.effect = useMemo(effect, inputs)
+  if (current) current.effect = useMemo(cb, inputs)
 }
 
-export function useMemo (create, inputs) {
+export function useMemo (cb, inputs) {
   return function () {
     let current = getCurrentFiber()
     if (current) {
       let hasChaged = inputs
-        ? oldInputs.some((value, i) => inputs[i] !== value)
+        ? oldInputs.some((v, i) => inputs[i] !== v)
         : true
-      if (inputs && !inputs.length && !mounted) {
+      if (inputs && !inputs.length && !isMounted) {
         // 空数组只执行一次
         hasChaged = true
-        mounted = true
+        isMounted = true
       }
-      if (hasChaged) create()
+      if (hasChaged) cb()
       oldInputs = inputs
     }
   }
