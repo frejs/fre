@@ -20,6 +20,9 @@
     });
     return out
   };
+  const extend = (a, b) => {
+    for (var i in b) a[i] = b[i];
+  };
   const merge = (a, b) => {
     let out = {};
     for (var i in a) out[i] = a[i];
@@ -165,7 +168,6 @@
   let nextWork = null;
   let pendingCommit = null;
   let currentFiber = null;
-  let isRecycling = true;
   function render (vdom, container) {
     let rootFiber = {
       tag: ROOT,
@@ -279,7 +281,7 @@
     this.patchTag = data.patchTag;
     this.tag = data.tag || typeof vnode.type === 'function' ? HOOK : HOST;
     vnode.props = vnode.props || { nodeValue: vnode.nodeValue };
-    return merge(vnode, this)
+    extend(this, vnode);
   }
   function completeWork (fiber) {
     if (fiber.parent) {
@@ -293,7 +295,6 @@
   }
   function commitWork (WIP) {
     WIP.patches.forEach(p => commit(p));
-    isRecycling = false;
     currentFiber.effect && currentFiber.effect();
     nextWork = pendingCommit = null;
   }
@@ -304,17 +305,16 @@
     }
     const parent = parentFiber.base;
     let dom = fiber.base;
-    if (fiber.tag == HOOK) ; else if (fiber.patchTag == UPDATE) {
+    if (fiber.tag == HOOK || fiber.tag === ROOT) ; else if (fiber.patchTag == UPDATE) {
       updateElement(dom, fiber.alternate.props, fiber.props);
     } else if (fiber.patchTag == DELETE) {
       parent.removeChild(dom);
     } else {
-      let after = isRecycling
-        ? null
-        : fiber.insertPoint
-          ? fiber.patchTag == PLACE
-            ? fiber.insertPoint.base.nextSibling
-            : fiber.insertPoint.base.nextSibling || parent.firstChild
+      const { insertPoint, patchTag } = fiber;
+      let after = insertPoint
+          ? patchTag == PLACE
+            ? insertPoint.base.nextSibling
+            : insertPoint.base.nextSibling || parent.firstChild
           : null;
       if (after == dom) return
       parent.insertBefore(dom, after);
