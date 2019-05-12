@@ -10,6 +10,8 @@ export function h (type, props) {
     if (node && node.pop) {
       for (length = node.length; length--;) rest.push(node[length])
     } else if (node === null || node === true || node === false) {
+    } else if (typeof node === 'function') {
+      children = node
     } else {
       children.push(
         typeof node !== 'object'
