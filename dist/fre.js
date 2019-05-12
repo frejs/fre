@@ -327,12 +327,7 @@ function commit (fiber) {
 function deleteElement (fiber, parent) {
   let node = fiber;
   while (true) {
-    if (node.tag == HOOK) {
-      node = node.child;
-      continue
-    }
     parent.removeChild(node.base);
-    node.patches = [];
     while (node != fiber && !node.sibling) node = node.parent;
     if (node == fiber) return
     node = node.sibling;
