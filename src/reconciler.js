@@ -57,8 +57,8 @@ function updateHost (WIP) {
   let parent = WIP.parent || {}
   WIP.insertPoint = parent.oldPoint
   parent.oldPoint = WIP
-  const newChildren = WIP.props.children
-  reconcileChildren(WIP, newChildren)
+  const children = WIP.props.children
+  reconcileChildren(WIP, children)
 }
 
 function updateHOOK (WIP) {
@@ -66,17 +66,17 @@ function updateHOOK (WIP) {
   WIP.state = WIP.state || {}
   currentFiber = WIP
   resetCursor()
-  const newChildren = WIP.type(WIP.props)
-  reconcileChildren(WIP, newChildren)
+  const children = WIP.type(WIP.props)
+  reconcileChildren(WIP, children)
   currentFiber.patches = WIP.patches
 }
 function fiberize (children, WIP) {
   return (WIP.children = hashfy(children))
 }
 
-function reconcileChildren (WIP, newChildren) {
+function reconcileChildren (WIP, children) {
   const oldFibers = WIP.children
-  const newFibers = fiberize(newChildren, WIP)
+  const newFibers = fiberize(children, WIP)
   let reused = {}
 
   for (let k in oldFibers) {
@@ -163,7 +163,7 @@ function commit (fiber) {
   }
   const parent = parentFiber.base
   let dom = fiber.base
-  if (fiber.tag == HOOK || fiber.tag === ROOT) {
+  if (fiber.tag == HOOK) {
   } else if (fiber.patchTag == UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props)
   } else if (fiber.patchTag == DELETE) {
