@@ -1,4 +1,6 @@
 import { h, render } from '../../src'
+// const HelloBox = () => <Box render={value => <h1>{value}</h1>} />
+
 const HelloBox = () => (
   <Box>
     {value => {
@@ -8,9 +10,7 @@ const HelloBox = () => (
 )
 
 const Box = props => {
-  console.log(props)
-  return <div>{props.children('hello world!')}</div>
+  return <div>{props.render('hello world!')}</div>
 }
-
 
 render(<HelloBox />, document.getElementById('root'))

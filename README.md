@@ -229,8 +229,14 @@ const HelloBox = () => (
 const Box = props => <div>{props.children}</div>
 ```
 
-Hooks do not support HOC and extends, but render props/children are supported by default
+Hooks do not support HOC and extends, but render props are supported by default
 
+```js
+const HelloBox = () => <Box render={value => <h1>{value}</h1>} />
+
+const Box = props => <div>{props.render('hello world!')}</div>
+```
+Also can be render children
 ```js
 const HelloBox = () => (
   <Box>
