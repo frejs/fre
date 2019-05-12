@@ -1,4 +1,3 @@
-<p align="right"><strong>只可亵玩♂ 不可生产</strong></p>
 <p align="center"><img src="http://wx2.sinaimg.cn/mw690/0060lm7Tly1ftpm5b3ihfj3096097aaj.jpg" alt="fre logo" width="180"></p>
 <h1 align="center">Fre</h1>
 <p align="center">:ghost: Fast 1kB React like library with the same hooks API</p>
@@ -47,7 +46,7 @@ react hooks API is a miracle, and fre will make it become a leading role
 
 #### useState
 
-`useState` is a base API, It will receive initial state adn return a Array
+`useState` is a base API, It will receive initial state and return a Array
 
 You can use it many times, new state is available when component is rerender
 
