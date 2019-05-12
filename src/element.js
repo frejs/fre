@@ -39,12 +39,11 @@ export function createElement (fiber) {
   return element
 }
 
-export function deleteElement (fiber, parent) {
-  let node = fiber
-  while (true) {
-    parent.removeChild(node.base)
-    while (node != fiber && !node.sibling) node = node.parent
-    if (node == fiber) return
-    node = node.sibling
-  }
-}
+// export function deleteElement (fiber, parent) {
+    
+//     parent.removeChild(node.base)
+//     // while (node != fiber && !node.sibling) node = node.parent
+//     // if (node == fiber) return
+//     // node = node.sibling
+//   }
+// }

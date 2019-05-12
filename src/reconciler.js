@@ -154,23 +154,23 @@ function completeWork (fiber) {
 
 function commitWork (WIP) {
   WIP.patches.forEach(p => commit(p))
+  isRecycling = false
   currentFiber.effect && currentFiber.effect()
   nextWork = pendingCommit = null
 }
 
 function commit (fiber) {
-  if (fiber.tag !== HOST) return
   let parentFiber = fiber.parent
   while (parentFiber.tag == HOOK) {
     parentFiber = parentFiber.parent
   }
   const parent = parentFiber.base
   let dom = fiber.base
-
-  if (fiber.patchTag == UPDATE) {
+  if (fiber.patchTag == HOOK || fiber.tag === ROOT) {
+  } else if (fiber.patchTag == UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props)
   } else if (fiber.patchTag == DELETE) {
-    deleteElement(fiber, parent)
+    parent.removeChild(dom)
   } else {
     let after = isRecycling
       ? null
@@ -182,8 +182,7 @@ function commit (fiber) {
     if (after == dom) return
     parent.insertBefore(dom, after)
   }
-  if (dom != parent.lastChild) isRecycling = false
-  parentFiber.patches = fiber.patches = []
+  parentFiber.patches = fiber.patches = fiber.parent.patches = []
 }
 
 export function getCurrentFiber () {
