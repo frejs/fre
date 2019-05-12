@@ -44,7 +44,7 @@ export function useMemo (create, inputs) {
       let hasChaged = inputs
         ? oldInputs.some((value, i) => inputs[i] !== value)
         : true
-      if (inputs && inputs.length === 0 && !mounted) {
+      if (inputs && !inputs.length && !mounted) {
         // 空数组只执行一次
         hasChaged = true
         mounted = true
