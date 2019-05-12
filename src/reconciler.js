@@ -63,9 +63,6 @@ function updateHost (WIP) {
 }
 
 function updateHOOK (WIP) {
-  if (WIP.base == null) {
-    WIP.base = new WIP.type(WIP.props)
-  }
   WIP.props = WIP.props || {}
   WIP.state = WIP.state || {}
   currentFiber = WIP
@@ -162,7 +159,7 @@ function commitWork (WIP) {
 }
 
 function commit (fiber) {
-  if (fiber.tag == ROOT) return
+  if (fiber.tag == ROOT || fiber.tag == HOOK) return
   let parentFiber = fiber.parent
   while (parentFiber.tag == HOOK) {
     parentFiber = parentFiber.parent
@@ -170,8 +167,7 @@ function commit (fiber) {
   const parent = parentFiber.base
   let dom = fiber.base
 
-  if (fiber.tag == HOOK) {
-  } else if (fiber.patchTag == UPDATE) {
+  if (fiber.patchTag == UPDATE) {
     updateElement(fiber.base, fiber.alternate.props, fiber.props)
   } else if (fiber.patchTag == DELETE) {
     deleteElement(fiber, parent)
