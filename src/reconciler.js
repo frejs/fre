@@ -65,7 +65,6 @@ function updateHOOK (WIP) {
   }
   WIP.props = WIP.props || {}
   WIP.state = WIP.state || {}
-  WIP.effects = WIP.effects || {}
   currentFiber = WIP
   resetCursor()
   const newChildren = WIP.type(WIP.props)
