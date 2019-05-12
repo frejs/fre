@@ -19,7 +19,7 @@ export const extend = (a, b) => {
   for (var i in b) a[i] = b[i]
 }
 
-export const megre = (a, b) => {
+export const merge = (a, b) => {
   let out = {}
 
   for (var i in a) out[i] = a[i]

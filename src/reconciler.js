@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './element'
 import { resetCursor } from './hooks'
-import { rAF, rIC, hashfy, isSame, extend, megre } from './util'
+import { rAF, rIC, hashfy, isSame, extend, merge } from './util'
 
 const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
 
@@ -110,7 +110,7 @@ function reconcileChildren (WIP, newChildren) {
         })
 
         newFiber.patchTag = UPDATE
-        newFiber = megre(alternate, newFiber)
+        newFiber = merge(alternate, newFiber)
         newFiber.alternate = alternate
         if (oldFiber.key) {
           newFiber.patchTag = REPLACE
