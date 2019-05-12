@@ -35,8 +35,12 @@ function workLoop (deadline) {
     nextWork = performWork(nextWork)
   }
 
-  if (nextWork || updateQueue.length > 0) rIC(workLoop)
-  if (pendingCommit) rAF(() => commitWork(pendingCommit))
+  if (nextWork || updateQueue.length > 0) {
+    rIC(workLoop)
+  }
+  if (pendingCommit) {
+    rAF(() => commitWork(pendingCommit))
+  }
 }
 
 function performWork (WIP) {
@@ -59,9 +63,8 @@ function updateHost (WIP) {
 }
 
 function updateHOOK (WIP) {
-  let instance = WIP.base
-  if (instance == null) {
-    instance = WIP.base = createInstance(WIP)
+  if (WIP.base == null) {
+    WIP.base = new WIP.type(WIP.props)
   }
   WIP.props = WIP.props || {}
   WIP.state = WIP.state || {}
@@ -132,12 +135,6 @@ function reconcileChildren (WIP, newChildren) {
     prevFiber = newFiber
   }
   if (prevFiber) prevFiber.sibling = null
-}
-
-function createInstance (fiber) {
-  const instance = new fiber.type(fiber.props)
-  instance.fiber = fiber
-  return instance
 }
 
 function Fiber (vnode, data) {

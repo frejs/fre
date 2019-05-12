@@ -36,7 +36,7 @@ export function useEffect (cb, inputs) {
 }
 
 export function useMemo (cb, inputs) {
-  return function () {
+  return () => {
     let current = getCurrentFiber()
     if (current) {
       let hasChaged = inputs
