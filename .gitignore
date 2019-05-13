@@ -4,6 +4,6 @@
 yarn-error.log
 .ignore/
 packages/.fre/
-examples/**/node_modules/
-examples/**/.cache/
-examples/**/dist/
+demo/**/node_modules/
+demo/**/.cache/
+demo/**/dist/
