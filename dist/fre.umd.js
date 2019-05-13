@@ -190,9 +190,11 @@
     if (nextWork || updateQueue.length > 0) {
       rIC(workLoop);
     }
-    if (pendingCommit) {
-      rAF(() => commitWork(pendingCommit));
-    }
+    rAF(() => {
+      if (pendingCommit) {
+        commitWork(pendingCommit);
+      }
+    });
   }
   function performWork (WIP) {
     WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP);
@@ -297,7 +299,12 @@
     }
     const parent = parentFiber.base;
     let dom = fiber.base;
-    if (fiber.tag == HOOK) ; else if (fiber.patchTag == UPDATE) {
+    if (fiber.tag == HOOK) {
+      if (fiber.patchTag == DELETE) {
+        dom = fiber.child.base;
+        parent.removeChild(dom);
+      }
+    } else if (fiber.patchTag == UPDATE) {
       updateElement(dom, fiber.alternate.props, fiber.props);
     } else if (fiber.patchTag == DELETE) {
       parent.removeChild(dom);
