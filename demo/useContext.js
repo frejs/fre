@@ -1,4 +1,4 @@
-import { createContext, useContext, render, h } from '../../src'
+import { createContext, useContext, render, h } from '../src'
 
 const ctx = createContext(0)
 

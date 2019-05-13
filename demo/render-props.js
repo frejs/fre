@@ -1,4 +1,4 @@
-import { h, render } from '../../src'
+import { h, render } from '../src'
 // const HelloBox = () => <Box render={value => <h1>{value}</h1>} />
 
 const HelloBox = () => (

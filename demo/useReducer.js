@@ -1,4 +1,4 @@
-import { h, render, useReducer } from '../../src'
+import { h, render, useReducer } from '../src'
 
 function count(state, action) {
   switch (action.type) {

@@ -1,4 +1,4 @@
-import { h, render, useState, useEffect } from '../../src'
+import { h, render, useState, useEffect } from '../src'
 
 // A B C D -> B A D C √
 
