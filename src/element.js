@@ -1,8 +1,7 @@
 import { isNew } from './util'
 
 function updateProperty (element, name, value, newValue) {
-  if (name === 'children' || name === 'key') {
-  } else if (name === 'style') {
+  if (name === 'style') {
     for (key in newValue) {
       let style = !newValue || !newValue[key] ? '' : newValue[key]
       element[name][key] = style
@@ -20,7 +19,7 @@ function updateProperty (element, name, value, newValue) {
 
 export function updateElement (element, props, newProps) {
   Object.keys(newProps)
-    .filter(isNew(props, newProps)) // 进行一层浅比较
+    .filter(isNew(props, newProps)) //进行浅比较和过滤
     .forEach(key => {
       if (key === 'value' || key === 'nodeValue') {
         element[key] = newProps[key]
