@@ -38,7 +38,9 @@ function workLoop (deadline) {
     rIC(workLoop)
   }
   rAF(() => {
-    if (pendingCommit) commitWork(pendingCommit) // dom操作高优先级
+    if (pendingCommit) {
+      commitWork(pendingCommit)
+    }
   })
 }
 
@@ -159,6 +161,11 @@ function commit (fiber) {
   const parent = parentFiber.base
   let dom = fiber.base
   if (fiber.tag == HOOK) {
+    if (fiber.patchTag == DELETE) {
+      // 这里的实现不正确
+      dom = fiber.child.base
+      parent.removeChild(dom)
+    }
   } else if (fiber.patchTag == UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props)
   } else if (fiber.patchTag == DELETE) {
