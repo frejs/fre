@@ -301,8 +301,7 @@
     let dom = fiber.base;
     if (fiber.tag == HOOK) {
       if (fiber.patchTag == DELETE) {
-        dom = fiber.child.base;
-        parent.removeChild(dom);
+        parent.removeChild(fiber.child.base);
       }
     } else if (fiber.patchTag == UPDATE) {
       updateElement(dom, fiber.alternate.props, fiber.props);

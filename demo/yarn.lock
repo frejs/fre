@@ -277,10 +277,10 @@ esutils@^2.0.0, esutils@^2.0.2:
   resolved "http://registry.npm.taobao.org/esutils/download/esutils-2.0.2.tgz#0abf4f1caa5bcb1f7a9d8acc6dea4faaa04bac9b"
   integrity sha1-Cr9PHKpbyx96nYrMbepPqqBLrJs=
 
-fre@^1.3.12:
-  version "1.3.12"
-  resolved "https://registry.npmjs.org/fre/-/fre-1.3.12.tgz#d1fdab70e7274c3193f664cec079a16dac5d141d"
-  integrity sha512-e7Mp535R0u25BJ6Sb8obvemY+7HK7G2VDgjwfFVMzybDTPDXuUJ1d6grFlD5vLfaXQFFROvzedgPXi4bZN5BGw==
+fre@^1.3.13:
+  version "1.3.13"
+  resolved "https://registry.npmjs.org/fre/-/fre-1.3.13.tgz#88e5d13361f1556168a017173908480bb0e0775c"
+  integrity sha512-KphT/Qv7zoKcImyP2jdvg0qsz6+3fzlK1y251qyY+Pp6T44rQuaVS+EGj0ixjfdKaShsZsTp3GM4JsobeMjvRw==
 
 globals@^11.1.0:
   version "11.11.0"
