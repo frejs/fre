@@ -15,7 +15,7 @@
 
 ### Introduction
 
-Fre (pronounced `/fri:/`, like free) is a tiny and perfect js library, It means [Free!](https://www.clicli.us/search/free) ~ 
+Fre (pronounced `/fri:/`, like free) is a tiny and perfect js library, It means [Free!](https://www.clicli.us/search/free) ~
 
 ### Use
 
@@ -37,7 +37,6 @@ function Counter() {
 }
 
 render(<Counter />, document.getElementById('root'))
-
 ```
 
 ### Hooks API
@@ -59,7 +58,7 @@ function Counter() {
       <h1>{up}</h1>
       <button onClick={() => setUp(up + 1)}>+</button>
       <h1>{down}</h1>
-      <button onClick={() => setDown(down -1)}>-</button>
+      <button onClick={() => setDown(down - 1)}>-</button>
     </div>
   )
 }
@@ -178,18 +177,24 @@ function App() {
     <div>
       <h1>{count}</h1>
       <button onClick={() => setCount(count + 1)}>+</button>
-      <Sex count={count}/>
+      <Sex count={count} />
     </div>
   )
 }
 
-function Sex(props){
+function Sex(props) {
   const [sex, setSex] = useState('boy')
   return (
     <div>
       <h2>{props.count}</h2>
       <h1>{sex}</h1>
-      <button onClick={() => {sex==='boy'?setSex('girl'):setSex('boy')}}>x</button>
+      <button
+        onClick={() => {
+          sex === 'boy' ? setSex('girl') : setSex('boy')
+        }}
+      >
+        x
+      </button>
     </div>
   )
 }
@@ -217,6 +222,7 @@ function Sex(props) {
   return <div>{props.sex}</div>
 }
 ```
+
 Props contains children to render all the child elements of itself
 
 ```js
@@ -236,7 +242,9 @@ const HelloBox = () => <Box render={value => <h1>{value}</h1>} />
 
 const Box = props => <div>{props.render('hello world!')}</div>
 ```
+
 Also can be render children
+
 ```js
 const HelloBox = () => (
   <Box>
@@ -251,13 +259,13 @@ const Box = props => <div>{props.children('hello world!')}</div>
 
 #### Fiber
 
-Fiber is a priority scheduling scheme. 
+Fiber is a priority scheduling scheme.
 
 It uses the traversal form of linked list to achieve time slicing
 
 #### hash.keyed diff
 
-Fre implements a compact diff algorithm 
+Fre implements a compact diff algorithm
 
 It uses hash to mark locations for easy comparison
 
@@ -271,15 +279,19 @@ import { h } from 'fre'
 
 ```json
 {
-  "plugins": [
-    ["transform-react-jsx", { "pragma":"h" }]
-  ]
+  "plugins": [["transform-react-jsx", { "pragma": "h" }]]
 }
 ```
 
 If it is a browser environment, recommend to use [htm](https://github.com/developit/htm)
 
+### Ecosystem
+
+| Package                                              | Version                                             | About          |
+| ---------------------------------------------------- | --------------------------------------------------- | -------------- |
+| [`Fre`](.)                                           | ![npm](https://img.shields.io/npm/v/fre.svg)        | fre core       |
+| [`use-routes`](https://github.com/132yse/use-routes) | ![npm](https://img.shields.io/npm/v/use-routes.svg) | router for fre |
+
 #### License
 
 _MIT_ ©132yse inspired by [anu](https://github.com/RubyLouvre/anu)
-
