@@ -9,11 +9,11 @@ let nextWork = null
 let pendingCommit = null
 let currentFiber = null
 
-export function render (vdom, container) {
+export function render (vnode, container) {
   let rootFiber = {
     tag: ROOT,
     base: container,
-    props: { children: vdom }
+    props: { children: vnode }
   }
   updateQueue.push(rootFiber)
   rIC(workLoop)
