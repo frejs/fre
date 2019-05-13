@@ -14,7 +14,7 @@ function User ({ id }) {
   return (
     <div>
       <p>{id}</p>
-      <A href='/'>jack</A>
+      <A href='/'>Go home</A>
     </div>
   )
 }
