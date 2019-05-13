@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './element'
 import { resetCursor } from './hooks'
-import { rAF, rIC, hashfy, isSame, merge } from './util'
+import { rAF, rIC, hashfy, merge } from './util'
 
 const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
 
@@ -98,7 +98,7 @@ function reconcileChildren (WIP, children) {
     let oldFiber = reused[k]
 
     if (oldFiber) {
-      if (isSame(oldFiber, newFiber)) {
+      if (oldFiber.type === newFiber.type) {
         alternate = createFiber(oldFiber, {
           patchTag: UPDATE
         })
