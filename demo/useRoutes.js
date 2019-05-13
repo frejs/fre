@@ -1,19 +1,27 @@
 import { h, render } from 'fre'
 import { useRoutes, push, A } from 'use-routes'
 
-const routes = {
-  '/': () => (
+function Home () {
+  return (
     <div>
       <p>home</p>
       <button onClick={() => push('/home/jack')}>Go jack</button>
     </div>
-  ),
-  '/home/:id': ({ id }) => (
+  )
+}
+
+function User ({ id }) {
+  return (
     <div>
       <p>{id}</p>
       <A href='/'>jack</A>
     </div>
   )
+}
+
+const routes = {
+  '/': Home,
+  '/home/:id': User
 }
 
 const App = () => useRoutes(routes)
