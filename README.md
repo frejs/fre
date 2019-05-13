@@ -10,7 +10,7 @@
 ### Feature
 
 - :tada: really functionalComponent, hooks API, render props
-- :confetti_ball: Fiber Reconciler and hash keyed diff algorithm
+- :confetti_ball: Fiber Scheduler and hash keyed diff algorithm
 - :telescope: minimal but wonderful , just 1 KB , no dependences
 
 ### Introduction
