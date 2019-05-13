@@ -162,9 +162,7 @@ function commit (fiber) {
   let dom = fiber.base
   if (fiber.tag == HOOK) {
     if (fiber.patchTag == DELETE) {
-      // 这里的实现不正确
-      dom = fiber.child.base
-      parent.removeChild(dom)
+      parent.removeChild(fiber.child.base) // 这个地方不完美
     }
   } else if (fiber.patchTag == UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props)
