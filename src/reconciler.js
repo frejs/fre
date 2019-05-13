@@ -37,9 +37,9 @@ function workLoop (deadline) {
   if (nextWork || updateQueue.length > 0) {
     rIC(workLoop)
   }
-  if (pendingCommit) {
-    rAF(() => commitWork(pendingCommit))
-  }
+  rAF(() => {
+    if (pendingCommit) commitWork(pendingCommit) // dom操作高优先级
+  })
 }
 
 function performWork (WIP) {

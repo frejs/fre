@@ -1,5 +1,5 @@
 /**
- * by 132yse Copyright 2019-05-12
+ * by 132yse Copyright 2019-05-13
  */
 
 'use strict';
@@ -7,8 +7,8 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 const arrayfy = arr => (!arr ? [] : Array.isArray(arr) ? arr : [arr]);
-const isNew = (o, n) => k => o[k] !== n[k];
-const isSame = (a, b) => a.type == b.type && a.key == b.key;
+const isNew = (o, n) => k =>
+  k !== 'children' && k !== 'key' && o[k] !== n[k];
 function hashfy (arr) {
   let out = {};
   let i = 0;
@@ -58,7 +58,7 @@ function h (type, props) {
 }
 
 function updateProperty (element, name, value, newValue) {
-  if (name === 'children' || name === 'key') ; else if (name === 'style') {
+  if (name === 'style') {
     for (key in newValue) {
       let style = !newValue || !newValue[key] ? '' : newValue[key];
       element[name][key] = style;
@@ -163,11 +163,11 @@ let updateQueue = [];
 let nextWork = null;
 let pendingCommit = null;
 let currentFiber = null;
-function render (vdom, container) {
+function render (vnode, container) {
   let rootFiber = {
     tag: ROOT,
     base: container,
-    props: { children: vdom }
+    props: { children: vnode }
   };
   updateQueue.push(rootFiber);
   rIC(workLoop);
@@ -241,7 +241,7 @@ function reconcileChildren (WIP, children) {
     let newFiber = newFibers[k];
     let oldFiber = reused[k];
     if (oldFiber) {
-      if (isSame(oldFiber, newFiber)) {
+      if (oldFiber.type === newFiber.type) {
         alternate = createFiber(oldFiber, {
           patchTag: UPDATE
         });
