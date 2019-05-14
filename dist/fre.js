@@ -1,5 +1,5 @@
 /**
- * by 132yse Copyright 2019-05-13
+ * by 132yse Copyright 2019-05-14
  */
 
 'use strict';
@@ -296,17 +296,15 @@ function commit (fiber) {
     parentFiber = parentFiber.parent;
   }
   const parent = parentFiber.base;
-  let dom = fiber.base;
+  let dom = fiber.base || fiber.child.base;
+  const { insertPoint, patchTag } = fiber;
   if (fiber.tag == HOOK) {
-    if (fiber.patchTag == DELETE) {
-      parent.removeChild(fiber.child.base);
-    }
-  } else if (fiber.patchTag == UPDATE) {
+    if (patchTag == DELETE) parent.removeChild(dom);
+  } else if (patchTag == UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props);
-  } else if (fiber.patchTag == DELETE) {
+  } else if (patchTag == DELETE) {
     parent.removeChild(dom);
   } else {
-    const { insertPoint, patchTag } = fiber;
     let after = insertPoint
       ? patchTag == PLACE
         ? insertPoint.base.nextSibling
