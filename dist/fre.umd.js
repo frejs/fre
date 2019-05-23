@@ -26,8 +26,7 @@
     for (var i in b) out[i] = b[i];
     return out
   }
-  const rIC =
-    requestIdleCallback || (cb => setTimeout(() => cb({ timeRemaining: 2 })));
+  const rIC = requestIdleCallback || setTimeout;
   const rAF = requestAnimationFrame || setTimeout;
 
   function h (type, props) {
@@ -179,16 +178,14 @@
       if (!update) return
       nextWork = update;
     }
-    while (nextWork && deadline.timeRemaining() > 1) {
+    while (nextWork && (!deadline || deadline.timeRemaining() > 1)) {
       nextWork = performWork(nextWork);
     }
     if (nextWork || updateQueue.length > 0) {
       rIC(workLoop);
     }
     rAF(() => {
-      if (pendingCommit) {
-        commitWork(pendingCommit);
-      }
+      if (pendingCommit) commitWork(pendingCommit);
     });
   }
   function performWork (WIP) {
