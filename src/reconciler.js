@@ -37,10 +37,8 @@ function workLoop (deadline) {
   if (nextWork || updateQueue.length > 0) {
     rIC(workLoop)
   }
-  rAF(() => {
-    if (pendingCommit) {
-      commitWork(pendingCommit)
-    }
+  rAF(() => { //高优先级，保证每次都执行
+    if (pendingCommit) commitWork(pendingCommit)
   })
 }
 
