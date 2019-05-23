@@ -1,5 +1,5 @@
 /**
- * by 132yse Copyright 2019-05-14
+ * by 132yse Copyright 2019-05-23
  */
 
 (function (global, factory) {
@@ -27,12 +27,7 @@
     return out
   }
   const rIC =
-    requestIdleCallback ||
-    function (cb, ed = Date.now()) {
-      setTimeout(() => {
-        cb({ timeRemaining: () => Math.max(0, 50 - (Date.now() - ed)) });
-      }, 1);
-    };
+    requestIdleCallback || (cb => setTimeout(() => cb({ timeRemaining: 2 })));
   const rAF = requestAnimationFrame || setTimeout;
 
   function h (type, props) {

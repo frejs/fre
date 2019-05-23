@@ -30,7 +30,7 @@ function workLoop (deadline) {
     if (!update) return
     nextWork = update
   }
-  while (nextWork && deadline.timeRemaining() > 1) {
+  while (nextWork && (!deadline || deadline.timeRemaining() > 1)) {
     nextWork = performWork(nextWork)
   }
 
