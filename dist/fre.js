@@ -4,6 +4,8 @@
 
 'use strict';
 
+Object.defineProperty(exports, '__esModule', { value: true });
+
 const arrayfy = arr => (!arr ? [] : Array.isArray(arr) ? arr : [arr]);
 const isNew = (o, n) => k =>
   k !== 'children' && k !== 'key' && o[k] !== n[k];

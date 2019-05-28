@@ -15,21 +15,19 @@ export function useState (initState) {
 }
 export function useReducer (reducer, initState) {
   let current = getCurrentFiber()
+  if (!current) return [initState, setter]
   let key = '$' + cursor
   let setter = update.bind(current, key, reducer)
-  if (!current) {
-    return [initState, setter]
+  cursor++
+  let state = current.state || {}
+  if (key in state) {
+    return [state[key], setter]
   } else {
-    cursor++
-    let state = current.state || {}
-    if (typeof state === 'object' && key in state) {
-      return [state[key], setter]
-    } else {
-      current.state[key] = initState
-    }
+    current.state[key] = initState
     return [initState, setter]
   }
 }
+
 export function useEffect (cb, inputs) {
   let current = getCurrentFiber()
   if (current) current.effect = useMemo(cb, inputs)
