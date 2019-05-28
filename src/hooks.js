@@ -54,11 +54,9 @@ export function createContext (initContext = {}) {
   let context = initContext
   let setters = []
   const update = newContext => setters.forEach(fn => fn(newContext))
-
   const subscribe = fn => setters.push(fn)
-
   const unSubscribe = fn => (setters = setters.filter(f => f !== fn))
-
+  
   return { context, update, subscribe, unSubscribe }
 }
 
