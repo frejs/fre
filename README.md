@@ -283,7 +283,7 @@ import { h } from 'fre'
 
 If browser environment, recommend to use [htm](https://github.com/developit/htm)
 
-Fre supports most JSX syntax, if-else is also but need to be careful.
+Fre supports most JSX syntax, `if-else` is also Ok but need to be careful.
 
 ```jsx
 {
