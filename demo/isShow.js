@@ -1,10 +1,10 @@
 import { h, render, useState } from '../src'
 
 function Counter () {
-  const [show, set] = useState(false)
+  const [isShow, set] = useState(false)
   return (
     <div>
-      {show ? <A /> : <B />}
+      {isShow && <A />}
       <button onClick={() => set(!show)}>change</button>
     </div>
   )
@@ -13,7 +13,7 @@ function Counter () {
 function A () {
   return <h1>A</h1>
 }
-function B(){
+function B () {
   return <h1>B</h1>
 }
 render(<Counter />, document.getElementById('root'))

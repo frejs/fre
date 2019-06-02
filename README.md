@@ -257,17 +257,15 @@ const HelloBox = () => (
 const Box = props => <div>{props.children('hello world!')}</div>
 ```
 
-#### Fiber
+### HOC
 
-Fiber is a priority scheduling scheme.
+Does not support HOC but you can renturn a function wrapped another function.
 
-It uses the traversal form of linked list to achieve time slicing
-
-#### hash.keyed diff
-
-Fre implements a compact diff algorithm
-
-It uses hash to mark locations for easy comparison
+```js
+function App() {
+  return HOC(() => <div>I am wrapped by a HOC</div>)
+}
+```
 
 #### JSX
 
@@ -283,7 +281,30 @@ import { h } from 'fre'
 }
 ```
 
-If it is a browser environment, recommend to use [htm](https://github.com/developit/htm)
+If browser environment, recommend to use [htm](https://github.com/developit/htm)
+
+Fre supports most JSX syntax, if-else is also but need to be careful.
+
+```jsx
+{
+  isShow && <A />
+  isShow ? <A /> : null
+  isShow ? <A /> : <B />
+}
+```
+because there no `key` for them, please use it as late as possible.
+
+#### Fiber
+
+Fiber is a priority scheduling scheme.
+
+It uses the traversal form of linked list to achieve time slicing
+
+#### hash.keyed diff
+
+Fre implements a compact diff algorithm
+
+It uses hash to mark locations for easy comparison
 
 ### Ecosystem
 
