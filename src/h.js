@@ -1,13 +1,17 @@
 import { merge } from './util'
 export function h (type, props) {
-  for (var vnode, rest = [], children = [], i = arguments.length; i-- > 2;) {
-    rest.push(arguments[i])
-  }
+  let rest = []
+  let children = []
+  let length = arguments.length
+
+  while (length-- > 2) rest.push(arguments[length])
 
   while (rest.length) {
-    if ((vnode = rest.pop()) && vnode.pop) {
+    let vnode = rest.pop()
+    if (vnode && vnode.pop) {
       for (length = vnode.length; length--;) rest.push(vnode[length])
     } else if (vnode === null || vnode === true || vnode === false) {
+      //此处应该对应一个空函数
     } else if (typeof vnode === 'function') {
       children = vnode
     } else {
@@ -21,6 +25,6 @@ export function h (type, props) {
   return {
     type,
     props: merge(props, { children }),
-    key: (props || {}).key
+    key: props && props.key
   }
 }
