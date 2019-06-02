@@ -1,5 +1,5 @@
 /**
- * by 132yse Copyright 2019-05-31
+ * by 132yse Copyright 2019-06-02
  */
 
 'use strict';
@@ -7,6 +7,8 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 const arrayfy = arr => (!arr ? [] : Array.isArray(arr) ? arr : [arr]);
+const isSame = (a, b) =>
+  a.type === b.type || typeof a.type === typeof b.type;
 const isNew = (o, n) => k =>
   k !== 'children' && k !== 'key' && o[k] !== n[k];
 function hashfy (arr) {
@@ -28,13 +30,17 @@ const rIC = requestIdleCallback || setTimeout;
 const rAF = requestAnimationFrame || setTimeout;
 
 function h (type, props) {
-  for (var vnode, rest = [], children = [], i = arguments.length; i-- > 2;) {
-    rest.push(arguments[i]);
-  }
+  let rest = [];
+  let children = [];
+  let length = arguments.length;
+  while (length-- > 2) rest.push(arguments[length]);
   while (rest.length) {
-    if ((vnode = rest.pop()) && vnode.pop) {
+    let vnode = rest.pop();
+    if (vnode && vnode.pop) {
       for (length = vnode.length; length--;) rest.push(vnode[length]);
-    } else if (vnode === null || vnode === true || vnode === false) ; else if (typeof vnode === 'function') {
+    } else if (vnode === null || vnode === true || vnode === false) {
+      vnode = { type: () => {} };
+    } else if (typeof vnode === 'function') {
       children = vnode;
     } else {
       children.push(
@@ -47,7 +53,7 @@ function h (type, props) {
   return {
     type,
     props: merge(props, { children }),
-    key: (props || {}).key
+    key: props && props.key
   }
 }
 
@@ -219,7 +225,7 @@ function reconcileChildren (WIP, children) {
   for (let k in oldFibers) {
     let newFiber = newFibers[k];
     let oldFiber = oldFibers[k];
-    if (newFiber && oldFiber.type === newFiber.type) {
+    if (newFiber && isSame(newFiber, oldFiber)) {
       reused[k] = oldFiber;
     } else {
       oldFiber.patchTag = DELETE;
@@ -232,7 +238,7 @@ function reconcileChildren (WIP, children) {
     let newFiber = newFibers[k];
     let oldFiber = reused[k];
     if (oldFiber) {
-      if (oldFiber.type === newFiber.type) {
+      if (isSame(oldFiber, newFiber)) {
         alternate = createFiber(oldFiber, {
           patchTag: UPDATE
         });
