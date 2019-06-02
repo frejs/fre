@@ -17,6 +17,12 @@
 
 Fre (pronounced `/fri:/`, like free) is a tiny and perfect js library, It means [Free!](https://www.clicli.us/search/free) ~
 
+| Package                                              | Version                                             | About          |
+| ---------------------------------------------------- | --------------------------------------------------- | -------------- |
+| [`Fre`](.)                                           | ![npm](https://img.shields.io/npm/v/fre.svg)        | fre core       |
+| [`use-routes`](https://github.com/132yse/use-routes) | ![npm](https://img.shields.io/npm/v/use-routes.svg) | router for fre |
+
+
 ### Use
 
 ```shell
@@ -257,7 +263,7 @@ const HelloBox = () => (
 const Box = props => <div>{props.children('hello world!')}</div>
 ```
 
-### HOC
+#### HOC
 
 Does not support HOC but you can renturn a function wrapped another function.
 
@@ -305,13 +311,6 @@ It uses the traversal form of linked list to achieve time slicing
 Fre implements a compact diff algorithm
 
 It uses hash to mark locations for easy comparison
-
-### Ecosystem
-
-| Package                                              | Version                                             | About          |
-| ---------------------------------------------------- | --------------------------------------------------- | -------------- |
-| [`Fre`](.)                                           | ![npm](https://img.shields.io/npm/v/fre.svg)        | fre core       |
-| [`use-routes`](https://github.com/132yse/use-routes) | ![npm](https://img.shields.io/npm/v/use-routes.svg) | router for fre |
 
 #### License
 
