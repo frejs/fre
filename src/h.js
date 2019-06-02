@@ -11,7 +11,7 @@ export function h (type, props) {
     if (vnode && vnode.pop) {
       for (length = vnode.length; length--;) rest.push(vnode[length])
     } else if (vnode === null || vnode === true || vnode === false) {
-      //此处应该对应一个空函数
+      vnode = { type: () => {} }
     } else if (typeof vnode === 'function') {
       children = vnode
     } else {
