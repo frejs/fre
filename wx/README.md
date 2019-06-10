@@ -5,20 +5,20 @@
 ### Use
 
 ```js
-import { h, useState } from 'fre'
-import { render, View, Button } from 'fre/wx'
+import { useState } from 'fre'
+import { h, render } from 'fre/wx'
 
 function Counter() {
   const [count, setCount] = useState(0)
   return (
-    <View>
+    <view>
       {count}
-      <Button onClick={() => setCount(count + 1)}>+</Button>
-    </View>
+      <button onClick={() => setCount(count + 1)}>+</button>
+    </view>
   )
 }
 
-render(<Counter />, document.getElementById('root'))
+render(<Counter />)
 ```
 
 p.s. fre 默认的 render 方法是 web 环境，操作 dom
