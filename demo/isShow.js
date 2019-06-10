@@ -4,8 +4,8 @@ function Counter () {
   const [isShow, set] = useState(false)
   return (
     <div>
-      {isShow && <A />}
-      <button onClick={() => set(!show)}>change</button>
+      {isShow ? <A /> : <B />}
+      <button onClick={() => set(!isShow)}>change</button>
     </div>
   )
 }

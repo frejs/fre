@@ -9,14 +9,14 @@ let nextWork = null
 let pendingCommit = null
 let currentFiber = null
 
-export function render (vnode, container) {
+//默认是 dom 方法，小程序移步 ../wx
+export function render (vnode, el) {
   let rootFiber = {
     tag: ROOT,
-    base: container,
+    base: el,
     props: { children: vnode }
   }
-  updateQueue.push(rootFiber)
-  rIC(workLoop)
+  scheduleWork(rootFiber)
 }
 
 export function scheduleWork (fiber) {
