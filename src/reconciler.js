@@ -3,6 +3,7 @@ import { resetCursor } from './hooks'
 import { rAF, rIC, hashfy, merge, isSame } from './util'
 
 const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
+export let options = {}
 
 let updateQueue = []
 let nextWork = null
@@ -39,7 +40,8 @@ function workLoop (deadline) {
   }
   rAF(() => {
     if (pendingCommit) {
-      //如果有 options ，优先执行 
+      // 如果有 options ，优先执行
+      console.log(options.commitWork)
       options.commitWork
         ? options.commitWork(pendingCommit)
         : commitWork(pendingCommit)
@@ -137,7 +139,11 @@ function reconcileChildren (WIP, children) {
 
 function createFiber (vnode, data) {
   data.tag = typeof vnode.type === 'function' ? HOOK : HOST
+  if (typeof vnode === 'string') {
+    vnode = { type: 'text', props: { nodeValue: vnode } }
+  }
   vnode.props = vnode.props || { nodeValue: vnode.nodeValue }
+  console.log(vnode)
   return merge(vnode, data)
 }
 

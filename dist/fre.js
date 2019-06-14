@@ -156,6 +156,7 @@ function useContext (ctx) {
 }
 
 const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6];
+let options = {};
 let updateQueue = [];
 let nextWork = null;
 let pendingCommit = null;
@@ -186,6 +187,7 @@ function workLoop (deadline) {
   }
   rAF(() => {
     if (pendingCommit) {
+      console.log(options.commitWork);
       options.commitWork
         ? options.commitWork(pendingCommit)
         : commitWork(pendingCommit);
@@ -270,7 +272,11 @@ function reconcileChildren (WIP, children) {
 }
 function createFiber (vnode, data) {
   data.tag = typeof vnode.type === 'function' ? HOOK : HOST;
+  if (typeof vnode === 'string') {
+    vnode = { type: 'text', props: { nodeValue: vnode } };
+  }
   vnode.props = vnode.props || { nodeValue: vnode.nodeValue };
+  console.log(vnode);
   return merge(vnode, data)
 }
 function completeWork (fiber) {
@@ -317,11 +323,9 @@ function getCurrentFiber () {
   return currentFiber || null
 }
 
-const options$1 = {};
-
 exports.createContext = createContext;
 exports.h = h;
-exports.options = options$1;
+exports.options = options;
 exports.render = render;
 exports.useContext = useContext;
 exports.useEffect = useEffect;

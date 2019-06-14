@@ -1,6 +1,5 @@
 import { h } from './h'
-import { render } from './reconciler'
-import { default as options } from './options'
+import { render, options } from './reconciler'
 import {
   useState,
   useReducer,
