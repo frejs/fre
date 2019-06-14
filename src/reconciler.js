@@ -41,7 +41,6 @@ function workLoop (deadline) {
   rAF(() => {
     if (pendingCommit) {
       // 如果有 options ，优先执行
-      console.log(options.commitWork)
       options.commitWork
         ? options.commitWork(pendingCommit)
         : commitWork(pendingCommit)

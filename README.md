@@ -22,7 +22,6 @@ Fre (pronounced `/fri:/`, like free) is a tiny and perfect js library, It means 
 | [`Fre`](.)                                           | ![npm](https://img.shields.io/npm/v/fre.svg)        | fre core       |
 | [`use-routes`](https://github.com/132yse/use-routes) | ![npm](https://img.shields.io/npm/v/use-routes.svg) | router for fre |
 
-
 ### Use
 
 ```shell
@@ -273,6 +272,16 @@ function App() {
 }
 ```
 
+### options
+
+If you want to rewrite any function, please use options, such as:
+
+```js
+options.commitWork = fiber => {
+  Object.keys(fiber.effects).forEach(i => commit(i))
+}
+```
+
 #### JSX
 
 The default export h function needs to be configured
@@ -298,6 +307,7 @@ Fre supports most JSX syntax, `if-else` is also Ok but need to be careful.
   isShow ? <A /> : <B />
 }
 ```
+
 because there no `key` for them, please use it as late as possible.
 
 #### Fiber

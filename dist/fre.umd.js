@@ -189,7 +189,6 @@
     }
     rAF(() => {
       if (pendingCommit) {
-        console.log(options.commitWork);
         options.commitWork
           ? options.commitWork(pendingCommit)
           : commitWork(pendingCommit);
