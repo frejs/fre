@@ -1,5 +1,5 @@
 import { h } from './h'
-import { render, options } from './reconciler'
+import { render, scheduleWork, options } from './reconciler'
 import {
   useState,
   useReducer,
@@ -12,11 +12,12 @@ import {
 export {
   h,
   render,
+  scheduleWork,
+  options,
   useState,
   useReducer,
   useEffect,
   useMemo,
   createContext,
-  useContext,
-  options
+  useContext
 }
