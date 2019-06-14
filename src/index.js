@@ -1,5 +1,6 @@
 import { h } from './h'
 import { render } from './reconciler'
+import { default as options } from './options'
 import {
   useState,
   useReducer,
@@ -8,7 +9,6 @@ import {
   createContext,
   useContext
 } from './hooks'
-const options = {}
 
 export {
   h,

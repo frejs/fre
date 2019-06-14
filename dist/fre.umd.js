@@ -1,5 +1,5 @@
 /**
- * by 132yse Copyright 2019-06-02
+ * by 132yse Copyright 2019-06-14
  */
 
 (function (global, factory) {
@@ -162,14 +162,13 @@
   let nextWork = null;
   let pendingCommit = null;
   let currentFiber = null;
-  function render (vnode, container) {
+  function render (vnode, el) {
     let rootFiber = {
       tag: ROOT,
-      base: container,
+      base: el,
       props: { children: vnode }
     };
-    updateQueue.push(rootFiber);
-    rIC(workLoop);
+    scheduleWork(rootFiber);
   }
   function scheduleWork (fiber) {
     updateQueue.push(fiber);
@@ -188,7 +187,11 @@
       rIC(workLoop);
     }
     rAF(() => {
-      if (pendingCommit) commitWork(pendingCommit);
+      if (pendingCommit) {
+        options.commitWork
+          ? options.commitWork(pendingCommit)
+          : commitWork(pendingCommit);
+      }
     });
   }
   function performWork (WIP) {
@@ -316,8 +319,11 @@
     return currentFiber || null
   }
 
+  const options$1 = {};
+
   exports.createContext = createContext;
   exports.h = h;
+  exports.options = options$1;
   exports.render = render;
   exports.useContext = useContext;
   exports.useEffect = useEffect;
