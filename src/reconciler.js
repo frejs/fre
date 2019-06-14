@@ -9,7 +9,7 @@ let nextWork = null
 let pendingCommit = null
 let currentFiber = null
 
-//默认是 dom 方法，小程序移步 ../wx
+// 默认是 dom 方法，小程序移步 ../wx
 export function render (vnode, el) {
   let rootFiber = {
     tag: ROOT,
@@ -38,8 +38,12 @@ function workLoop (deadline) {
     rIC(workLoop)
   }
   rAF(() => {
-    // 高优先级，保证每次都执行
-    if (pendingCommit) commitWork(pendingCommit)
+    if (pendingCommit) {
+      //如果有 options ，优先执行 
+      options.commitWork
+        ? options.commitWork(pendingCommit)
+        : commitWork(pendingCommit)
+    }
   })
 }
 

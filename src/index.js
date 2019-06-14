@@ -8,6 +8,7 @@ import {
   createContext,
   useContext
 } from './hooks'
+const options = {}
 
 export {
   h,
@@ -17,5 +18,6 @@ export {
   useEffect,
   useMemo,
   createContext,
-  useContext
+  useContext,
+  options
 }
