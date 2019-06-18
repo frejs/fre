@@ -28,8 +28,8 @@
     for (var i in b) out[i] = b[i];
     return out
   }
-  const rIC = requestIdleCallback || setTimeout;
-  const rAF = requestAnimationFrame || setTimeout;
+  const defer =
+    typeof Promise === 'function' ? cb => Promise.resolve().then(cb) : setTimeout;
 
   function h (type, props) {
     let rest = [];
@@ -173,27 +173,22 @@
   }
   function scheduleWork (fiber) {
     updateQueue.push(fiber);
-    rIC(workLoop);
+    defer(workLoop);
   }
-  function workLoop (deadline) {
+  function workLoop () {
     if (!nextWork && updateQueue.length) {
       const update = updateQueue.shift();
       if (!update) return
       nextWork = update;
     }
-    while (nextWork && (!deadline || deadline.timeRemaining() > 1)) {
+    while (nextWork) {
       nextWork = performWork(nextWork);
     }
-    if (nextWork || updateQueue.length > 0) {
-      rIC(workLoop);
+    if (pendingCommit) {
+      options.commitWork
+        ? options.commitWork(pendingCommit)
+        : commitWork(pendingCommit);
     }
-    rAF(() => {
-      if (pendingCommit) {
-        options.commitWork
-          ? options.commitWork(pendingCommit)
-          : commitWork(pendingCommit);
-      }
-    });
   }
   function performWork (WIP) {
     WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP);
