@@ -1,7 +1,14 @@
-import { h, render, options } from '../src'
+import { h, render, options, useState } from '../src'
 
 function Counter () {
-  return 'hello world'
+  const [count, setCount] = useState(0)
+  console.log(count)
+  return (
+    <div>
+      <h1>{count}</h1>
+      <button onClick={() => setCount(count + 1)}>+</button>
+    </div>
+  )
 }
 options.commitWork = fiber => {
   console.log(fiber)

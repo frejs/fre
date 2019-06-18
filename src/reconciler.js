@@ -79,7 +79,7 @@ function updateHOOK (WIP) {
   currentFiber.patches = WIP.patches
 }
 function fiberize (children, WIP) {
-  return (WIP.children = hashfy(children))
+  return (WIP.childFibers = hashfy(children))
 }
 
 function reconcileChildren (WIP, children) {

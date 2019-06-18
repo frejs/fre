@@ -328,6 +328,7 @@
   exports.h = h;
   exports.options = options;
   exports.render = render;
+  exports.scheduleWork = scheduleWork;
   exports.useContext = useContext;
   exports.useEffect = useEffect;
   exports.useMemo = useMemo;
