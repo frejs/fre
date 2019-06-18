@@ -1,5 +1,5 @@
 /**
- * by 132yse Copyright 2019-06-14
+ * by 132yse Copyright 2019-06-18
  */
 
 (function (global, factory) {
@@ -222,7 +222,7 @@
     currentFiber.patches = WIP.patches;
   }
   function fiberize (children, WIP) {
-    return (WIP.children = hashfy(children))
+    return (WIP.childFibers = hashfy(children))
   }
   function reconcileChildren (WIP, children) {
     const oldFibers = WIP.children;
