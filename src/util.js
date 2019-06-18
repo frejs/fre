@@ -22,7 +22,6 @@ export function merge (a, b) {
   for (var i in b) out[i] = b[i]
   return out
 }
+export const defer =
+  typeof Promise === 'function' ? cb => Promise.resolve().then(cb) : setTimeout
 
-export const rIC = requestIdleCallback || setTimeout
-
-export const rAF = requestAnimationFrame || setTimeout

@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './element'
 import { resetCursor } from './hooks'
-import { rAF, rIC, hashfy, merge, isSame } from './util'
+import { defer, hashfy, merge, isSame } from './util'
 
 const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
 export let options = {}
@@ -22,30 +22,24 @@ export function render (vnode, el) {
 
 export function scheduleWork (fiber) {
   updateQueue.push(fiber)
-  rIC(workLoop)
+  defer(workLoop)
 }
 
-function workLoop (deadline) {
+function workLoop () {
   if (!nextWork && updateQueue.length) {
     const update = updateQueue.shift()
     if (!update) return
     nextWork = update
   }
-  while (nextWork && (!deadline || deadline.timeRemaining() > 1)) {
+  while (nextWork) {
     nextWork = performWork(nextWork)
   }
 
-  if (nextWork || updateQueue.length > 0) {
-    rIC(workLoop)
+  if (pendingCommit) {
+    options.commitWork
+      ? options.commitWork(pendingCommit)
+      : commitWork(pendingCommit)
   }
-  rAF(() => {
-    if (pendingCommit) {
-      // 如果有 options ，优先执行
-      options.commitWork
-        ? options.commitWork(pendingCommit)
-        : commitWork(pendingCommit)
-    }
-  })
 }
 
 function performWork (WIP) {
