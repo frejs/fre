@@ -10,8 +10,9 @@ function Counter () {
     </div>
   )
 }
+options.platform = 'miniapp'
 options.commitWork = fiber => {
   console.log(fiber)
 }
 
-render(<Counter />, document.getElementById('root'))
+render(<Counter />)

@@ -203,7 +203,9 @@ function performWork (WIP) {
   }
 }
 function updateHost (WIP) {
-  if (!WIP.base) WIP.base = createElement(WIP);
+  if (!WIP.base && !options.platform) {
+    WIP.base = createElement(WIP);
+  }
   let parent = WIP.parent || {};
   WIP.insertPoint = parent.oldPoint;
   parent.oldPoint = WIP;
@@ -220,7 +222,7 @@ function updateHOOK (WIP) {
   currentFiber.patches = WIP.patches;
 }
 function fiberize (children, WIP) {
-  return (WIP.childFibers = hashfy(children))
+  return (WIP.children = hashfy(children))
 }
 function reconcileChildren (WIP, children) {
   const oldFibers = WIP.children;
@@ -271,11 +273,7 @@ function reconcileChildren (WIP, children) {
 }
 function createFiber (vnode, data) {
   data.tag = typeof vnode.type === 'function' ? HOOK : HOST;
-  if (typeof vnode === 'string') {
-    vnode = { type: 'text', props: { nodeValue: vnode } };
-  }
   vnode.props = vnode.props || { nodeValue: vnode.nodeValue };
-  console.log(vnode);
   return merge(vnode, data)
 }
 function completeWork (fiber) {
