@@ -277,6 +277,7 @@ function App() {
 If you want to rewrite any function, please use options, such as:
 
 ```js
+options.platform = 'miniapp'
 options.commitWork = fiber => {
   Object.keys(fiber.effects).forEach(i => commit(i))
 }
