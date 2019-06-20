@@ -11,6 +11,7 @@ import {
 
 export {
   h,
+  h as createElement,
   render,
   scheduleWork,
   options,
