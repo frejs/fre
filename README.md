@@ -17,11 +17,11 @@
 
 Fre (pronounced `/fri:/`, like free) is a tiny and perfect js library, It means [Free!](https://www.clicli.us/search/free) ~
 
-| Package                                              | Version                                             | About            |
-| ---------------------------------------------------- | --------------------------------------------------- | ---------------- |
-| [`Fre`](.)                                           | ![npm](https://img.shields.io/npm/v/fre.svg)        | fre core         |
-| [`Fard`](https://github.com/132yse/fard)             | ![npm](https://img.shields.io/npm/v/fard.svg)       | fre mini-program |
-| [`use-routes`](https://github.com/132yse/use-routes) | ![npm](https://img.shields.io/npm/v/use-routes.svg) | router for fre   |
+| Package                                              | Version                                             | About                 |
+| ---------------------------------------------------- | --------------------------------------------------- | --------------------- |
+| [`Fre`](.)                                           | ![npm](https://img.shields.io/npm/v/fre.svg)        | fre core              |
+| [`Fard`](https://github.com/132yse/fard)             | ![npm](https://img.shields.io/npm/v/fard.svg)       | mini-program with fre |
+| [`use-routes`](https://github.com/132yse/use-routes) | ![npm](https://img.shields.io/npm/v/use-routes.svg) | router for fre        |
 
 ### Use
 
