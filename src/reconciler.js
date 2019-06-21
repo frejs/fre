@@ -139,7 +139,7 @@ function createFiber (vnode, data) {
 }
 
 function completeWork (fiber) {
-  if (fiber.parent) {
+  if (!options.platform && fiber.parent) {
     fiber.parent.patches = (fiber.parent.patches || []).concat(
       fiber.patches || [],
       fiber.patchTag ? [fiber] : []
