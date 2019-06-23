@@ -10,7 +10,6 @@ let nextWork = null
 let pendingCommit = null
 let currentFiber = null
 
-// 默认是 dom 方法，小程序移步 ../wx
 export function render (vnode, el) {
   let rootFiber = {
     tag: ROOT,
