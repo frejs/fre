@@ -52,7 +52,7 @@ function performWork (WIP) {
 }
 
 function updateHost (WIP) {
-  if (!WIP.base && !options.platform) {
+  if (!WIP.base && options.web) {
     WIP.base = createElement(WIP)
   }
 
@@ -138,7 +138,7 @@ function createFiber (vnode, data) {
 }
 
 function completeWork (fiber) {
-  if (!options.platform && fiber.parent) {
+  if (options.web && fiber.parent) {
     fiber.parent.patches = (fiber.parent.patches || []).concat(
       fiber.patches || [],
       fiber.patchTag ? [fiber] : []
