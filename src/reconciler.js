@@ -3,7 +3,7 @@ import { resetCursor } from './hooks'
 import { defer, hashfy, merge, isSame } from './util'
 
 const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
-export let options = {}
+export const options = {}
 
 let updateQueue = []
 let nextWork = null
@@ -106,7 +106,7 @@ function reconcileChildren (WIP, children) {
           patchTag: UPDATE
         })
 
-        newFiber.patchTag = UPDATE
+        if (options.web) newFiber.patchTag = UPDATE
         newFiber = merge(alternate, newFiber)
         newFiber.alternate = alternate
         if (oldFiber.key) {
