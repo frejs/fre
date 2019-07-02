@@ -278,9 +278,9 @@ function App() {
 If you want to rewrite any function, please use options, such as:
 
 ```js
-options.web = false
+options.end = false
 options.commitWork = fiber => {
-  // something to do
+  // something you will rewrite commitWork
 }
 ```
 
@@ -327,3 +327,5 @@ It uses hash to mark locations for easy comparison
 #### License
 
 _MIT_ ©132yse inspired by [anu](https://github.com/RubyLouvre/anu)
+
+
