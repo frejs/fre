@@ -106,7 +106,7 @@ function reconcileChildren (WIP, children) {
           patchTag: UPDATE
         })
 
-        if (options.web) newFiber.patchTag = UPDATE
+        if (options.end) newFiber.patchTag = UPDATE
         newFiber = merge(alternate, newFiber)
         newFiber.alternate = alternate
         if (oldFiber.key) {
