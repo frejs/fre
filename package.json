@@ -4,6 +4,7 @@
   "description": "",
   "main": "dist/fre.js",
   "unpkg": "dist/fre.umd.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "test": "jest && tsc --noEmit",
     "typecheck": "tsc --declaration",
