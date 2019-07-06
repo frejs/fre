@@ -7,7 +7,7 @@
   "typings": "dist/index.d.ts",
   "scripts": {
     "test": "jest && tsc --noEmit",
-    "typecheck": "tsc --declaration",
+    "typecheck": "tsc --emitDeclarationOnly",
     "build:umd": "cross-env NODE_ENV=umd rollup -c ",
     "build:cjs": "cross-env NODE_ENV=cjs rollup -c ",
     "build": "yarn typecheck && yarn build:cjs && yarn build:umd"
@@ -17,7 +17,6 @@
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "@babel/core": "^7.5.0",
     "@babel/preset-env": "^7.5.0",
     "@babel/preset-typescript": "^7.3.3",
     "@types/jest": "^24.0.15",
@@ -28,6 +27,7 @@
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-cleanup": "^3.1.1",
     "rollup-plugin-license": "^0.8.1",
+    "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-uglify-es": "^0.0.1",
     "typescript": "^3.5.2"
   }

@@ -1,6 +1,8 @@
 import cleanup from 'rollup-plugin-cleanup'
 import license from 'rollup-plugin-license'
 import babel from 'rollup-plugin-babel'
+import resolve from 'rollup-plugin-node-resolve'
+// import uglify from 'rollup-plugin-uglify-es'
 
 let env = process.env.NODE_ENV
 
@@ -17,6 +19,9 @@ export default {
       exclude: 'node_modules/**',
       externalHelpers: true,
       extensions: ['.js', '.ts'],
+    }),
+    resolve({
+      extensions: ['.ts', '.js', '.jsx', '.json'],
     }),
     license({
       banner: `by 132yse Copyright ${JSON.stringify(new Date()).replace(

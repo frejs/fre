@@ -7,6 +7,7 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 var arrayfy = function arrayfy(arr) {
   return !arr ? [] : Array.isArray(arr) ? arr : [arr];
 };
@@ -28,13 +29,17 @@ function hashfy(arr) {
   return out;
 }
 function merge(a, b) {
-  var out = {};
+  var out = {}; // @ts-ignore
+
   for (var i in a) {
     out[i] = a[i];
+  } // @ts-ignore
+
+
+  for (var _i in b) {
+    out[_i] = b[_i];
   }
-  for (var i in b) {
-    out[i] = b[i];
-  }
+
   return out;
 }
 var defer = typeof Promise === 'function' ? function (cb) {
@@ -43,19 +48,22 @@ var defer = typeof Promise === 'function' ? function (cb) {
 
 function _typeof$1(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof$1 = function _typeof(obj) { return typeof obj; }; } else { _typeof$1 = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof$1(obj); }
 function h(type, props) {
-  var rest = [];
+  for (var _len = arguments.length, rest = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+    rest[_key - 2] = arguments[_key];
+  }
+
   var children = [];
   var length = arguments.length;
-  while (length-- > 2) {
-    rest.push(arguments[length]);
-  }
+
   while (rest.length) {
     var vnode = rest.pop();
-    if (vnode && vnode.pop) {
+
+    if (vnode && Array.isArray(vnode)) {
       for (length = vnode.length; length--;) {
         rest.push(vnode[length]);
       }
     } else if (vnode === null || vnode === true || vnode === false) {
+      // @ts-ignore
       vnode = {
         type: function type() {}
       };
@@ -70,6 +78,7 @@ function h(type, props) {
       });
     }
   }
+
   return {
     type: type,
     props: merge(props, {
