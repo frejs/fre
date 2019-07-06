@@ -1,6 +1,6 @@
 {
   "name": "fre",
-  "version": "1.4.4",
+  "version": "1.4.6",
   "description": "",
   "main": "dist/fre.js",
   "unpkg": "dist/fre.umd.js",
@@ -17,6 +17,7 @@
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
+    "@babel/core": "^7.5.0",
     "@babel/preset-env": "^7.5.0",
     "@babel/preset-typescript": "^7.3.3",
     "@types/jest": "^24.0.15",

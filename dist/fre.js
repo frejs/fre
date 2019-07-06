@@ -247,7 +247,7 @@ function performWork(WIP) {
   }
 }
 function updateHost(WIP) {
-  if (!WIP.base && options.end) {
+  if (!options.end && !WIP.base) {
     WIP.base = createElement(WIP);
   }
   var parent = WIP.parent || {};
@@ -292,7 +292,7 @@ function reconcileChildren(WIP, children) {
         alternate = createFiber(_oldFiber, {
           patchTag: UPDATE
         });
-        if (options.end) _newFiber.patchTag = UPDATE;
+        if (!options.end) _newFiber.patchTag = UPDATE;
         _newFiber = merge(alternate, _newFiber);
         _newFiber.alternate = alternate;
         if (_oldFiber.key) {
@@ -323,7 +323,7 @@ function createFiber(vnode, data) {
   return merge(vnode, data);
 }
 function completeWork(fiber) {
-  if (options.end && fiber.parent) {
+  if (!options.end && fiber.parent) {
     fiber.parent.patches = (fiber.parent.patches || []).concat(fiber.patches || [], fiber.patchTag ? [fiber] : []);
   } else {
     pendingCommit = fiber;

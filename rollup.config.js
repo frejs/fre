@@ -1,7 +1,6 @@
 import cleanup from 'rollup-plugin-cleanup'
 import license from 'rollup-plugin-license'
 import babel from 'rollup-plugin-babel'
-// import uglify from 'rollup-plugin-uglify-es'
 
 let env = process.env.NODE_ENV
 
@@ -26,7 +25,6 @@ export default {
       )}`
     }),
     cleanup()
-    // uglify()
   ]
 }
 
