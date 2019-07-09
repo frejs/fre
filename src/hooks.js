@@ -1,19 +1,19 @@
 import { scheduleWork, getCurrentFiber } from './reconciler'
 let cursor = 0
 
-function update (key, reducer, value) {
+function update(key, reducer, value) {
   const current = this ? this : getCurrentFiber()
   value = reducer ? reducer(current.state[key], value) : value
   current.state[key] = value
   scheduleWork(current)
 }
-export function resetCursor () {
+export function resetCursor() {
   cursor = 0
 }
-export function useState (initState) {
+export function useState(initState) {
   return useReducer(null, initState)
 }
-export function useReducer (reducer, initState) {
+export function useReducer(reducer, initState) {
   let current = getCurrentFiber()
   if (!current) return [initState, setter]
   let key = '$' + cursor
@@ -28,12 +28,12 @@ export function useReducer (reducer, initState) {
   }
 }
 
-export function useEffect (cb, inputs) {
+export function useEffect(cb, inputs) {
   let current = getCurrentFiber()
   if (current) current.effect = useMemo(cb, inputs)
 }
 
-export function useMemo (cb, inputs) {
+export function useMemo(cb, inputs) {
   return () => {
     let current = getCurrentFiber()
     if (current) {
@@ -50,21 +50,21 @@ export function useMemo (cb, inputs) {
   }
 }
 
-export function createContext (initContext = {}) {
+export function createContext(initContext = {}) {
   let context = initContext
   let setters = []
-  const update = newContext => setters.forEach(fn => fn(newContext))
+  const update = newContext => {
+    setters.forEach(fn => fn(newContext))
+    setters = []
+  }
   const subscribe = fn => setters.push(fn)
-  const unSubscribe = fn => (setters = setters.filter(f => f !== fn))
-  
-  return { context, update, subscribe, unSubscribe }
+
+  return { context, update, subscribe, setters }
 }
 
-export function useContext (ctx) {
+export function useContext(ctx) {
+  ctx.setters = []
   const [context, setContext] = useState(ctx.context)
-
   ctx.subscribe(setContext)
-  useEffect(() => ctx.unSubscribe(setContext))
-
   return [context, ctx.update]
 }

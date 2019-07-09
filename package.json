@@ -17,8 +17,8 @@
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "@babel/core": "^7.5.0",
-    "@babel/preset-env": "^7.5.0",
+    "@babel/core": "^7.0.0-0",
+    "@babel/preset-env": "^7.5.2",
     "@babel/preset-typescript": "^7.3.3",
     "@types/jest": "^24.0.15",
     "babel-jest": "^24.8.0",
