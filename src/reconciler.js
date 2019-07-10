@@ -72,8 +72,6 @@ function updateHOOK(WIP) {
   const children = WIP.type(WIP.props)
   reconcileChildren(WIP, children)
   currentFiber.patches = WIP.patches
-  //如果是跨端，需要提前执行 effect
-  options.end && currentFiber.effect && currentFiber.effect()
 }
 function fiberize(children, WIP) {
   return (WIP.children = hashfy(children))
