@@ -1,6 +1,6 @@
 {
   "name": "fre",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "description": "",
   "main": "dist/fre.js",
   "unpkg": "dist/fre.umd.js",
@@ -10,7 +10,7 @@
     "typecheck": "tsc --declaration",
     "build:umd": "cross-env NODE_ENV=umd rollup -c ",
     "build:cjs": "cross-env NODE_ENV=cjs rollup -c ",
-    "build": "yarn typecheck && yarn build:cjs && yarn build:umd"
+    "build": "yarn build:cjs && yarn build:umd"
   },
   "keywords": [],
   "author": "132yse",
