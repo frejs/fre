@@ -50,21 +50,20 @@ export function useMemo(cb, inputs) {
   }
 }
 
-export function createContext(initContext = {}) {
-  let context = initContext
-  let setters = []
-  const update = newContext => {
-    setters.forEach(fn => fn(newContext))
-    setters = []
+export function createContext(init = {}) {
+  let context = init
+  let set = {}
+  const update = context => {
+    for (let key in set) set[key](context)
   }
-  const subscribe = fn => setters.push(fn)
+  const subscribe = (fn, name) => set[name] = fn
 
-  return { context, update, subscribe, setters }
+  return { context, update, subscribe, set }
 }
 
 export function useContext(ctx) {
-  ctx.setters = []
   const [context, setContext] = useState(ctx.context)
-  ctx.subscribe(setContext)
+  const current = getCurrentFiber()
+  ctx.subscribe(setContext, current.type.name)
   return [context, ctx.update]
 }
