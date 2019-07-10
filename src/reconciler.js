@@ -152,7 +152,6 @@ function completeWork(fiber) {
 
 function commitWork(WIP) {
   WIP.patches.forEach(p => commit(p))
-  currentFiber.effect && currentFiber.effect()
   nextWork = pendingCommit = null
 }
 
@@ -165,6 +164,7 @@ function commit(fiber) {
   let dom = fiber.base || fiber.child.base
   const { insertPoint, patchTag } = fiber
   if (fiber.tag == HOOK) {
+    fiber.effect && fiber.effect()
     if (patchTag == DELETE) parent.removeChild(dom)
   } else if (patchTag == UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props)
