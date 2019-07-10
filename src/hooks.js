@@ -1,8 +1,8 @@
-import { scheduleWork, getCurrentFiber } from './reconciler'
+import { scheduleWork, getWIP } from './reconciler'
 let cursor = 0
 
 function update(key, reducer, value) {
-  const current = this ? this : getCurrentFiber()
+  const current = this ? this : getWIP()
   value = reducer ? reducer(current.state[key], value) : value
   current.state[key] = value
   scheduleWork(current)
@@ -14,7 +14,7 @@ export function useState(initState) {
   return useReducer(null, initState)
 }
 export function useReducer(reducer, initState) {
-  let current = getCurrentFiber()
+  let current = getWIP()
   if (!current) return [initState, setter]
   let key = '$' + cursor
   let setter = update.bind(current, key, reducer)
@@ -29,13 +29,13 @@ export function useReducer(reducer, initState) {
 }
 
 export function useEffect(cb, inputs) {
-  let current = getCurrentFiber()
+  let current = getWIP()
   if (current) current.effect = useMemo(cb, inputs)
 }
 
 export function useMemo(cb, inputs) {
   return () => {
-    let current = getCurrentFiber()
+    let current = getWIP()
     if (current) {
       let hasChaged = inputs
         ? (current.oldInputs || []).some((v, i) => inputs[i] !== v)
@@ -63,7 +63,7 @@ export function createContext(init = {}) {
 
 export function useContext(ctx) {
   const [context, setContext] = useState(ctx.context)
-  const current = getCurrentFiber()
+  const current = getWIP()
   ctx.subscribe(setContext, current.type.name)
   return [context, ctx.update]
 }

@@ -2,15 +2,15 @@ import { createElement, updateElement } from './element'
 import { resetCursor } from './hooks'
 import { defer, hashfy, merge, isSame } from './util'
 
+const options = {}
 const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
-export const options = {}
 
 let updateQueue = []
 let nextWork = null
 let pendingCommit = null
 let currentFiber = null
 
-export function render(vnode, el) {
+function render(vnode, el) {
   let rootFiber = {
     tag: ROOT,
     base: el,
@@ -19,7 +19,7 @@ export function render(vnode, el) {
   scheduleWork(rootFiber)
 }
 
-export function scheduleWork(fiber) {
+function scheduleWork(fiber) {
   updateQueue.push(fiber)
   defer(workLoop)
 }
@@ -182,6 +182,8 @@ function commit(fiber) {
   parentFiber.patches = fiber.patches = []
 }
 
-export function getCurrentFiber() {
+function getWIP() {
   return currentFiber || null
 }
+
+export { render, scheduleWork, getWIP, options }
