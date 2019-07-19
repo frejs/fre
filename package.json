@@ -1,16 +1,15 @@
 {
   "name": "fre",
-  "version": "1.4.7",
+  "version": "1.4.9",
   "description": "",
   "main": "dist/fre.js",
   "unpkg": "dist/fre.umd.js",
   "typings": "dist/index.d.ts",
   "scripts": {
     "test": "jest && tsc --noEmit",
-    "build:umd": "cross-env NODE_ENV=umd rollup -c ",
-    "build:cjs": "cross-env NODE_ENV=cjs rollup -c ",
-    "build": "yarn build:cjs && yarn build:umd",
-    "minify":"terser dist/fre.js -o dist/fre.js -mc"
+    "build:iife": "rollup -i src/index.js -o dist/fre.js --no-esModule -mf iife -n fre",
+    "minify": "terser dist/fre.js -o dist/fre.js -mc --source-map includeSources,url=fre.js.map",
+    "build": "yarn build:iife&&yarn minify"
   },
   "keywords": [],
   "author": "132yse",
