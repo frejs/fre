@@ -7,10 +7,10 @@
   "typings": "dist/index.d.ts",
   "scripts": {
     "test": "jest && tsc --noEmit",
-    "typecheck": "tsc --declaration",
     "build:umd": "cross-env NODE_ENV=umd rollup -c ",
     "build:cjs": "cross-env NODE_ENV=cjs rollup -c ",
-    "build": "yarn build:cjs && yarn build:umd"
+    "build": "yarn build:cjs && yarn build:umd",
+    "minify":"terser dist/fre.js -o dist/fre.js -mc"
   },
   "keywords": [],
   "author": "132yse",
@@ -18,7 +18,6 @@
   "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.0.0-0",
-    "@babel/preset-env": "^7.5.2",
     "@babel/preset-typescript": "^7.3.3",
     "@types/jest": "^24.0.15",
     "babel-jest": "^24.8.0",
@@ -29,6 +28,7 @@
     "rollup-plugin-cleanup": "^3.1.1",
     "rollup-plugin-license": "^0.8.1",
     "rollup-plugin-uglify-es": "^0.0.1",
+    "terser": "^4.1.2",
     "typescript": "^3.5.2"
   }
 }

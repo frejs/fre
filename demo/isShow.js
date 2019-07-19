@@ -4,7 +4,7 @@ function Counter () {
   const [isShow, set] = useState(false)
   return (
     <div>
-      {isShow ? <A /> : <B />}
+      {isShow ? <h1>222</h1>: <h1>111</h1>}
       <button onClick={() => set(!isShow)}>change</button>
     </div>
   )

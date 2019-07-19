@@ -12,12 +12,6 @@ export default {
     name: 'fre'
   },
   plugins: [
-    // babel({
-    //   babelrc: true,
-    //   exclude: 'node_modules/**',
-    //   externalHelpers: true,
-    //   extensions: ['.js', '.ts'],
-    // }),
     license({
       banner: `by 132yse Copyright ${JSON.stringify(new Date()).replace(
         /T.*|"/g,

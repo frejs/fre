@@ -56,14 +56,17 @@ export function createContext(init = {}) {
   const update = context => {
     for (let key in set) set[key](context)
   }
-  const subscribe = (fn, name) => set[name] = fn
+  const subscribe = (fn, name) => {
+    if(name in set) return
+    set[name] = fn
+  }
 
   return { context, update, subscribe, set }
 }
 
 export function useContext(ctx) {
   const [context, setContext] = useState(ctx.context)
-  const current = getWIP()
-  ctx.subscribe(setContext, current.type.name)
+  const name = getWIP().type.name
+  ctx.subscribe(setContext, name)
   return [context, ctx.update]
 }

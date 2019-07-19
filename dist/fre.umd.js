@@ -1,5 +1,5 @@
 /**
- * by 132yse Copyright 2019-07-10
+ * by 132yse Copyright 2019-07-19
  */
 
 (function (global, factory) {
@@ -97,7 +97,7 @@
 
   let cursor = 0;
   function update(key, reducer, value) {
-    const current = this ? this : getCurrentFiber();
+    const current = this ? this : getWIP();
     value = reducer ? reducer(current.state[key], value) : value;
     current.state[key] = value;
     scheduleWork(current);
@@ -109,7 +109,7 @@
     return useReducer(null, initState)
   }
   function useReducer(reducer, initState) {
-    let current = getCurrentFiber();
+    let current = getWIP();
     if (!current) return [initState, setter]
     let key = '$' + cursor;
     let setter = update.bind(current, key, reducer);
@@ -123,12 +123,12 @@
     }
   }
   function useEffect(cb, inputs) {
-    let current = getCurrentFiber();
+    let current = getWIP();
     if (current) current.effect = useMemo(cb, inputs);
   }
   function useMemo(cb, inputs) {
     return () => {
-      let current = getCurrentFiber();
+      let current = getWIP();
       if (current) {
         let hasChaged = inputs
           ? (current.oldInputs || []).some((v, i) => inputs[i] !== v)
@@ -148,18 +148,21 @@
     const update = context => {
       for (let key in set) set[key](context);
     };
-    const subscribe = (fn, name) => set[name] = fn;
+    const subscribe = (fn, name) => {
+      if(name in set) return
+      set[name] = fn;
+    };
     return { context, update, subscribe, set }
   }
   function useContext(ctx) {
     const [context, setContext] = useState(ctx.context);
-    const current = getCurrentFiber();
-    ctx.subscribe(setContext, current.type.name);
+    const name = getWIP().type.name;
+    ctx.subscribe(setContext, name);
     return [context, ctx.update]
   }
 
-  const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6];
   const options = {};
+  const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6];
   let updateQueue = [];
   let nextWork = null;
   let pendingCommit = null;
@@ -218,7 +221,6 @@
     const children = WIP.type(WIP.props);
     reconcileChildren(WIP, children);
     currentFiber.patches = WIP.patches;
-    options.end && currentFiber.effect && currentFiber.effect();
   }
   function fiberize(children, WIP) {
     return (WIP.children = hashfy(children))
@@ -287,7 +289,6 @@
   }
   function commitWork(WIP) {
     WIP.patches.forEach(p => commit(p));
-    currentFiber.effect && currentFiber.effect();
     nextWork = pendingCommit = null;
   }
   function commit(fiber) {
@@ -299,6 +300,7 @@
     let dom = fiber.base || fiber.child.base;
     const { insertPoint, patchTag } = fiber;
     if (fiber.tag == HOOK) {
+      fiber.effect && fiber.effect();
       if (patchTag == DELETE) parent.removeChild(dom);
     } else if (patchTag == UPDATE) {
       updateElement(dom, fiber.alternate.props, fiber.props);
@@ -315,7 +317,7 @@
     }
     parentFiber.patches = fiber.patches = [];
   }
-  function getCurrentFiber() {
+  function getWIP() {
     return currentFiber || null
   }
 
