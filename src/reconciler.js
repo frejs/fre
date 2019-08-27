@@ -22,18 +22,17 @@ function render (vnode, el) {
 
 function scheduleWork (fiber) {
   updateQueue.push(fiber)
-  defer(workLoop)
+  if (!nextWork) {
+    const update = updateQueue.shift()
+    nextWork = update
+    defer(workLoop)
+  }
 }
 
 function workLoop (startTime = 0) {
   if (startTime && performance.now() - startTime > FPS) {
     defer(workLoop)
   } else {
-    if (!nextWork && updateQueue.length) {
-      const update = updateQueue.shift()
-      nextWork = update
-      defer(workLoop)
-    }
     while (nextWork) {
       const nextTime = performance.now()
       nextWork = performWork(nextWork)
