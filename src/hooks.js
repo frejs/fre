@@ -1,19 +1,19 @@
 import { scheduleWork, getWIP } from './reconciler'
 let cursor = 0
 
-function update(key, reducer, value) {
+function update (key, reducer, value) {
   const current = this ? this : getWIP()
   value = reducer ? reducer(current.state[key], value) : value
   current.state[key] = value
   scheduleWork(current)
 }
-export function resetCursor() {
+export function resetCursor () {
   cursor = 0
 }
-export function useState(initState) {
+export function useState (initState) {
   return useReducer(null, initState)
 }
-export function useReducer(reducer, initState) {
+export function useReducer (reducer, initState) {
   let current = getWIP()
   if (!current) return [initState, setter]
   let key = '$' + cursor
@@ -28,13 +28,16 @@ export function useReducer(reducer, initState) {
   }
 }
 
-export function useEffect(cb, inputs) {
+export function useEffect (cb, inputs) {
   let current = getWIP()
-  if (current) current.effect = useMemo(cb, inputs)
+  if (current) current.effect = useCallback(cb, inputs)
 }
 
-export function useMemo(cb, inputs) {
-  return () => {
+export function useCallback (cb, inputs) {
+  return useMemo(() => cb, inputs)
+}
+
+export function useMemo (cb, inputs) {
     let current = getWIP()
     if (current) {
       let hasChaged = inputs
@@ -44,27 +47,27 @@ export function useMemo(cb, inputs) {
         hasChaged = true
         current.isMounted = true
       }
-      if (hasChaged) cb()
+      if (hasChaged) const res = cb()
       current.oldInputs = inputs
+      return res
     }
   }
-}
 
-export function createContext(init = {}) {
+export function createContext (init = {}) {
   let context = init
   let set = {}
   const update = context => {
     for (let key in set) set[key](context)
   }
   const subscribe = (fn, name) => {
-    if(name in set) return
+    if (name in set) return
     set[name] = fn
   }
 
   return { context, update, subscribe, set }
 }
 
-export function useContext(ctx) {
+export function useContext (ctx) {
   const [context, setContext] = useState(ctx.context)
   const name = getWIP().type.name
   ctx.subscribe(setContext, name)
