@@ -35,12 +35,13 @@ function workLoop (startTime = 0) {
   } else {
     const nextTime = performance.now()
     nextWork = performWork(nextWork)
-    if (nextWork) workLoop(nextTime)
-  }
-  if (pendingCommit) {
-    options.commitWork
-      ? options.commitWork(pendingCommit)
-      : commitWork(pendingCommit)
+    if (nextWork) {
+      workLoop(nextTime)
+    } else {
+      options.commitWork
+        ? options.commitWork(pendingCommit)
+        : commitWork(pendingCommit)
+    }
   }
 }
 
