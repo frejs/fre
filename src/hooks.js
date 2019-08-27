@@ -38,20 +38,20 @@ export function useCallback (cb, inputs) {
 }
 
 export function useMemo (cb, inputs) {
-    let current = getWIP()
-    if (current) {
-      let hasChaged = inputs
-        ? (current.oldInputs || []).some((v, i) => inputs[i] !== v)
-        : true
-      if (inputs && !inputs.length && !current.isMounted) {
-        hasChaged = true
-        current.isMounted = true
-      }
-      if (hasChaged) const res = cb()
-      current.oldInputs = inputs
-      return res
+  let current = getWIP()
+  if (current) {
+    let hasChaged = inputs
+      ? (current.oldInputs || []).some((v, i) => inputs[i] !== v)
+      : true
+    if (inputs && !inputs.length && !current.isMounted) {
+      hasChaged = true
+      current.isMounted = true
     }
+    current.oldInputs = inputs
+    
+    if (hasChaged) return cb()
   }
+}
 
 export function createContext (init = {}) {
   let context = init
