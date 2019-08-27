@@ -33,11 +33,9 @@ function workLoop (startTime = 0) {
   if (startTime && performance.now() - startTime > FPS) {
     defer(workLoop)
   } else {
-    while (nextWork) {
-      const nextTime = performance.now()
-      nextWork = performWork(nextWork)
-      workLoop(nextTime)
-    }
+    const nextTime = performance.now()
+    nextWork = performWork(nextWork)
+    if (nextWork) workLoop(nextTime)
   }
   if (pendingCommit) {
     options.commitWork
