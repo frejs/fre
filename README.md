@@ -10,9 +10,9 @@
 
 ### Feature
 
-- :tada: really functionalComponent, hooks API, render props
-- :confetti_ball: Fiber Scheduler and hash keyed diff algorithm
-- :telescope: minimal but wonderful , just 1 KB , no dependences
+- :tada: really functionalComponent, hooks API
+- :confetti_ball: Async rendering like react Fiber and keyed diff algorithm
+- :telescope: minimal but perfect , fast 1 KB , no dependences
 
 ### Introduction
 
@@ -313,15 +313,15 @@ Fre supports most JSX syntax, `if-else` is also Ok but need to be careful.
 
 because there no `key` for them, please use it as late as possible.
 
-#### Fiber
+#### Async rendering
 
-Fiber is a priority scheduling scheme.
+Fre use `requestAnimationFrame` to update, It like react Fiber but tinier than. 
 
-It uses the traversal form of linked list to achieve time slicing
+Async is also called `time slicing`.
 
-#### hash.keyed diff
+#### keyed diff
 
-Fre implements a compact diff algorithm
+Fre implements a compact diff algorithm support keyed
 
 It uses hash to mark locations for easy comparison
 
