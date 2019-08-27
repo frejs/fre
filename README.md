@@ -48,8 +48,6 @@ render(<Counter />, document.getElementById('root'))
 
 ### Hooks API
 
-react hooks API is a miracle, and fre will make it become a leading role
-
 * [useState](https://github.com/132yse/fre#usestate)
 
 * [useEffect](https://github.com/132yse/fre#useeffect)
