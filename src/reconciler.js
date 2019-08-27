@@ -167,10 +167,7 @@ function commit (fiber) {
   const parent = parentFiber.base
   let dom = fiber.base || fiber.child.base
   const { insertPoint, patchTag } = fiber
-  if (fiber.tag == HOOK) {
-    fiber.effect && fiber.effect()
-    if (patchTag == DELETE) parent.removeChild(dom)
-  } else if (patchTag == UPDATE) {
+  if (patchTag == UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props)
   } else if (patchTag == DELETE) {
     parent.removeChild(dom)
