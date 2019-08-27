@@ -3,6 +3,7 @@ import { resetCursor } from './hooks'
 import { defer, hashfy, merge, isSame } from './util'
 
 const options = {}
+const FPS = 1000 / 60
 const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
 
 let updateQueue = []
@@ -10,7 +11,7 @@ let nextWork = null
 let pendingCommit = null
 let currentFiber = null
 
-function render(vnode, el) {
+function render (vnode, el) {
   let rootFiber = {
     tag: ROOT,
     base: el,
@@ -19,21 +20,26 @@ function render(vnode, el) {
   scheduleWork(rootFiber)
 }
 
-function scheduleWork(fiber) {
+function scheduleWork (fiber) {
   updateQueue.push(fiber)
   defer(workLoop)
 }
 
-function workLoop() {
-  if (!nextWork && updateQueue.length) {
-    const update = updateQueue.shift()
-    if (!update) return
-    nextWork = update
+function workLoop (startTime = 0) {
+  if (startTime && performance.now() - startTime > FPS) {
+    defer(workLoop)
+  } else {
+    if (!nextWork && updateQueue.length) {
+      const update = updateQueue.shift()
+      nextWork = update
+      defer(workLoop)
+    }
+    while (nextWork) {
+      const nextTime = performance.now()
+      nextWork = performWork(nextWork)
+      workLoop(nextTime)
+    }
   }
-  while (nextWork) {
-    nextWork = performWork(nextWork)
-  }
-
   if (pendingCommit) {
     options.commitWork
       ? options.commitWork(pendingCommit)
@@ -41,7 +47,7 @@ function workLoop() {
   }
 }
 
-function performWork(WIP) {
+function performWork (WIP) {
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
   while (WIP) {
@@ -51,7 +57,7 @@ function performWork(WIP) {
   }
 }
 
-function updateHost(WIP) {
+function updateHost (WIP) {
   if (!options.end && !WIP.base) {
     WIP.base = createElement(WIP)
   }
@@ -64,7 +70,7 @@ function updateHost(WIP) {
   reconcileChildren(WIP, children)
 }
 
-function updateHOOK(WIP) {
+function updateHOOK (WIP) {
   WIP.props = WIP.props || {}
   WIP.state = WIP.state || {}
   currentFiber = WIP
@@ -73,11 +79,11 @@ function updateHOOK(WIP) {
   reconcileChildren(WIP, children)
   currentFiber.patches = WIP.patches
 }
-function fiberize(children, WIP) {
+function fiberize (children, WIP) {
   return (WIP.children = hashfy(children))
 }
 
-function reconcileChildren(WIP, children) {
+function reconcileChildren (WIP, children) {
   const oldFibers = WIP.children
   const newFibers = fiberize(children, WIP)
   let reused = {}
@@ -131,13 +137,13 @@ function reconcileChildren(WIP, children) {
   if (prevFiber) prevFiber.sibling = null
 }
 
-function createFiber(vnode, data) {
+function createFiber (vnode, data) {
   data.tag = typeof vnode.type === 'function' ? HOOK : HOST
   vnode.props = vnode.props || { nodeValue: vnode.nodeValue }
   return merge(vnode, data)
 }
 
-function completeWork(fiber) {
+function completeWork (fiber) {
   if (!options.end && fiber.parent) {
     fiber.parent.patches = (fiber.parent.patches || []).concat(
       fiber.patches || [],
@@ -148,12 +154,12 @@ function completeWork(fiber) {
   }
 }
 
-function commitWork(WIP) {
+function commitWork (WIP) {
   WIP.patches.forEach(p => commit(p))
   nextWork = pendingCommit = null
 }
 
-function commit(fiber) {
+function commit (fiber) {
   let parentFiber = fiber.parent
   while (parentFiber.tag == HOOK) {
     parentFiber = parentFiber.parent
@@ -180,7 +186,7 @@ function commit(fiber) {
   parentFiber.patches = fiber.patches = []
 }
 
-function getWIP() {
+function getWIP () {
   return currentFiber || null
 }
 
