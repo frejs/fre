@@ -138,7 +138,7 @@ function Counter({ flag }) {
 render(<Counter />, document.getElementById('root'))
 ```
 
-#### useCallbak
+#### useCallback
 
 `useCallback` has the same parameters as `useEffect`, but `useCallback` will return a cached function.
 
