@@ -19,8 +19,8 @@
 Fre (pronounced `/fri:/`, like free) is a tiny and perfect js library, It means [Free!](https://www.clicli.us/search/free) ~
 
 | Package                                              | Version                                             | About                 |
-|------------------------------------------------------|-----------------------------------------------------|-----------------------|
-| [`Fre`](https://github.com/132yse/fre)              | ![npm](https://img.shields.io/npm/v/fre.svg)        | fre core              |
+| ---------------------------------------------------- | --------------------------------------------------- | --------------------- |
+| [`Fre`](https://github.com/132yse/fre)               | ![npm](https://img.shields.io/npm/v/fre.svg)        | fre core              |
 | [`Fard`](https://github.com/132yse/fard)             | ![npm](https://img.shields.io/npm/v/fard.svg)       | mini-program with fre |
 | [`use-routes`](https://github.com/132yse/use-routes) | ![npm](https://img.shields.io/npm/v/use-routes.svg) | router for fre        |
 
@@ -128,18 +128,45 @@ function Counter({ flag }) {
 render(<Counter />, document.getElementById('root'))
 ```
 
+#### useCallbak
+
+`useCallback` has the same parameters as `useEffect`, but `useCallback` will return a cached function.
+
+```js
+const set = new Set()
+
+function Counter() {
+  const [count, setCount] = useState(0)
+  const cb = useCallback(() => {
+    console.log('cb was cached')
+  }, [count])
+  set.add(cb)
+  
+  return (
+    <div>
+      <h1>{set.size}</h1>
+      <button onClick={() => setCount(count + 1)}>+</button>
+    </div>
+  )
+}
+```
+
 #### useMemo
 
-`useMemo` has the same parameters as `useEffect`, but `useMemo` will be ran immediately.
+`useMemo` has the same parameters as `useEffect`, but `useMemo` will return a cached value.
 
 ```js
 function Counter() {
   const [count, setCount] = useState(0)
+  const val = useMemo(() => {
+    return new Date()
+  }, [count])
   return (
     <div>
-      <h1>{count}</h1>
+      <h1>
+        {count} - {val}
+      </h1>
       <button onClick={() => setCount(count + 1)}>+</button>
-      {(useMemo(<Sex />), [])}
     </div>
   )
 }
@@ -315,7 +342,7 @@ because there no `key` for them, please use it as late as possible.
 
 #### Async rendering
 
-Fre use `requestAnimationFrame` to update, It like react Fiber but tinier than. 
+Fre use `requestAnimationFrame` to update, It like react Fiber but tinier than.
 
 Async is also called `time slicing`.
 
@@ -328,5 +355,3 @@ It uses hash to mark locations for easy comparison
 #### License
 
 _MIT_ ©132yse inspired by [anu](https://github.com/RubyLouvre/anu)
-
-
