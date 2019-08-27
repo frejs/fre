@@ -50,6 +50,13 @@ render(<Counter />, document.getElementById('root'))
 
 react hooks API is a miracle, and fre will make it become a leading role
 
+[useState](https://github.com/132yse/fre#usestate)
+[useEffect](https://github.com/132yse/fre#useeffect)
+[useContext](https://github.com/132yse/fre#usecontext)
+[useReducer](https://github.com/132yse/fre#usereducer)
+[useCallback](https://github.com/132yse/fre#usecallback)
+[useMemo](https://github.com/132yse/fre#usememo)
+
 #### useState
 
 `useState` is a base API, It will receive initial state and return a Array
@@ -141,7 +148,7 @@ function Counter() {
     console.log('cb was cached')
   }, [count])
   set.add(cb)
-  
+
   return (
     <div>
       <h1>{set.size}</h1>
