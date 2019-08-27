@@ -23,8 +23,7 @@ function render (vnode, el) {
 function scheduleWork (fiber) {
   updateQueue.push(fiber)
   if (!nextWork) {
-    const update = updateQueue.shift()
-    nextWork = update
+    nextWork = updateQueue.shift()
     defer(workLoop)
   }
 }
