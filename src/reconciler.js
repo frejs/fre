@@ -1,4 +1,4 @@
-import { createElement, updateElement } from './element'
+import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { defer, hashfy, merge, isSame } from './util'
 

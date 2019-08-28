@@ -8,7 +8,7 @@ function App () {
     <div>
       <ul>
         {arr.map(item => (
-          <A key={item} num={item}/>
+          <A key={item} val={item}/>
         ))}
       </ul>
       <button onClick={() => setArr(['B','A','D','C'])}>+</button>
@@ -17,7 +17,7 @@ function App () {
 }
 
 function A(props){
-  return <div>{props.num}</div>
+  return <div>{props.val}</div>
 }
 // function App () {
 //   const [arr, setArr] = useState(['A', 'B','C','D','E','F'])
