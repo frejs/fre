@@ -18,8 +18,8 @@ export function hashfy (arr) {
 
 export function merge (a, b) {
   let out = {}
-  for (var i in a) out[i] = a[i]
-  for (var i in b) out[i] = b[i]
+  for (const i in a) out[i] = a[i]
+  for (const i in b) out[i] = b[i]
   return out
 }
 export const defer = requestAnimationFrame || setTimeout
