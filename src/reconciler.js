@@ -103,16 +103,20 @@ function reconcileChildren (WIP, children) {
     let newFiber = newFibers[k]
     let oldFiber = reused[k]
 
-    if (oldFiber && isSame(oldFiber, newFiber)) {
-      alternate = createFiber(oldFiber, {
-        patchTag: UPDATE
-      })
-
-      if (!options.end) newFiber.patchTag = UPDATE
-      newFiber = merge(alternate, newFiber)
-      newFiber.alternate = alternate
-      if (oldFiber.key || isFn(oldFiber.parent.type)) {
-        newFiber.patchTag = REPLACE
+    if (oldFiber) {
+      if (isSame(oldFiber, newFiber)) {
+        alternate = createFiber(oldFiber, {
+          patchTag: UPDATE
+        })
+        if (!options.end) newFiber.patchTag = UPDATE
+        newFiber = merge(alternate, newFiber)
+        newFiber.alternate = alternate
+        if (oldFiber.key) {
+          newFiber.patchTag = REPLACE
+        }
+      } else {
+        oldFiber.patchTag = DELETE
+        WIP.patches.push(oldFiber)
       }
     } else {
       newFiber = createFiber(newFiber, {
@@ -156,12 +160,12 @@ function commitWork (WIP) {
 }
 
 function commit (fiber) {
-  let parentFiber = fiber.parent
-  while (parentFiber.tag == HOOK) {
-    parentFiber = parentFiber.parent
-  }
-  const parent = parentFiber.base
+  let p = fiber.parent
+  while (p.tag == HOOK) p = p.parent
+
+  const parent = p.base
   let dom = fiber.base || fiber.child.base
+
   const { insertPoint, patchTag } = fiber
   if (fiber.parent.tag === ROOT) {
   } else if (patchTag == UPDATE) {
@@ -170,14 +174,13 @@ function commit (fiber) {
     parent.removeChild(dom)
   } else {
     let after = insertPoint
-      ? patchTag == PLACE
-        ? insertPoint.base.nextSibling
-        : insertPoint.base.nextSibling || parent.firstChild
+      ? insertPoint.base.nextSibling || parent.firstChild
       : null
     if (after == dom) return
+    if (patchTag == PLACE) after = null
     parent.insertBefore(dom, after)
   }
-  parentFiber.patches = []
+  p.patches = []
   fiber.patches = []
 }
 
