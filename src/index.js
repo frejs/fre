@@ -6,7 +6,8 @@ import {
   useEffect,
   useMemo,
   createContext,
-  useContext
+  useContext,
+  useCallback
 } from './hooks'
 
 export {
@@ -20,5 +21,6 @@ export {
   useEffect,
   useMemo,
   createContext,
-  useContext
+  useContext,
+  useCallback
 }

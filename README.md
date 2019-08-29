@@ -4,13 +4,13 @@
 <p align="center">
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/v/fre.svg?style=flat-square" alt="npm-v"></a>
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/dt/fre.svg?style=flat-square" alt="npm-d"></a>
-<a href="https://bundlephobia.com/result?p=fre"><img src="https://img.shields.io/bundlephobia/minzip/fre.svg?style=flat-square" alt="gzip"></a>
+<a href="https://bundlephobia.com/result?p=fre"><img src="http://img.badgesize.io/https://unpkg.com/fre/dist/fre.js?compression=gzip&style=flat-square" alt="gzip"></a>
 <a href="https://jq.qq.com/?_wv=1027&k=5Zyggbc"><img src="https://img.shields.io/badge/qq.group-813783512-ff69b4.svg?maxAge=2592000&style=flat-square"></a>
 </p>
 
 ### Feature
 
-- :tada: really functionalComponent, hooks API
+- :tada: really functionalComponent and hooks API
 - :confetti_ball: Async rendering like react Fiber and keyed diff algorithm
 - :telescope: minimal but perfect , fast 1 KB , no dependences
 
@@ -19,8 +19,8 @@
 Fre (pronounced `/fri:/`, like free) is a tiny and perfect js library, It means [Free!](https://www.clicli.us/search/free) ~
 
 | Package                                              | Version                                             | About                 |
-|------------------------------------------------------|-----------------------------------------------------|-----------------------|
-| [`Fre`](https://github.com/132yse/fre)              | ![npm](https://img.shields.io/npm/v/fre.svg)        | fre core              |
+| ---------------------------------------------------- | --------------------------------------------------- | --------------------- |
+| [`Fre`](https://github.com/132yse/fre)               | ![npm](https://img.shields.io/npm/v/fre.svg)        | fre core              |
 | [`Fard`](https://github.com/132yse/fard)             | ![npm](https://img.shields.io/npm/v/fard.svg)       | mini-program with fre |
 | [`use-routes`](https://github.com/132yse/use-routes) | ![npm](https://img.shields.io/npm/v/use-routes.svg) | router for fre        |
 
@@ -48,7 +48,17 @@ render(<Counter />, document.getElementById('root'))
 
 ### Hooks API
 
-react hooks API is a miracle, and fre will make it become a leading role
+* [useState](https://github.com/132yse/fre#usestate)
+
+* [useEffect](https://github.com/132yse/fre#useeffect)
+
+* [useContext](https://github.com/132yse/fre#usecontext)
+
+* [useReducer](https://github.com/132yse/fre#usereducer)
+
+* [useCallback](https://github.com/132yse/fre#usecallback)
+
+* [useMemo](https://github.com/132yse/fre#usememo)
 
 #### useState
 
@@ -128,18 +138,45 @@ function Counter({ flag }) {
 render(<Counter />, document.getElementById('root'))
 ```
 
+#### useCallback
+
+`useCallback` has the same parameters as `useEffect`, but `useCallback` will return a cached function.
+
+```js
+const set = new Set()
+
+function Counter() {
+  const [count, setCount] = useState(0)
+  const cb = useCallback(() => {
+    console.log('cb was cached')
+  }, [count])
+  set.add(cb)
+
+  return (
+    <div>
+      <h1>{set.size}</h1>
+      <button onClick={() => setCount(count + 1)}>+</button>
+    </div>
+  )
+}
+```
+
 #### useMemo
 
-`useMemo` has the same parameters as `useEffect`, but `useMemo` will be ran immediately.
+`useMemo` has the same parameters as `useEffect`, but `useMemo` will return a cached value.
 
 ```js
 function Counter() {
   const [count, setCount] = useState(0)
+  const val = useMemo(() => {
+    return new Date()
+  }, [count])
   return (
     <div>
-      <h1>{count}</h1>
+      <h1>
+        {count} - {val}
+      </h1>
       <button onClick={() => setCount(count + 1)}>+</button>
-      {(useMemo(<Sex />), [])}
     </div>
   )
 }
@@ -315,9 +352,9 @@ because there no `key` for them, please use it as late as possible.
 
 #### Async rendering
 
-Fre use `requestAnimationFrame` to update, It like react Fiber but tinier than. 
+Fre use `requestAnimationFrame` to process update queue, It like react Fiber but tinier than.
 
-Async is also called `time slicing`.
+Async rendering is also called `time slicing`.
 
 #### keyed diff
 
@@ -328,5 +365,3 @@ It uses hash to mark locations for easy comparison
 #### License
 
 _MIT_ ©132yse inspired by [anu](https://github.com/RubyLouvre/anu)
-
-

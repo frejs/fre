@@ -1,4 +1,4 @@
-import { createElement, updateElement } from './element'
+import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { defer, hashfy, merge, isSame } from './util'
 
@@ -103,18 +103,16 @@ function reconcileChildren (WIP, children) {
     let newFiber = newFibers[k]
     let oldFiber = reused[k]
 
-    if (oldFiber) {
-      if (isSame(oldFiber, newFiber)) {
-        alternate = createFiber(oldFiber, {
-          patchTag: UPDATE
-        })
+    if (oldFiber && isSame(oldFiber, newFiber)) {
+      alternate = createFiber(oldFiber, {
+        patchTag: UPDATE
+      })
 
-        if (!options.end) newFiber.patchTag = UPDATE
-        newFiber = merge(alternate, newFiber)
-        newFiber.alternate = alternate
-        if (oldFiber.key) {
-          newFiber.patchTag = REPLACE
-        }
+      if (!options.end) newFiber.patchTag = UPDATE
+      newFiber = merge(alternate, newFiber)
+      newFiber.alternate = alternate
+      if (oldFiber.key) {
+        newFiber.patchTag = REPLACE
       }
     } else {
       newFiber = createFiber(newFiber, {
