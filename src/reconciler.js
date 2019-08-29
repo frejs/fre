@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
-import { defer, hashfy, merge, isSame } from './util'
+import { defer, hashfy, merge, isSame, isFn } from './util'
 
 const options = {}
 const FPS = 1000 / 60
@@ -111,7 +111,7 @@ function reconcileChildren (WIP, children) {
       if (!options.end) newFiber.patchTag = UPDATE
       newFiber = merge(alternate, newFiber)
       newFiber.alternate = alternate
-      if (oldFiber.key) {
+      if (oldFiber.key || isFn(oldFiber.parent.type)) {
         newFiber.patchTag = REPLACE
       }
     } else {
@@ -133,7 +133,7 @@ function reconcileChildren (WIP, children) {
 }
 
 function createFiber (vnode, data) {
-  data.tag = typeof vnode.type === 'function' ? HOOK : HOST
+  data.tag = isFn(vnode.type) ? HOOK : HOST
   vnode.props = vnode.props || { nodeValue: vnode.nodeValue }
   return merge(vnode, data)
 }
@@ -151,7 +151,8 @@ function completeWork (fiber) {
 
 function commitWork (WIP) {
   WIP.patches.forEach(p => commit(p))
-  nextWork = pendingCommit = null
+  nextWork = null
+  pendingCommit = null
 }
 
 function commit (fiber) {
@@ -162,7 +163,7 @@ function commit (fiber) {
   const parent = parentFiber.base
   let dom = fiber.base || fiber.child.base
   const { insertPoint, patchTag } = fiber
-  if (fiber.parent.tag == ROOT) {
+  if (fiber.parent.tag === ROOT) {
   } else if (patchTag == UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props)
   } else if (patchTag == DELETE) {
@@ -176,7 +177,8 @@ function commit (fiber) {
     if (after == dom) return
     parent.insertBefore(dom, after)
   }
-  parentFiber.patches = fiber.patches = []
+  parentFiber.patches = []
+  fiber.patches = []
 }
 
 function getWIP () {

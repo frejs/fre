@@ -23,3 +23,5 @@ export function merge (a, b) {
   return out
 }
 export const defer = requestAnimationFrame || setTimeout
+
+export const isFn = fn => typeof(fn) === 'function'
