@@ -1,5 +1,6 @@
 import { merge } from './util'
 export function h (type, props) {
+  console.log(arguments)
   let rest = []
   let children = []
   let length = arguments.length

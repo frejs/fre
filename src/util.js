@@ -5,10 +5,11 @@ export const isSame = (a, b) => a.type === b.type
 export const isNew = (o, n) => k =>
   k !== 'children' && k !== 'key' && o[k] !== n[k]
 
-export function hashfy (arr) {
+export function hashfy (arr, kids) {
   let out = {}
   let i = 0
-  arrayfy(arr).forEach(item => {
+  const newKids = arrayfy(arr)
+  newKids.forEach(item => {
     let key = ((item || {}).props || {}).key
     key ? (out['.' + key] = item) : (out['.' + i] = item) && i++
   })
