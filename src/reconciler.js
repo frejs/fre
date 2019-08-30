@@ -103,6 +103,8 @@ function reconcileChildren (WIP, children) {
     let newFiber = newFibers[k]
     let oldFiber = reused[k]
 
+    console.log(oldFiber,newFiber)
+
     if (oldFiber) {
       if (isSame(oldFiber, newFiber)) {
         alternate = createFiber(oldFiber, {
@@ -166,22 +168,31 @@ function commit (fiber) {
   const parent = p.base
   let dom = fiber.base || fiber.child.base
 
-  const { insertPoint, patchTag } = fiber
+  const { patchTag } = fiber
   if (fiber.parent.tag === ROOT) {
   } else if (patchTag == UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props)
   } else if (patchTag == DELETE) {
     parent.removeChild(dom)
   } else {
+    const insertPoint = getInsertPoint(fiber)
     let after = insertPoint
       ? insertPoint.base.nextSibling || parent.firstChild
       : null
     if (after == dom) return
-    if (patchTag == PLACE) after = null
     parent.insertBefore(dom, after)
   }
   p.patches = []
   fiber.patches = []
+}
+
+function getInsertPoint (fiber) {
+  if (fiber.patchTag == PLACE) {
+    return null
+  }
+  if (fiber.insertPoint) {
+    return fiber.insertPoint
+  }
 }
 
 function getWIP () {

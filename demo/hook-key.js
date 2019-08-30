@@ -1,25 +1,32 @@
 import { h, render, useState } from '../src'
 
-function App () {
-  const [arr, setArr] = useState(1)
-  return (
-    <div>
-      {new Array(arr).fill().map(i => (
-        <A val={i} key={i}/>
-      ))}
-      <button onClick={() => setArr(arr+1)}>+</button>
-    </div>
-  )
-}
-
-function A (props) {
-  const [count, setCount] = useState(0)
+function Counter() {
+  const [count, setCount] = useState(0);
+  
   return (
     <div>
       {count}
-      <button onClick={() => setCount(count + 1)}>+</button>
+      <button onClick={() => setCount(count + 1)}>
+        +
+      </button>
     </div>
-  )
+  );
+}
+
+function App() {
+  const [counters, setCounters] = useState(1);
+
+  return <div>
+    {new Array(counters).fill().map(i => (
+      <Counter />
+    ))}
+    <button onClick={() => setCounters(counters + 1)}>
+      Add
+    </button>
+    <button onClick={() => setCounters(counters - 1)}>
+      Remove
+    </button>
+  </div>
 }
 
 // function App () {
