@@ -1,7 +1,6 @@
 export const arrayfy = arr => (!arr ? [] : Array.isArray(arr) ? arr : [arr])
 
-export const isSame = (a, b) =>
-  a.type === b.type || typeof a.type === typeof b.type
+export const isSame = (a, b) => a.type === b.type
 
 export const isNew = (o, n) => k =>
   k !== 'children' && k !== 'key' && o[k] !== n[k]
@@ -9,9 +8,20 @@ export const isNew = (o, n) => k =>
 export function hashfy (arr) {
   let out = {}
   let i = 0
-  arrayfy(arr).forEach(item => {
-    let key = ((item || {}).props || {}).key
-    key ? (out['.' + key] = item) : (out['.' + i] = item) && i++
+  let j = 0
+  const newKids = arrayfy(arr)
+  newKids.forEach(item => {
+    if (item.pop) {
+      item.forEach(item => {
+        let key = ((item || {}).props || {}).key
+        key
+          ? (out['.' + i + '.' + key] = item)
+          : (out['.' + i + '.' + j] = item) && j++
+      })
+      i++
+    } else {
+      ;(out['.' + i] = item) && i++
+    }
   })
   return out
 }
@@ -23,3 +33,5 @@ export function merge (a, b) {
   return out
 }
 export const defer = requestAnimationFrame || setTimeout
+
+export const isFn = fn => typeof fn === 'function'

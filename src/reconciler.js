@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
-import { defer, hashfy, merge, isSame } from './util'
+import { defer, hashfy, merge, isSame, isFn } from './util'
 
 const options = {}
 const FPS = 1000 / 60
@@ -77,7 +77,7 @@ function updateHOOK (WIP) {
   currentFiber.patches = WIP.patches
 }
 function fiberize (children, WIP) {
-  return (WIP.children = hashfy(children))
+  return (WIP.children = hashfy(children, WIP.children))
 }
 
 function reconcileChildren (WIP, children) {
@@ -88,6 +88,7 @@ function reconcileChildren (WIP, children) {
   for (let k in oldFibers) {
     let newFiber = newFibers[k]
     let oldFiber = oldFibers[k]
+
     if (newFiber && isSame(newFiber, oldFiber)) {
       reused[k] = oldFiber
     } else {
@@ -104,17 +105,14 @@ function reconcileChildren (WIP, children) {
     let oldFiber = reused[k]
 
     if (oldFiber) {
-      if (isSame(oldFiber, newFiber)) {
-        alternate = createFiber(oldFiber, {
-          patchTag: UPDATE
-        })
-
-        if (!options.end) newFiber.patchTag = UPDATE
-        newFiber = merge(alternate, newFiber)
-        newFiber.alternate = alternate
-        if (oldFiber.key) {
-          newFiber.patchTag = REPLACE
-        }
+      alternate = createFiber(oldFiber, {
+        patchTag: UPDATE
+      })
+      if (!options.end) newFiber.patchTag = UPDATE
+      newFiber = merge(alternate, newFiber)
+      newFiber.alternate = alternate
+      if (oldFiber.key) {
+        newFiber.patchTag = REPLACE
       }
     } else {
       newFiber = createFiber(newFiber, {
@@ -131,12 +129,11 @@ function reconcileChildren (WIP, children) {
     }
     prevFiber = newFiber
   }
-  if (prevFiber) prevFiber.sibling = null
 }
 
 function createFiber (vnode, data) {
-  data.tag = typeof vnode.type === 'function' ? HOOK : HOST
-  vnode.props = vnode.props || { nodeValue: vnode.nodeValue }
+  data.tag = isFn(vnode.type) ? HOOK : HOST
+  vnode.props = vnode.props
   return merge(vnode, data)
 }
 
@@ -153,23 +150,23 @@ function completeWork (fiber) {
 
 function commitWork (WIP) {
   WIP.patches.forEach(p => commit(p))
-  nextWork = pendingCommit = null
+  nextWork = null
+  pendingCommit = null
 }
-
 function commit (fiber) {
-  let parentFiber = fiber.parent
-  while (parentFiber.tag == HOOK) {
-    parentFiber = parentFiber.parent
-  }
-  const parent = parentFiber.base
+  let p = fiber.parent
+  while (p.tag == HOOK) p = p.parent
+  const parent = p.base
   let dom = fiber.base || fiber.child.base
-  const { insertPoint, patchTag } = fiber
-  if (fiber.tag == HOOK) {
+
+  const { patchTag } = fiber
+  if (fiber.parent.tag === ROOT) {
   } else if (patchTag == UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props)
   } else if (patchTag == DELETE) {
     parent.removeChild(dom)
   } else {
+    const insertPoint = getInsertPoint(fiber)
     let after = insertPoint
       ? patchTag == PLACE
         ? insertPoint.base.nextSibling
@@ -178,7 +175,14 @@ function commit (fiber) {
     if (after == dom) return
     parent.insertBefore(dom, after)
   }
-  parentFiber.patches = fiber.patches = []
+  p.patches = []
+  fiber.patches = []
+}
+
+function getInsertPoint (fiber) {
+  if (fiber.insertPoint) {
+    return fiber.insertPoint
+  }
 }
 
 function getWIP () {
