@@ -19,7 +19,7 @@ function updateProperty (dom, name, value, newValue) {
 
 export function updateElement (dom, props, newProps) {
   Object.keys(newProps)
-    .filter(isNew(props, newProps)) // 进行浅比较和过滤
+    .filter(isNew(props, newProps))
     .forEach(key => {
       if (key === 'value' || key === 'nodeValue') {
         dom[key] = newProps[key]

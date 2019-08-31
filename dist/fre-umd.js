@@ -81,7 +81,7 @@
 
   function updateElement (dom, props, newProps) {
     Object.keys(newProps)
-      .filter(isNew(props, newProps)) // 进行浅比较和过滤
+      .filter(isNew(props, newProps))
       .forEach(key => {
         if (key === 'value' || key === 'nodeValue') {
           dom[key] = newProps[key];
@@ -276,8 +276,6 @@
     for (let k in newFibers) {
       let newFiber = newFibers[k];
       let oldFiber = reused[k];
-
-      // console.log(newFiber,oldFiber)
 
       if (oldFiber) {
         alternate = createFiber(oldFiber, {

@@ -104,8 +104,6 @@ function reconcileChildren (WIP, children) {
     let newFiber = newFibers[k]
     let oldFiber = reused[k]
 
-    // console.log(newFiber,oldFiber)
-
     if (oldFiber) {
       alternate = createFiber(oldFiber, {
         patchTag: UPDATE
