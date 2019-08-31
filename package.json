@@ -3,11 +3,15 @@
   "version": "1.5.7",
   "description": "",
   "main": "dist/fre.js",
+  "unpkg":"dist/fre-umd.js",
+  "module": "dist/fre-esm.js",
   "scripts": {
     "test": "jest && tsc --noEmit",
-    "build:iife": "rollup -i src/index.js -o dist/fre.js --no-esModule -mf iife -n fre",
+    "build:cjs": "rollup -i src/index.js -o dist/fre.js --no-esModule -mf cjs -n fre",
+    "build:umd": "rollup -i src/index.js -o dist/fre-umd.js --no-esModule -mf umd -n fre",
+    "build:esm": "rollup -i src/index.js -o dist/fre-esm.js --no-esModule -mf esm -n fre",
     "minify": "terser dist/fre.js -o dist/fre.js -mc --source-map includeSources,url=fre.js.map",
-    "build": "yarn build:iife&&yarn minify"
+    "build": "yarn build:cjs&&yarn minify&&yarn build:umd&&yarn build:esm"
   },
   "keywords": [],
   "author": "132yse",
