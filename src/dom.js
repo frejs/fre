@@ -1,39 +1,39 @@
 import { isNew } from './util'
 
-function updateProperty (element, name, value, newValue) {
+function updateProperty (dom, name, value, newValue) {
   if (name === 'style') {
     for (key in newValue) {
       let style = !newValue || !newValue[key] ? '' : newValue[key]
-      element[name][key] = style
+      dom[name][key] = style
     }
   } else if (name[0] === 'o' && name[1] === 'n') {
     name = name.slice(2).toLowerCase()
     if (value) {
-      element.removeEventListener(name, value)
+      dom.removeEventListener(name, value)
     }
-    element.addEventListener(name, newValue)
+    dom.addEventListener(name, newValue)
   } else {
-    element.setAttribute(name, newValue)
+    dom.setAttribute(name, newValue)
   }
 }
 
-export function updateElement (element, props, newProps) {
+export function updateElement (dom, props, newProps) {
   Object.keys(newProps)
-    .filter(isNew(props, newProps)) //进行浅比较和过滤
+    .filter(isNew(props, newProps)) // 进行浅比较和过滤
     .forEach(key => {
       if (key === 'value' || key === 'nodeValue') {
-        element[key] = newProps[key]
+        dom[key] = newProps[key]
       } else {
-        updateProperty(element, key, props[key], newProps[key])
+        updateProperty(dom, key, props[key], newProps[key])
       }
     })
 }
 
 export function createElement (fiber) {
-  const element =
+  const dom =
     fiber.type === 'text'
       ? document.createTextNode('')
       : document.createElement(fiber.type)
-  updateElement(element, [], fiber.props)
-  return element
+  updateElement(dom, [], fiber.props)
+  return dom
 }
