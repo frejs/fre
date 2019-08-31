@@ -1,35 +1,30 @@
-import { h, render, useState } from 'fre';
+import { h, render, useState } from 'fre'
 
+// import { createElement, render, useState, useEffect } from 'preact/compat';
 
-//import { createElement, render, useState, useEffect } from 'preact/compat';
-
-function Counter() {
-  const [count, setCount] = useState(0);
+function Counter () {
+  const [count, setCount] = useState(0)
 
   return (
     <div>
-      Count: {count}
-      <button onClick={() => setCount(count + 1)}>
-        +
-      </button>
+      {count}
+      {/* <button onClick={() => setCount(count + 1)}>+</button> */}
     </div>
-  );
+  )
 }
 
-function App() {
-  const [counters, setCounters] = useState(1);
+function App () {
+  const [counters, setCounters] = useState(1)
 
-  return <div>
-    {new Array(counters).fill().map(i => (
-      <Counter/>
-    ))}
-    <button onClick={() => setCounters(counters + 1)}>
-      Add
-    </button>
-    <button onClick={() => setCounters(counters + 1)}>
-      Add
-    </button>
-  </div>
+  return (
+    <div>
+      {new Array(counters).fill().map(i => (
+        <li>1</li>
+      ))}
+      <button onClick={() => setCounters(counters + 1)}>+</button>
+      <button onClick={() => setCounters(counters - 1)}>-</button>
+    </div>
+  )
 }
 
-render(<App/>, document.body);
+render(<App />, document.body)

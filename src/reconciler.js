@@ -111,7 +111,7 @@ function reconcileChildren (WIP, children) {
       newFiber = merge(alternate, newFiber)
       newFiber.alternate = alternate
       if (oldFiber.key) {
-        newFiber.patchTag = REPLACE
+        newFiber.patchTag = PLACE
       }
     } else {
       newFiber = createFiber(newFiber, {
@@ -124,10 +124,9 @@ function reconcileChildren (WIP, children) {
 
     if (prevFiber) {
       prevFiber.sibling = newFiber
-      newFiber.insertPoint = prevFiber
     } else {
       WIP.child = newFiber
-      newFiber.insertPoint = null
+      newFiber.oldPoint = null
     }
     prevFiber = newFiber
   }
