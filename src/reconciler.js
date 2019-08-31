@@ -6,6 +6,7 @@ const options = {}
 const FPS = 1000 / 60
 const [HOST, HOOK, ROOT, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5]
 
+let once = true
 let updateQueue = []
 let nextWork = null
 let pendingCommit = null
@@ -98,6 +99,7 @@ function reconcileChildren (WIP, children) {
 
   let prevFiber = null
   let alternate = null
+  // console.log(reused)
 
   for (let k in newFibers) {
     let newFiber = newFibers[k]
@@ -123,11 +125,10 @@ function reconcileChildren (WIP, children) {
     newFiber.parent = WIP
 
     if (prevFiber) {
-      newFiber.insertPoint = prevFiber
       prevFiber.sibling = newFiber
     } else {
-      newFiber.oldPoint = null
       WIP.child = newFiber
+      newFiber.oldPoint = null
     }
     prevFiber = newFiber
   }
@@ -153,9 +154,11 @@ function completeWork (fiber) {
 
 function commitWork (WIP) {
   WIP.patches.forEach(p => commit(p))
+  once = false
   nextWork = null
   pendingCommit = null
 }
+
 function commit (fiber) {
   let p = fiber.parent
   while (p.tag == HOOK) p = p.parent
@@ -173,10 +176,11 @@ function commit (fiber) {
       const insertPoint = fiber.insertPoint
       let point = insertPoint ? insertPoint.base : null
       let after = point ? point.nextSibling : parent.firstChild
-
       if (after == dom) return
       if (after === null && dom === parent.lastChild) return
+      if (once) after = null
       parent.insertBefore(dom, after)
+      break
   }
 
   p.patches = []
