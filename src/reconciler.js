@@ -6,11 +6,11 @@ const options = {}
 const FPS = 1000 / 60
 const [HOST, HOOK, ROOT, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5]
 
-let once = true
 let updateQueue = []
 let nextWork = null
 let pendingCommit = null
 let currentFiber = null
+let once = true
 
 function render (vnode, el) {
   let rootFiber = {
@@ -99,7 +99,6 @@ function reconcileChildren (WIP, children) {
 
   let prevFiber = null
   let alternate = null
-  // console.log(reused)
 
   for (let k in newFibers) {
     let newFiber = newFibers[k]
@@ -158,14 +157,13 @@ function commitWork (WIP) {
   nextWork = null
   pendingCommit = null
 }
-
 function commit (fiber) {
   let p = fiber.parent
   while (p.tag == HOOK) p = p.parent
   const parent = p.base
   let dom = fiber.base || fiber.child.base
 
-  switch (fiber.tag) {
+  switch (fiber.patchTag) {
     case UPDATE:
       updateElement(dom, fiber.alternate.props, fiber.props)
       break
@@ -182,7 +180,6 @@ function commit (fiber) {
       parent.insertBefore(dom, after)
       break
   }
-
   p.patches = []
   fiber.patches = []
 }
