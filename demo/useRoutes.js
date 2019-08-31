@@ -1,28 +1,38 @@
-import { h, render } from '../src'
+import { h, render, useState } from '../src'
 import { useRoutes, push, A } from './use-routes'
 
-function Home () {
-  return (
-    <div>
-      <p>home</p>
-      <button onClick={() => push('/home/jack')}>Go jack</button>
-    </div>
-  )
-}
-
-function User ({ id }) {
-  return (
-    <div>
-      <A href='/'>Go home</A>
-    </div>
-  )
-}
-
 const routes = {
-  '/': Home,
-  '/home/:id': User
+  '/': function () {
+    return h('div', null,
+      h('p', null, 'home'),
+      h('button', {onClick: () => push('/home/jack')}, 'Go jack')
+    )
+  },
+
+  // DOM structure is different, causes "NotFoundError: Node was not found" error
+  '/home/:id': function ({id}) {
+    return h('div', null,
+      h('div', null, id),
+      h('div', null, 'testing'),
+      h('button', {onClick: () => push('/')}, 'Go home')
+    )
+  }
 }
 
 const App = () => useRoutes(routes)
+render(h(App), document.getElementById('root'))
 
-render(<App />, document.getElementById('root'))
+// function User ({ id }) {
+//   return (
+//     <div>
+//       <button onClick={() => push('/home/jack')}>Go home</button>
+//     </div>
+//   )
+// }
+
+// const routes = {
+//   '/': Home,
+//   '/home/:id': User
+// }
+
+// const App = () => useRoutes(routes)

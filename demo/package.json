@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "fre": "^1.3.13",
-    "use-routes": "^0.2.2"
+    "use-routes": "^0.2.2",
+    "v8": "^0.1.0"
   }
 }

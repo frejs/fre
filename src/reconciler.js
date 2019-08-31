@@ -104,6 +104,8 @@ function reconcileChildren (WIP, children) {
     let newFiber = newFibers[k]
     let oldFiber = reused[k]
 
+    // console.log(newFiber,oldFiber)
+
     if (oldFiber) {
       alternate = createFiber(oldFiber, {
         patchTag: UPDATE
@@ -162,6 +164,8 @@ function commit (fiber) {
   while (p.tag == HOOK) p = p.parent
   const parent = p.base
   let dom = fiber.base || fiber.child.base
+  p.patches = fiber.patches = []
+  if (fiber.parent.tag == ROOT) return
 
   switch (fiber.patchTag) {
     case UPDATE:
@@ -180,8 +184,6 @@ function commit (fiber) {
       parent.insertBefore(dom, after)
       break
   }
-  p.patches = []
-  fiber.patches = []
 }
 
 function getWIP () {

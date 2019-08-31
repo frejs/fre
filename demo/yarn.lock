@@ -5240,6 +5240,11 @@ v8-compile-cache@^2.0.0:
   resolved "https://registry.yarnpkg.com/v8-compile-cache/-/v8-compile-cache-2.0.3.tgz#00f7494d2ae2b688cfe2899df6ed2c54bef91dbe"
   integrity sha512-CNmdbwQMBjwr9Gsmohvm0pbL954tJrNzf6gWL3K+QMQf00PF7ERGrEiLgjuU3mKreLC2MeGhUsNV9ybTbLgd3w==
 
+v8@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.npm.taobao.org/v8/download/v8-0.1.0.tgz#86b9007e730da75186ad9a0ad1e38dd3af36c2bd"
+  integrity sha1-hrkAfnMNp1GGrZoK0eON0682wr0=
+
 vendors@^1.0.0:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/vendors/-/vendors-1.0.3.tgz#a6467781abd366217c050f8202e7e50cc9eef8c0"
