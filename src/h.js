@@ -1,15 +1,20 @@
-export function h (type, config, ...args) {
-  const props = Object.assign({}, config)
-  const kids = [...args]
-  props.children = kids
-    .filter(c => c != null && c !== false)
-    .map(c => {
-      return c.pop || typeof c === 'object'
-        ? c
-        : { type: 'text', props: { nodeValue: c } }
-    })
+export function h (type, config) {
+  let props = config || {}
+  let key = props.key || null
+  let children = []
 
-  const key = props.key || null
+  for (let i = 2; i < arguments.length; i++) {
+    let vnode = arguments[i]
+    if (vnode === null || vnode === true || vnode === false) {
+    } else if (vnode.pop || typeof vnode === 'object') {
+      children.push(vnode)
+    } else if (typeof vnode === 'function') {
+      children = vnode
+    } else {
+      children.push({ type: 'text', props: { nodeValue: vnode } })
+    }
+  }
+  props.children = children
 
   return { type, props, key }
 }
