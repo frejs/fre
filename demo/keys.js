@@ -20,18 +20,7 @@ import { h, render, useState, useEffect } from '../src'
 // function A (props) {
 //   return <li>1</li>
 // }
-function App () {
-  const [arr, setArr] = useState(['A', 'B','C','D','E','F'])
-  return (
-    <div>
-      <ul>
-        <p>111</p>
-        <div>222</div>
-      </ul>
-      <button onClick={() => setArr(['B','A','D','C','F','E'])}>+</button>
-    </div>
-  )
-}
+
 // function App () {
 //   const [arr, setArr] = useState(['A', 'B', 'C', 'D', 'E', 'F'])
 //   return (

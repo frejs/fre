@@ -152,7 +152,13 @@ function completeWork (fiber) {
 }
 
 function commitWork (WIP) {
-  WIP.patches.forEach(p => commit(p))
+  WIP.patches.forEach(p => {
+    commit(p)
+    const e = p.effect
+    if (p.effect) {
+      for (const k in e) e[k]()
+    }
+  })
   once = false
   nextWork = null
   pendingCommit = null
