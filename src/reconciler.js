@@ -4,7 +4,7 @@ import { defer, hashfy, merge, isSame, isFn } from './util'
 
 const options = {}
 const FPS = 1000 / 60
-const [HOST, HOOK, ROOT, PLACE, REPLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
+const [HOST, HOOK, ROOT, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5]
 
 let updateQueue = []
 let nextWork = null
@@ -123,10 +123,11 @@ function reconcileChildren (WIP, children) {
     newFiber.parent = WIP
 
     if (prevFiber) {
+      newFiber.insertPoint = prevFiber
       prevFiber.sibling = newFiber
     } else {
-      WIP.child = newFiber
       newFiber.oldPoint = null
+      WIP.child = newFiber
     }
     prevFiber = newFiber
   }
@@ -161,22 +162,23 @@ function commit (fiber) {
   const parent = p.base
   let dom = fiber.base || fiber.child.base
 
-  const { patchTag } = fiber
-  if (fiber.parent.tag === ROOT) {
-  } else if (patchTag == UPDATE) {
-    updateElement(dom, fiber.alternate.props, fiber.props)
-  } else if (patchTag == DELETE) {
-    parent.removeChild(dom)
-  } else {
-    const insertPoint = fiber.insertPoint
-    let point = insertPoint ? insertPoint.base : null
-    let after = point ? point.nextSibling : parent.firstChild
+  switch (fiber.tag) {
+    case UPDATE:
+      updateElement(dom, fiber.alternate.props, fiber.props)
+      break
+    case DELETE:
+      parent.removeChild(dom)
+      break
+    default:
+      const insertPoint = fiber.insertPoint
+      let point = insertPoint ? insertPoint.base : null
+      let after = point ? point.nextSibling : parent.firstChild
 
-    if (after == dom) return
-    if (after === null && dom === parent.lastChild) return
-
-    parent.insertBefore(dom, after)
+      if (after == dom) return
+      if (after === null && dom === parent.lastChild) return
+      parent.insertBefore(dom, after)
   }
+
   p.patches = []
   fiber.patches = []
 }
