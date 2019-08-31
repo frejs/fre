@@ -125,7 +125,11 @@ function useReducer (reducer, initState) {
 
 function useEffect (cb, inputs) {
   let current = getWIP();
-  if (current) current.effect = useCallback(cb, inputs);
+  if (!current) return
+  let key = '$' + cursor;
+  cursor++;
+  current.effect = current.effect || {};
+  current.effect[key] = useCallback(cb, inputs);
 }
 
 function useCallback (cb, inputs) {
@@ -143,7 +147,7 @@ function useMemo (cb, inputs) {
       current.isMounted = true;
     }
     current.oldInputs = inputs;
-    
+
     if (hasChaged) return cb()
   }
 }
@@ -319,7 +323,13 @@ function completeWork (fiber) {
 }
 
 function commitWork (WIP) {
-  WIP.patches.forEach(p => commit(p));
+  WIP.patches.forEach(p => {
+    commit(p);
+    const e = p.effect;
+    if (p.effect) {
+      for (const k in e) e[k]();
+    }
+  });
   once = false;
   nextWork = null;
   pendingCommit = null;
