@@ -155,7 +155,7 @@ function commitWork (WIP) {
   WIP.patches.forEach(p => {
     commit(p)
     const e = p.effect
-    if (p.effect) {
+    if (e) {
       for (const k in e) e[k]()
     }
   })
