@@ -62,7 +62,6 @@ function updateHost (WIP) {
   let parent = WIP.parent || {}
   WIP.insertPoint = parent.oldPoint
   parent.oldPoint = WIP
-
   const children = WIP.props.children
   reconcileChildren(WIP, children)
 }
@@ -119,16 +118,20 @@ function reconcileChildren (WIP, children) {
         patchTag: PLACE
       })
     }
+
     newFibers[k] = newFiber
     newFiber.parent = WIP
 
     if (prevFiber) {
       prevFiber.sibling = newFiber
+      newFiber.insertPoint = prevFiber
     } else {
       WIP.child = newFiber
+      newFiber.insertPoint = null
     }
     prevFiber = newFiber
   }
+  if (prevFiber) prevFiber.sibling = null
 }
 
 function createFiber (vnode, data) {
@@ -166,23 +169,17 @@ function commit (fiber) {
   } else if (patchTag == DELETE) {
     parent.removeChild(dom)
   } else {
-    const insertPoint = getInsertPoint(fiber)
-    let after = insertPoint
-      ? patchTag == PLACE
-        ? insertPoint.base.nextSibling
-        : insertPoint.base.nextSibling || parent.firstChild
-      : null
+    const insertPoint = fiber.insertPoint
+    let point = insertPoint ? insertPoint.base : null
+    let after = point ? point.nextSibling : parent.firstChild
+
     if (after == dom) return
+    if (after === null && dom === parent.lastChild) return
+
     parent.insertBefore(dom, after)
   }
   p.patches = []
   fiber.patches = []
-}
-
-function getInsertPoint (fiber) {
-  if (fiber.insertPoint) {
-    return fiber.insertPoint
-  }
 }
 
 function getWIP () {

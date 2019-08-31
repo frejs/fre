@@ -2,35 +2,35 @@ import { h, render, useState, useEffect } from '../src'
 
 // A B C D -> B A D C √
 
-// function App () {
-//   const [arr, setArr] = useState(1)
-//   return (
-//     <div>
-//       {new Array(arr).fill().map(_ => (
-//         <A />
-//       ))}
-//       <button onClick={() => setArr(arr + 1)}>+</button>
-//       <button onClick={() => setArr(arr - 1)}>-</button>
-//     </div>
-//   )
-// }
-
-// function A (props) {
-//   return <li>1</li>
-// }
 function App () {
-  const [arr, setArr] = useState(['A', 'B','C','D','E','F'])
+  const [arr, setArr] = useState(1)
   return (
     <div>
-      <ul>
-        {arr.map(item => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
-      <button onClick={() => setArr(['B','A','D','C','F','E'])}>+</button>
+      {new Array(arr).fill().map(_ => (
+        <A />
+      ))}
+      <button onClick={() => setArr(arr + 1)}>+</button>
+      <button onClick={() => setArr(arr - 1)}>-</button>
     </div>
   )
 }
+
+function A (props) {
+  return <li>1</li>
+}
+// function App () {
+//   const [arr, setArr] = useState(['A', 'B','C','D','E','F'])
+//   return (
+//     <div>
+//       <ul>
+//         {arr.map(item => (
+//           <li key={item}>{item}</li>
+//         ))}
+//       </ul>
+//       <button onClick={() => setArr(['B','A','D','C','F','E'])}>+</button>
+//     </div>
+//   )
+// }
 // function App () {
 //   const [arr, setArr] = useState(['A', 'B', 'C', 'D', 'E','F'])
 //   return (

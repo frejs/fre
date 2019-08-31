@@ -9,5 +9,7 @@ export function h (type, config, ...args) {
         : { type: 'text', props: { nodeValue: c } }
     })
 
-  return { type, props }
+  const key = props.key || null
+
+  return { type, props, key }
 }
