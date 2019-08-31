@@ -1,5 +1,5 @@
-import { h, render } from 'fre'
-import { useRoutes, push, A } from 'use-routes'
+import { h, render } from '../src'
+import { useRoutes, push, A } from './use-routes'
 
 function Home () {
   return (
@@ -13,7 +13,6 @@ function Home () {
 function User ({ id }) {
   return (
     <div>
-      <p>{id}</p>
       <A href='/'>Go home</A>
     </div>
   )

@@ -1,4 +1,4 @@
-import { h, render, useState } from 'fre'
+import { h, render, useState } from '../src'
 
 // import { createElement, render, useState, useEffect } from 'preact/compat';
 
@@ -8,7 +8,7 @@ function Counter () {
   return (
     <div>
       {count}
-      {/* <button onClick={() => setCount(count + 1)}>+</button> */}
+      <button onClick={() => setCount(count + 1)}>+</button>
     </div>
   )
 }
@@ -19,7 +19,7 @@ function App () {
   return (
     <div>
       {new Array(counters).fill().map(i => (
-        <li>1</li>
+        <Counter />
       ))}
       <button onClick={() => setCounters(counters + 1)}>+</button>
       <button onClick={() => setCounters(counters - 1)}>-</button>

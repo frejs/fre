@@ -2,22 +2,24 @@ import { h, render, useState, useEffect } from '../src'
 
 // A B C D -> B A D C √
 
-function App () {
-  const [arr, setArr] = useState(1)
-  return (
-    <div>
-      {new Array(arr).fill().map(i=> (
-        <A key={i}/>
-      ))}
-      <button onClick={() => setArr(arr + 1)}>+</button>
-      <button onClick={() => setArr(arr - 1)}>-</button>
-    </div>
-  )
-}
 
-function A (props) {
-  return <li>1</li>
-}
+
+// function App () {
+//   const [arr, setArr] = useState(1)
+//   return (
+//     <div>
+//       {new Array(arr).fill().map(i=> (
+//         <A key={i}/>
+//       ))}
+//       <button onClick={() => setArr(arr + 1)}>+</button>
+//       <button onClick={() => setArr(arr - 1)}>-</button>
+//     </div>
+//   )
+// }
+
+// function A (props) {
+//   return <li>1</li>
+// }
 // function App () {
 //   const [arr, setArr] = useState(['A', 'B','C','D','E','F'])
 //   return (
