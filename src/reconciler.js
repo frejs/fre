@@ -154,10 +154,8 @@ function commitWork (WIP) {
   let once = true
   WIP.patches.forEach(p => {
     commit(p, once)
-    const e = p.effect
-    if (e) {
-      for (const k in e) e[k]()
-    }
+    const e = p.effects
+    if (e) for (const k in e) e[k]()
   })
   once = false
   nextWork = null

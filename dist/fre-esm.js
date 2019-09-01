@@ -125,11 +125,12 @@ function useReducer (reducer, initState) {
 
 function useEffect (cb, inputs) {
   let current = getWIP();
-  if (current) return
-  let key = '$' + cursor;
-  current.effect = current.effect || {};
-  current.effect[key] = useCallback(cb, inputs);
-  cursor++;
+  if (current) {
+    let key = '$' + cursor;
+    current.effects = current.effects || {};
+    current.effects[key] = useCallback(cb, inputs);
+    cursor++;
+  }
 }
 
 function useCallback (cb, inputs) {
@@ -325,10 +326,8 @@ function commitWork (WIP) {
   let once = true;
   WIP.patches.forEach(p => {
     commit(p, once);
-    const e = p.effect;
-    if (e) {
-      for (const k in e) e[k]();
-    }
+    const e = p.effects;
+    if (e) for (const k in e) e[k]();
   });
   once = false;
   nextWork = null;

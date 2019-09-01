@@ -30,11 +30,12 @@ export function useReducer (reducer, initState) {
 
 export function useEffect (cb, inputs) {
   let current = getWIP()
-  if (current) return
-  let key = '$' + cursor
-  current.effect = current.effect || {}
-  current.effect[key] = useCallback(cb, inputs)
-  cursor++
+  if (current) {
+    let key = '$' + cursor
+    current.effects = current.effects || {}
+    current.effects[key] = useCallback(cb, inputs)
+    cursor++
+  }
 }
 
 export function useCallback (cb, inputs) {
