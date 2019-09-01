@@ -10,7 +10,6 @@ let updateQueue = []
 let nextWork = null
 let pendingCommit = null
 let currentFiber = null
-let once = true
 
 function render (vnode, el) {
   let rootFiber = {
@@ -152,9 +151,9 @@ function completeWork (fiber) {
 }
 
 function commitWork (WIP) {
-  console.log(WIP.patches)
+  let once = true
   WIP.patches.forEach(p => {
-    commit(p)
+    commit(p, once)
     const e = p.effect
     if (e) {
       for (const k in e) e[k]()
@@ -164,14 +163,13 @@ function commitWork (WIP) {
   nextWork = null
   pendingCommit = null
 }
-function commit (fiber) {
+function commit (fiber, once) {
   let p = fiber.parent
   while (p.tag == HOOK) p = p.parent
   const parent = p.base
   let dom = fiber.base || fiber.child.base
   p.patches = fiber.patches = null
   if (fiber.parent.tag == ROOT) return
-
   switch (fiber.patchTag) {
     case UPDATE:
       updateElement(dom, fiber.alternate.props, fiber.props)
