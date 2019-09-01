@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "fre": "./fre.js"
+  }
+}

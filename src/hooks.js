@@ -30,11 +30,11 @@ export function useReducer (reducer, initState) {
 
 export function useEffect (cb, inputs) {
   let current = getWIP()
-  if (!current) return
+  if (current) return
   let key = '$' + cursor
-  cursor++
   current.effect = current.effect || {}
   current.effect[key] = useCallback(cb, inputs)
+  cursor++
 }
 
 export function useCallback (cb, inputs) {
@@ -44,16 +44,16 @@ export function useCallback (cb, inputs) {
 export function useMemo (cb, inputs) {
   let current = getWIP()
   if (current) {
-    let hasChaged = inputs
+    let isChange = inputs
       ? (current.oldInputs || []).some((v, i) => inputs[i] !== v)
       : true
     if (inputs && !inputs.length && !current.isMounted) {
-      hasChaged = true
+      isChange = true
       current.isMounted = true
     }
     current.oldInputs = inputs
 
-    if (hasChaged) return cb()
+    return isChange || !current.isMounted ? (current.memo = cb()) : current.memo
   }
 }
 

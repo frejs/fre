@@ -152,6 +152,7 @@ function completeWork (fiber) {
 }
 
 function commitWork (WIP) {
+  console.log(WIP.patches)
   WIP.patches.forEach(p => {
     commit(p)
     const e = p.effect
@@ -168,7 +169,7 @@ function commit (fiber) {
   while (p.tag == HOOK) p = p.parent
   const parent = p.base
   let dom = fiber.base || fiber.child.base
-  p.patches = fiber.patches = []
+  p.patches = fiber.patches = null
   if (fiber.parent.tag == ROOT) return
 
   switch (fiber.patchTag) {

@@ -6,7 +6,7 @@ export function h (type, config) {
   for (let i = 2; i < arguments.length; i++) {
     let vnode = arguments[i]
     if (vnode === null || vnode === true || vnode === false) {
-    } else if (vnode.pop || typeof vnode === 'object') {
+    } else if (Array.isArray(vnode) || typeof vnode === 'object') {
       children.push(vnode)
     } else if (typeof vnode === 'function') {
       children = vnode
