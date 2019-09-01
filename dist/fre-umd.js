@@ -11,7 +11,7 @@
 
     for (let i = 2; i < arguments.length; i++) {
       let vnode = arguments[i];
-      if (vnode === null || vnode === true || vnode === false) ; else if (vnode.pop || typeof vnode === 'object') {
+      if (vnode === null || vnode === true || vnode === false) ; else if (Array.isArray(vnode) || typeof vnode === 'object') {
         children.push(vnode);
       } else if (typeof vnode === 'function') {
         children = vnode;
@@ -131,11 +131,11 @@
 
   function useEffect (cb, inputs) {
     let current = getWIP();
-    if (!current) return
+    if (current) return
     let key = '$' + cursor;
-    cursor++;
     current.effect = current.effect || {};
     current.effect[key] = useCallback(cb, inputs);
+    cursor++;
   }
 
   function useCallback (cb, inputs) {
@@ -145,16 +145,16 @@
   function useMemo (cb, inputs) {
     let current = getWIP();
     if (current) {
-      let hasChaged = inputs
+      let isChange = inputs
         ? (current.oldInputs || []).some((v, i) => inputs[i] !== v)
         : true;
       if (inputs && !inputs.length && !current.isMounted) {
-        hasChaged = true;
+        isChange = true;
         current.isMounted = true;
       }
       current.oldInputs = inputs;
 
-      if (hasChaged) return cb()
+      return isChange || !current.isMounted ? (current.memo = cb()) : current.memo
     }
   }
 
@@ -187,7 +187,6 @@
   let nextWork = null;
   let pendingCommit = null;
   let currentFiber = null;
-  let once = true;
 
   function render (vnode, el) {
     let rootFiber = {
@@ -329,10 +328,11 @@
   }
 
   function commitWork (WIP) {
+    let once = true;
     WIP.patches.forEach(p => {
-      commit(p);
+      commit(p, once);
       const e = p.effect;
-      if (p.effect) {
+      if (e) {
         for (const k in e) e[k]();
       }
     });
@@ -340,14 +340,13 @@
     nextWork = null;
     pendingCommit = null;
   }
-  function commit (fiber) {
+  function commit (fiber, once) {
     let p = fiber.parent;
     while (p.tag == HOOK) p = p.parent;
     const parent = p.base;
     let dom = fiber.base || fiber.child.base;
-    p.patches = fiber.patches = [];
+    p.patches = fiber.patches = null;
     if (fiber.parent.tag == ROOT) return
-
     switch (fiber.patchTag) {
       case UPDATE:
         updateElement(dom, fiber.alternate.props, fiber.props);
