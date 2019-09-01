@@ -21,17 +21,17 @@ import { h, render, useState, useEffect } from '../src'
 //   return <li>1</li>
 // }
 
-// function App () {
-//   const [arr, setArr] = useState(['A', 'B', 'C', 'D', 'E', 'F'])
-//   return (
-//     <div>
-//       {arr.map(item => (
-//         <li key={item}>{item}</li>
-//       ))}
-//       <button onClick={() => setArr(['E', 'F', 'C', 'D', 'A', 'B'])}>+</button>
-//     </div>
-//   )
-// }
+function App () {
+  const [arr, setArr] = useState(['A', 'B', 'C', 'D', 'E', 'F'])
+  return (
+    <div>
+      {arr.map(item => (
+        <li>{item}</li>
+      ))}
+      <button onClick={() => setArr(['E', 'F', 'C', 'D', 'A', 'B'])}>+</button>
+    </div>
+  )
+}
 
 // A B C D -> C D A B √
 
