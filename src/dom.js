@@ -2,9 +2,13 @@ import { isNew } from './util'
 
 function updateProperty (dom, name, value, newValue) {
   if (name === 'style') {
-    for (key in newValue) {
-      let style = !newValue || !newValue[key] ? '' : newValue[key]
-      dom[name][key] = style
+    for (let key in value) {
+      if (!newValue[key]) {
+        dom[name][key] = ''
+      }
+    }
+    for (let key in newValue) {
+      dom[name][key] = newValue[key]
     }
   } else if (name[0] === 'o' && name[1] === 'n') {
     name = name.slice(2).toLowerCase()
