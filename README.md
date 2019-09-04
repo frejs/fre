@@ -1,4 +1,4 @@
-<p align="center"><img src="http://wx2.sinaimg.cn/mw690/0060lm7Tly1ftpm5b3ihfj3096097aaj.jpg" alt="fre logo" width="180"></p>
+<p align="center"><img src="https://pbs.twimg.com/media/EDmvlU_WsAol7mq?format=jpg&name=small" alt="fre logo" width="180"></p>
 <h1 align="center">Fre</h1>
 <p align="center">:ghost: Fast 1kB React like library with the same hooks API</p>
 <p align="center">
