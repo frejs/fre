@@ -6,7 +6,7 @@ function Counter () {
   const [count, setCount] = useState(0)
 
   return (
-    <div style={count > 5 ? { color: 'red' } : { backgroundColor: 'red' }}>
+    <div>
       {count}
       <button onClick={() => setCount(count + 1)}>+</button>
     </div>
@@ -27,4 +27,4 @@ function App () {
   )
 }
 
-render(<App />, document.body)
+render(<App />, document.querySelector('#root'))

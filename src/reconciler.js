@@ -10,7 +10,6 @@ let updateQueue = []
 let nextWork = null
 let pendingCommit = null
 let currentFiber = null
-let once = true
 
 function render (vnode, el) {
   let rootFiber = {
@@ -58,13 +57,24 @@ function performWork (WIP) {
 function updateHost (WIP) {
   if (!options.end && !WIP.base) {
     WIP.base = createElement(WIP)
+    WIP.mum = getParentNode(WIP)
   }
-
-  let parent = WIP.parent || {}
+  let parent = WIP.mum || {}
   WIP.insertPoint = parent.oldPoint
   parent.oldPoint = WIP
+
   const children = WIP.props.children
   reconcileChildren(WIP, children)
+}
+
+function getParentNode (fiber) {
+  if (fiber.parent) {
+    return fiber.parent.tag === HOOK
+      ? fiber.parent.parent.base
+      : fiber.parent.base
+  } else {
+    return fiber.base
+  }
 }
 
 function updateHOOK (WIP) {
@@ -127,7 +137,6 @@ function reconcileChildren (WIP, children) {
       prevFiber.sibling = newFiber
     } else {
       WIP.child = newFiber
-      newFiber.oldPoint = null
     }
     prevFiber = newFiber
   }
@@ -157,18 +166,13 @@ function commitWork (WIP) {
     const e = p.effects
     if (e) for (const k in e) e[k]()
   })
-  once = false
   nextWork = null
   pendingCommit = null
 }
 function commit (fiber) {
-  let p = fiber.parent
-  while (p.tag == HOOK) p = p.parent
-  p.patches = fiber.patches = []
-  
-  const parent = p.base
+  let parent = fiber.mum || fiber.parent.base
+  fiber.parent.patches = fiber.patches = []
   let dom = fiber.base || fiber.child.base
-  if (fiber.parent.tag == ROOT) return
   switch (fiber.patchTag) {
     case UPDATE:
       updateElement(dom, fiber.alternate.props, fiber.props)
@@ -182,7 +186,7 @@ function commit (fiber) {
       let after = point ? point.nextSibling : parent.firstChild
       if (after == dom) return
       if (after === null && dom === parent.lastChild) return
-      if (once) after = null
+      console.log(dom,after) 
       parent.insertBefore(dom, after)
       break
   }
