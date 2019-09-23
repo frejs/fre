@@ -186,7 +186,7 @@ function commit (fiber) {
       let after = point ? point.nextSibling : parent.firstChild
       if (after == dom) return
       if (after === null && dom === parent.lastChild) return
-      console.log(dom,after) 
+      if (point == null && after != null) return
       parent.insertBefore(dom, after)
       break
   }
