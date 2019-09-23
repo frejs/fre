@@ -64,9 +64,13 @@
 
   function updateProperty (dom, name, value, newValue) {
     if (name === 'style') {
-      for (key in newValue) {
-        let style = !newValue || !newValue[key] ? '' : newValue[key];
-        dom[name][key] = style;
+      for (let key in value) {
+        if (!newValue[key]) {
+          dom[name][key] = '';
+        }
+      }
+      for (let key in newValue) {
+        dom[name][key] = newValue[key];
       }
     } else if (name[0] === 'o' && name[1] === 'n') {
       name = name.slice(2).toLowerCase();
@@ -235,13 +239,24 @@
   function updateHost (WIP) {
     if (!options.end && !WIP.base) {
       WIP.base = createElement(WIP);
+      WIP.mum = getParentNode(WIP);
     }
-
-    let parent = WIP.parent || {};
+    let parent = WIP.mum || {};
     WIP.insertPoint = parent.oldPoint;
     parent.oldPoint = WIP;
+
     const children = WIP.props.children;
     reconcileChildren(WIP, children);
+  }
+
+  function getParentNode (fiber) {
+    if (fiber.parent) {
+      return fiber.parent.tag === HOOK
+        ? fiber.parent.parent.base
+        : fiber.parent.base
+    } else {
+      return fiber.base
+    }
   }
 
   function updateHOOK (WIP) {
@@ -304,7 +319,6 @@
         prevFiber.sibling = newFiber;
       } else {
         WIP.child = newFiber;
-        newFiber.oldPoint = null;
       }
       prevFiber = newFiber;
     }
@@ -329,23 +343,18 @@
   }
 
   function commitWork (WIP) {
-    let once = true;
     WIP.patches.forEach(p => {
-      commit(p, once);
+      commit(p);
       const e = p.effects;
       if (e) for (const k in e) e[k]();
     });
-    once = false;
     nextWork = null;
     pendingCommit = null;
   }
-  function commit (fiber, once) {
-    let p = fiber.parent;
-    while (p.tag == HOOK) p = p.parent;
-    const parent = p.base;
+  function commit (fiber) {
+    let parent = fiber.mum || fiber.parent.base;
+    fiber.parent.patches = fiber.patches = [];
     let dom = fiber.base || fiber.child.base;
-    p.patches = fiber.patches = null;
-    if (fiber.parent.tag == ROOT) return
     switch (fiber.patchTag) {
       case UPDATE:
         updateElement(dom, fiber.alternate.props, fiber.props);
@@ -359,7 +368,7 @@
         let after = point ? point.nextSibling : parent.firstChild;
         if (after == dom) return
         if (after === null && dom === parent.lastChild) return
-        if (once) after = null;
+        if (point == null && after != null) return
         parent.insertBefore(dom, after);
         break
     }
