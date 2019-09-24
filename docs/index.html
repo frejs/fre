@@ -10,10 +10,8 @@
 
 <body>
   <div id="app"></div>
-  <script src=""></script>
-  <script src="https://cdn.jsdelivr.net/npm/htm"></script>
   <script type="module">
-    import { h, useState } from 'https://cdn.jsdelivr.net/npm/fre'
+    import { h, useState, render } from 'https://cdn.jsdelivr.net/npm/fre'
     import htm from 'https://unpkg.com/htm?module'
     const html = htm.bind(h)
 
@@ -24,6 +22,8 @@
         `
       )
     }
+
+    render(html`<${App}/>`,document.getElementById('app'))
 
   </script>
 </body>
