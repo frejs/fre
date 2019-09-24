@@ -1,9 +1,9 @@
 import { h, render, useState } from '../src'
 
 function App () {
-  const [count, setCount] = useState(0)
+  const [flag, setFlag] = useState(true)
   return (
-    <div style={count > 5 ? { color: 'red' } : { backgroundColor: 'black' }}>
+    <div style={flag? { color: 'red' } : { backgroundColor: 'black' }}>
       <svg xmlns='http://www.w3.org/2000/svg' version='1.1'>
         <circle
           cx='100'
@@ -11,12 +11,12 @@ function App () {
           r='40'
           stroke='black'
           stroke-width='2'
-          fill='red'
+          fill={flag?'black':'red'}
         />
       </svg>
-      {/* <button onClick={() => setCount(count + 1)} disabled={count === 3}>
+      <button onClick={() => setFlag(!flag)}>
         +
-      </button> */}
+      </button>
     </div>
   )
 }
