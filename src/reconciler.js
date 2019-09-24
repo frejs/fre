@@ -4,7 +4,15 @@ import { defer, hashfy, merge, isSame } from './util'
 
 const options = {}
 const FPS = 1000 / 60
-const [HOST, HOOK, ROOT, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5]
+export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6
+]
 
 let updateQueue = []
 let nextWork = null
@@ -28,7 +36,7 @@ function scheduleWork (fiber) {
 function workLoop (startTime = 0) {
   if (startTime && performance.now() - startTime > FPS) {
     defer(workLoop)
-  } else if (!nextWork || updateQueue.length > 0) {
+  } else if (!nextWork && updateQueue.length > 0) {
     nextWork = updateQueue.shift()
     defer(workLoop)
   } else {
@@ -132,6 +140,7 @@ function reconcileChildren (WIP, children) {
     if (prevFiber) {
       prevFiber.sibling = newFiber
     } else {
+      if (WIP.tag === SVG) newFiber.tag = SVG
       WIP.child = newFiber
     }
     prevFiber = newFiber

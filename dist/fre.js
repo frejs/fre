@@ -56,24 +56,16 @@ function merge (a, b) {
 }
 const defer = requestAnimationFrame || setTimeout;
 
-const isFn = fn => typeof fn === 'function';
-
 function updateProperty (dom, name, value, newValue) {
   if (name === 'style') {
-    for (let key in value) {
-      if (!newValue[key]) {
-        dom[name][key] = '';
-      }
-    }
-    for (let key in newValue) {
-      dom[name][key] = newValue[key];
-    }
+    for (let key in value) if (!newValue[key]) dom[name][key] = '';
+    for (let key in newValue) dom[name][key] = newValue[key];
   } else if (name[0] === 'o' && name[1] === 'n') {
     name = name.slice(2).toLowerCase();
-    if (value) {
-      dom.removeEventListener(name, value);
-    }
+    if (value) dom.removeEventListener(name, value);
     dom.addEventListener(name, newValue);
+  } else if (newValue == null || newValue === false) {
+    dom.removeAttribute(name);
   } else {
     dom.setAttribute(name, newValue);
   }
@@ -83,20 +75,22 @@ function updateElement (dom, props, newProps) {
   Object.keys(newProps)
     .filter(isNew(props, newProps))
     .forEach(key => {
-      if (key === 'value' || key === 'nodeValue') {
-        dom[key] = newProps[key];
-      } else {
-        updateProperty(dom, key, props[key], newProps[key]);
-      }
+      key === 'value' || key === 'nodeValue'
+        ? (dom[key] = newProps[key])
+        : updateProperty(dom, key, props[key], newProps[key]);
     });
 }
 
 function createElement (fiber) {
+  if (fiber.type === 'svg') fiber.tag = SVG;
   const dom =
     fiber.type === 'text'
       ? document.createTextNode('')
-      : document.createElement(fiber.type);
+      : fiber.tag === SVG
+        ? document.createElementNS('http://www.w3.org/2000/svg', fiber.type)
+        : document.createElement(fiber.type);
   updateElement(dom, [], fiber.props);
+
   return dom
 }
 
@@ -182,7 +176,15 @@ function useContext (ctx) {
 
 const options = {};
 const FPS = 1000 / 60;
-const [HOST, HOOK, ROOT, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5];
+const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6
+];
 
 let updateQueue = [];
 let nextWork = null;
@@ -200,14 +202,14 @@ function render (vnode, el) {
 
 function scheduleWork (fiber) {
   updateQueue.push(fiber);
-  if (!nextWork) {
-    nextWork = updateQueue.shift();
-    defer(workLoop);
-  }
+  defer(workLoop);
 }
 
 function workLoop (startTime = 0) {
   if (startTime && performance.now() - startTime > FPS) {
+    defer(workLoop);
+  } else if (!nextWork && updateQueue.length > 0) {
+    nextWork = updateQueue.shift();
     defer(workLoop);
   } else {
     const nextTime = performance.now();
@@ -293,9 +295,7 @@ function reconcileChildren (WIP, children) {
     let oldFiber = reused[k];
 
     if (oldFiber) {
-      alternate = createFiber(oldFiber, {
-        patchTag: UPDATE
-      });
+      alternate = createFiber(oldFiber, { patchTag: UPDATE });
       if (!options.end) newFiber.patchTag = UPDATE;
       newFiber = merge(alternate, newFiber);
       newFiber.alternate = alternate;
@@ -303,9 +303,7 @@ function reconcileChildren (WIP, children) {
         newFiber.patchTag = PLACE;
       }
     } else {
-      newFiber = createFiber(newFiber, {
-        patchTag: PLACE
-      });
+      newFiber = createFiber(newFiber, { patchTag: PLACE });
     }
 
     newFibers[k] = newFiber;
@@ -314,6 +312,7 @@ function reconcileChildren (WIP, children) {
     if (prevFiber) {
       prevFiber.sibling = newFiber;
     } else {
+      if (WIP.tag === SVG) newFiber.tag = SVG;
       WIP.child = newFiber;
     }
     prevFiber = newFiber;
@@ -322,8 +321,7 @@ function reconcileChildren (WIP, children) {
 }
 
 function createFiber (vnode, data) {
-  data.tag = isFn(vnode.type) ? HOOK : HOST;
-  vnode.props = vnode.props;
+  data.tag = typeof vnode.type === 'function' ? HOOK : HOST;
   return merge(vnode, data)
 }
 
@@ -348,8 +346,8 @@ function commitWork (WIP) {
   pendingCommit = null;
 }
 function commit (fiber) {
-  let parent = fiber.mum || fiber.parent.base;
   fiber.parent.patches = fiber.patches = [];
+  let parent = fiber.mum || fiber.parent.base;
   let dom = fiber.base || fiber.child.base;
   switch (fiber.patchTag) {
     case UPDATE:
@@ -362,9 +360,9 @@ function commit (fiber) {
       const insertPoint = fiber.insertPoint;
       let point = insertPoint ? insertPoint.base : null;
       let after = point ? point.nextSibling : parent.firstChild;
-      if (after == dom) return
+      if (after === dom) return
       if (after === null && dom === parent.lastChild) return
-      if (point == null && after != null) return
+      if (point === null && after !== null) return
       parent.insertBefore(dom, after);
       break
   }
