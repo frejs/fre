@@ -6,7 +6,7 @@
   "unpkg": "dist/fre-umd.js",
   "module": "dist/fre-esm.js",
   "scripts": {
-    "test": "jest && tsc --noEmit",
+    "test": "jest --coverage && tsc --noEmit",
     "build:cjs": "rollup -i src/index.js -o dist/fre.js --no-esModule -mf cjs -n fre",
     "build:umd": "rollup -i src/index.js -o dist/fre-umd.js --no-esModule -mf umd -n fre",
     "build:esm": "rollup -i src/index.js -o dist/fre-esm.js --no-esModule -mf esm -n fre",
@@ -19,6 +19,7 @@
   "devDependencies": {
     "@babel/core": "^7.0.0-0",
     "@babel/preset-env": "7.5.0",
+    "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.3.3",
     "@types/jest": "^24.0.15",
     "babel-jest": "^24.8.0",

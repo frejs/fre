@@ -5,7 +5,7 @@ export function h (type, config) {
 
   for (let i = 2; i < arguments.length; i++) {
     let vnode = arguments[i]
-    if (vnode === null || vnode === true || vnode === false) {
+    if (vnode == null || vnode === true || vnode === false) {
     } else if (Array.isArray(vnode) || typeof vnode === 'object') {
       children.push(vnode)
     } else if (typeof vnode === 'function') {
@@ -14,6 +14,9 @@ export function h (type, config) {
       children.push({ type: 'text', props: { nodeValue: vnode } })
     }
   }
+
+  delete props.key
+
   props.children = children
 
   return { type, props, key }
