@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
-import { defer, hashfy, merge, isSame, isFn } from './util'
+import { defer, hashfy, merge, isSame } from './util'
 
 const options = {}
 const FPS = 1000 / 60
@@ -115,9 +115,7 @@ function reconcileChildren (WIP, children) {
     let oldFiber = reused[k]
 
     if (oldFiber) {
-      alternate = createFiber(oldFiber, {
-        patchTag: UPDATE
-      })
+      alternate = createFiber(oldFiber, { patchTag: UPDATE })
       if (!options.end) newFiber.patchTag = UPDATE
       newFiber = merge(alternate, newFiber)
       newFiber.alternate = alternate
@@ -125,9 +123,7 @@ function reconcileChildren (WIP, children) {
         newFiber.patchTag = PLACE
       }
     } else {
-      newFiber = createFiber(newFiber, {
-        patchTag: PLACE
-      })
+      newFiber = createFiber(newFiber, { patchTag: PLACE })
     }
 
     newFibers[k] = newFiber
@@ -144,8 +140,7 @@ function reconcileChildren (WIP, children) {
 }
 
 function createFiber (vnode, data) {
-  data.tag = isFn(vnode.type) ? HOOK : HOST
-  vnode.props = vnode.props
+  data.tag = typeof vnode.type === 'function' ? HOOK : HOST
   return merge(vnode, data)
 }
 
@@ -170,8 +165,8 @@ function commitWork (WIP) {
   pendingCommit = null
 }
 function commit (fiber) {
-  let parent = fiber.mum || fiber.parent.base
   fiber.parent.patches = fiber.patches = []
+  let parent = fiber.mum || fiber.parent.base
   let dom = fiber.base || fiber.child.base
   switch (fiber.patchTag) {
     case UPDATE:
@@ -184,9 +179,9 @@ function commit (fiber) {
       const insertPoint = fiber.insertPoint
       let point = insertPoint ? insertPoint.base : null
       let after = point ? point.nextSibling : parent.firstChild
-      if (after == dom) return
+      if (after === dom) return
       if (after === null && dom === parent.lastChild) return
-      if (point == null && after != null) return
+      if (point === null && after !== null) return
       parent.insertBefore(dom, after)
       break
   }
