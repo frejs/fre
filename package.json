@@ -11,7 +11,7 @@
     "build:umd": "rollup -i src/index.js -o dist/fre-umd.js --no-esModule -mf umd -n fre",
     "build:esm": "rollup -i src/index.js -o dist/fre-esm.js --no-esModule -mf esm -n fre",
     "minify": "terser dist/fre.js -o dist/fre.js -mc --source-map includeSources,url=fre.js.map",
-    "build": "yarn build:cjs&&yarn build:umd&&yarn build:esm"
+    "build": "yarpm run build:cjs && yarpm run build:umd && yarpm run build:esm"
   },
   "keywords": [],
   "author": "132yse",
@@ -30,6 +30,7 @@
     "rollup-plugin-license": "^0.8.1",
     "rollup-plugin-uglify-es": "^0.0.1",
     "terser": "^4.1.2",
-    "typescript": "^3.5.2"
+    "typescript": "^3.5.2",
+    "yarpm": "^0.2.1"
   }
 }
