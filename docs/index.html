@@ -1,13 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Fre · Fast 1kB React like library with the same hooks API</title>
 </head>
+
 <body>
   <div id="app"></div>
-  <script type="module" src="./index.js"></script>
+  <script src=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/htm"></script>
+  <script type="module">
+    import { h, useState } from 'https://cdn.jsdelivr.net/npm/fre'
+    import htm from 'https://unpkg.com/htm?module'
+    const html = htm.bind(h)
+
+    function App() {
+      return (
+        html`
+          <h1>hello fre~</h1>
+        `
+      )
+    }
+
+  </script>
 </body>
+
 </html>
