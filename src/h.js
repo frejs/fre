@@ -6,10 +6,10 @@ export function h (type, config) {
   for (let i = 2; i < arguments.length; i++) {
     let vnode = arguments[i]
     if (vnode == null || vnode === true || vnode === false) {
-    } else if (Array.isArray(vnode) || typeof vnode === 'object') {
-      children.push(vnode)
-    } else {
+    } else if (typeof vnode === 'number' || typeof vnode === 'string') {
       children.push({ type: 'text', props: { nodeValue: vnode } })
+    } else {
+      children.push(vnode)
     }
   }
 
