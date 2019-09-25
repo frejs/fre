@@ -12,6 +12,7 @@ let pendingCommit = null
 let currentFiber = null
 
 function render (vnode, el) {
+  console.log(vnode)
   let rootFiber = {
     tag: ROOT,
     base: el,
