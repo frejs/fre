@@ -8,8 +8,6 @@ export function h (type, config) {
     if (vnode == null || vnode === true || vnode === false) {
     } else if (Array.isArray(vnode) || typeof vnode === 'object') {
       children.push(vnode)
-    } else if (typeof vnode === 'function') {
-      children = vnode
     } else {
       children.push({ type: 'text', props: { nodeValue: vnode } })
     }
@@ -17,7 +15,11 @@ export function h (type, config) {
 
   delete props.key
 
-  props.children = children
+  if (children.length) {
+    props.children = children.length === 1
+      ? children[0]
+      : children
+  }
 
   return { type, props, key }
 }
