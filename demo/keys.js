@@ -38,7 +38,7 @@ function App () {
   return (
     <div>
       {arr.map(item => (
-        <li>{item}</li>
+        <li key={item}>{item}</li>
       ))}
       <button onClick={() => setArr(['B', 'A', 'D', 'C'])}>+</button>
     </div>

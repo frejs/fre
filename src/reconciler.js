@@ -46,6 +46,7 @@ function workLoop (startTime = 0) {
 
 function performWork (WIP) {
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
+  console.log(WIP)
   if (WIP.child) return WIP.child
   while (WIP) {
     completeWork(WIP)

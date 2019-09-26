@@ -1,5 +1,5 @@
-export function h (type, config) {
-  let props = config || {}
+export function h (type, attrs) {
+  let props = attrs || {}
   let key = props.key || null
   let children = []
 
@@ -12,12 +12,11 @@ export function h (type, config) {
       children.push(vnode)
     }
   }
-  
+
   if (children.length) {
-    props.children = children.length === 1
-      ? children[0]
-      : children
+    props.children = children.length === 1 ? children[0] : children
   }
 
+  delete props.key
   return { type, props, key }
 }
