@@ -10,7 +10,7 @@ export function hashfy (arr) {
   arrayfy(arr).forEach(item => {
     if (item.pop) {
       item.forEach(item => {
-        let key = ((item || {}).props || {}).key
+        let key = item.key
         key
           ? (out['.' + i + '.' + key] = item)
           : (out['.' + i + '.' + j] = item) && j++
