@@ -4,7 +4,15 @@ import { defer, hashfy, merge, isSame } from './util'
 
 const options = {}
 const FPS = 1000 / 60
-export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [0,1,2,3,4,5,6]
+export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6
+]
 
 let updateQueue = []
 let nextWork = null
@@ -56,12 +64,12 @@ function performWork (WIP) {
 
 function updateHost (WIP) {
   if (!options.end && !WIP.node) {
-    WIP.node = createElement(WIP)
     WIP.parentNode = getParentNode(WIP)
+    WIP.node = createElement(WIP)
   }
-  let parentNode = WIP.parentNode || {}
-  WIP.insertPoint = parentNode.oldPoint
-  parentNode.oldPoint = WIP
+  let p = WIP.parentNode || {}
+  WIP.insertPoint = p.oldPoint || null
+  p.oldPoint = WIP
   const children = WIP.props.children
   reconcileChildren(WIP, children)
 }
@@ -86,11 +94,11 @@ function updateHOOK (WIP) {
   currentFiber.patches = WIP.patches
 }
 function fiberize (children, WIP) {
-  return (WIP.children = hashfy(children, WIP.children))
+  return (WIP.kids = hashfy(children, WIP.kids))
 }
 
 function reconcileChildren (WIP, children) {
-  const oldFibers = WIP.children
+  const oldFibers = WIP.kids
   const newFibers = fiberize(children, WIP)
   let reused = {}
 

@@ -9,8 +9,7 @@ export function hashfy (arr) {
   let out = {}
   let i = 0
   let j = 0
-  const newKids = arrayfy(arr)
-  newKids.forEach(item => {
+  arrayfy(arr).forEach(item => {
     if (item.pop) {
       item.forEach(item => {
         let key = ((item || {}).props || {}).key
