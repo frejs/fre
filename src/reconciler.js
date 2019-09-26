@@ -1,20 +1,20 @@
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
-import { defer, hashfy, merge, isSame } from './util'
+import { defer, hashfy, merge } from './util'
 
 const options = {}
 const FPS = 1000 / 60
-export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [0,1,2,3,4,5,6]
+export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
 
 let updateQueue = []
 let nextWork = null
 let pendingCommit = null
 let currentFiber = null
 
-function render (vnode, el) {
+function render (vnode, node) {
   let rootFiber = {
     tag: ROOT,
-    base: el,
+    node,
     props: { children: vnode }
   }
   scheduleWork(rootFiber)
@@ -55,25 +55,25 @@ function performWork (WIP) {
 }
 
 function updateHost (WIP) {
-  if (!options.end && !WIP.base) {
-    WIP.base = createElement(WIP)
-    WIP.mum = getParentNode(WIP)
+  if (!options.end && !WIP.node) {
+    WIP.parentNode = getParentNode(WIP)
+    if (WIP.type === 'svg') WIP.tag = SVG
+    WIP.node = createElement(WIP)
   }
-  let parent = WIP.mum || {}
-  WIP.insertPoint = parent.oldPoint
-  parent.oldPoint = WIP
-
-  const children = WIP.props.children
-  reconcileChildren(WIP, children)
+  let p = WIP.parentNode || {}
+  WIP.insertPoint = p.lastFiber || null
+  p.lastFiber = WIP
+  WIP.node.lastFiber = null
+  reconcileChildren(WIP, WIP.props.children)
 }
 
 function getParentNode (fiber) {
   if (fiber.parent) {
     return fiber.parent.tag === HOOK
-      ? fiber.parent.parent.base
-      : fiber.parent.base
+      ? fiber.parent.parent.node
+      : fiber.parent.node
   } else {
-    return fiber.base
+    return fiber.node
   }
 }
 
@@ -82,24 +82,20 @@ function updateHOOK (WIP) {
   WIP.state = WIP.state || {}
   currentFiber = WIP
   resetCursor()
-  const children = WIP.type(WIP.props)
-  reconcileChildren(WIP, children)
+  reconcileChildren(WIP, WIP.type(WIP.props))
   currentFiber.patches = WIP.patches
-}
-function fiberize (children, WIP) {
-  return (WIP.children = hashfy(children, WIP.children))
 }
 
 function reconcileChildren (WIP, children) {
-  const oldFibers = WIP.children
-  const newFibers = fiberize(children, WIP)
+  const oldFibers = WIP.kids
+  const newFibers = (WIP.kids = hashfy(children, WIP.kids))
   let reused = {}
 
-  for (let k in oldFibers) {
+  for (const k in oldFibers) {
     let newFiber = newFibers[k]
     let oldFiber = oldFibers[k]
 
-    if (newFiber && isSame(newFiber, oldFiber)) {
+    if (newFiber && newFiber.type === oldFiber.type) {
       reused[k] = oldFiber
     } else {
       oldFiber.patchTag = DELETE
@@ -110,7 +106,7 @@ function reconcileChildren (WIP, children) {
   let prevFiber = null
   let alternate = null
 
-  for (let k in newFibers) {
+  for (const k in newFibers) {
     let newFiber = newFibers[k]
     let oldFiber = reused[k]
 
@@ -119,9 +115,7 @@ function reconcileChildren (WIP, children) {
       if (!options.end) newFiber.patchTag = UPDATE
       newFiber = merge(alternate, newFiber)
       newFiber.alternate = alternate
-      if (oldFiber.key) {
-        newFiber.patchTag = PLACE
-      }
+      if (newFiber.key) newFiber.patchTag = PLACE
     } else {
       newFiber = createFiber(newFiber, { patchTag: PLACE })
     }
@@ -167,8 +161,8 @@ function commitWork (WIP) {
 }
 function commit (fiber) {
   fiber.parent.patches = fiber.patches = []
-  let parent = fiber.mum || fiber.parent.base
-  let dom = fiber.base || fiber.child.base
+  let parent = fiber.parentNode || fiber.parent.node
+  let dom = fiber.node || fiber.child.node
   switch (fiber.patchTag) {
     case UPDATE:
       updateElement(dom, fiber.alternate.props, fiber.props)
@@ -177,12 +171,10 @@ function commit (fiber) {
       parent.removeChild(dom)
       break
     default:
-      const insertPoint = fiber.insertPoint
-      let point = insertPoint ? insertPoint.base : null
+      let point = fiber.insertPoint ? fiber.insertPoint.node : null
       let after = point ? point.nextSibling : parent.firstChild
-      if (after === dom) return
+      if (fiber.tag === HOOK || after === dom) return
       if (after === null && dom === parent.lastChild) return
-      if (point === null && after !== null) return
       parent.insertBefore(dom, after)
       break
   }

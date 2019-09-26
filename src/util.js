@@ -1,27 +1,21 @@
 export const arrayfy = arr => (!arr ? [] : Array.isArray(arr) ? arr : [arr])
 
-export const isSame = (a, b) => a.type === b.type
-
 export const isNew = (o, n) => k =>
   k !== 'children' && k !== 'key' && o[k] !== n[k]
 
 export function hashfy (arr) {
-  let out = {}
-  let i = 0
-  let j = 0
-  const newKids = arrayfy(arr)
-  newKids.forEach(item => {
+  let out = {}, i = 0, j = 0
+  
+  arrayfy(arr).forEach(item => {
     if (item.pop) {
       item.forEach(item => {
-        let key = ((item || {}).props || {}).key
+        let key = item.key
         key
           ? (out['.' + i + '.' + key] = item)
           : (out['.' + i + '.' + j] = item) && j++
       })
       i++
-    } else {
-      ;(out['.' + i] = item) && i++
-    }
+    } else (out['.' + i] = item) && i++
   })
   return out
 }
