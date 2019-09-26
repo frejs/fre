@@ -12,9 +12,7 @@ export function h (type, config) {
       children.push(vnode)
     }
   }
-
-  delete props.key
-
+  
   if (children.length) {
     props.children = children.length === 1
       ? children[0]

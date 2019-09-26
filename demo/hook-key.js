@@ -19,7 +19,7 @@ function App () {
   return (
     <div>
       {new Array(counters).fill().map(i => (
-        <Counter key={i}/>
+        <Counter/>
       ))}
       <button onClick={() => setCounters(counters + 1)}>+</button>
       <button onClick={() => setCounters(counters - 1)}>-</button>

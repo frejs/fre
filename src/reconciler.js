@@ -14,7 +14,7 @@ let currentFiber = null
 function render (vnode, el) {
   let rootFiber = {
     tag: ROOT,
-    base: el,
+    node: el,
     props: { children: vnode }
   }
   scheduleWork(rootFiber)
@@ -55,14 +55,13 @@ function performWork (WIP) {
 }
 
 function updateHost (WIP) {
-  if (!options.end && !WIP.base) {
-    WIP.base = createElement(WIP)
-    WIP.mum = getParentNode(WIP)
+  if (!options.end && !WIP.node) {
+    WIP.node = createElement(WIP)
+    WIP.parentNode = getParentNode(WIP)
   }
-  let parent = WIP.mum || {}
-  WIP.insertPoint = parent.oldPoint
-  parent.oldPoint = WIP
-
+  let parentNode = WIP.parentNode || {}
+  WIP.insertPoint = parentNode.oldPoint
+  parentNode.oldPoint = WIP
   const children = WIP.props.children
   reconcileChildren(WIP, children)
 }
@@ -70,10 +69,10 @@ function updateHost (WIP) {
 function getParentNode (fiber) {
   if (fiber.parent) {
     return fiber.parent.tag === HOOK
-      ? fiber.parent.parent.base
-      : fiber.parent.base
+      ? fiber.parent.parent.node
+      : fiber.parent.node
   } else {
-    return fiber.base
+    return fiber.node
   }
 }
 
@@ -119,9 +118,7 @@ function reconcileChildren (WIP, children) {
       if (!options.end) newFiber.patchTag = UPDATE
       newFiber = merge(alternate, newFiber)
       newFiber.alternate = alternate
-      if (oldFiber.key) {
-        newFiber.patchTag = PLACE
-      }
+      if (oldFiber.key) newFiber.patchTag = PLACE
     } else {
       newFiber = createFiber(newFiber, { patchTag: PLACE })
     }
@@ -167,8 +164,8 @@ function commitWork (WIP) {
 }
 function commit (fiber) {
   fiber.parent.patches = fiber.patches = []
-  let parent = fiber.mum || fiber.parent.base
-  let dom = fiber.base || fiber.child.base
+  let parent = fiber.parentNode || fiber.parent.node
+  let dom = fiber.node || fiber.child.node
   switch (fiber.patchTag) {
     case UPDATE:
       updateElement(dom, fiber.alternate.props, fiber.props)
@@ -177,8 +174,7 @@ function commit (fiber) {
       parent.removeChild(dom)
       break
     default:
-      const insertPoint = fiber.insertPoint
-      let point = insertPoint ? insertPoint.base : null
+      let point = fiber.insertPoint ? fiber.insertPoint.node : null
       let after = point ? point.nextSibling : parent.firstChild
       if (after === dom) return
       if (after === null && dom === parent.lastChild) return
