@@ -9,6 +9,8 @@ function updateProperty (dom, name, value, newValue) {
     name = name.slice(2).toLowerCase()
     if (value) dom.removeEventListener(name, value)
     dom.addEventListener(name, newValue)
+  } else if ((name in dom) && !(dom instanceof SVGElement)) {
+    dom[name] = newValue==null ? '' : newValue;
   } else if (newValue == null || newValue === false) {
     dom.removeAttribute(name)
   } else {
@@ -19,11 +21,7 @@ function updateProperty (dom, name, value, newValue) {
 export function updateElement (dom, props, newProps) {
   Object.keys(newProps)
     .filter(isNew(props, newProps))
-    .forEach(key => {
-      key === 'value' || key === 'nodeValue'
-        ? (dom[key] = newProps[key])
-        : updateProperty(dom, key, props[key], newProps[key])
-    })
+    .forEach(key => updateProperty(dom, key, props[key], newProps[key]));
 }
 
 export function createElement (fiber) {
