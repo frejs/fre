@@ -4,9 +4,8 @@ export const isNew = (o, n) => k =>
   k !== 'children' && k !== 'key' && o[k] !== n[k]
 
 export function hashfy (arr) {
-  let out = {}
-  let i = 0
-  let j = 0
+  let out = {}, i = 0, j = 0
+  
   arrayfy(arr).forEach(item => {
     if (item.pop) {
       item.forEach(item => {
@@ -16,9 +15,7 @@ export function hashfy (arr) {
           : (out['.' + i + '.' + j] = item) && j++
       })
       i++
-    } else {
-      ;(out['.' + i] = item) && i++
-    }
+    } else (out['.' + i] = item) && i++
   })
   return out
 }
