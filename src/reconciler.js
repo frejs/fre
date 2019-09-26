@@ -57,6 +57,7 @@ function performWork (WIP) {
 function updateHost (WIP) {
   if (!options.end && !WIP.node) {
     WIP.parentNode = getParentNode(WIP)
+    if (WIP.type === 'svg') WIP.tag = SVG
     WIP.node = createElement(WIP)
   }
   let p = WIP.parentNode || {}

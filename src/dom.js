@@ -27,7 +27,6 @@ export function updateElement (dom, props, newProps) {
 }
 
 export function createElement (fiber) {
-  if (fiber.type === 'svg') fiber.tag = SVG
   const dom =
     fiber.type === 'text'
       ? document.createTextNode('')
