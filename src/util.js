@@ -26,4 +26,4 @@ export function merge (a, b) {
   for (const i in b) out[i] = b[i]
   return out
 }
-export const defer = requestAnimationFrame || setTimeout
+export const defer = setTimeout // TODO requestAnimationFrame || setTimeout ?

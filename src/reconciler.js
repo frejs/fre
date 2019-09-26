@@ -11,11 +11,12 @@ let nextWork = null
 let pendingCommit = null
 let currentFiber = null
 
-function render (vnode, node) {
+function render (vnode, node, done) {
   let rootFiber = {
     tag: ROOT,
     node,
-    props: { children: vnode }
+    props: { children: vnode },
+    done
   }
   scheduleWork(rootFiber)
 }
@@ -178,6 +179,7 @@ function commit (fiber) {
       parent.insertBefore(dom, after)
       break
   }
+  fiber.parent.done && fiber.parent.done()
 }
 
 function getWIP () {
