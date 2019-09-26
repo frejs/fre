@@ -4,7 +4,7 @@ function App () {
   const [flag, setFlag] = useState(true)
   return (
     <div style={flag? { color: 'red' } : { backgroundColor: 'black' }}>
-      <svg xmlns='http://www.w3.org/2000/svg' version='1.1'>
+      <svg>
         <circle
           cx='100'
           cy='50'
