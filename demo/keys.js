@@ -21,6 +21,18 @@ import { h, render, useState, useEffect } from '../src'
 //   return <li>1</li>
 // }
 
+// function App () {
+//   const [arr, setArr] = useState(['A', 'B', 'C', 'D'])
+//   return (
+//     <div>
+//       {arr.map(item => (
+//         <li>{item}</li>
+//       ))}
+//       <button onClick={() => setArr(['C', 'D', 'A', 'B'])}>+</button>
+//     </div>
+//   )
+// }
+
 function App () {
   const [arr, setArr] = useState(['A', 'B', 'C', 'D'])
   return (
@@ -28,7 +40,7 @@ function App () {
       {arr.map(item => (
         <li>{item}</li>
       ))}
-      <button onClick={() => setArr(['C', 'D', 'A', 'B'])}>+</button>
+      <button onClick={() => setArr(['B', 'A', 'D', 'C'])}>+</button>
     </div>
   )
 }

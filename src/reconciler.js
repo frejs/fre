@@ -172,9 +172,8 @@ function commit (fiber) {
     default:
       let point = fiber.insertPoint ? fiber.insertPoint.node : null
       let after = point ? point.nextSibling : parent.firstChild
-      if (after === dom) return
+      if (fiber.tag === HOOK || after === dom) return
       if (after === null && dom === parent.lastChild) return
-      if (fiber.tag === HOOK) return
       parent.insertBefore(dom, after)
       break
   }
