@@ -1,28 +1,20 @@
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
-import { defer, hashfy, merge, isSame } from './util'
+import { defer, hashfy, merge } from './util'
 
 const options = {}
 const FPS = 1000 / 60
-export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [
-  0,
-  1,
-  2,
-  3,
-  4,
-  5,
-  6
-]
+export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
 
 let updateQueue = []
 let nextWork = null
 let pendingCommit = null
 let currentFiber = null
 
-function render (vnode, el) {
+function render (vnode, node) {
   let rootFiber = {
     tag: ROOT,
-    node: el,
+    node,
     props: { children: vnode }
   }
   scheduleWork(rootFiber)
@@ -68,10 +60,10 @@ function updateHost (WIP) {
     WIP.node = createElement(WIP)
   }
   let p = WIP.parentNode || {}
-  WIP.insertPoint = p.oldPoint || null
-  p.oldPoint = WIP
-  const children = WIP.props.children
-  reconcileChildren(WIP, children)
+  WIP.insertPoint = p.lastFiber || null
+  p.lastFiber = WIP
+  WIP.node.lastFiber = null
+  reconcileChildren(WIP, WIP.props.children)
 }
 
 function getParentNode (fiber) {
@@ -89,24 +81,20 @@ function updateHOOK (WIP) {
   WIP.state = WIP.state || {}
   currentFiber = WIP
   resetCursor()
-  const children = WIP.type(WIP.props)
-  reconcileChildren(WIP, children)
+  reconcileChildren(WIP, WIP.type(WIP.props))
   currentFiber.patches = WIP.patches
-}
-function fiberize (children, WIP) {
-  return (WIP.kids = hashfy(children, WIP.kids))
 }
 
 function reconcileChildren (WIP, children) {
   const oldFibers = WIP.kids
-  const newFibers = fiberize(children, WIP)
+  const newFibers = (WIP.kids = hashfy(children, WIP.kids))
   let reused = {}
 
-  for (let k in oldFibers) {
+  for (const k in oldFibers) {
     let newFiber = newFibers[k]
     let oldFiber = oldFibers[k]
 
-    if (newFiber && isSame(newFiber, oldFiber)) {
+    if (newFiber && newFiber.type === oldFiber.type) {
       reused[k] = oldFiber
     } else {
       oldFiber.patchTag = DELETE
@@ -117,7 +105,7 @@ function reconcileChildren (WIP, children) {
   let prevFiber = null
   let alternate = null
 
-  for (let k in newFibers) {
+  for (const k in newFibers) {
     let newFiber = newFibers[k]
     let oldFiber = reused[k]
 
@@ -126,7 +114,7 @@ function reconcileChildren (WIP, children) {
       if (!options.end) newFiber.patchTag = UPDATE
       newFiber = merge(alternate, newFiber)
       newFiber.alternate = alternate
-      if (oldFiber.key) newFiber.patchTag = PLACE
+      if (newFiber.key) newFiber.patchTag = PLACE
     } else {
       newFiber = createFiber(newFiber, { patchTag: PLACE })
     }
@@ -186,7 +174,7 @@ function commit (fiber) {
       let after = point ? point.nextSibling : parent.firstChild
       if (after === dom) return
       if (after === null && dom === parent.lastChild) return
-      if (point === null && after !== null) return
+      if (fiber.tag === HOOK) return
       parent.insertBefore(dom, after)
       break
   }
