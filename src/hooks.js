@@ -14,8 +14,7 @@ export function useState (initState) {
   return useReducer(null, initState)
 }
 export function useReducer (reducer, initState) {
-  let current = getWIP()
-  if (!current) return [initState, setter]
+  let current = getWIP() || {}
   let key = '$' + cursor
   let setter = update.bind(current, key, reducer)
   cursor++
@@ -29,7 +28,7 @@ export function useReducer (reducer, initState) {
 }
 
 export function useEffect (cb, inputs) {
-  let current = getWIP()
+  let current = getWIP() || {}
   if (current) {
     let key = '$' + cursor
     current.effects = current.effects || {}
