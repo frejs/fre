@@ -29,12 +29,10 @@ export function useReducer (reducer, initState) {
 
 export function useEffect (cb, inputs) {
   let current = getWIP() || {}
-  if (current) {
-    let key = '$' + cursor
-    current.effects = current.effects || {}
-    current.effects[key] = useCallback(cb, inputs)
-    cursor++
-  }
+  let key = '$' + cursor
+  current.effects = current.effects || {}
+  current.effects[key] = useCallback(cb, inputs)
+  cursor++
 }
 
 export function useCallback (cb, inputs) {
@@ -42,19 +40,17 @@ export function useCallback (cb, inputs) {
 }
 
 export function useMemo (cb, inputs) {
-  let current = getWIP()
-  if (current) {
-    let isChange = inputs
-      ? (current.oldInputs || []).some((v, i) => inputs[i] !== v)
-      : true
-    if (inputs && !inputs.length && !current.isMounted) {
-      isChange = true
-      current.isMounted = true
-    }
-    current.oldInputs = inputs
-
-    return isChange || !current.isMounted ? (current.memo = cb()) : current.memo
+  let current = getWIP() || {}
+  let isChange = inputs
+    ? (current.oldInputs || []).some((v, i) => inputs[i] !== v)
+    : true
+  if (inputs && !inputs.length && !current.isMounted) {
+    isChange = true
+    current.isMounted = true
   }
+  current.oldInputs = inputs
+
+  return isChange || !current.isMounted ? (current.memo = cb()) : current.memo
 }
 
 export function createContext (init = {}) {
