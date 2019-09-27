@@ -152,8 +152,7 @@ function commitWork (WIP) {
     const e = p.effects
     if (e) for (const k in e) e[k]()
   })
-  nextWork = null
-  pendingCommit = null
+  nextWork = pendingCommit = null
 }
 function commit (fiber) {
   let parent = fiber.parentNode
