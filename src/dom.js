@@ -32,6 +32,5 @@ export function createElement (fiber) {
         ? document.createElementNS('http://www.w3.org/2000/svg', fiber.type)
         : document.createElement(fiber.type)
   updateElement(dom, [], fiber.props)
-
   return dom
 }
