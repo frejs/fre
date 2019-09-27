@@ -4,8 +4,8 @@
   (global = global || self, factory(global.fre = {}));
 }(this, function (exports) { 'use strict';
 
-  function h (type, config) {
-    let props = config || {};
+  function h (type, attrs) {
+    let props = attrs || {};
     let key = props.key || null;
     let children = [];
 
@@ -17,37 +17,32 @@
         children.push(vnode);
       }
     }
-    
+
     if (children.length) {
-      props.children = children.length === 1
-        ? children[0]
-        : children;
+      props.children = children.length === 1 ? children[0] : children;
     }
 
+    delete props.key;
     return { type, props, key }
   }
 
-  const arrayfy = arr => (!arr ? [] : Array.isArray(arr) ? arr : [arr]);
+  const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr]);
 
   const isNew = (o, n) => k =>
     k !== 'children' && k !== 'key' && o[k] !== n[k];
 
   function hashfy (arr) {
-    let out = {};
-    let i = 0;
-    let j = 0;
+    let out = {}, i = 0, j = 0;
     arrayfy(arr).forEach(item => {
       if (item.pop) {
         item.forEach(item => {
-          let key = ((item || {}).props || {}).key;
+          let key = item.key;
           key
             ? (out['.' + i + '.' + key] = item)
             : (out['.' + i + '.' + j] = item) && j++;
         });
         i++;
-      } else {
-  (out['.' + i] = item) && i++;
-      }
+      } else (out['.' + i] = item) && i++;
     });
     return out
   }
@@ -68,6 +63,8 @@
       name = name.slice(2).toLowerCase();
       if (value) dom.removeEventListener(name, value);
       dom.addEventListener(name, newValue);
+    } else if (name in dom && !(dom instanceof SVGElement)) {
+      dom[name] = newValue == null ? '' : newValue;
     } else if (newValue == null || newValue === false) {
       dom.removeAttribute(name);
     } else {
@@ -78,15 +75,10 @@
   function updateElement (dom, props, newProps) {
     Object.keys(newProps)
       .filter(isNew(props, newProps))
-      .forEach(key => {
-        key === 'value' || key === 'nodeValue'
-          ? (dom[key] = newProps[key])
-          : updateProperty(dom, key, props[key], newProps[key]);
-      });
+      .forEach(key => updateProperty(dom, key, props[key], newProps[key]));
   }
 
   function createElement (fiber) {
-    if (fiber.type === 'svg') fiber.tag = SVG;
     const dom =
       fiber.type === 'text'
         ? document.createTextNode('')
@@ -113,8 +105,7 @@
     return useReducer(null, initState)
   }
   function useReducer (reducer, initState) {
-    let current = getWIP();
-    if (!current) return [initState, setter]
+    let current = getWIP() || {};
     let key = '$' + cursor;
     let setter = update.bind(current, key, reducer);
     cursor++;
@@ -128,13 +119,11 @@
   }
 
   function useEffect (cb, inputs) {
-    let current = getWIP();
-    if (current) {
-      let key = '$' + cursor;
-      current.effects = current.effects || {};
-      current.effects[key] = useCallback(cb, inputs);
-      cursor++;
-    }
+    let current = getWIP() || {};
+    let key = '$' + cursor;
+    current.effects = current.effects || {};
+    current.effects[key] = useCallback(cb, inputs);
+    cursor++;
   }
 
   function useCallback (cb, inputs) {
@@ -142,19 +131,17 @@
   }
 
   function useMemo (cb, inputs) {
-    let current = getWIP();
-    if (current) {
-      let isChange = inputs
-        ? (current.oldInputs || []).some((v, i) => inputs[i] !== v)
-        : true;
-      if (inputs && !inputs.length && !current.isMounted) {
-        isChange = true;
-        current.isMounted = true;
-      }
-      current.oldInputs = inputs;
-
-      return isChange || !current.isMounted ? (current.memo = cb()) : current.memo
+    let current = getWIP() || {};
+    let isChange = inputs
+      ? (current.oldInputs || []).some((v, i) => inputs[i] !== v)
+      : true;
+    if (inputs && !inputs.length && !current.isMounted) {
+      isChange = true;
+      current.isMounted = true;
     }
+    current.oldInputs = inputs;
+
+    return isChange || !current.isMounted ? (current.memo = cb()) : current.memo
   }
 
   function createContext (init = {}) {
@@ -233,6 +220,7 @@
   function updateHost (WIP) {
     if (!options.end && !WIP.node) {
       WIP.parentNode = getParentNode(WIP);
+      if (WIP.type === 'svg') WIP.tag = SVG;
       WIP.node = createElement(WIP);
     }
     let p = WIP.parentNode || {};
@@ -348,9 +336,8 @@
       default:
         let point = fiber.insertPoint ? fiber.insertPoint.node : null;
         let after = point ? point.nextSibling : parent.firstChild;
-        if (after === dom) return
+        if (fiber.tag === HOOK || after === dom) return
         if (after === null && dom === parent.lastChild) return
-        if (fiber.tag === HOOK) return
         parent.insertBefore(dom, after);
         break
     }
