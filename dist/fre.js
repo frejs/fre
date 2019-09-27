@@ -24,11 +24,12 @@ function h (type, attrs) {
 
 const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr]);
 
-const isNew = (o, n) => k =>
-  k !== 'children' && k !== 'key' && o[k] !== n[k];
+const isNew = (o, n) => k => k !== 'children' && o[k] !== n[k];
 
 function hashfy (arr) {
-  let out = {}, i = 0, j = 0;
+  let out = {};
+  let i = 0;
+  let j = 0;
   arrayfy(arr).forEach(item => {
     if (item.pop) {
       item.forEach(item => {
@@ -82,7 +83,6 @@ function createElement (fiber) {
         ? document.createElementNS('http://www.w3.org/2000/svg', fiber.type)
         : document.createElement(fiber.type);
   updateElement(dom, [], fiber.props);
-
   return dom
 }
 
@@ -204,6 +204,7 @@ function workLoop (startTime = 0) {
 }
 
 function performWork (WIP) {
+  WIP.parentNode = getParentNode(WIP);
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP);
   if (WIP.child) return WIP.child
   while (WIP) {
@@ -215,7 +216,6 @@ function performWork (WIP) {
 
 function updateHost (WIP) {
   if (!options.end && !WIP.node) {
-    WIP.parentNode = getParentNode(WIP);
     if (WIP.type === 'svg') WIP.tag = SVG;
     WIP.node = createElement(WIP);
   }
@@ -227,13 +227,9 @@ function updateHost (WIP) {
 }
 
 function getParentNode (fiber) {
-  if (fiber.parent) {
-    return fiber.parent.tag === HOOK
-      ? fiber.parent.parent.node
-      : fiber.parent.node
-  } else {
-    return fiber.node
-  }
+  if (!fiber.parent) return fiber.node
+  while (fiber.parent.tag === HOOK) return fiber.parent.parent.node
+  return fiber.parent.node
 }
 
 function updateHOOK (WIP) {
@@ -242,7 +238,6 @@ function updateHOOK (WIP) {
   currentFiber = WIP;
   resetCursor();
   reconcileChildren(WIP, WIP.type(WIP.props));
-  currentFiber.patches = WIP.patches;
 }
 
 function reconcileChildren (WIP, children) {
@@ -311,17 +306,17 @@ function completeWork (fiber) {
 
 function commitWork (WIP) {
   WIP.patches.forEach(p => {
+    p.parent.patches = p.patches = null;
     commit(p);
     const e = p.effects;
     if (e) for (const k in e) e[k]();
   });
-  nextWork = null;
-  pendingCommit = null;
+  nextWork = pendingCommit = null;
 }
 function commit (fiber) {
-  fiber.parent.patches = fiber.patches = [];
-  let parent = fiber.parentNode || fiber.parent.node;
-  let dom = fiber.node || fiber.child.node;
+  let parent = fiber.parentNode;
+  let dom = fiber.node;
+  while (!dom) dom = fiber.child.node;
   switch (fiber.patchTag) {
     case UPDATE:
       updateElement(dom, fiber.alternate.props, fiber.props);
