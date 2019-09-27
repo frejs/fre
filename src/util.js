@@ -1,11 +1,10 @@
-export const arrayfy = arr => (!arr ? [] : Array.isArray(arr) ? arr : [arr])
+export const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr])
 
 export const isNew = (o, n) => k =>
   k !== 'children' && k !== 'key' && o[k] !== n[k]
 
 export function hashfy (arr) {
   let out = {}, i = 0, j = 0
-  
   arrayfy(arr).forEach(item => {
     if (item.pop) {
       item.forEach(item => {
