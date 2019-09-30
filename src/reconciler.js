@@ -6,7 +6,6 @@ const options = {}
 const FPS = 1000 / 60
 export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
 
-let updateQueue = []
 let nextWork = null
 let pendingCommit = null
 let currentFiber = null
@@ -21,7 +20,7 @@ function render (vnode, node) {
 }
 
 function scheduleWork (fiber) {
-  updateQueue.push(fiber)
+  nextWork = fiber
   defer(workLoop)
 }
 
@@ -29,7 +28,6 @@ function workLoop (startTime = 0) {
   if (startTime && performance.now() - startTime > FPS) {
     defer(workLoop)
   } else if (!nextWork && updateQueue.length > 0) {
-    nextWork = updateQueue.shift()
     defer(workLoop)
   } else {
     const nextTime = performance.now()
