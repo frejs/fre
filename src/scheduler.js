@@ -8,7 +8,7 @@ let timeoutTime = -1
 let inMacro = false
 let deadline = {
   didTimeout: false,
-  timeRemaining: FD - performance.now()
+  timeRemaining: FD - performance.now() > 0 ? FD - performance.now() : 0
 }
 
 function schedulerCallback (cb, dueTime, config) {
