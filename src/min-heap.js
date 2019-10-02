@@ -207,28 +207,6 @@ function peek (heap) {
   return first || null
 }
 
-const channel = new MessageChannel()
+const channel = new MessageChannel
 const port = channel.port2
 channel.port1.onmessage = performWork
-
-// function nextTick () {
-//   let timeoutid
-//   if (!currentTask) {
-//     prevRAFTtime = prevRAFTInterval = -1 // where？
-//     inRAF = false
-//   }
-//   inRAF = true
-//   requestAnimationFrame(nextTime => {
-//     clearTimeout(timeoutid)
-//     nextTick(nextTime)
-//   })
-//     // todo……
-//   let timetick = () => {
-//     frameDeadline = getTime() + frameLength / 2
-//     performWork()
-//     timeoutid = setTimeout(timetick, frameLength * 3)
-//   }
-
-//   timeoutid = setTimeout(timetick, frameLength * 3)
-
-// }
