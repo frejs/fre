@@ -6,9 +6,9 @@ let isPerform = false
 let currentTask = null
 let currentCallback = null
 let inMC = false
-let inRAF = false
-let isHostCallbackScheduled = false
-let isHostTimeoutScheduled = false
+// let inRAF = false
+let scheduledCallback = false
+let scheduledTimeout = false
 let iniTime = Date.now()
 let outid
 let frameLength = 5
@@ -33,9 +33,9 @@ function scheduleCallback (callback) {
     push(timerQueue, newTask)
 
     if (peek(taskQueue) == null && newTask == peek(timerQueue)) {
-      isHostTimeoutScheduled
+      scheduledTimeout
         ? clearTimeout(outid)
-        : (isHostTimeoutScheduled = true)
+        : (scheduledTimeout = true)
       outid = setTimeout(
         () => handleTimeout(getTime()),
         startTime - currentTime
@@ -45,8 +45,8 @@ function scheduleCallback (callback) {
     newTask.index = dueTime
     push(taskQueue, newTask)
 
-    if (!isHostTimeoutScheduled && !isPerform) {
-      isHostTimeoutScheduled = true
+    if (!scheduledTimeout && !isPerform) {
+      scheduledTimeout = true
       requestHostCallback(flushWork)
     }
   }
@@ -54,12 +54,12 @@ function scheduleCallback (callback) {
 }
 
 function handleTimeout (currentTime) {
-  isHostTimeoutScheduled = false
+  scheduledTimeout = false
   advanceTimers(currentTime)
 
-  if (!isHostCallbackScheduled) {
+  if (!scheduledCallback) {
     if (peek(taskQueue) != null) {
-      isHostCallbackScheduled = true
+      scheduledCallback = true
       requestHostCallback(flushWork)
     } else {
       if (peek(timerQueue)) {
@@ -76,9 +76,9 @@ function requestHostCallback (cb) {
   }
 }
 function flushWork (didout, iniTime) {
-  isHostCallbackScheduled = false
-  if (isHostTimeoutScheduled) {
-    isHostTimeoutScheduled = false
+  scheduledCallback = false
+  if (scheduledTimeout) {
+    scheduledTimeout = false
     clearTimeout(outid)
   }
   isPerform = true
