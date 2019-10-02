@@ -4,16 +4,19 @@ let taskId = 1
 
 let isPerform = false
 let currentTask = null
+let currentCallback = null
+let inMC = false
+let inRAF = false
 let isHostCallbackScheduled = false
 let isHostTimeoutScheduled = false
 let iniTime = Date.now()
+let outid
 
 function scheduleCallback (callback) {
   const currentTime = getTime()
   let startTime = currentTime
   let timeout = 5000 // idle
   let dueTime = startTime + timeout
-  let outid
 
   let newTask = {
     id: taskId++,
@@ -63,8 +66,81 @@ function handleTimeout (currentTime) {
     }
   }
 }
-function requestHostCallback (cb) {}
-function flushWork () {}
+function requestHostCallback (cb) {
+  currentCallback = cb
+  if (!inMC) {
+    inMC = true
+    port.postMessage(null)
+  }
+}
+function flushWork (didout, iniTime) {
+  isHostCallbackScheduled = false
+  if (isHostTimeoutScheduled) {
+    isHostTimeoutScheduled = false
+    clearTimeout(outid)
+  }
+  isPerform = true
+
+  try {
+    return workLoop(didout, iniTime)
+  } finally {
+    currentTask = null
+    isPerform = false
+  }
+}
+
+function performWork () {
+  if (currentCallback) {
+    let currentTime = getTime()
+    frameDeadline = currentTime + frameLength
+    let didout = true
+
+    try {
+      let moreWork = scheduleCallback(didout, currentTime) // important logic
+      if (!moreWork) {
+        inMC = false
+        currentCallback = null
+      } else {
+        port.postMessage(null)
+      }
+    } catch (e) {
+      port.postMessage(null)
+      throw e
+    }
+  } else inMC = false
+}
+
+function workLoop (didout, iniTime) {
+  let currentTime = iniTime
+  advanceTimers(currentTime)
+  currentTask = peek(taskQueue)
+
+  while (currentTask !== null) {
+    if (currentTask.dueTime > currentTime) break
+    let callback = currentTask.callback
+
+    if (callback) {
+      currentTask.callback = null
+      let didout = currentTask.dueTime < currentTime
+      callback(didout)
+    }
+  }
+}
+
+function advanceTimers (currentTime) {
+  let timer = peek(timerQueue)
+  while (timer) {
+    if (!timer.callback) {
+      pop(timerQueue)
+    } else if (timer.startTime <= currentTime) {
+      pop(timerQueue)
+      timer.index = timer.dueTime
+      push(taskQueue, timer)
+    } else return
+    timer = peek(timerQueue)
+  }
+}
+
 const getTime = () => Date.now() - iniTime
 
 function push (heap, node) {
@@ -128,3 +204,8 @@ function peek (heap) {
   var first = heap[0]
   return first || null
 }
+
+const channel = new MessageChannel()
+const port = channel.port2
+channel.port1.onmessage = performWork
+
