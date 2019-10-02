@@ -11,6 +11,8 @@ let isHostCallbackScheduled = false
 let isHostTimeoutScheduled = false
 let iniTime = Date.now()
 let outid
+let frameLength = 5
+let frameDeadline = 0
 
 function scheduleCallback (callback) {
   const currentTime = getTime()
@@ -159,7 +161,7 @@ function push (heap, node) {
   }
 }
 
-function pop (heap, node) {
+function pop (heap) {
   let first = heap[0]
   if (first) {
     let last = heap.pop()
@@ -174,19 +176,19 @@ function pop (heap, node) {
         let rightIndex = leftIndex + 1
         let right = heap[rightIndex]
 
-        if (left && compare(left, node) < 0) {
-          if (right && compare(right, node) < 0) {
+        if (left && compare(left, last) < 0) {
+          if (right && compare(right, last) < 0) {
             heap[index] = right
-            heap[rightIndex] = node
+            heap[rightIndex] = last
             index = rightIndex
           } else {
             heap[index] = left
-            heap[leftIndex] = node
+            heap[leftIndex] = last
             index = leftIndex
           }
-        } else if (right && compare(right, node) < 0) {
+        } else if (right && compare(right, last) < 0) {
           heap[index] = right
-          heap[rightIndex] = node
+          heap[rightIndex] = last
           index = rightIndex
         } else return
       }
@@ -209,3 +211,24 @@ const channel = new MessageChannel()
 const port = channel.port2
 channel.port1.onmessage = performWork
 
+// function nextTick () {
+//   let timeoutid
+//   if (!currentTask) {
+//     prevRAFTtime = prevRAFTInterval = -1 // where？
+//     inRAF = false
+//   }
+//   inRAF = true
+//   requestAnimationFrame(nextTime => {
+//     clearTimeout(timeoutid)
+//     nextTick(nextTime)
+//   })
+//     // todo……
+//   let timetick = () => {
+//     frameDeadline = getTime() + frameLength / 2
+//     performWork()
+//     timeoutid = setTimeout(timetick, frameLength * 3)
+//   }
+
+//   timeoutid = setTimeout(timetick, frameLength * 3)
+
+// }
