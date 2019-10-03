@@ -6,15 +6,13 @@ let isPerform = false
 let currentTask = null
 let currentCallback = null
 let inMC = false
-// let inRAF = false
 let scheduledCallback = false
 let scheduledTimeout = false
-let iniTime = Date.now()
 let outid
 let frameLength = 5
 let frameDeadline = 0
 
-function scheduleCallback (callback) {
+export function scheduleCallback (callback) {
   const currentTime = getTime()
   let startTime = currentTime
   let timeout = 5000 // idle
@@ -75,7 +73,7 @@ function requestHostCallback (cb) {
     port.postMessage(null)
   }
 }
-function flushWork (didout, iniTime) {
+function flushWork (iniTime) {
   scheduledCallback = false
   if (scheduledTimeout) {
     scheduledTimeout = false
@@ -84,7 +82,7 @@ function flushWork (didout, iniTime) {
   isPerform = true
 
   try {
-    return workLoop(didout, iniTime)
+    return workLoop(iniTime)
   } finally {
     currentTask = null
     isPerform = false
@@ -95,10 +93,9 @@ function performWork () {
   if (currentCallback) {
     let currentTime = getTime()
     frameDeadline = currentTime + frameLength
-    let didout = true
 
     try {
-      let moreWork = scheduleCallback(didout, currentTime) // important logic
+      let moreWork = currentCallback(currentTime) // important logic
       if (!moreWork) {
         inMC = false
         currentCallback = null
@@ -112,22 +109,24 @@ function performWork () {
   } else inMC = false
 }
 
-function workLoop (didout, iniTime) {
+function workLoop (iniTime) {
   let currentTime = iniTime
   advanceTimers(currentTime)
   currentTask = peek(taskQueue)
 
-  while (currentTask !== null) {
-    if (currentTask.dueTime > currentTime) break
+
+  // while (currentTask != null) {
+    // if (currentTask.dueTime > currentTime) break
     let callback = currentTask.callback
 
     if (callback) {
       currentTask.callback = null
       let didout = currentTask.dueTime < currentTime
       callback(didout)
+      pop(taskQueue)
     }
   }
-}
+// }
 
 function advanceTimers (currentTime) {
   let timer = peek(timerQueue)
@@ -143,7 +142,7 @@ function advanceTimers (currentTime) {
   }
 }
 
-const getTime = () => Date.now() - iniTime
+const getTime = () => performance.now()
 
 function push (heap, node) {
   let index = heap.length

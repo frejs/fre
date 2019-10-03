@@ -1,10 +1,19 @@
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { defer, hashfy, merge } from './util'
+import { scheduleCallback } from './scheduler'
 
 const options = {}
 const FPS = 1000 / 60
-export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
+export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6
+]
 
 let nextWork = null
 let pendingCommit = null
@@ -21,28 +30,22 @@ function render (vnode, node) {
 
 function scheduleWork (fiber) {
   nextWork = fiber
-  defer(workLoop)
+  scheduleCallback(performWork)
 }
 
-function workLoop (startTime = 0) {
-  if (startTime && performance.now() - startTime > FPS) {
-    defer(workLoop)
-  } else if (!nextWork && updateQueue.length > 0) {
-    defer(workLoop)
-  } else {
-    const nextTime = performance.now()
-    nextWork = performWork(nextWork)
-    if (nextWork) {
-      workLoop(nextTime)
-    } else {
-      options.commitWork
-        ? options.commitWork(pendingCommit)
-        : commitWork(pendingCommit)
-    }
+function performWork (didout) {
+  while (nextWork && !didout) {
+    nextWork = performNext(nextWork)
+  }
+
+  if (pendingCommit) {
+    options.commitWork
+      ? options.commitWork(pendingCommit)
+      : commitWork(pendingCommit)
   }
 }
 
-function performWork (WIP) {
+function performNext (WIP) {
   WIP.parentNode = getParentNode(WIP)
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
