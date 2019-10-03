@@ -24,8 +24,6 @@ export function scheduleCallback (callback) {
   push(taskQueue, newTask)
 
   requestHostCallback(flushWork)
-
-  return newTask
 }
 function requestHostCallback (cb) {
   currentCallback = cb
