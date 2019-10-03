@@ -139,27 +139,6 @@ function useMemo (cb, inputs) {
   return isChange || !current.isMounted ? (current.memo = cb()) : current.memo
 }
 
-function createContext (init = {}) {
-  let context = init;
-  let set = {};
-  const update = context => {
-    for (let key in set) set[key](context);
-  };
-  const subscribe = (fn, name) => {
-    if (name in set) return
-    set[name] = fn;
-  };
-
-  return { context, update, subscribe, set }
-}
-
-function useContext (ctx) {
-  const [context, setContext] = useState(ctx.context);
-  const name = getWIP().type.name;
-  ctx.subscribe(setContext, name);
-  return [context, ctx.update]
-}
-
 function push (heap, node) {
   let index = heap.length;
   heap.push(node);
@@ -176,6 +155,42 @@ function push (heap, node) {
   }
 }
 
+function pop (heap) {
+  let first = heap[0];
+  if (first) {
+    let last = heap.pop();
+    if (first !== last) {
+      heap[0] = last;
+      let index = 0;
+      let length = heap.length;
+
+      while (index < length) {
+        let leftIndex = (index + 1) * 2 - 1;
+        let left = heap[leftIndex];
+        let rightIndex = leftIndex + 1;
+        let right = heap[rightIndex];
+
+        if (left && compare(left, last) < 0) {
+          if (right && compare(right, last) < 0) {
+            heap[index] = right;
+            heap[rightIndex] = last;
+            index = rightIndex;
+          } else {
+            heap[index] = left;
+            heap[leftIndex] = last;
+            index = leftIndex;
+          }
+        } else if (right && compare(right, last) < 0) {
+          heap[index] = right;
+          heap[rightIndex] = last;
+          index = rightIndex;
+        } else return
+      }
+    }
+    return first
+  } else return null
+}
+
 function compare (a, b) {
   let diff = a.dueTime - b.dueTime;
   return diff !== 0 ? diff : a.id - b.id
@@ -188,10 +203,11 @@ function peek (heap) {
 
 let taskQueue = [];
 let taskId = 1;
-
 let currentTask = null;
 let currentCallback = null;
 let inMC = false;
+let frameLength = 5;
+let frameDeadline = 0;
 
 function scheduleCallback (callback) {
   const currentTime = getTime();
@@ -209,8 +225,6 @@ function scheduleCallback (callback) {
   push(taskQueue, newTask);
 
   requestHostCallback(flushWork);
-
-  return newTask
 }
 function requestHostCallback (cb) {
   currentCallback = cb;
@@ -221,22 +235,31 @@ function requestHostCallback (cb) {
 }
 function flushWork (iniTime) {
   try {
-    let currentTime = iniTime;
-    currentTask = peek(taskQueue);
-
-    let callback = currentTask.callback;
-    if (callback) {
-      let didout = currentTask.dueTime < currentTime;
-      callback(didout);
-    }
+    return workLoop(iniTime)
   } finally {
     currentTask = null;
+  }
+}
+
+function workLoop (iniTime) {
+  let currentTime = iniTime;
+  currentTask = peek(taskQueue);
+
+  while (currentTask) {
+    if (currentTask.dueTime > currentTime && shouldYield()) break
+    let callback = currentTask.callback;
+    if (callback) {
+      currentTask.callback = null;
+      let didout = currentTask.dueTime < currentTime;
+      callback(didout);
+    } else pop(taskQueue);
   }
 }
 
 function portMessage () {
   if (currentCallback) {
     let currentTime = getTime();
+    frameDeadline = currentTime + frameLength;
     let moreWork = currentCallback(currentTime);
     moreWork
       ? port.postMessage(null)
@@ -245,21 +268,14 @@ function portMessage () {
 }
 
 const getTime = () => performance.now();
+const shouldYield = () => getTime() > frameDeadline;
 
 const channel = new MessageChannel();
 const port = channel.port2;
 channel.port1.onmessage = portMessage;
 
 const options = {};
-const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [
-  0,
-  1,
-  2,
-  3,
-  4,
-  5,
-  6
-];
+const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6];
 
 let nextWork = null;
 let pendingCommit = null;
@@ -275,8 +291,8 @@ function render (vnode, node) {
 }
 
 function scheduleWork (fiber) {
-  nextWork = fiber;
   scheduleCallback(performWork);
+  nextWork = fiber;
 }
 
 function performWork (didout) {
@@ -426,14 +442,12 @@ function getWIP () {
   return currentFiber || null
 }
 
-exports.createContext = createContext;
 exports.createElement = h;
 exports.h = h;
 exports.options = options;
 exports.render = render;
 exports.scheduleWork = scheduleWork;
 exports.useCallback = useCallback;
-exports.useContext = useContext;
 exports.useEffect = useEffect;
 exports.useMemo = useMemo;
 exports.useReducer = useReducer;

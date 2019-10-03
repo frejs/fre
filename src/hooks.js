@@ -52,24 +52,3 @@ export function useMemo (cb, inputs) {
 
   return isChange || !current.isMounted ? (current.memo = cb()) : current.memo
 }
-
-export function createContext (init = {}) {
-  let context = init
-  let set = {}
-  const update = context => {
-    for (let key in set) set[key](context)
-  }
-  const subscribe = (fn, name) => {
-    if (name in set) return
-    set[name] = fn
-  }
-
-  return { context, update, subscribe, set }
-}
-
-export function useContext (ctx) {
-  const [context, setContext] = useState(ctx.context)
-  const name = getWIP().type.name
-  ctx.subscribe(setContext, name)
-  return [context, ctx.update]
-}
