@@ -48,9 +48,11 @@ function workLoop (iniTime) {
     if (currentTask.dueTime > currentTime && shouldYield()) break
     let callback = currentTask.callback
     if (callback) {
-      currentTask.callback = null
       let didout = currentTask.dueTime < currentTime
       callback(didout)
+      if (currentTask === peek(taskQueue)) {
+        pop(taskQueue)
+      }
     } else pop(taskQueue)
   }
 }

@@ -20,8 +20,8 @@ function render (vnode, node) {
 }
 
 function scheduleWork (fiber) {
-  scheduleCallback(performWork)
   nextWork = fiber
+  scheduleCallback(performWork)
 }
 
 function performWork (didout) {
