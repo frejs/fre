@@ -2,10 +2,11 @@ import { push, pop, peek } from './min-heap'
 
 let taskQueue = []
 let taskId = 1
-
 let currentTask = null
 let currentCallback = null
 let inMC = false
+let frameLength = 5
+let frameDeadline = 0
 
 export function scheduleCallback (callback) {
   const currentTime = getTime()
@@ -35,22 +36,31 @@ function requestHostCallback (cb) {
 }
 function flushWork (iniTime) {
   try {
-    let currentTime = iniTime
-    currentTask = peek(taskQueue)
-
-    let callback = currentTask.callback
-    if (callback) {
-      let didout = currentTask.dueTime < currentTime
-      callback(didout)
-    }
+    return workLoop(iniTime)
   } finally {
     currentTask = null
+  }
+}
+
+function workLoop (iniTime) {
+  let currentTime = iniTime
+  currentTask = peek(taskQueue)
+
+  while (currentTask) {
+    if (currentTask.dueTime > currentTime && shouldYield()) break
+    let callback = currentTask.callback
+    if (callback) {
+      currentTask.callback = null
+      let didout = currentTask.dueTime < currentTime
+      callback(didout)
+    } else pop(taskQueue)
   }
 }
 
 function portMessage () {
   if (currentCallback) {
     let currentTime = getTime()
+    frameDeadline = currentTime + frameLength
     let moreWork = currentCallback(currentTime)
     moreWork
       ? port.postMessage(null)
@@ -59,6 +69,7 @@ function portMessage () {
 }
 
 const getTime = () => performance.now()
+const shouldYield = () => getTime() > frameDeadline
 
 const channel = new MessageChannel()
 const port = channel.port2
