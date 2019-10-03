@@ -1,9 +1,12 @@
+// import { unstable_createRoot } from "react-dom"
+// import { createElement as h, useState, useEffect } from "react"
 import { h, render, useState, useEffect } from "../../src"
+
 import './style.css'
 
 const UPDATE_EVERY = 1000;
 const BLOCK_FOR = 3;
-const NUM_COMPONENTS = 30;
+const NUM_COMPONENTS = 100;
 
 const App = () => {
   const [count, setCount] = useState(0);
@@ -34,3 +37,5 @@ const SlowComponent = ({ value }) => {
 }
 
 render(<App/>, document.getElementById("root"));
+// const root = unstable_createRoot(document.getElementById('root'))
+// root.render(<App />)

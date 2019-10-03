@@ -48,12 +48,25 @@ function workLoop (iniTime) {
     if (currentTask.dueTime > currentTime && shouldYield()) break
     let callback = currentTask.callback
     if (callback) {
+      currentTask.callback = null
       let didout = currentTask.dueTime < currentTime
-      callback(didout)
-      if (currentTask === peek(taskQueue)) {
-        pop(taskQueue)
+      let nextWork = callback(didout)
+      if (nextWork) {
+        currentTask.callback = nextWork
+      } else {
+        // if (currentTask === peek(taskQueue)) {
+        //   pop(taskQueue)
+        // }
       }
     } else pop(taskQueue)
+    currentTask = peek(taskQueue)
+  }
+  if (currentTask) {
+    console.log(222)
+    return true
+  } else {
+    console.log(333)
+    return false
   }
 }
 
@@ -62,9 +75,12 @@ function portMessage () {
     let currentTime = getTime()
     frameDeadline = currentTime + frameLength
     let moreWork = currentCallback(currentTime)
-    moreWork
-      ? port.postMessage(null)
-      : (inMC = false) && (currentCallback = null)
+    if (!moreWork) {
+      inMC = false
+      currentCallback = null
+    } else {
+      port.postMessage(null)
+    }
   } else inMC = false
 }
 
