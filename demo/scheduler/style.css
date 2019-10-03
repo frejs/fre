@@ -1,0 +1,18 @@
+
+body {
+  background: #010911;
+  font-family: sans-serif;
+}
+
+#animation {
+  width: 380px;
+  height: 380px;
+  transform: translate(50%, 50%);
+}
+
+.SlowComponent {
+  background: #089;
+  color: white;
+  padding: 4px 8px;
+  margin-right: 4px;
+}

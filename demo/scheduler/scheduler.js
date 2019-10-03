@@ -1,4 +1,5 @@
-import { h, render, useState, useEffect } from "../src";
+import { h, render, useState, useEffect } from "../../src"
+import './style.css'
 
 const UPDATE_EVERY = 1000;
 const BLOCK_FOR = 3;
@@ -8,7 +9,6 @@ const App = () => {
   const [count, setCount] = useState(0);
   
   useEffect(() => {
-    console.log(111)
     setTimeout(() => setCount(count + 1), UPDATE_EVERY);
   });
 
