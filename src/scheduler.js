@@ -35,13 +35,20 @@ function requestHostCallback (cb) {
 }
 function flushWork (iniTime) {
   try {
-    return workLoop(iniTime)
+    let currentTime = iniTime
+    currentTask = peek(taskQueue)
+
+    let callback = currentTask.callback
+    if (callback) {
+      let didout = currentTask.dueTime < currentTime
+      callback(didout)
+    }
   } finally {
     currentTask = null
   }
 }
 
-function performWork () {
+function portMessage () {
   if (currentCallback) {
     let currentTime = getTime()
     let moreWork = currentCallback(currentTime)
@@ -51,20 +58,8 @@ function performWork () {
   } else inMC = false
 }
 
-function workLoop (iniTime) {
-  let currentTime = iniTime
-  currentTask = peek(taskQueue)
-
-  let callback = currentTask.callback
-  if (callback) {
-    let didout = currentTask.dueTime < currentTime
-    callback(didout)
-    pop(taskQueue)
-  }
-}
-
 const getTime = () => performance.now()
 
 const channel = new MessageChannel()
 const port = channel.port2
-channel.port1.onmessage = performWork
+channel.port1.onmessage = portMessage
