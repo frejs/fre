@@ -2955,6 +2955,11 @@ mime-types@^2.1.12, mime-types@~2.1.19:
   dependencies:
     mime-db "1.40.0"
 
+min@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.npm.taobao.org/min/download/min-0.2.2.tgz#0300582fc7b97cfb4788c3d8061164ea911669fd"
+  integrity sha1-AwBYL8e5fPtHiMPYBhFk6pEWaf0=
+
 minimatch@^3.0.4:
   version "3.0.4"
   resolved "https://registry.npmjs.org/minimatch/-/minimatch-3.0.4.tgz#5166e286457f03306064be5497e8dbb0c3d32083"
