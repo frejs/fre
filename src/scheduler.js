@@ -1,5 +1,4 @@
 let taskQueue = []
-let timerQueue = []
 let taskId = 1
 
 let isPerform = false
@@ -7,10 +6,6 @@ let currentTask = null
 let currentCallback = null
 let inMC = false
 let scheduledCallback = false
-let scheduledTimeout = false
-let outid
-let frameLength = 5
-let frameDeadline = 0
 
 export function scheduleCallback (callback) {
   const currentTime = getTime()
@@ -26,45 +21,15 @@ export function scheduleCallback (callback) {
     index: -1
   }
 
-  if (startTime > currentTime) {
-    newTask.index = startTime
-    push(timerQueue, newTask)
+  newTask.index = dueTime
+  push(taskQueue, newTask)
 
-    if (peek(taskQueue) == null && newTask == peek(timerQueue)) {
-      scheduledTimeout
-        ? clearTimeout(outid)
-        : (scheduledTimeout = true)
-      outid = setTimeout(
-        () => handleTimeout(getTime()),
-        startTime - currentTime
-      )
-    }
-  } else {
-    newTask.index = dueTime
-    push(taskQueue, newTask)
-
-    if (!scheduledTimeout && !isPerform) {
-      scheduledTimeout = true
-      requestHostCallback(flushWork)
-    }
+  if (!scheduledCallback && !isPerform) {
+    scheduledCallback = true
+    requestHostCallback(flushWork)
   }
+
   return newTask
-}
-
-function handleTimeout (currentTime) {
-  scheduledTimeout = false
-  advanceTimers(currentTime)
-
-  if (!scheduledCallback) {
-    if (peek(taskQueue) != null) {
-      scheduledCallback = true
-      requestHostCallback(flushWork)
-    } else {
-      if (peek(timerQueue)) {
-        requestHostTimeout(handleTimeout, first.startTime - currentTime)
-      }
-    }
-  }
 }
 function requestHostCallback (cb) {
   currentCallback = cb
@@ -75,10 +40,6 @@ function requestHostCallback (cb) {
 }
 function flushWork (iniTime) {
   scheduledCallback = false
-  if (scheduledTimeout) {
-    scheduledTimeout = false
-    clearTimeout(outid)
-  }
   isPerform = true
 
   try {
@@ -92,53 +53,22 @@ function flushWork (iniTime) {
 function performWork () {
   if (currentCallback) {
     let currentTime = getTime()
-    frameDeadline = currentTime + frameLength
-
-    try {
-      let moreWork = currentCallback(currentTime) // important logic
-      if (!moreWork) {
-        inMC = false
-        currentCallback = null
-      } else {
-        port.postMessage(null)
-      }
-    } catch (e) {
-      port.postMessage(null)
-      throw e
-    }
+    let moreWork = currentCallback(currentTime)
+    moreWork
+      ? port.postMessage(null)
+      : (inMC = false) && (currentCallback = null)
   } else inMC = false
 }
 
 function workLoop (iniTime) {
   let currentTime = iniTime
-  advanceTimers(currentTime)
   currentTask = peek(taskQueue)
 
-
-  // while (currentTask != null) {
-    // if (currentTask.dueTime > currentTime) break
-    let callback = currentTask.callback
-
-    if (callback) {
-      currentTask.callback = null
-      let didout = currentTask.dueTime < currentTime
-      callback(didout)
-      pop(taskQueue)
-    }
-  }
-// }
-
-function advanceTimers (currentTime) {
-  let timer = peek(timerQueue)
-  while (timer) {
-    if (!timer.callback) {
-      pop(timerQueue)
-    } else if (timer.startTime <= currentTime) {
-      pop(timerQueue)
-      timer.index = timer.dueTime
-      push(taskQueue, timer)
-    } else return
-    timer = peek(timerQueue)
+  let callback = currentTask.callback
+  if (callback) {
+    let didout = currentTask.dueTime < currentTime
+    callback(didout)
+    pop(taskQueue)
   }
 }
 
@@ -206,6 +136,6 @@ function peek (heap) {
   return first || null
 }
 
-const channel = new MessageChannel
+const channel = new MessageChannel()
 const port = channel.port2
 channel.port1.onmessage = performWork
