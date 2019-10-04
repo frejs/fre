@@ -1,4 +1,4 @@
-import { push, pop, peek } from './min-heap'
+import { push, pop, peek } from './heapy'
 
 let taskQueue = []
 let taskId = 1
