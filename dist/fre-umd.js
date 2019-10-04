@@ -169,17 +169,14 @@
   }
 
   function compare (a, b) {
-    let diff = a.dueTime - b.dueTime;
-    return diff !== 0 ? diff : a.id - b.id
+    return a.dueTime - b.dueTime
   }
 
   function peek (heap) {
-    var first = heap[0];
-    return first || null
+    return heap[0] || null
   }
 
   let taskQueue = [];
-  let taskId = 1;
   let currentTask = null;
   let currentCallback = null;
   let inMC = false;
@@ -193,7 +190,6 @@
     let dueTime = startTime + timeout;
 
     let newTask = {
-      id: taskId++,
       callback,
       startTime,
       dueTime
@@ -229,10 +225,9 @@
       let callback = currentTask.callback;
       if (callback) {
         currentTask.callback = null;
-        let didout = currentTask.dueTime < currentTime;
-        let nextWork = callback(didout);
-        if (nextWork) {
-          currentTask.callback = nextWork;
+        let next = callback();
+        if (next) {
+          currentTask.callback = next;
         } else {
           if (currentTask === peek(taskQueue)) {
             pop(taskQueue);
@@ -241,13 +236,9 @@
       } else pop(taskQueue);
       currentTask = peek(taskQueue);
     }
-    if (currentTask) {
-      console.log(222);
-      return true
-    } else {
-      console.log(333);
-      return false
-    }
+
+    return !!currentTask
+    
   }
 
   function portMessage () {
@@ -294,8 +285,8 @@
     scheduleCallback(performWork);
   }
 
-  function performWork (didout) {
-    while (nextWork && !didout && !shouldYeild()) {
+  function performWork () {
+    while (nextWork && !shouldYeild()) {
       nextWork = performNext(nextWork);
     }
 
@@ -306,11 +297,12 @@
       return null
     }
 
-    return performWork.bind(null, didout)
+    return performWork.bind(null)
   }
 
   function performNext (WIP) {
     WIP.parentNode = getParentNode(WIP);
+    WIP.patches = [];
     WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP);
     if (WIP.child) return WIP.child
     while (WIP) {
