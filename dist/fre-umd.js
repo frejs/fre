@@ -26,35 +26,6 @@
     return { type, props, key }
   }
 
-  const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr]);
-
-  const isNew = (o, n) => k => k !== 'children' && o[k] !== n[k];
-
-  function hashfy (arr) {
-    let out = {};
-    let i = 0;
-    let j = 0;
-    arrayfy(arr).forEach(item => {
-      if (item.pop) {
-        item.forEach(item => {
-          let key = item.key;
-          key
-            ? (out['.' + i + '.' + key] = item)
-            : (out['.' + i + '.' + j] = item) && j++;
-        });
-        i++;
-      } else (out['.' + i] = item) && i++;
-    });
-    return out
-  }
-
-  function merge (a, b) {
-    let out = {};
-    for (const i in a) out[i] = a[i];
-    for (const i in b) out[i] = b[i];
-    return out
-  }
-
   function updateProperty (dom, name, value, newValue) {
     if (name === 'style') {
       for (let key in value) if (!newValue[key]) dom[name][key] = '';
@@ -88,6 +59,8 @@
     updateElement(dom, [], fiber.props);
     return dom
   }
+
+  const isNew = (o, n) => k => k !== 'children' && o[k] !== n[k];
 
   let cursor = 0;
 
@@ -229,6 +202,8 @@
     push(taskQueue, newTask);
 
     requestHostCallback(flushWork);
+
+    return newTask
   }
   function requestHostCallback (cb) {
     currentCallback = cb;
@@ -250,15 +225,28 @@
     currentTask = peek(taskQueue);
 
     while (currentTask) {
-      if (currentTask.dueTime > currentTime && shouldYield()) break
+      if (currentTask.dueTime > currentTime && shouldYeild()) break
       let callback = currentTask.callback;
       if (callback) {
+        currentTask.callback = null;
         let didout = currentTask.dueTime < currentTime;
-        callback(didout);
-        if (currentTask === peek(taskQueue)) {
-          pop(taskQueue);
+        let nextWork = callback(didout);
+        if (nextWork) {
+          currentTask.callback = nextWork;
+        } else {
+          if (currentTask === peek(taskQueue)) {
+            pop(taskQueue);
+          }
         }
       } else pop(taskQueue);
+      currentTask = peek(taskQueue);
+    }
+    if (currentTask) {
+      console.log(222);
+      return true
+    } else {
+      console.log(333);
+      return false
     }
   }
 
@@ -267,15 +255,20 @@
       let currentTime = getTime();
       frameDeadline = currentTime + frameLength;
       let moreWork = currentCallback(currentTime);
-      moreWork
-        ? port.postMessage(null)
-        : (inMC = false) && (currentCallback = null);
+      if (!moreWork) {
+        inMC = false;
+        currentCallback = null;
+      } else {
+        port.postMessage(null);
+      }
     } else inMC = false;
   }
 
-  const getTime = () => performance.now();
-  const shouldYield = () => getTime() > frameDeadline;
+  function shouldYeild () {
+    return getTime() > frameDeadline
+  }
 
+  const getTime = () => performance.now();
   const channel = new MessageChannel();
   const port = channel.port2;
   channel.port1.onmessage = portMessage;
@@ -302,7 +295,7 @@
   }
 
   function performWork (didout) {
-    while (nextWork && !didout) {
+    while (nextWork && !didout && !shouldYeild()) {
       nextWork = performNext(nextWork);
     }
 
@@ -310,7 +303,10 @@
       options.commitWork
         ? options.commitWork(pendingCommit)
         : commitWork(pendingCommit);
+      return null
     }
+
+    return performWork.bind(null, didout)
   }
 
   function performNext (WIP) {
@@ -446,6 +442,33 @@
 
   function getWIP () {
     return currentFiber || null
+  }
+
+  const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr]);
+
+  function hashfy (arr) {
+    let out = {};
+    let i = 0;
+    let j = 0;
+    arrayfy(arr).forEach(item => {
+      if (item.pop) {
+        item.forEach(item => {
+          let key = item.key;
+          key
+            ? (out['.' + i + '.' + key] = item)
+            : (out['.' + i + '.' + j] = item) && j++;
+        });
+        i++;
+      } else (out['.' + i] = item) && i++;
+    });
+    return out
+  }
+
+  function merge (a, b) {
+    let out = {};
+    for (const i in a) out[i] = a[i];
+    for (const i in b) out[i] = b[i];
+    return out
   }
 
   exports.createElement = h;
