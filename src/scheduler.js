@@ -51,9 +51,9 @@ function workLoop (iniTime) {
     let callback = currentTask.callback
     if (callback) {
       currentTask.callback = null
-      let nextCallback = callback()
-      if (nextCallback) {
-        currentTask.callback = nextWork
+      let next = callback()
+      if (next) {
+        currentTask.callback = next
       } else {
         if (currentTask === peek(taskQueue)) {
           pop(taskQueue)

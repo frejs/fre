@@ -22,8 +22,8 @@ const App = () => {
   return (
     <div className='wraper'>
       <h1>Count: {count}</h1>
-      {values.map((value, index) => (
-        <SlowComponent key={index} value={value} />
+      {values.map((value,index) => (
+        <SlowComponent key={value} value={value} />
       ))}
     </div>
   )

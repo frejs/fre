@@ -40,6 +40,7 @@ function performWork () {
 
 function performNext (WIP) {
   WIP.parentNode = getParentNode(WIP)
+  WIP.patches = []
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
   while (WIP) {
