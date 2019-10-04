@@ -51,13 +51,11 @@ function pop (heap) {
 }
 
 function compare (a, b) {
-  let diff = a.dueTime - b.dueTime
-  return diff !== 0 ? diff : a.id - b.id
+  return a.dueTime - b.dueTime
 }
 
 function peek (heap) {
-  var first = heap[0]
-  return first || null
+  return heap[0] || null
 }
 
 export { push, peek, pop }

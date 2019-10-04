@@ -1,7 +1,6 @@
 import { push, pop, peek } from './heapy'
 
 let taskQueue = []
-let taskId = 1
 let currentTask = null
 let currentCallback = null
 let inMC = false
@@ -15,7 +14,6 @@ export function scheduleCallback (callback) {
   let dueTime = startTime + timeout
 
   let newTask = {
-    id: taskId++,
     callback,
     startTime,
     dueTime
