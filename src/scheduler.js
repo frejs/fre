@@ -47,7 +47,7 @@ function workLoop (iniTime) {
   currentTask = peek(taskQueue)
 
   while (currentTask) {
-    if (currentTask.dueTime > currentTime && hasTime()) break
+    if (currentTask.dueTime > currentTime && shouldYeild()) break
     let callback = currentTask.callback
     if (callback) {
       currentTask.callback = null
@@ -86,22 +86,11 @@ function portMessage () {
   } else inMC = false
 }
 
-export function shouldYeild(){
-    var currentTime = getTime()
-    var firstTask = peek(taskQueue)
-    return (
-      (firstTask !== currentTask &&
-        currentTask !== null &&
-        firstTask !== null &&
-        firstTask.callback !== null &&
-        firstTask.startTime <= currentTime) ||
-      hasTime()
-    )
+export function shouldYeild () {
+  return getTime() > frameDeadline
 }
 
 const getTime = () => performance.now()
-const hasTime = () => getTime() > frameDeadline
-
 const channel = new MessageChannel()
 const port = channel.port2
 channel.port1.onmessage = portMessage
