@@ -51,8 +51,7 @@ function workLoop (iniTime) {
     let callback = currentTask.callback
     if (callback) {
       currentTask.callback = null
-      let didout = currentTask.dueTime < currentTime
-      let nextWork = callback(didout)
+      let nextWork = callback()
       if (nextWork) {
         currentTask.callback = nextWork
       } else {
@@ -63,13 +62,9 @@ function workLoop (iniTime) {
     } else pop(taskQueue)
     currentTask = peek(taskQueue)
   }
-  if (currentTask) {
-    console.log(222)
-    return true
-  } else {
-    console.log(333)
-    return false
-  }
+
+  return !!currentTask
+  
 }
 
 function portMessage () {

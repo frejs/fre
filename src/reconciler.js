@@ -23,8 +23,8 @@ function scheduleWork (fiber) {
   scheduleCallback(performWork)
 }
 
-function performWork (didout) {
-  while (nextWork && !didout && !shouldYeild()) {
+function performWork () {
+  while (nextWork && !shouldYeild()) {
     nextWork = performNext(nextWork)
   }
 
@@ -35,7 +35,7 @@ function performWork (didout) {
     return null
   }
 
-  return performWork.bind(null, didout)
+  return performWork.bind(null)
 }
 
 function performNext (WIP) {
