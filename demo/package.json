@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "parcel index.html",
-    "fiber": "parcel ./scheduler/index.html"
+    "concurrent": "parcel ./concurrent/index.html"
   },
   "keywords": [],
   "author": "",
