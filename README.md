@@ -27,6 +27,7 @@ Fre (pronounced `/fri:/`, like free) is a tiny and perfect js library, It means 
 ### Demo
 ```shell
 cd demo
+yarn install
 yarn start // run use cases for API
 yarn concurrent // run demo for concurrent mode (fiber scheduler)
 ```
