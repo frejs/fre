@@ -24,6 +24,8 @@ export function scheduleCallback (callback) {
   push(taskQueue, newTask)
 
   requestHostCallback(flushWork)
+
+  return newTask
 }
 function requestHostCallback (cb) {
   currentCallback = cb
@@ -45,7 +47,7 @@ function workLoop (iniTime) {
   currentTask = peek(taskQueue)
 
   while (currentTask) {
-    if (currentTask.dueTime > currentTime && shouldYield()) break
+    if (currentTask.dueTime > currentTime && hasTime()) break
     let callback = currentTask.callback
     if (callback) {
       currentTask.callback = null
@@ -54,9 +56,9 @@ function workLoop (iniTime) {
       if (nextWork) {
         currentTask.callback = nextWork
       } else {
-        // if (currentTask === peek(taskQueue)) {
-        //   pop(taskQueue)
-        // }
+        if (currentTask === peek(taskQueue)) {
+          pop(taskQueue)
+        }
       }
     } else pop(taskQueue)
     currentTask = peek(taskQueue)
@@ -84,8 +86,21 @@ function portMessage () {
   } else inMC = false
 }
 
+export function shouldYeild(){
+    var currentTime = getTime()
+    var firstTask = peek(taskQueue)
+    return (
+      (firstTask !== currentTask &&
+        currentTask !== null &&
+        firstTask !== null &&
+        firstTask.callback !== null &&
+        firstTask.startTime <= currentTime) ||
+      hasTime()
+    )
+}
+
 const getTime = () => performance.now()
-const shouldYield = () => getTime() > frameDeadline
+const hasTime = () => getTime() > frameDeadline
 
 const channel = new MessageChannel()
 const port = channel.port2

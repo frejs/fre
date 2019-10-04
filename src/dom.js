@@ -1,4 +1,3 @@
-import { isNew } from './util'
 import { SVG } from './reconciler'
 
 function updateProperty (dom, name, value, newValue) {
@@ -34,3 +33,5 @@ export function createElement (fiber) {
   updateElement(dom, [], fiber.props)
   return dom
 }
+
+const isNew = (o, n) => k => k !== 'children' && o[k] !== n[k]

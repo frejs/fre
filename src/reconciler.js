@@ -1,7 +1,6 @@
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
-import { defer, hashfy, merge } from './util'
-import { scheduleCallback } from './scheduler'
+import { scheduleCallback, shouldYeild } from './scheduler'
 
 const options = {}
 export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
@@ -25,7 +24,7 @@ function scheduleWork (fiber) {
 }
 
 function performWork (didout) {
-  while (nextWork && !didout) {
+  while (nextWork && !didout && !shouldYeild()) {
     nextWork = performNext(nextWork)
   }
 
@@ -33,7 +32,10 @@ function performWork (didout) {
     options.commitWork
       ? options.commitWork(pendingCommit)
       : commitWork(pendingCommit)
+    return null
   }
+
+  return performWork.bind(null, didout)
 }
 
 function performNext (WIP) {
@@ -169,6 +171,33 @@ function commit (fiber) {
 
 function getWIP () {
   return currentFiber || null
+}
+
+const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr])
+
+function hashfy (arr) {
+  let out = {}
+  let i = 0
+  let j = 0
+  arrayfy(arr).forEach(item => {
+    if (item.pop) {
+      item.forEach(item => {
+        let key = item.key
+        key
+          ? (out['.' + i + '.' + key] = item)
+          : (out['.' + i + '.' + j] = item) && j++
+      })
+      i++
+    } else (out['.' + i] = item) && i++
+  })
+  return out
+}
+
+function merge (a, b) {
+  let out = {}
+  for (const i in a) out[i] = a[i]
+  for (const i in b) out[i] = b[i]
+  return out
 }
 
 export { render, scheduleWork, getWIP, options }
