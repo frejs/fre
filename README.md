@@ -11,8 +11,8 @@
 ### Feature
 
 - :tada: really functionalComponent and hooks API
-- :confetti_ball: Async rendering like react Fiber and keyed diff algorithm
-- :telescope: minimal but perfect , fast 1 KB , no dependences
+- :confetti_ball: Async rendering like react Fiber scheduler
+- :telescope: keyed diff schema
 
 ### Introduction
 
@@ -23,6 +23,13 @@ Fre (pronounced `/fri:/`, like free) is a tiny and perfect js library, It means 
 | [`Fre`](https://github.com/132yse/fre)               | ![npm](https://img.shields.io/npm/v/fre.svg)        | fre core              |
 | [`Fard`](https://github.com/132yse/fard)             | ![npm](https://img.shields.io/npm/v/fard.svg)       | mini-program with fre |
 | [`use-routes`](https://github.com/132yse/use-routes) | ![npm](https://img.shields.io/npm/v/use-routes.svg) | router for fre        |
+
+### Demo
+```shell
+cd demo
+yarn start // run use cases for API
+yarn concurrent // run demo for concurrent mode (fiber scheduler)
+```
 
 ### Use
 
@@ -51,8 +58,6 @@ render(<Counter />, document.getElementById('root'))
 * [useState](https://github.com/132yse/fre#usestate)
 
 * [useEffect](https://github.com/132yse/fre#useeffect)
-
-* [useContext](https://github.com/132yse/fre#usecontext)
 
 * [useReducer](https://github.com/132yse/fre#usereducer)
 
@@ -182,32 +187,6 @@ function Counter() {
 }
 
 render(<Counter />, document.getElementById('root'))
-```
-
-#### useContext
-
-Context is the state of external create, internal use
-
-When it changes, all components that own `useContext` will rerender
-
-```js
-const ctx = createContext(0)
-
-function App() {
-  const [count, setCount] = useContext(ctx)
-  return (
-    <div>
-      <h1>{count}</h1>
-      <button onClick={() => setCount(count + 1)}>+</button>
-      <Other />
-    </div>
-  )
-}
-
-function Other() {
-  const count = useContext(ctx)[0]
-  return <h1>{count}</h1>
-}
 ```
 
 ### FunctionalComponent
