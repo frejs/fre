@@ -1,4 +1,4 @@
-import { push, pop, peek } from './heapy'
+import { push, pop, peek } from './heapify'
 
 let taskQueue = []
 let currentTask = null
@@ -90,4 +90,4 @@ const getTime = () => performance.now()
 
 const channel = new MessageChannel()
 const port = channel.port2
-channel.port1.onmessage = portMessage
+channel.port1.onmessage = performWork
