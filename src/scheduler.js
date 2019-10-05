@@ -29,7 +29,7 @@ function requestHostCallback (cb) {
   currentCallback = cb
   if (!inMC) {
     inMC = true
-    port.postMessage(null)
+    planWork()
   }
 }
 function flushWork (iniTime) {
@@ -65,7 +65,7 @@ function workLoop (iniTime) {
   
 }
 
-function portMessage () {
+function performWork () {
   if (currentCallback) {
     let currentTime = getTime()
     frameDeadline = currentTime + frameLength
@@ -74,9 +74,13 @@ function portMessage () {
       inMC = false
       currentCallback = null
     } else {
-      port.postMessage(null)
+      planWork()
     }
   } else inMC = false
+}
+
+function planWork() {
+  setTimeout(performWork, 0)
 }
 
 export function shouldYeild () {
@@ -84,6 +88,3 @@ export function shouldYeild () {
 }
 
 const getTime = () => performance.now()
-const channel = new MessageChannel()
-const port = channel.port2
-channel.port1.onmessage = portMessage
