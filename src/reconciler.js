@@ -147,6 +147,7 @@ function commitWork (WIP) {
     const e = p.effects
     if (e) for (const k in e) e[k]()
   })
+  if (options.resolve) resolve()
   nextWork = pendingCommit = null
 }
 function commit (fiber) {
