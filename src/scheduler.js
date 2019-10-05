@@ -78,16 +78,20 @@ function performWork () {
   } else inMC = false
 }
 
-function planWork () {
-  port ? port.postMessage(null) : setTimeout(performWork, 0)
-}
+const planWork = (() => {
+  if (typeof MessageChannel !== "undefined") {
+    const channel = new MessageChannel()
+    const port = channel.port2
+    channel.port1.onmessage = performWork
+
+    return () => port.postMessage(null)
+  }
+
+  return () => setTimeout(performWork, 0)
+})()
 
 export function shouldYeild () {
   return getTime() > frameDeadline
 }
 
 const getTime = () => performance.now()
-
-const channel = new MessageChannel()
-const port = channel.port2
-channel.port1.onmessage = performWork
