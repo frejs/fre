@@ -1,4 +1,4 @@
-import { push, pop, peek } from './heapy'
+import { push, pop, peek } from './heapify'
 
 let taskQueue = []
 let currentTask = null
