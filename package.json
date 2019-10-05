@@ -7,11 +7,7 @@
   "module": "dist/fre-esm.js",
   "scripts": {
     "test": "jest --coverage",
-    "build:cjs": "rollup -i src/index.js -o dist/fre.js --no-esModule -mf cjs -n fre",
-    "build:umd": "rollup -i src/index.js -o dist/fre-umd.js --no-esModule -mf umd -n fre",
-    "build:esm": "rollup -i src/index.js -o dist/fre-esm.js --no-esModule -mf esm -n fre",
-    "minify": "terser dist/fre.js -o dist/fre.js -mc --source-map includeSources,url=fre.js.map",
-    "build": "yarpm run build:cjs && yarpm run build:umd && yarpm run build:esm"
+    "build": "rollup -c && gzip-size dist/fre.js"
   },
   "keywords": [],
   "author": "132yse",
@@ -24,12 +20,13 @@
     "@types/jest": "^24.0.15",
     "babel-jest": "^24.8.0",
     "cross-env": "^5.2.0",
+    "gzip-size-cli": "^3.0.0",
     "jest": "^24.8.0",
     "rollup": "^1.10.1",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-cleanup": "^3.1.1",
     "rollup-plugin-license": "^0.8.1",
-    "rollup-plugin-uglify-es": "^0.0.1",
+    "rollup-plugin-terser": "^5.1.2",
     "terser": "^4.1.2",
     "typescript": "^3.5.2",
     "yarpm": "^0.2.1"
