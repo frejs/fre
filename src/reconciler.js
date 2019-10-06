@@ -64,9 +64,10 @@ function updateHost (WIP) {
 }
 
 function getParentNode (fiber) {
-  if (!fiber.parent) return fiber.node
-  if (fiber.parent.tag === HOOK) return fiber.parent.parent.node
-  return fiber.parent.node
+  let parent = fiber.parent
+  if (!parent) return fiber.node
+  while (parent.tag === HOOK) parent = parent. parent
+  return parent.node
 }
 
 function updateHOOK (WIP) {
