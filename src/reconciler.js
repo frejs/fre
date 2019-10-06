@@ -9,11 +9,12 @@ let nextWork = null
 let pendingCommit = null
 let currentFiber = null
 
-function render (vnode, node) {
+function render (vnode, node, done) {
   let rootFiber = {
     tag: ROOT,
     node,
-    props: { children: vnode }
+    props: { children: vnode },
+    done
   }
   scheduleWork(rootFiber)
 }
@@ -64,7 +65,7 @@ function updateHost (WIP) {
 
 function getParentNode (fiber) {
   if (!fiber.parent) return fiber.node
-  while (fiber.parent.tag === HOOK) return fiber.parent.parent.node
+  if (fiber.parent.tag === HOOK) return fiber.parent.parent.node
   return fiber.parent.node
 }
 
@@ -147,7 +148,7 @@ function commitWork (WIP) {
     const e = p.effects
     if (e) for (const k in e) e[k]()
   })
-  if (options.resolve) options.resolve()
+  WIP.done && WIP.done()
   nextWork = pendingCommit = null
 }
 function commit (fiber) {

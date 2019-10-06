@@ -1,12 +1,12 @@
 /** @jsx h */
 
-import { render, options } from "../src/reconciler"
+import { render } from "../src/reconciler"
 import { h } from "../src/h";
 
 const testRender = jsx => new Promise(resolve => {
   document.body.innerHTML = ""
 
-  options.resolve = () => {
+  render(jsx, document.body, () => {
     const html = document.createDocumentFragment();
 
     for (const child of document.body.childNodes) {
@@ -14,9 +14,7 @@ const testRender = jsx => new Promise(resolve => {
     }
 
     resolve(html)
-  }
-
-  render(jsx, document.body)
+  })
 })
 
 const toString = el => Array.from(el.childNodes).map(child => child.outerHTML).join("")
