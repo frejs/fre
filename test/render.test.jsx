@@ -5,38 +5,30 @@ import { h, render, useState, useEffect } from "../src/index"
 const testRender = jsx => new Promise(resolve => {
   document.body.innerHTML = ""
 
-  render(jsx, document.body, () => {
-    const html = document.createDocumentFragment()
-
-    for (const child of document.body.childNodes) {
-      html.appendChild(child)
-    }
-
-    resolve(html)
-  })
+  render(jsx, document.body, () => resolve([...document.body.childNodes]))
 })
 
-const toString = el => Array.from(el.childNodes).map(child => child.outerHTML).join("")
+const toString = elements => elements.map(child => child.outerHTML).join("")
 
 test('render nested HTML elements, apply attributes', done => {
-  testRender(<div><span class="foo">test</span></div>).then(html => {
-    expect(toString(html)).toBe(`<div><span class="foo">test</span></div>`)
+  testRender(<div><span class="foo">test</span></div>).then(elements => {
+    expect(toString(elements)).toBe(`<div><span class="foo">test</span></div>`)
 
     done()
   })
 })
 
 test('apply props to object properties', done => {
-  testRender(<input defaultChecked={true}/>).then(html => {
-    expect(html.children[0].defaultChecked).toBe(true)
+  testRender(<input defaultChecked={true}/>).then(elements => {
+    expect(elements[0].defaultChecked).toBe(true)
 
     done()
   })
 })
 
 test('render range of HTML elements', done => {
-  testRender(<ul><li>1</li><li>2</li><li>3</li></ul>).then(html => {
-    expect(toString(html)).toBe("<ul><li>1</li><li>2</li><li>3</li></ul>")
+  testRender(<ul><li>1</li><li>2</li><li>3</li></ul>).then(elements => {
+    expect(toString(elements)).toBe("<ul><li>1</li><li>2</li><li>3</li></ul>")
 
     done()
   })
@@ -47,8 +39,8 @@ test('attach DOM event handler', done => {
 
   const handler = () => clicked = true
 
-  testRender(<button onclick={handler}>OK</button>).then(html => {
-    html.children[0].click()
+  testRender(<button onclick={handler}>OK</button>).then(elements => {
+    elements[0].click()
 
     setTimeout(() => {
       expect(clicked).toBe(true)
@@ -57,7 +49,6 @@ test('attach DOM event handler', done => {
     })
   })
 })
-
 
 test('update components; use state and effect hooks', done => {
   const Component = ({ effect }) => {
@@ -78,17 +69,17 @@ test('update components; use state and effect hooks', done => {
 
   let afterEffect = () => effectCalled = true
 
-  testRender(<Component effect={() => afterEffect()}/>).then(html => {
+  testRender(<Component effect={() => afterEffect()}/>).then(elements => {
     expect(effectCalled).toBe(true)
 
-    expect(html.children[0].firstChild.nodeValue).toBe("0")
+    expect(elements[0].firstChild.nodeValue).toBe("0")
 
     afterEffect = checkEffect
 
-    html.children[0].click()
+    elements[0].click()
 
     function checkEffect() {
-      expect(html.children[0].firstChild.nodeValue).toBe("1")
+      expect(elements[0].firstChild.nodeValue).toBe("1")
 
       done()
     }
