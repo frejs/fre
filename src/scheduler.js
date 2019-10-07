@@ -91,3 +91,4 @@ const getTime = () => performance.now()
 const channel = new MessageChannel()
 const port = channel.port2
 channel.port1.onmessage = performWork
+
