@@ -151,7 +151,7 @@ function completeWork (fiber) {
 function commitWork (WIP) {
   WIP.patches.forEach(p => {
     p.parent.patches = p.patches = null
-    p.tag === HOST && commit(p)
+    commit(p)
     traverse(p.effect)
   })
   WIP.done && WIP.done()
@@ -173,12 +173,13 @@ function commit (fiber) {
       updateElement(dom, fiber.alternate.props, fiber.props)
       break
     case DELETE:
+      console.log(parent,dom)
       parent.removeChild(dom)
       break
     default:
       let point = fiber.insertPoint ? fiber.insertPoint.node : null
       let after = point ? point.nextSibling : parent.firstChild
-      if (after === dom) return
+      if (after === dom || fiber.tag === HOOK) return
       if (after === null && dom === parent.lastChild) return
       parent.insertBefore(dom, after)
       break

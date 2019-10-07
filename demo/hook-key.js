@@ -1,29 +1,62 @@
-import { h, render, useState } from '../src'
+import { h, render, useState, useEffect } from '../src'
 
-// import { createElement, render, useState, useEffect } from 'preact/compat';
+function Counter ({ id, remove }) {
+  const [count, setCount] = useState(0)
 
-function Counter (props) {
-  const [count, setCount] = useState(props.value)
+  useEffect(() => {
+    document.title = `You clicked ${count} times`
+
+    return () => {
+      document.title = `Counter removed`
+    }
+  })
 
   return (
     <div>
-      {count}
-      <button onClick={() => setCount(count + 1)}>+</button>
+      Counter {id} is {count}
+      &nbsp;
+      <button onClick={() => setCount(count + 1)}>➕</button>
+      <button onClick={() => setCount(count - 1)}>➖</button>
+      &nbsp;
+      <button onClick={remove}>❌</button>
     </div>
   )
 }
+
+let nextId = 3
 
 function App () {
-  const [counters, setCounters] = useState([1,2,3])
+  const [counters, setCounters] = useState([1, 2, 3])
+
+  console.log(counters)
 
   return (
     <div>
-      {counters.map(i => (
-        <Counter key={i} value={i}/>
+      {counters.map(id => (
+        <Counter
+          key={id}
+          id={id}
+          remove={() => setCounters(counters.filter(c => c !== id))}
+        />
       ))}
-      <button onClick={() => setCounters(counters.slice().reverse())}>+</button>
+      <hr />
+      <button onClick={() => setCounters(counters.concat(++nextId))}>
+        Add new
+      </button>
+      <button
+        onClick={() => setCounters(counters.slice(0, counters.length - 1))}
+        disabled={counters.length === 1}
+      >
+        Remove last
+      </button>
+      <button
+        onClick={() => setCounters(counters.slice().reverse())}
+        disabled={counters.length === 1}
+      >
+        Reverse
+      </button>
     </div>
   )
 }
 
-render(<App />, document.querySelector('#root'))
+render(<App />, document.body)
