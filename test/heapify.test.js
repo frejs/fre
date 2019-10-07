@@ -21,23 +21,17 @@ test('test pop', () => {
   const heap1 = [{ dueTime: 1 }, { dueTime: 2 }, { dueTime: 3 }]
   pop(heap1)
 
-  const heap2 = [{ dueTime: 3 }, { dueTime: 1 }, { dueTime: 2 }, { dueTime: 5 }]
-  pop(heap2)
+  const heap2 = [{ dueTime: 3 }, { dueTime: 2 }, { dueTime: 1 }]
   pop(heap2)
 
   let heap3 = []
   heap3 = pop(heap3)
 
-  let heap4 = [{ dueTime: 2 }, { dueTime: 4 }, { dueTime: 3 }]
+  let heap4 = [{ dueTime: 2 }]
   pop(heap4)
 
-  // const heap4 = [{ dueTime: 3 }, { dueTime: 0.5 },{ dueTime: 1 }, { dueTime: 2 }]
-  // pop(heap4)
-  // pop(heap4)
-  // pop(heap4)
-
   expect(heap1).toStrictEqual([{ dueTime: 2 }, { dueTime: 3 }])
-  expect(heap2).toStrictEqual([{ dueTime: 1 }, { dueTime: 5 }])
+  expect(heap2).toStrictEqual([{ dueTime: 1 }, { dueTime: 2 }])
   expect(heap3).toStrictEqual(null)
-  expect(heap4).toStrictEqual([{ dueTime: 3 }, { dueTime: 4 }])
+  expect(heap4).toStrictEqual([])
 })
