@@ -148,7 +148,7 @@
           let right = heap[rightIndex];
 
           if (left && compare(left, last) < 0) {
-            if (right && compare(right, last) < 0) {
+            if (right && compare(right, left) < 0) {
               heap[index] = right;
               heap[rightIndex] = last;
               index = rightIndex;
@@ -273,15 +273,7 @@
   const getTime = () => performance.now();
 
   const options = {};
-  const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
-    6
-  ];
+  const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6];
 
   let nextWork = null;
   let pendingCommit = null;
@@ -429,7 +421,7 @@
   function commitWork (WIP) {
     WIP.patches.forEach(p => {
       p.parent.patches = p.patches = null;
-      p.tag === HOST && commit(p);
+      commit(p);
       traverse(p.effect);
     });
     WIP.done && WIP.done();
@@ -451,12 +443,13 @@
         updateElement(dom, fiber.alternate.props, fiber.props);
         break
       case DELETE:
+        console.log(parent,dom);
         parent.removeChild(dom);
         break
       default:
         let point = fiber.insertPoint ? fiber.insertPoint.node : null;
         let after = point ? point.nextSibling : parent.firstChild;
-        if (after === dom) return
+        if (after === dom || fiber.tag === HOOK) return
         if (after === null && dom === parent.lastChild) return
         parent.insertBefore(dom, after);
         break
