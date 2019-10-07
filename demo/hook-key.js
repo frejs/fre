@@ -2,8 +2,8 @@ import { h, render, useState } from '../src'
 
 // import { createElement, render, useState, useEffect } from 'preact/compat';
 
-function Counter () {
-  const [count, setCount] = useState(0)
+function Counter (props) {
+  const [count, setCount] = useState(props.value)
 
   return (
     <div>
@@ -14,15 +14,14 @@ function Counter () {
 }
 
 function App () {
-  const [counters, setCounters] = useState(1)
+  const [counters, setCounters] = useState([1,2,3])
 
   return (
     <div>
-      {new Array(counters).fill().map(i => (
-        <Counter/>
+      {counters.map(i => (
+        <Counter key={i} value={i}/>
       ))}
-      <button onClick={() => setCounters(counters + 1)}>+</button>
-      <button onClick={() => setCounters(counters - 1)}>-</button>
+      <button onClick={() => setCounters(counters.slice().reverse())}>+</button>
     </div>
   )
 }

@@ -10,9 +10,9 @@
 
 ### Feature
 
-- :tada: really functionalComponent and hooks API
-- :confetti_ball: Async rendering like react Fiber scheduler
-- :telescope: keyed diff schema
+- :tada: FunctionalComponent and hooks API
+- :confetti_ball: Async rendering like react Fiber（also called time slicing, concurrent mode）
+- :telescope: keyed reconcilation（also called diff） algorithm
 
 ### Introduction
 
@@ -332,9 +332,9 @@ because there no `key` for them, please use it as late as possible.
 
 #### Async rendering
 
-Fre use `requestAnimationFrame` to process update queue, It like react Fiber but tinier than.
+Fre implement a tiny priority scheduler, which like react Fiber.
 
-Async rendering is also called `time slicing`.
+Async rendering is also called `time slicing` or `concurrent mode`.
 
 #### keyed diff
 
