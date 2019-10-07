@@ -14,10 +14,8 @@ function Counter ({ id, remove }) {
   return (
     <div>
       Counter {id} is {count}
-      &nbsp;
       <button onClick={() => setCount(count + 1)}>➕</button>
       <button onClick={() => setCount(count - 1)}>➖</button>
-      &nbsp;
       <button onClick={remove}>❌</button>
     </div>
   )

@@ -3,7 +3,15 @@ import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild } from './scheduler'
 
 const options = {}
-export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
+export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6
+]
 
 let nextWork = null
 let pendingCommit = null
@@ -30,9 +38,7 @@ function performWork () {
   }
 
   if (pendingCommit) {
-    options.commitWork
-      ? options.commitWork(pendingCommit)
-      : commitWork(pendingCommit)
+    commitWork(pendingCommit)
     return null
   }
 
@@ -52,7 +58,7 @@ function performNext (WIP) {
 }
 
 function updateHost (WIP) {
-  if (!options.end && !WIP.node) {
+  if (!WIP.node) {
     if (WIP.type === 'svg') WIP.tag = SVG
     WIP.node = createElement(WIP)
   }
@@ -102,12 +108,11 @@ function reconcileChildren (WIP, children) {
     let newFiber = newFibers[k]
     let oldFiber = reused[k]
 
-    if (oldFiber) {
+    if (oldFiber && isSame(oldFiber, newFiber)) {
       alternate = createFiber(oldFiber, { patchTag: UPDATE })
-      if (!options.end) newFiber.patchTag = UPDATE
+      newFiber.patchTag = UPDATE
       newFiber = merge(alternate, newFiber)
       newFiber.alternate = alternate
-      replace(newFiber)
     } else {
       newFiber = createFiber(newFiber, { patchTag: PLACE })
     }
@@ -126,10 +131,8 @@ function reconcileChildren (WIP, children) {
   if (prevFiber) prevFiber.sibling = null
 }
 
-function replace (fiber) {
-  let parent = fiber.parent
-  if (parent.tag == HOOK && parent.key) fiber.key = parent.key
-  if (fiber.key) fiber.patchTag = PLACE
+function isSame (a, b) {
+  return a.type == b.type && a.key == b.key
 }
 
 function createFiber (vnode, data) {
@@ -138,7 +141,7 @@ function createFiber (vnode, data) {
 }
 
 function completeWork (fiber) {
-  if (!options.end && fiber.parent) {
+  if (fiber.parent) {
     fiber.parent.patches = (fiber.parent.patches || []).concat(
       fiber.patches || [],
       fiber.patchTag ? [fiber] : []
@@ -173,13 +176,12 @@ function commit (fiber) {
       updateElement(dom, fiber.alternate.props, fiber.props)
       break
     case DELETE:
-      console.log(parent,dom)
       parent.removeChild(dom)
       break
     default:
       let point = fiber.insertPoint ? fiber.insertPoint.node : null
       let after = point ? point.nextSibling : parent.firstChild
-      if (after === dom || fiber.tag === HOOK) return
+      if (after === dom || fiber.tag == HOOK) return
       if (after === null && dom === parent.lastChild) return
       parent.insertBefore(dom, after)
       break
