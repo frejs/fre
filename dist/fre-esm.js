@@ -87,8 +87,8 @@ function useReducer (reducer, initState) {
 function useEffect (cb, inputs) {
   let current = getWIP() || {};
   let key = '$' + cursor;
-  current.effects = current.effects || {};
-  current.effects[key] = useCallback(cb, inputs);
+  current.effect = current.effects || {};
+  current.effect[key] = useCallback(cb, inputs);
   cursor++;
 }
 
@@ -199,7 +199,7 @@ function requestHostCallback (cb) {
   currentCallback = cb;
   if (!inMC) {
     inMC = true;
-    port.postMessage(null);
+    planWork();
   }
 }
 function flushWork (iniTime) {
@@ -232,10 +232,9 @@ function workLoop (iniTime) {
   }
 
   return !!currentTask
-  
 }
 
-function portMessage () {
+function performWork () {
   if (currentCallback) {
     let currentTime = getTime();
     frameDeadline = currentTime + frameLength;
@@ -244,42 +243,60 @@ function portMessage () {
       inMC = false;
       currentCallback = null;
     } else {
-      port.postMessage(null);
+      planWork();
     }
   } else inMC = false;
 }
+
+const planWork = (() => {
+  if (typeof MessageChannel !== "undefined") {
+    const channel = new MessageChannel();
+    const port = channel.port2;
+    channel.port1.onmessage = performWork;
+
+    return () => port.postMessage(null)
+  }
+
+  return () => setTimeout(performWork, 0)
+})();
 
 function shouldYeild () {
   return getTime() > frameDeadline
 }
 
 const getTime = () => performance.now();
-const channel = new MessageChannel();
-const port = channel.port2;
-channel.port1.onmessage = portMessage;
 
 const options = {};
-const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6];
+const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6
+];
 
 let nextWork = null;
 let pendingCommit = null;
 let currentFiber = null;
 
-function render (vnode, node) {
+function render (vnode, node, done) {
   let rootFiber = {
     tag: ROOT,
     node,
-    props: { children: vnode }
+    props: { children: vnode },
+    done
   };
   scheduleWork(rootFiber);
 }
 
 function scheduleWork (fiber) {
   nextWork = fiber;
-  scheduleCallback(performWork);
+  scheduleCallback(performWork$1);
 }
 
-function performWork () {
+function performWork$1 () {
   while (nextWork && !shouldYeild()) {
     nextWork = performNext(nextWork);
   }
@@ -291,7 +308,7 @@ function performWork () {
     return null
   }
 
-  return performWork.bind(null)
+  return performWork$1.bind(null)
 }
 
 function performNext (WIP) {
@@ -319,9 +336,10 @@ function updateHost (WIP) {
 }
 
 function getParentNode (fiber) {
-  if (!fiber.parent) return fiber.node
-  while (fiber.parent.tag === HOOK) return fiber.parent.parent.node
-  return fiber.parent.node
+  let parent = fiber.parent;
+  if (!parent) return fiber.node
+  while (parent.tag === HOOK) parent = parent.parent;
+  return parent.node
 }
 
 function updateHOOK (WIP) {
@@ -361,7 +379,7 @@ function reconcileChildren (WIP, children) {
       if (!options.end) newFiber.patchTag = UPDATE;
       newFiber = merge(alternate, newFiber);
       newFiber.alternate = alternate;
-      if (newFiber.key) newFiber.patchTag = PLACE;
+      replace(newFiber);
     } else {
       newFiber = createFiber(newFiber, { patchTag: PLACE });
     }
@@ -378,6 +396,12 @@ function reconcileChildren (WIP, children) {
     prevFiber = newFiber;
   }
   if (prevFiber) prevFiber.sibling = null;
+}
+
+function replace (fiber) {
+  let parent = fiber.parent;
+  if (parent.tag == HOOK && parent.key) fiber.key = parent.key;
+  if (fiber.key) fiber.patchTag = PLACE;
 }
 
 function createFiber (vnode, data) {
@@ -399,11 +423,18 @@ function completeWork (fiber) {
 function commitWork (WIP) {
   WIP.patches.forEach(p => {
     p.parent.patches = p.patches = null;
-    commit(p);
-    const e = p.effects;
-    if (e) for (const k in e) e[k]();
+    p.tag === HOST && commit(p);
+    traverse(p.effect);
   });
+  WIP.done && WIP.done();
   nextWork = pendingCommit = null;
+}
+
+function traverse (fns) {
+  for (const k in fns) {
+    const fn = fns[k];
+    fn();
+  }
 }
 function commit (fiber) {
   let parent = fiber.parentNode;
@@ -419,7 +450,7 @@ function commit (fiber) {
     default:
       let point = fiber.insertPoint ? fiber.insertPoint.node : null;
       let after = point ? point.nextSibling : parent.firstChild;
-      if (fiber.tag === HOOK || after === dom) return
+      if (after === dom) return
       if (after === null && dom === parent.lastChild) return
       parent.insertBefore(dom, after);
       break

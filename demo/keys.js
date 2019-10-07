@@ -33,17 +33,17 @@ import { h, render, useState, useEffect } from '../src'
 //   )
 // }
 
-function App () {
-  const [arr, setArr] = useState(['A', 'B', 'C', 'D'])
-  return (
-    <div>
-      {arr.map(item => (
-        <li key={item}>{item}</li>
-      ))}
-      <button onClick={() => setArr(['B', 'A', 'D', 'C'])}>+</button>
-    </div>
-  )
-}
+// function App () {
+//   const [arr, setArr] = useState(['A', 'B', 'C', 'D'])
+//   return (
+//     <div>
+//       {arr.map(item => (
+//         <li key={item}>{item}</li>
+//       ))}
+//       <button onClick={() => setArr(['B', 'A', 'D', 'C'])}>+</button>
+//     </div>
+//   )
+// }
 
 // A B C D -> C D A B √
 
