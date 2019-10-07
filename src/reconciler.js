@@ -3,15 +3,7 @@ import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild } from './scheduler'
 
 const options = {}
-export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [
-  0,
-  1,
-  2,
-  3,
-  4,
-  5,
-  6
-]
+export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
 
 let nextWork = null
 let pendingCommit = null

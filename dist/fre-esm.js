@@ -379,7 +379,7 @@ function reconcileChildren (WIP, children) {
       if (!options.end) newFiber.patchTag = UPDATE;
       newFiber = merge(alternate, newFiber);
       newFiber.alternate = alternate;
-      if (newFiber.key) newFiber.patchTag = PLACE;
+      replace(newFiber);
     } else {
       newFiber = createFiber(newFiber, { patchTag: PLACE });
     }
@@ -396,6 +396,12 @@ function reconcileChildren (WIP, children) {
     prevFiber = newFiber;
   }
   if (prevFiber) prevFiber.sibling = null;
+}
+
+function replace (fiber) {
+  let parent = fiber.parent;
+  if (parent.tag == HOOK && parent.key) fiber.key = parent.key;
+  if (fiber.key) fiber.patchTag = PLACE;
 }
 
 function createFiber (vnode, data) {
@@ -417,14 +423,14 @@ function completeWork (fiber) {
 function commitWork (WIP) {
   WIP.patches.forEach(p => {
     p.parent.patches = p.patches = null;
-    commit(p);
+    p.tag === HOST && commit(p);
     traverse(p.effect);
   });
   WIP.done && WIP.done();
   nextWork = pendingCommit = null;
 }
 
-function traverse(fns){
+function traverse (fns) {
   for (const k in fns) {
     const fn = fns[k];
     fn();
@@ -446,7 +452,6 @@ function commit (fiber) {
       let after = point ? point.nextSibling : parent.firstChild;
       if (after === dom) return
       if (after === null && dom === parent.lastChild) return
-      if (fiber.tag == HOOK) return
       parent.insertBefore(dom, after);
       break
   }
