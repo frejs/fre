@@ -154,7 +154,7 @@ function commitWork (WIP) {
   WIP.patches.forEach(p => {
     p.parent.patches = p.patches = null
     commit(p)
-    traverse(p.effects)
+    traverse(p.effect)
   })
   WIP.done && WIP.done()
   nextWork = pendingCommit = null
