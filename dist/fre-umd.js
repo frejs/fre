@@ -28,8 +28,8 @@
 
   function updateProperty (dom, name, value, newValue) {
     if (name === 'style') {
-      for (let key in value) if (!newValue[key]) dom[name][key] = '';
-      for (let key in newValue) dom[name][key] = newValue[key];
+      for (let k in value) if (!newValue[k]) dom[name][k] = '';
+      for (let k in newValue) dom[name][k] = newValue[k];
     } else if (name[0] === 'o' && name[1] === 'n') {
       name = name.slice(2).toLowerCase();
       if (value) dom.removeEventListener(name, value);
@@ -93,7 +93,7 @@
   function useEffect (cb, inputs) {
     let current = getWIP() || {};
     let key = '$' + cursor;
-    current.effect = current.effects || {};
+    current.effect = current.effect|| {};
     current.effect[key] = useCallback(cb, inputs);
     cursor++;
   }
