@@ -1,6 +1,6 @@
 <p align="center"><img src="http://wx2.sinaimg.cn/mw690/0060lm7Tly1ftpm5b3ihfj3096097aaj.jpg" alt="fre logo" width="180"></p>
 <h1 align="center">Fre</h1>
-<p align="center">:ghost: Fast 1kB React like library with the same hooks API</p>
+<p align="center">:ghost: Tiny React16 like library with Async rendering.</p>
 <p align="center">
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/v/fre.svg?style=flat-square" alt="npm-v"></a>
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/dt/fre.svg?style=flat-square" alt="npm-d"></a>
@@ -342,6 +342,12 @@ Fre implements a compact diff algorithm support keyed
 
 It uses hash to mark locations for easy comparison
 
+### Contributors
+
+<a href="https://github.com/132yse/fre/graphs/contributors">
+  <img src="https://opencollective.com/fre/contributors.svg?width=890&button=false" />
+</a>
+
 #### License
 
-_MIT_ ©132yse inspired by [anu](https://github.com/RubyLouvre/anu)
+_MIT_ ©132yse inspired by [react](https://github.com/facebook/react) [anu](https://github.com/RubyLouvre/anu)

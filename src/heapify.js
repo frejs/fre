@@ -30,7 +30,7 @@ function pop (heap) {
         let right = heap[rightIndex]
 
         if (left && compare(left, last) < 0) {
-          if (right && compare(right, last) < 0) {
+          if (right && compare(right, left) < 0) {
             heap[index] = right
             heap[rightIndex] = last
             index = rightIndex

@@ -28,8 +28,8 @@
 
   function updateProperty (dom, name, value, newValue) {
     if (name === 'style') {
-      for (let key in value) if (!newValue[key]) dom[name][key] = '';
-      for (let key in newValue) dom[name][key] = newValue[key];
+      for (let k in value) if (!newValue[k]) dom[name][k] = '';
+      for (let k in newValue) dom[name][k] = newValue[k];
     } else if (name[0] === 'o' && name[1] === 'n') {
       name = name.slice(2).toLowerCase();
       if (value) dom.removeEventListener(name, value);
@@ -93,7 +93,7 @@
   function useEffect (cb, inputs) {
     let current = getWIP() || {};
     let key = '$' + cursor;
-    current.effect = current.effects || {};
+    current.effect = current.effect|| {};
     current.effect[key] = useCallback(cb, inputs);
     cursor++;
   }
@@ -148,7 +148,7 @@
           let right = heap[rightIndex];
 
           if (left && compare(left, last) < 0) {
-            if (right && compare(right, last) < 0) {
+            if (right && compare(right, left) < 0) {
               heap[index] = right;
               heap[rightIndex] = last;
               index = rightIndex;
@@ -273,15 +273,7 @@
   const getTime = () => performance.now();
 
   const options = {};
-  const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
-    6
-  ];
+  const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6];
 
   let nextWork = null;
   let pendingCommit = null;
@@ -308,9 +300,7 @@
     }
 
     if (pendingCommit) {
-      options.commitWork
-        ? options.commitWork(pendingCommit)
-        : commitWork(pendingCommit);
+      commitWork(pendingCommit);
       return null
     }
 
@@ -330,7 +320,7 @@
   }
 
   function updateHost (WIP) {
-    if (!options.end && !WIP.node) {
+    if (!WIP.node) {
       if (WIP.type === 'svg') WIP.tag = SVG;
       WIP.node = createElement(WIP);
     }
@@ -380,12 +370,11 @@
       let newFiber = newFibers[k];
       let oldFiber = reused[k];
 
-      if (oldFiber) {
+      if (oldFiber && isSame(oldFiber, newFiber)) {
         alternate = createFiber(oldFiber, { patchTag: UPDATE });
-        if (!options.end) newFiber.patchTag = UPDATE;
+        newFiber.patchTag = UPDATE;
         newFiber = merge(alternate, newFiber);
         newFiber.alternate = alternate;
-        replace(newFiber);
       } else {
         newFiber = createFiber(newFiber, { patchTag: PLACE });
       }
@@ -404,10 +393,8 @@
     if (prevFiber) prevFiber.sibling = null;
   }
 
-  function replace (fiber) {
-    let parent = fiber.parent;
-    if (parent.tag == HOOK && parent.key) fiber.key = parent.key;
-    if (fiber.key) fiber.patchTag = PLACE;
+  function isSame (a, b) {
+    return a.type == b.type && a.key == b.key
   }
 
   function createFiber (vnode, data) {
@@ -416,7 +403,7 @@
   }
 
   function completeWork (fiber) {
-    if (!options.end && fiber.parent) {
+    if (fiber.parent) {
       fiber.parent.patches = (fiber.parent.patches || []).concat(
         fiber.patches || [],
         fiber.patchTag ? [fiber] : []
@@ -429,7 +416,7 @@
   function commitWork (WIP) {
     WIP.patches.forEach(p => {
       p.parent.patches = p.patches = null;
-      p.tag === HOST && commit(p);
+      commit(p);
       traverse(p.effect);
     });
     WIP.done && WIP.done();
@@ -443,23 +430,21 @@
     }
   }
   function commit (fiber) {
+    let tag = fiber.patchTag;
     let parent = fiber.parentNode;
     let dom = fiber.node;
     while (!dom) dom = fiber.child.node;
-    switch (fiber.patchTag) {
-      case UPDATE:
-        updateElement(dom, fiber.alternate.props, fiber.props);
-        break
-      case DELETE:
-        parent.removeChild(dom);
-        break
-      default:
-        let point = fiber.insertPoint ? fiber.insertPoint.node : null;
-        let after = point ? point.nextSibling : parent.firstChild;
-        if (after === dom) return
-        if (after === null && dom === parent.lastChild) return
-        parent.insertBefore(dom, after);
-        break
+
+    if (tag === DELETE) {
+      parent.removeChild(dom);
+    } else if (fiber.tag === HOOK) ; else if (tag === UPDATE) {
+      updateElement(dom, fiber.alternate.props, fiber.props);
+    } else {
+      let point = fiber.insertPoint ? fiber.insertPoint.node : null;
+      let after = point ? point.nextSibling : parent.firstChild;
+      if (after === dom) return
+      if (after === null && dom === parent.lastChild) return
+      parent.insertBefore(dom, after);
     }
   }
 
