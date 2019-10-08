@@ -10,6 +10,19 @@
 
 <body>
   <style>
+    .container{
+      width: 800px;
+      margin: 50px auto;
+      text-align: center;
+    }
+    a{
+      text-decoration: none;
+      margin-left:50px;
+      padding: 5px 15px;
+      border-radius: 10px;
+      color: #fff;
+      background: rgb(238, 42, 140);
+    }
 
   </style>
   <div id="root"></div>
@@ -21,10 +34,11 @@
     function App() {
       return (
         html`
-          <div>
-            <img src="http://wx2.sinaimg.cn/mw690/0060lm7Tly1ftpm5b3ihfj3096097aaj.jpg" alt="fre logo" width="180" />
+          <div class="container">
+            <img src="https://wx2.sinaimg.cn/mw690/0060lm7Tly1ftpm5b3ihfj3096097aaj.jpg"/>
             <h1>Fre</h1>
-            <p>:ghost: Tiny React16 like library with Async rendering.</p>
+            <a href="https://github.com/132yse/fre"> github </a>
+            <p>Tiny React16 like library with Async rendering.</p>
           </div>
         `
       )
