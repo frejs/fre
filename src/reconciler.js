@@ -1,51 +1,53 @@
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
-import { defer, hashfy, merge } from './util'
+import { scheduleCallback, shouldYeild } from './scheduler'
 
 const options = {}
-const FPS = 1000 / 60
-export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
+export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6
+]
 
-let updateQueue = []
 let nextWork = null
 let pendingCommit = null
 let currentFiber = null
 
-function render (vnode, node) {
+function render (vnode, node, done) {
   let rootFiber = {
     tag: ROOT,
     node,
-    props: { children: vnode }
+    props: { children: vnode },
+    done
   }
   scheduleWork(rootFiber)
 }
 
 function scheduleWork (fiber) {
-  updateQueue.push(fiber)
-  defer(workLoop)
+  nextWork = fiber
+  scheduleCallback(performWork)
 }
 
-function workLoop (startTime = 0) {
-  if (startTime && performance.now() - startTime > FPS) {
-    defer(workLoop)
-  } else if (!nextWork && updateQueue.length > 0) {
-    nextWork = updateQueue.shift()
-    defer(workLoop)
-  } else {
-    const nextTime = performance.now()
-    nextWork = performWork(nextWork)
-    if (nextWork) {
-      workLoop(nextTime)
-    } else {
-      options.commitWork
-        ? options.commitWork(pendingCommit)
-        : commitWork(pendingCommit)
-    }
+function performWork () {
+  while (nextWork && !shouldYeild()) {
+    nextWork = performNext(nextWork)
   }
+
+  if (pendingCommit) {
+    commitWork(pendingCommit)
+    return null
+  }
+
+  return performWork.bind(null)
 }
 
-function performWork (WIP) {
+function performNext (WIP) {
   WIP.parentNode = getParentNode(WIP)
+  WIP.patches = []
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
   while (WIP) {
@@ -56,7 +58,7 @@ function performWork (WIP) {
 }
 
 function updateHost (WIP) {
-  if (!options.end && !WIP.node) {
+  if (!WIP.node) {
     if (WIP.type === 'svg') WIP.tag = SVG
     WIP.node = createElement(WIP)
   }
@@ -68,9 +70,10 @@ function updateHost (WIP) {
 }
 
 function getParentNode (fiber) {
-  if (!fiber.parent) return fiber.node
-  while (fiber.parent.tag === HOOK) return fiber.parent.parent.node
-  return fiber.parent.node
+  let parent = fiber.parent
+  if (!parent) return fiber.node
+  while (parent.tag === HOOK) parent = parent.parent
+  return parent.node
 }
 
 function updateHOOK (WIP) {
@@ -105,12 +108,11 @@ function reconcileChildren (WIP, children) {
     let newFiber = newFibers[k]
     let oldFiber = reused[k]
 
-    if (oldFiber) {
+    if (oldFiber && isSame(oldFiber, newFiber)) {
       alternate = createFiber(oldFiber, { patchTag: UPDATE })
-      if (!options.end) newFiber.patchTag = UPDATE
+      newFiber.patchTag = UPDATE
       newFiber = merge(alternate, newFiber)
       newFiber.alternate = alternate
-      if (newFiber.key) newFiber.patchTag = PLACE
     } else {
       newFiber = createFiber(newFiber, { patchTag: PLACE })
     }
@@ -129,13 +131,17 @@ function reconcileChildren (WIP, children) {
   if (prevFiber) prevFiber.sibling = null
 }
 
+function isSame (a, b) {
+  return a.type == b.type && a.key == b.key
+}
+
 function createFiber (vnode, data) {
   data.tag = typeof vnode.type === 'function' ? HOOK : HOST
   return merge(vnode, data)
 }
 
 function completeWork (fiber) {
-  if (!options.end && fiber.parent) {
+  if (fiber.parent) {
     fiber.parent.patches = (fiber.parent.patches || []).concat(
       fiber.patches || [],
       fiber.patchTag ? [fiber] : []
@@ -149,34 +155,67 @@ function commitWork (WIP) {
   WIP.patches.forEach(p => {
     p.parent.patches = p.patches = null
     commit(p)
-    const e = p.effects
-    if (e) for (const k in e) e[k]()
+    traverse(p.effect)
   })
+  WIP.done && WIP.done()
   nextWork = pendingCommit = null
 }
+
+function traverse (fns) {
+  for (const k in fns) {
+    const fn = fns[k]
+    fn()
+  }
+}
 function commit (fiber) {
+  let tag = fiber.patchTag
   let parent = fiber.parentNode
   let dom = fiber.node
   while (!dom) dom = fiber.child.node
-  switch (fiber.patchTag) {
-    case UPDATE:
-      updateElement(dom, fiber.alternate.props, fiber.props)
-      break
-    case DELETE:
-      parent.removeChild(dom)
-      break
-    default:
-      let point = fiber.insertPoint ? fiber.insertPoint.node : null
-      let after = point ? point.nextSibling : parent.firstChild
-      if (fiber.tag === HOOK || after === dom) return
-      if (after === null && dom === parent.lastChild) return
-      parent.insertBefore(dom, after)
-      break
+
+  if (tag === DELETE) {
+    parent.removeChild(dom)
+  } else if (fiber.tag === HOOK) {
+  } else if (tag === UPDATE) {
+    updateElement(dom, fiber.alternate.props, fiber.props)
+  } else {
+    let point = fiber.insertPoint ? fiber.insertPoint.node : null
+    let after = point ? point.nextSibling : parent.firstChild
+    if (after === dom) return
+    if (after === null && dom === parent.lastChild) return
+    parent.insertBefore(dom, after)
   }
 }
 
 function getWIP () {
   return currentFiber || null
+}
+
+const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr])
+
+function hashfy (arr) {
+  let out = {}
+  let i = 0
+  let j = 0
+  arrayfy(arr).forEach(item => {
+    if (item.pop) {
+      item.forEach(item => {
+        let key = item.key
+        key
+          ? (out['.' + i + '.' + key] = item)
+          : (out['.' + i + '.' + j] = item) && j++
+      })
+      i++
+    } else (out['.' + i] = item) && i++
+  })
+  return out
+}
+
+function merge (a, b) {
+  let out = {}
+  for (const i in a) out[i] = a[i]
+  for (const i in b) out[i] = b[i]
+  return out
 }
 
 export { render, scheduleWork, getWIP, options }

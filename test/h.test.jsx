@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import { h } from "./h"
+import { h } from "../src/h"
 
 test('create JSX node', () => {
   const div = <div/>

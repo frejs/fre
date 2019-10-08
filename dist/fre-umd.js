@@ -26,36 +26,6 @@
     return { type, props, key }
   }
 
-  const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr]);
-
-  const isNew = (o, n) => k => k !== 'children' && o[k] !== n[k];
-
-  function hashfy (arr) {
-    let out = {};
-    let i = 0;
-    let j = 0;
-    arrayfy(arr).forEach(item => {
-      if (item.pop) {
-        item.forEach(item => {
-          let key = item.key;
-          key
-            ? (out['.' + i + '.' + key] = item)
-            : (out['.' + i + '.' + j] = item) && j++;
-        });
-        i++;
-      } else (out['.' + i] = item) && i++;
-    });
-    return out
-  }
-
-  function merge (a, b) {
-    let out = {};
-    for (const i in a) out[i] = a[i];
-    for (const i in b) out[i] = b[i];
-    return out
-  }
-  const defer = requestAnimationFrame || setTimeout;
-
   function updateProperty (dom, name, value, newValue) {
     if (name === 'style') {
       for (let key in value) if (!newValue[key]) dom[name][key] = '';
@@ -90,6 +60,8 @@
     return dom
   }
 
+  const isNew = (o, n) => k => k !== 'children' && o[k] !== n[k];
+
   let cursor = 0;
 
   function update (key, reducer, value) {
@@ -121,8 +93,8 @@
   function useEffect (cb, inputs) {
     let current = getWIP() || {};
     let key = '$' + cursor;
-    current.effects = current.effects || {};
-    current.effects[key] = useCallback(cb, inputs);
+    current.effect = current.effects || {};
+    current.effect[key] = useCallback(cb, inputs);
     cursor++;
   }
 
@@ -144,71 +116,202 @@
     return isChange || !current.isMounted ? (current.memo = cb()) : current.memo
   }
 
-  function createContext (init = {}) {
-    let context = init;
-    let set = {};
-    const update = context => {
-      for (let key in set) set[key](context);
-    };
-    const subscribe = (fn, name) => {
-      if (name in set) return
-      set[name] = fn;
-    };
+  function push (heap, node) {
+    let index = heap.length;
+    heap.push(node);
 
-    return { context, update, subscribe, set }
+    while (true) {
+      let parentIndex = Math.floor((index - 1) / 2);
+      let parent = heap[parentIndex];
+
+      if (parent && compare(parent, node) > 0) {
+        heap[parentIndex] = node;
+        heap[index] = parent;
+        index = parentIndex;
+      } else return
+    }
   }
 
-  function useContext (ctx) {
-    const [context, setContext] = useState(ctx.context);
-    const name = getWIP().type.name;
-    ctx.subscribe(setContext, name);
-    return [context, ctx.update]
+  function pop (heap) {
+    let first = heap[0];
+    if (first) {
+      let last = heap.pop();
+      if (first !== last) {
+        heap[0] = last;
+        let index = 0;
+        let length = heap.length;
+
+        while (index < length) {
+          let leftIndex = (index + 1) * 2 - 1;
+          let left = heap[leftIndex];
+          let rightIndex = leftIndex + 1;
+          let right = heap[rightIndex];
+
+          if (left && compare(left, last) < 0) {
+            if (right && compare(right, left) < 0) {
+              heap[index] = right;
+              heap[rightIndex] = last;
+              index = rightIndex;
+            } else {
+              heap[index] = left;
+              heap[leftIndex] = last;
+              index = leftIndex;
+            }
+          } else if (right && compare(right, last) < 0) {
+            heap[index] = right;
+            heap[rightIndex] = last;
+            index = rightIndex;
+          } else return
+        }
+      }
+      return first
+    } else return null
   }
+
+  function compare (a, b) {
+    return a.dueTime - b.dueTime
+  }
+
+  function peek (heap) {
+    return heap[0] || null
+  }
+
+  let taskQueue = [];
+  let currentTask = null;
+  let currentCallback = null;
+  let inMC = false;
+  let frameLength = 5;
+  let frameDeadline = 0;
+
+  function scheduleCallback (callback) {
+    const currentTime = getTime();
+    let startTime = currentTime;
+    let timeout = 5000; // idle
+    let dueTime = startTime + timeout;
+
+    let newTask = {
+      callback,
+      startTime,
+      dueTime
+    };
+
+    push(taskQueue, newTask);
+
+    requestHostCallback(flushWork);
+
+    return newTask
+  }
+  function requestHostCallback (cb) {
+    currentCallback = cb;
+    if (!inMC) {
+      inMC = true;
+      planWork();
+    }
+  }
+  function flushWork (iniTime) {
+    try {
+      return workLoop(iniTime)
+    } finally {
+      currentTask = null;
+    }
+  }
+
+  function workLoop (iniTime) {
+    let currentTime = iniTime;
+    currentTask = peek(taskQueue);
+
+    while (currentTask) {
+      if (currentTask.dueTime > currentTime && shouldYeild()) break
+      let callback = currentTask.callback;
+      if (callback) {
+        currentTask.callback = null;
+        let next = callback();
+        if (next) {
+          currentTask.callback = next;
+        } else {
+          if (currentTask === peek(taskQueue)) {
+            pop(taskQueue);
+          }
+        }
+      } else pop(taskQueue);
+      currentTask = peek(taskQueue);
+    }
+
+    return !!currentTask
+  }
+
+  function performWork () {
+    if (currentCallback) {
+      let currentTime = getTime();
+      frameDeadline = currentTime + frameLength;
+      let moreWork = currentCallback(currentTime);
+      if (!moreWork) {
+        inMC = false;
+        currentCallback = null;
+      } else {
+        planWork();
+      }
+    } else inMC = false;
+  }
+
+  const planWork = (() => {
+    if (typeof MessageChannel !== "undefined") {
+      const channel = new MessageChannel();
+      const port = channel.port2;
+      channel.port1.onmessage = performWork;
+
+      return () => port.postMessage(null)
+    }
+
+    return () => setTimeout(performWork, 0)
+  })();
+
+  function shouldYeild () {
+    return getTime() > frameDeadline
+  }
+
+  const getTime = () => performance.now();
 
   const options = {};
-  const FPS = 1000 / 60;
   const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6];
 
-  let updateQueue = [];
   let nextWork = null;
   let pendingCommit = null;
   let currentFiber = null;
 
-  function render (vnode, node) {
+  function render (vnode, node, done) {
     let rootFiber = {
       tag: ROOT,
       node,
-      props: { children: vnode }
+      props: { children: vnode },
+      done
     };
     scheduleWork(rootFiber);
   }
 
   function scheduleWork (fiber) {
-    updateQueue.push(fiber);
-    defer(workLoop);
+    nextWork = fiber;
+    scheduleCallback(performWork$1);
   }
 
-  function workLoop (startTime = 0) {
-    if (startTime && performance.now() - startTime > FPS) {
-      defer(workLoop);
-    } else if (!nextWork && updateQueue.length > 0) {
-      nextWork = updateQueue.shift();
-      defer(workLoop);
-    } else {
-      const nextTime = performance.now();
-      nextWork = performWork(nextWork);
-      if (nextWork) {
-        workLoop(nextTime);
-      } else {
-        options.commitWork
-          ? options.commitWork(pendingCommit)
-          : commitWork(pendingCommit);
-      }
+  function performWork$1 () {
+    while (nextWork && !shouldYeild()) {
+      nextWork = performNext(nextWork);
     }
+
+    if (pendingCommit) {
+      options.commitWork
+        ? options.commitWork(pendingCommit)
+        : commitWork(pendingCommit);
+      return null
+    }
+
+    return performWork$1.bind(null)
   }
 
-  function performWork (WIP) {
+  function performNext (WIP) {
     WIP.parentNode = getParentNode(WIP);
+    WIP.patches = [];
     WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP);
     if (WIP.child) return WIP.child
     while (WIP) {
@@ -231,9 +334,10 @@
   }
 
   function getParentNode (fiber) {
-    if (!fiber.parent) return fiber.node
-    while (fiber.parent.tag === HOOK) return fiber.parent.parent.node
-    return fiber.parent.node
+    let parent = fiber.parent;
+    if (!parent) return fiber.node
+    while (parent.tag === HOOK) parent = parent.parent;
+    return parent.node
   }
 
   function updateHOOK (WIP) {
@@ -273,7 +377,7 @@
         if (!options.end) newFiber.patchTag = UPDATE;
         newFiber = merge(alternate, newFiber);
         newFiber.alternate = alternate;
-        if (newFiber.key) newFiber.patchTag = PLACE;
+        replace(newFiber);
       } else {
         newFiber = createFiber(newFiber, { patchTag: PLACE });
       }
@@ -290,6 +394,12 @@
       prevFiber = newFiber;
     }
     if (prevFiber) prevFiber.sibling = null;
+  }
+
+  function replace (fiber) {
+    let parent = fiber.parent;
+    if (parent.tag == HOOK && parent.key) fiber.key = parent.key;
+    if (fiber.key) fiber.patchTag = PLACE;
   }
 
   function createFiber (vnode, data) {
@@ -312,10 +422,17 @@
     WIP.patches.forEach(p => {
       p.parent.patches = p.patches = null;
       commit(p);
-      const e = p.effects;
-      if (e) for (const k in e) e[k]();
+      traverse(p.effect);
     });
+    WIP.done && WIP.done();
     nextWork = pendingCommit = null;
+  }
+
+  function traverse (fns) {
+    for (const k in fns) {
+      const fn = fns[k];
+      fn();
+    }
   }
   function commit (fiber) {
     let parent = fiber.parentNode;
@@ -326,12 +443,13 @@
         updateElement(dom, fiber.alternate.props, fiber.props);
         break
       case DELETE:
+        console.log(parent,dom);
         parent.removeChild(dom);
         break
       default:
         let point = fiber.insertPoint ? fiber.insertPoint.node : null;
         let after = point ? point.nextSibling : parent.firstChild;
-        if (fiber.tag === HOOK || after === dom) return
+        if (after === dom || fiber.tag === HOOK) return
         if (after === null && dom === parent.lastChild) return
         parent.insertBefore(dom, after);
         break
@@ -342,14 +460,39 @@
     return currentFiber || null
   }
 
-  exports.createContext = createContext;
+  const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr]);
+
+  function hashfy (arr) {
+    let out = {};
+    let i = 0;
+    let j = 0;
+    arrayfy(arr).forEach(item => {
+      if (item.pop) {
+        item.forEach(item => {
+          let key = item.key;
+          key
+            ? (out['.' + i + '.' + key] = item)
+            : (out['.' + i + '.' + j] = item) && j++;
+        });
+        i++;
+      } else (out['.' + i] = item) && i++;
+    });
+    return out
+  }
+
+  function merge (a, b) {
+    let out = {};
+    for (const i in a) out[i] = a[i];
+    for (const i in b) out[i] = b[i];
+    return out
+  }
+
   exports.createElement = h;
   exports.h = h;
   exports.options = options;
   exports.render = render;
   exports.scheduleWork = scheduleWork;
   exports.useCallback = useCallback;
-  exports.useContext = useContext;
   exports.useEffect = useEffect;
   exports.useMemo = useMemo;
   exports.useReducer = useReducer;

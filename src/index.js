@@ -5,8 +5,6 @@ import {
   useReducer,
   useEffect,
   useMemo,
-  createContext,
-  useContext,
   useCallback
 } from './hooks'
 
@@ -20,7 +18,5 @@ export {
   useReducer,
   useEffect,
   useMemo,
-  createContext,
-  useContext,
   useCallback
 }
