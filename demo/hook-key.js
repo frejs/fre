@@ -15,11 +15,10 @@ function Counter () {
 
 function App () {
   const [counters, setCounters] = useState(1)
-
   return (
     <div>
       {new Array(counters).fill().map(i => (
-        <Counter/>
+        <Counter key={i}/>
       ))}
       <button onClick={() => setCounters(counters + 1)}>+</button>
       <button onClick={() => setCounters(counters - 1)}>-</button>
