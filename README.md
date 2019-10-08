@@ -350,4 +350,4 @@ It uses hash to mark locations for easy comparison
 
 #### License
 
-_MIT_ ©132yse inspired by [anu](https://github.com/RubyLouvre/anu)
+_MIT_ ©132yse inspired by [react](https://github.com/facebook/react) [anu](https://github.com/RubyLouvre/anu)
