@@ -342,6 +342,12 @@ Fre implements a compact diff algorithm support keyed
 
 It uses hash to mark locations for easy comparison
 
+### Contributors
+
+<a href="https://github.com/132yse/fre/graphs/contributors">
+  <img src="https://opencollective.com/fre/contributors.svg?width=890&button=false" />
+</a>
+
 #### License
 
 _MIT_ ©132yse inspired by [anu](https://github.com/RubyLouvre/anu)
