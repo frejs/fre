@@ -197,7 +197,8 @@ render(<Counter />, document.getElementById('root'))
 `useRef` will return a object which contains current node.
 
 ```js
-import {useRef,useEffect} from 'fre'
+import { useRef,useEffect } from 'fre'
+
 function Counter() {
   useEffect(()=>{
     console.log(t) // {current:<div>t</div>}
