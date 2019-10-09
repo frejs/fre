@@ -106,7 +106,9 @@ function reconcileChildren (WIP, children) {
       newFiber.patchTag = UPDATE
       newFiber = merge(alternate, newFiber)
       newFiber.alternate = alternate
-      if (shouldPlace(newFiber)) newFiber.patchTag = PLACE
+      if (shouldPlace(newFiber)) {
+        newFiber.patchTag = PLACE
+      }
     } else {
       newFiber = createFiber(newFiber, { patchTag: PLACE })
     }
@@ -122,6 +124,7 @@ function reconcileChildren (WIP, children) {
     }
     prevFiber = newFiber
   }
+  if (WIP.up) WIP.up = false
   if (prevFiber) prevFiber.sibling = null
 }
 
@@ -165,7 +168,8 @@ function traverse (fns) {
 function shouldPlace (fiber) {
   let p = fiber.parent
   if (p.tag === HOOK) {
-    return p.key && !p.up
+    if (p.key && !p.up) return true
+    return false
   }
   return fiber.key
 }
