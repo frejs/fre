@@ -1,6 +1,7 @@
 function h (type, attrs) {
   let props = attrs || {};
   let key = props.key || null;
+  let ref = props.ref || null;
   let children = [];
 
   for (let i = 2; i < arguments.length; i++) {
@@ -17,7 +18,8 @@ function h (type, attrs) {
   }
 
   delete props.key;
-  return { type, props, key }
+  delete props.ref;
+  return { type, props, key, ref }
 }
 
 function updateProperty (dom, name, value, newValue) {
@@ -62,7 +64,8 @@ function update (key, reducer, value) {
   const current = this ? this : getWIP();
   value = reducer ? reducer(current.state[key], value) : value;
   current.state[key] = value;
-  scheduleWork(current);
+  console.log(current.key);
+  scheduleWork(current, true);
 }
 function resetCursor () {
   cursor = 0;
@@ -71,7 +74,7 @@ function useState (initState) {
   return useReducer(null, initState)
 }
 function useReducer (reducer, initState) {
-  let current = getWIP() || {};
+  let current = getWIP();
   let key = '$' + cursor;
   let setter = update.bind(current, key, reducer);
   cursor++;
@@ -85,9 +88,9 @@ function useReducer (reducer, initState) {
 }
 
 function useEffect (cb, inputs) {
-  let current = getWIP() || {};
+  let current = getWIP();
   let key = '$' + cursor;
-  current.effect = current.effect|| {};
+  current.effect = current.effect || {};
   current.effect[key] = useCallback(cb, inputs);
   cursor++;
 }
@@ -97,7 +100,7 @@ function useCallback (cb, inputs) {
 }
 
 function useMemo (cb, inputs) {
-  let current = getWIP() || {};
+  let current = getWIP();
   let isChange = inputs
     ? (current.oldInputs || []).some((v, i) => inputs[i] !== v)
     : true;
@@ -108,6 +111,10 @@ function useMemo (cb, inputs) {
   current.oldInputs = inputs;
 
   return isChange || !current.isMounted ? (current.memo = cb()) : current.memo
+}
+
+function useRef (current) {
+  return { current }
 }
 
 function push (heap, node) {
@@ -174,7 +181,6 @@ let taskQueue = [];
 let currentTask = null;
 let currentCallback = null;
 let inMC = false;
-let frameLength = 5;
 let frameDeadline = 0;
 
 function scheduleCallback (callback) {
@@ -237,7 +243,7 @@ function workLoop (iniTime) {
 function performWork () {
   if (currentCallback) {
     let currentTime = getTime();
-    frameDeadline = currentTime + frameLength;
+    frameDeadline = currentTime + 5;
     let moreWork = currentCallback(currentTime);
     if (!moreWork) {
       inMC = false;
@@ -249,7 +255,7 @@ function performWork () {
 }
 
 const planWork = (() => {
-  if (typeof MessageChannel !== "undefined") {
+  if (typeof MessageChannel !== 'undefined') {
     const channel = new MessageChannel();
     const port = channel.port2;
     channel.port1.onmessage = performWork;
@@ -283,7 +289,8 @@ function render (vnode, node, done) {
   scheduleWork(rootFiber);
 }
 
-function scheduleWork (fiber) {
+function scheduleWork (fiber, up) {
+  fiber.up = up;
   nextWork = fiber;
   scheduleCallback(performWork$1);
 }
@@ -319,17 +326,10 @@ function updateHost (WIP) {
     WIP.node = createElement(WIP);
   }
   let p = WIP.parentNode || {};
-  WIP.insertPoint = p.lastFiber || null;
-  p.lastFiber = WIP;
-  WIP.node.lastFiber = null;
+  WIP.insertPoint = p.last || null;
+  p.last = WIP;
+  WIP.node.last = null;
   reconcileChildren(WIP, WIP.props.children);
-}
-
-function getParentNode (fiber) {
-  let parent = fiber.parent;
-  if (!parent) return fiber.node
-  while (parent.tag === HOOK) parent = parent.parent;
-  return parent.node
 }
 
 function updateHOOK (WIP) {
@@ -338,6 +338,13 @@ function updateHOOK (WIP) {
   currentFiber = WIP;
   resetCursor();
   reconcileChildren(WIP, WIP.type(WIP.props));
+}
+
+function getParentNode (fiber) {
+  let p = fiber.parent;
+  if (!p) return null
+  while (p.tag === HOOK) p = p.parent;
+  return p.node
 }
 
 function reconcileChildren (WIP, children) {
@@ -364,11 +371,14 @@ function reconcileChildren (WIP, children) {
     let newFiber = newFibers[k];
     let oldFiber = reused[k];
 
-    if (oldFiber && isSame(oldFiber, newFiber)) {
+    if (oldFiber) {
       alternate = createFiber(oldFiber, { patchTag: UPDATE });
       newFiber.patchTag = UPDATE;
       newFiber = merge(alternate, newFiber);
       newFiber.alternate = alternate;
+      if (shouldPlace(newFiber)) {
+        newFiber.patchTag = PLACE;
+      }
     } else {
       newFiber = createFiber(newFiber, { patchTag: PLACE });
     }
@@ -384,11 +394,8 @@ function reconcileChildren (WIP, children) {
     }
     prevFiber = newFiber;
   }
+  if (WIP.up) WIP.up = false;
   if (prevFiber) prevFiber.sibling = null;
-}
-
-function isSame (a, b) {
-  return a.type == b.type && a.key == b.key
 }
 
 function createFiber (vnode, data) {
@@ -397,11 +404,9 @@ function createFiber (vnode, data) {
 }
 
 function completeWork (fiber) {
-  if (fiber.parent) {
-    fiber.parent.patches = (fiber.parent.patches || []).concat(
-      fiber.patches || [],
-      fiber.patchTag ? [fiber] : []
-    );
+  let p = fiber.parent;
+  if (p) {
+    p.patches = p.patches.concat(fiber.patches, [fiber]);
   } else {
     pendingCommit = fiber;
   }
@@ -409,12 +414,18 @@ function completeWork (fiber) {
 
 function commitWork (WIP) {
   WIP.patches.forEach(p => {
-    p.parent.patches = p.patches = null;
+    p.patches = p.parent.patches = [];
     commit(p);
+    applyRef(p);
     traverse(p.effect);
   });
   WIP.done && WIP.done();
   nextWork = pendingCommit = null;
+}
+
+function applyRef (fiber) {
+  let ref = fiber.ref || null;
+  if (ref) ref.current = fiber.node;
 }
 
 function traverse (fns) {
@@ -422,6 +433,15 @@ function traverse (fns) {
     const fn = fns[k];
     fn();
   }
+}
+
+function shouldPlace (fiber) {
+  let p = fiber.parent;
+  if (p.tag === HOOK) {
+    if (p.key && !p.up) return true
+    return false
+  }
+  return fiber.key
 }
 function commit (fiber) {
   let tag = fiber.patchTag;
@@ -443,7 +463,7 @@ function commit (fiber) {
 }
 
 function getWIP () {
-  return currentFiber || null
+  return currentFiber || {}
 }
 
 const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr]);
@@ -453,15 +473,16 @@ function hashfy (arr) {
   let i = 0;
   let j = 0;
   arrayfy(arr).forEach(item => {
+    let key = item.key;
     if (item.pop) {
       item.forEach(item => {
         let key = item.key;
-        key
-          ? (out['.' + i + '.' + key] = item)
-          : (out['.' + i + '.' + j] = item) && j++;
+        key ? (out['.' + i + '.' + key] = item) : (out['.' + i + '.' + j] = item) && j++;
       });
       i++;
-    } else (out['.' + i] = item) && i++;
+    } else {
+      key ? (out['.' + key] = item) : (out['.' + i] = item) && i++;
+    }
   });
   return out
 }
@@ -473,5 +494,5 @@ function merge (a, b) {
   return out
 }
 
-export { h as createElement, h, options, render, scheduleWork, useCallback, useEffect, useMemo, useReducer, useState };
+export { h as createElement, h, options, render, scheduleWork, useCallback, useEffect, useMemo, useReducer, useRef, useState };
 //# sourceMappingURL=fre-esm.js.map

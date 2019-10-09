@@ -19,7 +19,7 @@
 Fre (pronounced `/fri:/`, like free) is a tiny and perfect js library, It means [Free!](https://www.clicli.us/search/free) ~
 
 | Package                                              | Version                                             | About                 |
-| ---------------------------------------------------- | --------------------------------------------------- | --------------------- |
+|------------------------------------------------------|-----------------------------------------------------|-----------------------|
 | [`Fre`](https://github.com/132yse/fre)               | ![npm](https://img.shields.io/npm/v/fre.svg)        | fre core              |
 | [`Fard`](https://github.com/132yse/fard)             | ![npm](https://img.shields.io/npm/v/fard.svg)       | mini-program with fre |
 | [`use-routes`](https://github.com/132yse/use-routes) | ![npm](https://img.shields.io/npm/v/use-routes.svg) | router for fre        |
@@ -65,6 +65,8 @@ render(<Counter />, document.getElementById('root'))
 * [useCallback](https://github.com/132yse/fre#usecallback)
 
 * [useMemo](https://github.com/132yse/fre#usememo)
+
+* [useRef](https://github.com/132yse/fre#useref)
 
 #### useState
 
@@ -190,6 +192,24 @@ function Counter() {
 render(<Counter />, document.getElementById('root'))
 ```
 
+#### useRef
+
+`useRef` will return a object which contains current node.
+
+```js
+import { useRef,useEffect } from 'fre'
+
+function Counter() {
+  useEffect(()=>{
+    console.log(t) // { current:<div>t</div> }
+  })
+  const t = useRef(null)
+  return <div ref={t}>t</div>
+}
+
+render(<Counter />, document.getElementById('root'))
+```
+
 ### FunctionalComponent
 
 functionalComponent is a new components scheme
@@ -281,16 +301,6 @@ const HelloBox = () => (
 const Box = props => <div>{props.children('hello world!')}</div>
 ```
 
-#### HOC
-
-Does not support HOC but you can renturn a function wrapped another function.
-
-```js
-function App() {
-  return HOC(() => <div>I am wrapped by a HOC</div>)
-}
-```
-
 ### options
 
 If you want to rewrite any function, please use options, such as:
@@ -318,18 +328,6 @@ import { h } from 'fre'
 
 If browser environment, recommend to use [htm](https://github.com/developit/htm)
 
-Fre supports most JSX syntax, `if-else` is also Ok but need to be careful.
-
-```jsx
-{
-  isShow && <A />
-  isShow ? <A /> : null
-  isShow ? <A /> : <B />
-}
-```
-
-because there no `key` for them, please use it as late as possible.
-
 #### Async rendering
 
 Fre implement a tiny priority scheduler, which like react Fiber.
@@ -340,13 +338,7 @@ Async rendering is also called `time slicing` or `concurrent mode`.
 
 Fre implements a compact diff algorithm support keyed
 
-It uses hash to mark locations for easy comparison
-
-### Contributors
-
-<a href="https://github.com/132yse/fre/graphs/contributors">
-  <img src="https://opencollective.com/fre/contributors.svg?width=890&button=false" />
-</a>
+It uses hash to mark locations to reduce much size.
 
 #### License
 
