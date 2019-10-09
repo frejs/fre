@@ -155,10 +155,16 @@ function commitWork (WIP) {
   WIP.patches.forEach(p => {
     p.patches = p.parent.patches = null
     commit(p)
+    applyRef(p)
     traverse(p.effect)
   })
   WIP.done && WIP.done()
   nextWork = pendingCommit = null
+}
+
+function applyRef (fiber) {
+  let ref = fiber.ref || null
+  if (ref) ref.current = fiber.node
 }
 
 function traverse (fns) {
@@ -196,7 +202,7 @@ function commit (fiber) {
 }
 
 function getWIP () {
-  return currentFiber || null
+  return currentFiber || {}
 }
 
 const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr])

@@ -14,7 +14,7 @@ export function useState (initState) {
   return useReducer(null, initState)
 }
 export function useReducer (reducer, initState) {
-  let current = getWIP() || {}
+  let current = getWIP()
   let key = '$' + cursor
   let setter = update.bind(current, key, reducer)
   cursor++
@@ -28,7 +28,7 @@ export function useReducer (reducer, initState) {
 }
 
 export function useEffect (cb, inputs) {
-  let current = getWIP() || {}
+  let current = getWIP()
   let key = '$' + cursor
   current.effect = current.effect || {}
   current.effect[key] = useCallback(cb, inputs)
@@ -40,7 +40,7 @@ export function useCallback (cb, inputs) {
 }
 
 export function useMemo (cb, inputs) {
-  let current = getWIP() || {}
+  let current = getWIP()
   let isChange = inputs
     ? (current.oldInputs || []).some((v, i) => inputs[i] !== v)
     : true
@@ -51,4 +51,8 @@ export function useMemo (cb, inputs) {
   current.oldInputs = inputs
 
   return isChange || !current.isMounted ? (current.memo = cb()) : current.memo
+}
+
+export function useRef (current) {
+  return { current }
 }
