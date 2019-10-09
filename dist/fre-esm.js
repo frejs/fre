@@ -62,7 +62,7 @@ function update (key, reducer, value) {
   const current = this ? this : getWIP();
   value = reducer ? reducer(current.state[key], value) : value;
   current.state[key] = value;
-  scheduleWork(current);
+  scheduleWork(current, true);
 }
 function resetCursor () {
   cursor = 0;
@@ -87,7 +87,7 @@ function useReducer (reducer, initState) {
 function useEffect (cb, inputs) {
   let current = getWIP() || {};
   let key = '$' + cursor;
-  current.effect = current.effect|| {};
+  current.effect = current.effect || {};
   current.effect[key] = useCallback(cb, inputs);
   cursor++;
 }
@@ -267,7 +267,15 @@ function shouldYeild () {
 const getTime = () => performance.now();
 
 const options = {};
-const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6];
+const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6
+];
 
 let nextWork = null;
 let pendingCommit = null;
@@ -283,7 +291,8 @@ function render (vnode, node, done) {
   scheduleWork(rootFiber);
 }
 
-function scheduleWork (fiber) {
+function scheduleWork (fiber, isUp) {
+  fiber.up = isUp;
   nextWork = fiber;
   scheduleCallback(performWork$1);
 }
@@ -303,8 +312,9 @@ function performWork$1 () {
 
 function performNext (WIP) {
   WIP.parentNode = getParentNode(WIP);
-  WIP.patches = [];
+  WIP.patches = WIP.patches || [];
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP);
+
   if (WIP.child) return WIP.child
   while (WIP) {
     completeWork(WIP);
@@ -325,19 +335,19 @@ function updateHost (WIP) {
   reconcileChildren(WIP, WIP.props.children);
 }
 
-function getParentNode (fiber) {
-  let parent = fiber.parent;
-  if (!parent) return fiber.node
-  while (parent.tag === HOOK) parent = parent.parent;
-  return parent.node
-}
-
 function updateHOOK (WIP) {
   WIP.props = WIP.props || {};
   WIP.state = WIP.state || {};
   currentFiber = WIP;
   resetCursor();
   reconcileChildren(WIP, WIP.type(WIP.props));
+}
+
+function getParentNode (fiber) {
+  let parent = fiber.parent;
+  if (!parent) return fiber.node
+  while (parent.tag === HOOK) parent = parent.parent;
+  return parent.node
 }
 
 function reconcileChildren (WIP, children) {
@@ -364,11 +374,14 @@ function reconcileChildren (WIP, children) {
     let newFiber = newFibers[k];
     let oldFiber = reused[k];
 
-    if (oldFiber && isSame(oldFiber, newFiber)) {
+    if (oldFiber) {
       alternate = createFiber(oldFiber, { patchTag: UPDATE });
       newFiber.patchTag = UPDATE;
       newFiber = merge(alternate, newFiber);
       newFiber.alternate = alternate;
+      if (shouldPlace(newFiber)) {
+        newFiber.patchTag = PLACE;
+      }
     } else {
       newFiber = createFiber(newFiber, { patchTag: PLACE });
     }
@@ -386,11 +399,6 @@ function reconcileChildren (WIP, children) {
   }
   if (prevFiber) prevFiber.sibling = null;
 }
-
-function isSame (a, b) {
-  return a.type == b.type && a.key == b.key
-}
-
 function createFiber (vnode, data) {
   data.tag = typeof vnode.type === 'function' ? HOOK : HOST;
   return merge(vnode, data)
@@ -409,7 +417,7 @@ function completeWork (fiber) {
 
 function commitWork (WIP) {
   WIP.patches.forEach(p => {
-    p.parent.patches = p.patches = null;
+    p.patches = p.parent.patches = null;
     commit(p);
     traverse(p.effect);
   });
@@ -421,6 +429,14 @@ function traverse (fns) {
   for (const k in fns) {
     const fn = fns[k];
     fn();
+  }
+}
+
+function shouldPlace (fiber) {
+  let parent = fiber.parent;
+  if (!parent) return false
+  if (parent.tag === HOOK) {
+    return parent.key && !parent.up
   }
 }
 function commit (fiber) {
