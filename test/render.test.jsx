@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import { h, render, useState, useEffect } from "../src/index"
+import { h, render, useState, useEffect, useRef } from "../src/index"
 
 const testRender = jsx => new Promise(resolve => {
   document.body.innerHTML = ""
@@ -74,6 +74,18 @@ test('update components; use state and effect hooks', async done => {
 
     done()
   }
+})
+
+test('obtain reference to DOM element', async () => {
+  const Component = () => {
+    const ref = useRef()
+
+    useEffect(() => expect(ref.current.name).toBe("foo"))
+
+    return <input name="foo" ref={ref}/>
+  }
+
+  await testRender(<Component/>)
 })
 
 test('reorder elements using key-based diff', done => {
