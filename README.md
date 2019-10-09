@@ -201,7 +201,7 @@ import { useRef,useEffect } from 'fre'
 
 function Counter() {
   useEffect(()=>{
-    console.log(t) // {current:<div>t</div>}
+    console.log(t) // { current:<div>t</div> }
   })
   const t = useRef(null)
   return <div ref={t}>t</div>
@@ -328,8 +328,6 @@ import { h } from 'fre'
 
 If browser environment, recommend to use [htm](https://github.com/developit/htm)
 
-because there no `key` for them, please use it as late as possible.
-
 #### Async rendering
 
 Fre implement a tiny priority scheduler, which like react Fiber.
@@ -340,13 +338,7 @@ Async rendering is also called `time slicing` or `concurrent mode`.
 
 Fre implements a compact diff algorithm support keyed
 
-It uses hash to mark locations for easy comparison
-
-### Contributors
-
-<a href="https://github.com/132yse/fre/graphs/contributors">
-  <img src="https://opencollective.com/fre/contributors.svg?width=890&button=false" />
-</a>
+It uses hash to mark locations to reduce much size.
 
 #### License
 
