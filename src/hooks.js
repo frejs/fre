@@ -5,7 +5,6 @@ function update (key, reducer, value) {
   const current = this ? this : getWIP()
   value = reducer ? reducer(current.state[key], value) : value
   current.state[key] = value
-  console.log(current.key)
   scheduleWork(current, true)
 }
 export function resetCursor () {
