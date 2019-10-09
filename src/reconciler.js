@@ -20,7 +20,7 @@ function render (vnode, node, done) {
 }
 
 function scheduleWork (fiber, up) {
-  fiber.up = up
+  fiber.updating = up
   nextWork = fiber
   scheduleCallback(performWork)
 }
@@ -124,8 +124,8 @@ function reconcileChildren (WIP, children) {
     }
     prevFiber = newFiber
   }
-  if (WIP.up) WIP.up = false
   if (prevFiber) prevFiber.sibling = null
+  if (WIP.updating) WIP.updating = false
 }
 
 function createFiber (vnode, data) {
@@ -168,7 +168,7 @@ function traverse (fns) {
 function shouldPlace (fiber) {
   let p = fiber.parent
   if (p.tag === HOOK) {
-    if (p.key && !p.up) return true
+    if (p.key && !p.updating) return true
     return false
   }
   return fiber.key
