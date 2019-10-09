@@ -5,7 +5,7 @@ function update (key, reducer, value) {
   const current = this ? this : getWIP()
   value = reducer ? reducer(current.state[key], value) : value
   current.state[key] = value
-  scheduleWork(current)
+  scheduleWork(current, true)
 }
 export function resetCursor () {
   cursor = 0
@@ -30,7 +30,7 @@ export function useReducer (reducer, initState) {
 export function useEffect (cb, inputs) {
   let current = getWIP() || {}
   let key = '$' + cursor
-  current.effect = current.effect|| {}
+  current.effect = current.effect || {}
   current.effect[key] = useCallback(cb, inputs)
   cursor++
 }
