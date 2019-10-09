@@ -7,6 +7,7 @@
   function h (type, attrs) {
     let props = attrs || {};
     let key = props.key || null;
+    let ref = props.ref || null;
     let children = [];
 
     for (let i = 2; i < arguments.length; i++) {
@@ -23,7 +24,8 @@
     }
 
     delete props.key;
-    return { type, props, key }
+    delete props.ref;
+    return { type, props, key, ref }
   }
 
   function updateProperty (dom, name, value, newValue) {
@@ -77,7 +79,7 @@
     return useReducer(null, initState)
   }
   function useReducer (reducer, initState) {
-    let current = getWIP() || {};
+    let current = getWIP();
     let key = '$' + cursor;
     let setter = update.bind(current, key, reducer);
     cursor++;
@@ -91,7 +93,7 @@
   }
 
   function useEffect (cb, inputs) {
-    let current = getWIP() || {};
+    let current = getWIP();
     let key = '$' + cursor;
     current.effect = current.effect || {};
     current.effect[key] = useCallback(cb, inputs);
@@ -103,7 +105,7 @@
   }
 
   function useMemo (cb, inputs) {
-    let current = getWIP() || {};
+    let current = getWIP();
     let isChange = inputs
       ? (current.oldInputs || []).some((v, i) => inputs[i] !== v)
       : true;
@@ -114,6 +116,10 @@
     current.oldInputs = inputs;
 
     return isChange || !current.isMounted ? (current.memo = cb()) : current.memo
+  }
+
+  function useRef (current) {
+    return { current }
   }
 
   function push (heap, node) {
@@ -425,10 +431,16 @@
     WIP.patches.forEach(p => {
       p.patches = p.parent.patches = null;
       commit(p);
+      applyRef(p);
       traverse(p.effect);
     });
     WIP.done && WIP.done();
     nextWork = pendingCommit = null;
+  }
+
+  function applyRef (fiber) {
+    let ref = fiber.ref || null;
+    if (ref) ref.current = fiber.node;
   }
 
   function traverse (fns) {
@@ -465,7 +477,7 @@
   }
 
   function getWIP () {
-    return currentFiber || null
+    return currentFiber || {}
   }
 
   const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr]);
@@ -504,6 +516,7 @@
   exports.useEffect = useEffect;
   exports.useMemo = useMemo;
   exports.useReducer = useReducer;
+  exports.useRef = useRef;
   exports.useState = useState;
 
 }));
