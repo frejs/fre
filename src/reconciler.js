@@ -48,9 +48,8 @@ function performWork () {
 
 function performNext (WIP) {
   WIP.parentNode = getParentNode(WIP)
-  WIP.patches = WIP.patches || []
+  WIP.patches = []
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
-
   if (WIP.child) return WIP.child
   while (WIP) {
     completeWork(WIP)
@@ -65,9 +64,9 @@ function updateHost (WIP) {
     WIP.node = createElement(WIP)
   }
   let p = WIP.parentNode || {}
-  WIP.insertPoint = p.lastFiber || null
-  p.lastFiber = WIP
-  WIP.node.lastFiber = null
+  WIP.insertPoint = p.last || null
+  p.last = WIP
+  WIP.node.last = null
   reconcileChildren(WIP, WIP.props.children)
 }
 
@@ -81,7 +80,7 @@ function updateHOOK (WIP) {
 
 function getParentNode (fiber) {
   let parent = fiber.parent
-  if (!parent) return fiber.node
+  if (!parent) return null
   while (parent.tag === HOOK) parent = parent.parent
   return parent.node
 }
@@ -115,9 +114,7 @@ function reconcileChildren (WIP, children) {
       newFiber.patchTag = UPDATE
       newFiber = merge(alternate, newFiber)
       newFiber.alternate = alternate
-      if (shouldPlace(newFiber)) {
-        newFiber.patchTag = PLACE
-      }
+      if (shouldPlace(newFiber)) newFiber.patchTag = PLACE
     } else {
       newFiber = createFiber(newFiber, { patchTag: PLACE })
     }
@@ -135,6 +132,7 @@ function reconcileChildren (WIP, children) {
   }
   if (prevFiber) prevFiber.sibling = null
 }
+
 function createFiber (vnode, data) {
   data.tag = typeof vnode.type === 'function' ? HOOK : HOST
   return merge(vnode, data)
@@ -175,11 +173,11 @@ function traverse (fns) {
 }
 
 function shouldPlace (fiber) {
-  let parent = fiber.parent
-  if (!parent) return false
-  if (parent.tag === HOOK) {
-    return parent.key && !parent.up
+  let p = fiber.parent
+  if (p.tag === HOOK) {
+    return p.key && !p.up
   }
+  return fiber.key
 }
 function commit (fiber) {
   let tag = fiber.patchTag
@@ -212,6 +210,7 @@ function hashfy (arr) {
   let i = 0
   let j = 0
   arrayfy(arr).forEach(item => {
+    let key = item.key
     if (item.pop) {
       item.forEach(item => {
         let key = item.key
@@ -220,7 +219,9 @@ function hashfy (arr) {
           : (out['.' + i + '.' + j] = item) && j++
       })
       i++
-    } else (out['.' + i] = item) && i++
+    } else {
+      key ? (out['.' + key] = item) : (out['.' + i] = item) && i++
+    }
   })
   return out
 }

@@ -26,6 +26,8 @@ let nextId = 3
 function App () {
   const [counters, setCounters] = useState([1, 2, 3])
 
+  console.log(counters)
+
   return (
     <div>
       {counters.map(id => (
