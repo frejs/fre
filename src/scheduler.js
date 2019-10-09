@@ -4,7 +4,6 @@ let taskQueue = []
 let currentTask = null
 let currentCallback = null
 let inMC = false
-let frameLength = 5
 let frameDeadline = 0
 
 export function scheduleCallback (callback) {
@@ -67,7 +66,7 @@ function workLoop (iniTime) {
 function performWork () {
   if (currentCallback) {
     let currentTime = getTime()
-    frameDeadline = currentTime + frameLength
+    frameDeadline = currentTime + 5
     let moreWork = currentCallback(currentTime)
     if (!moreWork) {
       inMC = false
@@ -79,7 +78,7 @@ function performWork () {
 }
 
 const planWork = (() => {
-  if (typeof MessageChannel !== "undefined") {
+  if (typeof MessageChannel !== 'undefined') {
     const channel = new MessageChannel()
     const port = channel.port2
     channel.port1.onmessage = performWork
