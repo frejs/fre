@@ -8,6 +8,39 @@ const testRender = jsx => new Promise(resolve => {
   render(jsx, document.body, () => resolve([...document.body.childNodes]))
 })
 
+const testUpdates = async updates => {
+  let effect = () => {}
+  let setContent
+
+  const Component = () => {
+    const [content, _setContent] = useState(updates[0].content)
+
+    setContent = _setContent
+
+    useEffect(effect)
+
+    return content
+  }
+
+  const run = index => updates[index].test([...document.body.childNodes])
+
+  await testRender(<Component/>)
+
+  run(0)
+
+  for (let i=1; i<updates.length; i++) {
+    await new Promise(resolve => {
+      effect = () => {
+        run(i)
+
+        resolve()
+      }
+
+      setContent(updates[i].content)
+    })
+  }
+}
+
 const toString = elements => elements.map(child => child.outerHTML).join("")
 
 test('render nested HTML elements, apply attributes', async () => {
@@ -84,65 +117,53 @@ test('obtain reference to DOM element', async () => {
   expect(ref.current).toBe(elements[0])
 })
 
-test('reorder elements using key-based diff', done => {
-  const initialState = [1,2,3]
-
+test('reorder and reuse elements during key-based reconciliation of child-nodes', async () => {
   const states = [
+    [1,2,3],
     [3,1,2], // shift right
+    [1,2,3],
     [2,3,1], // shift left
+    [1,2,3],
     [1,3],   // remove from middle
+    [1,2,3],
     [2,3],   // remove first
+    [1,2,3],
     [1,2],   // remove last
+    [1,2,3],
     [3,2,1], // reverse order
+    [1,2,3],
   ]
 
-  let update
+  let lastChildren
 
-  const Component = ({initialState}) => {
-    const [state, setState] = useState(initialState)
-
-    const afterEffect = new Promise(resolve => useEffect(resolve))
-
-    update = newState => {
-      setState(newState)
-
-      return afterEffect
-    }
-
-    return (
+  await testUpdates(states.map((state, stateNumber) => ({
+    content: (
       <ul>
         {state.map(value => <li key={value}>{value}</li>)}
       </ul>
-    )
-  }
+    ),
+    test: (elements) => {
+      const children = [...elements[0].children]
 
-  let promise = testRender(<Component initialState={initialState}/>)
+      expect(children.map(el => el.textContent)).toStrictEqual(state.map(value => "" + value))
 
-  for (const state of states) {
-    promise = promise.then(() => {
-      return update(state).then(() => {
-        const ul = document.body.children[0]
+      if (stateNumber >= 1) {
+        const lastState = states[stateNumber - 1]
 
-        // TODO preserve and check element references for identity between updates
+        // console.log(`transition from ${lastState.join(", ")} to ${state.join(", ")}`)
 
-        console.log("target state: ", state, [...ul.children].map(child => child.textContent))
+        state.forEach((value, index) => {
+          const lastIndex = lastState.indexOf(value)
 
-        expect(ul.children.length).toBe(state.length)
+          if (lastIndex !== -1) {
+            // console.log(`item ${value} position ${lastIndex} -> ${index}`)
 
-        state.map((value, index) => {
-          expect(ul.children[index].textContent).toBe("" + value)
+            expect(children[index]).toBe(lastChildren[lastIndex])
+          }
         })
+      }
 
-        return update(initialState).then(() => {
-          const ul = document.body.children[0]
-
-          expect(ul.children[0].textContent).toBe("" + initialState[0])
-          expect(ul.children[1].textContent).toBe("" + initialState[1])
-          expect(ul.children[2].textContent).toBe("" + initialState[2])
-        })
-      })
-    })
-  }
-
-  promise.then(done)
+      lastChildren = children
+    }
+  })))
 })
