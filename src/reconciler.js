@@ -3,15 +3,7 @@ import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild } from './scheduler'
 
 const options = {}
-export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [
-  0,
-  1,
-  2,
-  3,
-  4,
-  5,
-  6
-]
+export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
 
 let nextWork = null
 let pendingCommit = null
@@ -139,11 +131,9 @@ function createFiber (vnode, data) {
 }
 
 function completeWork (fiber) {
-  if (fiber.parent) {
-    fiber.parent.patches = (fiber.parent.patches || []).concat(
-      fiber.patches || [],
-      fiber.patchTag ? [fiber] : []
-    )
+  let p = fiber.parent
+  if (p) {
+    p.patches = fiber.parent.patches.concat(fiber.patches, [fiber])
   } else {
     pendingCommit = fiber
   }
@@ -151,7 +141,7 @@ function completeWork (fiber) {
 
 function commitWork (WIP) {
   WIP.patches.forEach(p => {
-    p.patches = p.parent.patches = null
+    p.patches = p.parent.patches = []
     commit(p)
     applyRef(p)
     traverse(p.effect)
@@ -214,9 +204,7 @@ function hashfy (arr) {
     if (item.pop) {
       item.forEach(item => {
         let key = item.key
-        key
-          ? (out['.' + i + '.' + key] = item)
-          : (out['.' + i + '.' + j] = item) && j++
+        key ? (out['.' + i + '.' + key] = item) : (out['.' + i + '.' + j] = item) && j++
       })
       i++
     } else {
