@@ -19,8 +19,8 @@ function render (vnode, node, done) {
   scheduleWork(rootFiber)
 }
 
-function scheduleWork (fiber, isUp) {
-  fiber.up = isUp
+function scheduleWork (fiber, up) {
+  fiber.up = up
   nextWork = fiber
   scheduleCallback(performWork)
 }
