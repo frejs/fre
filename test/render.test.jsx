@@ -77,15 +77,11 @@ test('update components; use state and effect hooks', async done => {
 })
 
 test('obtain reference to DOM element', async () => {
-  const Component = () => {
-    const ref = useRef()
+  const ref = useRef()
 
-    useEffect(() => expect(ref.current.name).toBe("foo"))
+  const elements = await testRender(<div ref={ref}/>)
 
-    return <input name="foo" ref={ref}/>
-  }
-
-  await testRender(<Component/>)
+  expect(ref.current).toBe(elements[0])
 })
 
 test('reorder elements using key-based diff', done => {
