@@ -10,47 +10,37 @@ const testRender = jsx => new Promise(resolve => {
 
 const toString = elements => elements.map(child => child.outerHTML).join("")
 
-test('render nested HTML elements, apply attributes', done => {
-  testRender(<div><span class="foo">test</span></div>).then(elements => {
-    expect(toString(elements)).toBe(`<div><span class="foo">test</span></div>`)
+test('render nested HTML elements, apply attributes', async () => {
+  const elements = await testRender(<div><span class="foo">test</span></div>)
 
-    done()
-  })
+  expect(toString(elements)).toBe(`<div><span class="foo">test</span></div>`)
 })
 
-test('apply props to object properties', done => {
-  testRender(<input defaultChecked={true}/>).then(elements => {
-    expect(elements[0].defaultChecked).toBe(true)
+test('apply props to object properties', async () => {
+  const elements = await testRender(<input defaultChecked={true}/>)
 
-    done()
-  })
+  expect(elements[0].defaultChecked).toBe(true)
 })
 
-test('render range of HTML elements', done => {
-  testRender(<ul><li>1</li><li>2</li><li>3</li></ul>).then(elements => {
-    expect(toString(elements)).toBe("<ul><li>1</li><li>2</li><li>3</li></ul>")
+test('render range of HTML elements', async () => {
+  const elements = await testRender(<ul><li>1</li><li>2</li><li>3</li></ul>)
 
-    done()
-  })
+  expect(toString(elements)).toBe("<ul><li>1</li><li>2</li><li>3</li></ul>")
 })
 
-test('attach DOM event handler', done => {
+test('attach DOM event handler', async () => {
   let clicked = false
 
   const handler = () => clicked = true
 
-  testRender(<button onclick={handler}>OK</button>).then(elements => {
-    elements[0].click()
+  const elements = await testRender(<button onclick={handler}>OK</button>)
 
-    setTimeout(() => {
-      expect(clicked).toBe(true)
+  elements[0].click()
 
-      done()
-    })
-  })
+  expect(clicked).toBe(true)
 })
 
-test('update components; use state and effect hooks', done => {
+test('update components; use state and effect hooks', async done => {
   const Component = ({ effect }) => {
     const [count, setCount] = useState(0)
 
@@ -69,21 +59,21 @@ test('update components; use state and effect hooks', done => {
 
   let afterEffect = () => effectCalled = true
 
-  testRender(<Component effect={() => afterEffect()}/>).then(elements => {
-    expect(effectCalled).toBe(true)
+  let elements = await testRender(<Component effect={() => afterEffect()}/>)
 
-    expect(elements[0].firstChild.nodeValue).toBe("0")
+  expect(effectCalled).toBe(true)
 
-    afterEffect = checkEffect
+  expect(elements[0].firstChild.nodeValue).toBe("0")
 
-    elements[0].click()
+  afterEffect = checkEffect
 
-    function checkEffect() {
-      expect(elements[0].firstChild.nodeValue).toBe("1")
+  elements[0].click()
 
-      done()
-    }
-  })
+  function checkEffect() {
+    expect(elements[0].firstChild.nodeValue).toBe("1")
+
+    done()
+  }
 })
 
 test('reorder elements using key-based diff', done => {
