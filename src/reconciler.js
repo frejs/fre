@@ -71,10 +71,10 @@ function updateHOOK (WIP) {
 }
 
 function getParentNode (fiber) {
-  let parent = fiber.parent
-  if (!parent) return null
-  while (parent.tag === HOOK) parent = parent.parent
-  return parent.node
+  let p = fiber.parent
+  if (!p) return null
+  while (p.tag === HOOK) p = p.parent
+  return p.node
 }
 
 function reconcileChildren (WIP, children) {
@@ -133,7 +133,7 @@ function createFiber (vnode, data) {
 function completeWork (fiber) {
   let p = fiber.parent
   if (p) {
-    p.patches = fiber.parent.patches.concat(fiber.patches, [fiber])
+    p.patches = p.patches.concat(fiber.patches, [fiber])
   } else {
     pendingCommit = fiber
   }
