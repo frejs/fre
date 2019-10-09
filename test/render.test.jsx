@@ -1,65 +1,79 @@
 /** @jsx h */
 
-import { h, render, useState, useEffect } from "../src/index"
+import { h, render, useState, useEffect, useRef } from "../src/index"
 
 const testRender = jsx => new Promise(resolve => {
   document.body.innerHTML = ""
 
-  render(jsx, document.body, () => {
-    const html = document.createDocumentFragment()
-
-    for (const child of document.body.childNodes) {
-      html.appendChild(child)
-    }
-
-    resolve(html)
-  })
+  render(jsx, document.body, () => resolve([...document.body.childNodes]))
 })
 
-const toString = el => Array.from(el.childNodes).map(child => child.outerHTML).join("")
+const testUpdates = async updates => {
+  let effect = () => {}
+  let setContent
 
-test('render nested HTML elements, apply attributes', done => {
-  testRender(<div><span class="foo">test</span></div>).then(html => {
-    expect(toString(html)).toBe(`<div><span class="foo">test</span></div>`)
+  const Component = () => {
+    const [content, _setContent] = useState(updates[0].content)
 
-    done()
-  })
+    setContent = _setContent
+
+    useEffect(effect)
+
+    return content
+  }
+
+  const run = index => updates[index].test([...document.body.childNodes])
+
+  await testRender(<Component/>)
+
+  run(0)
+
+  for (let i=1; i<updates.length; i++) {
+    await new Promise(resolve => {
+      effect = () => {
+        run(i)
+
+        resolve()
+      }
+
+      setContent(updates[i].content)
+    })
+  }
+}
+
+const toString = elements => elements.map(child => child.outerHTML).join("")
+
+test('render nested HTML elements, apply attributes', async () => {
+  const elements = await testRender(<div><span class="foo">test</span></div>)
+
+  expect(toString(elements)).toBe(`<div><span class="foo">test</span></div>`)
 })
 
-test('apply props to object properties', done => {
-  testRender(<input defaultChecked={true}/>).then(html => {
-    expect(html.children[0].defaultChecked).toBe(true)
+test('apply props to object properties', async () => {
+  const elements = await testRender(<input defaultChecked={true}/>)
 
-    done()
-  })
+  expect(elements[0].defaultChecked).toBe(true)
 })
 
-test('render range of HTML elements', done => {
-  testRender(<ul><li>1</li><li>2</li><li>3</li></ul>).then(html => {
-    expect(toString(html)).toBe("<ul><li>1</li><li>2</li><li>3</li></ul>")
+test('render range of HTML elements', async () => {
+  const elements = await testRender(<ul><li>1</li><li>2</li><li>3</li></ul>)
 
-    done()
-  })
+  expect(toString(elements)).toBe("<ul><li>1</li><li>2</li><li>3</li></ul>")
 })
 
-test('attach DOM event handler', done => {
+test('attach DOM event handler', async () => {
   let clicked = false
 
   const handler = () => clicked = true
 
-  testRender(<button onclick={handler}>OK</button>).then(html => {
-    html.children[0].click()
+  const elements = await testRender(<button onclick={handler}>OK</button>)
 
-    setTimeout(() => {
-      expect(clicked).toBe(true)
+  elements[0].click()
 
-      done()
-    })
-  })
+  expect(clicked).toBe(true)
 })
 
-
-test('update components; use state and effect hooks', done => {
+test('update components; use state and effect hooks', async done => {
   const Component = ({ effect }) => {
     const [count, setCount] = useState(0)
 
@@ -78,19 +92,78 @@ test('update components; use state and effect hooks', done => {
 
   let afterEffect = () => effectCalled = true
 
-  testRender(<Component effect={() => afterEffect()}/>).then(html => {
-    expect(effectCalled).toBe(true)
+  let elements = await testRender(<Component effect={() => afterEffect()}/>)
 
-    expect(html.children[0].firstChild.nodeValue).toBe("0")
+  expect(effectCalled).toBe(true)
 
-    afterEffect = checkEffect
+  expect(elements[0].firstChild.nodeValue).toBe("0")
 
-    html.children[0].click()
+  afterEffect = checkEffect
 
-    function checkEffect() {
-      expect(html.children[0].firstChild.nodeValue).toBe("1")
+  elements[0].click()
 
-      done()
+  function checkEffect() {
+    expect(elements[0].firstChild.nodeValue).toBe("1")
+
+    done()
+  }
+})
+
+test('obtain reference to DOM element', async () => {
+  const ref = useRef()
+
+  const elements = await testRender(<div ref={ref}/>)
+
+  expect(ref.current).toBe(elements[0])
+})
+
+test('reorder and reuse elements during key-based reconciliation of child-nodes', async () => {
+  const states = [
+    [1,2,3],
+    [3,1,2], // shift right
+    [1,2,3],
+    [2,3,1], // shift left
+    [1,2,3],
+    [1,3],   // remove from middle
+    [1,2,3],
+    [2,3],   // remove first
+    [1,2,3],
+    [1,2],   // remove last
+    [1,2,3],
+    [3,2,1], // reverse order
+    [1,2,3],
+  ]
+
+  let lastChildren
+
+  await testUpdates(states.map((state, stateNumber) => ({
+    content: (
+      <ul>
+        {state.map(value => <li key={value}>{value}</li>)}
+      </ul>
+    ),
+    test: (elements) => {
+      const children = [...elements[0].children]
+
+      expect(children.map(el => el.textContent)).toStrictEqual(state.map(value => "" + value))
+
+      if (stateNumber >= 1) {
+        const lastState = states[stateNumber - 1]
+
+        // console.log(`transition from ${lastState.join(", ")} to ${state.join(", ")}`)
+
+        state.forEach((value, index) => {
+          const lastIndex = lastState.indexOf(value)
+
+          if (lastIndex !== -1) {
+            // console.log(`item ${value} position ${lastIndex} -> ${index}`)
+
+            expect(children[index]).toBe(lastChildren[lastIndex])
+          }
+        })
+      }
+
+      lastChildren = children
     }
-  })
+  })))
 })
