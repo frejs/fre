@@ -70,6 +70,7 @@
     const current = this ? this : getWIP();
     value = reducer ? reducer(current.state[key], value) : value;
     current.state[key] = value;
+    console.log(current.key);
     scheduleWork(current, true);
   }
   function resetCursor () {
@@ -186,7 +187,6 @@
   let currentTask = null;
   let currentCallback = null;
   let inMC = false;
-  let frameLength = 5;
   let frameDeadline = 0;
 
   function scheduleCallback (callback) {
@@ -249,7 +249,7 @@
   function performWork () {
     if (currentCallback) {
       let currentTime = getTime();
-      frameDeadline = currentTime + frameLength;
+      frameDeadline = currentTime + 5;
       let moreWork = currentCallback(currentTime);
       if (!moreWork) {
         inMC = false;
@@ -261,7 +261,7 @@
   }
 
   const planWork = (() => {
-    if (typeof MessageChannel !== "undefined") {
+    if (typeof MessageChannel !== 'undefined') {
       const channel = new MessageChannel();
       const port = channel.port2;
       channel.port1.onmessage = performWork;
@@ -295,8 +295,8 @@
     scheduleWork(rootFiber);
   }
 
-  function scheduleWork (fiber, isUp) {
-    fiber.up = isUp;
+  function scheduleWork (fiber, up) {
+    fiber.up = up;
     nextWork = fiber;
     scheduleCallback(performWork$1);
   }
@@ -347,10 +347,10 @@
   }
 
   function getParentNode (fiber) {
-    let parent = fiber.parent;
-    if (!parent) return null
-    while (parent.tag === HOOK) parent = parent.parent;
-    return parent.node
+    let p = fiber.parent;
+    if (!p) return null
+    while (p.tag === HOOK) p = p.parent;
+    return p.node
   }
 
   function reconcileChildren (WIP, children) {
@@ -382,7 +382,9 @@
         newFiber.patchTag = UPDATE;
         newFiber = merge(alternate, newFiber);
         newFiber.alternate = alternate;
-        if (shouldPlace(newFiber)) newFiber.patchTag = PLACE;
+        if (shouldPlace(newFiber)) {
+          newFiber.patchTag = PLACE;
+        }
       } else {
         newFiber = createFiber(newFiber, { patchTag: PLACE });
       }
@@ -398,6 +400,7 @@
       }
       prevFiber = newFiber;
     }
+    if (WIP.up) WIP.up = false;
     if (prevFiber) prevFiber.sibling = null;
   }
 
@@ -409,7 +412,7 @@
   function completeWork (fiber) {
     let p = fiber.parent;
     if (p) {
-      p.patches = fiber.parent.patches.concat(fiber.patches, [fiber]);
+      p.patches = p.patches.concat(fiber.patches, [fiber]);
     } else {
       pendingCommit = fiber;
     }
@@ -441,7 +444,8 @@
   function shouldPlace (fiber) {
     let p = fiber.parent;
     if (p.tag === HOOK) {
-      return p.key && !p.up
+      if (p.key && !p.up) return true
+      return false
     }
     return fiber.key
   }
