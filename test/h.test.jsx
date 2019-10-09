@@ -8,6 +8,7 @@ test('create JSX node', () => {
   expect(div).toStrictEqual({
     type: "div",
     key: null,
+    ref: null,
     props: {}
   })
 })
@@ -18,6 +19,7 @@ test('create JSX node with key and props', () => {
   expect(div).toStrictEqual({
     type: "input",
     key: "foo",
+    ref: null,
     props: {
       name: "foo",
       value: "bar"
@@ -37,14 +39,17 @@ test('create JSX node with children', () => {
   expect(divs).toStrictEqual({
     type: "div",
     key: "a",
+    ref: null,
     props: {
       children: {
         type: "div",
         key: "b",
+        ref: null,
         props: {
           children: {
             type: "div",
             key: "c",
+            ref: null,
             props: {}
           }
         }
@@ -59,6 +64,7 @@ test('ignore `true`, `false`, `null` and `undefined` JSX literals', () => {
   expect(div).toStrictEqual({
     type: "div",
     key: null,
+    ref: null,
     props: {}
   })
 })
@@ -69,6 +75,7 @@ test('emit JSX string/number literals', () => {
   expect(div).toStrictEqual({
     type: "div",
     key: null,
+    ref: null,
     props: {
       children: [
         { type: "text", props: { nodeValue: "hello" } },
@@ -87,6 +94,7 @@ test('emit JSX component nodes', () => {
   expect(div).toStrictEqual({
     type: Component,
     key: null,
+    ref: null,
     props: {
       value: "foo",
       children: {
