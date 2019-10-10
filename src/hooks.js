@@ -2,10 +2,10 @@ import { scheduleWork, getWIP } from './reconciler'
 let cursor = 0
 
 function update (key, reducer, value) {
-  const current = this ? this : getWIP()
-  value = reducer ? reducer(current.state[key], value) : value
-  current.state[key] = value
-  scheduleWork(current, true)
+  const wip = this ? this : getWIP()
+  value = reducer ? reducer(wip.state[key], value) : value
+  wip.state[key] = value
+  scheduleWork(wip, true)
 }
 export function resetCursor () {
   cursor = 0
@@ -14,45 +14,46 @@ export function useState (initState) {
   return useReducer(null, initState)
 }
 export function useReducer (reducer, initState) {
-  let current = getWIP()
+  let wip = getWIP()
   let key = '$' + cursor
-  let setter = update.bind(current, key, reducer)
+  let setter = update.bind(wip, key, reducer)
   cursor++
-  let state = current.state || {}
+  let state = wip.state || {}
   if (key in state) {
     return [state[key], setter]
   } else {
-    current.state[key] = initState
+    wip.state[key] = initState
     return [initState, setter]
   }
 }
 
-export function useEffect (cb, inputs) {
-  let current = getWIP()
+export function useEffect (cb, deps) {
+  let wip = getWIP()
   let key = '$' + cursor
-  current.effect = current.effect || {}
-  current.effect[key] = useCallback(cb, inputs)
+  wip.effect = wip.effect || {}
+  wip.effect[key] = useCallback(cb, deps)
   cursor++
 }
 
-export function useCallback (cb, inputs) {
-  return useMemo(() => cb, inputs)
+export function useCallback (cb, deps) {
+  return useMemo(() => cb, deps)
 }
 
-export function useMemo (cb, inputs) {
-  let current = getWIP()
-  let isChange = inputs
-    ? (current.oldInputs || []).some((v, i) => inputs[i] !== v)
-    : true
-  if (inputs && !inputs.length && !current.isMounted) {
-    isChange = true
-    current.isMounted = true
+export function useMemo (cb, deps) {
+  let wip = getWIP()
+  if (isChanged(wip._deps, deps)) {
+    wip._deps = deps
+    wip._cb = cb
+    return (wip._memo = cb())
   }
-  current.oldInputs = inputs
 
-  return isChange || !current.isMounted ? (current.memo = cb()) : current.memo
+  return wip._memo
 }
 
 export function useRef (current) {
   return { current }
+}
+
+function isChanged (a, b) {
+  return !a || b.some((arg, index) => arg !== a[index])
 }
