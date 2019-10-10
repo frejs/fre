@@ -209,17 +209,15 @@ function hashfy (arr) {
   let i = 0
   let j = 0
   arrayfy(arr).forEach(item => {
-    let key = item.key
     if (item.pop) {
       item.forEach(item => {
-        let key = item.key
-        key
-          ? (out['.' + i + '.' + key] = item)
+        item.key
+          ? (out['.' + i + '.' + item.key] = item)
           : (out['.' + i + '.' + j] = item) && j++
       })
       i++
-    } else {
-      key ? (out['.' + key] = item) : (out['.' + i] = item) && i++
+    } else { 
+      item.key ? (out['.' + item.key] = item) : (out['.' + i] = item) && i++ 
     }
   })
   return out
