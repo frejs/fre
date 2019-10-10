@@ -70,7 +70,6 @@
     const current = this ? this : getWIP();
     value = reducer ? reducer(current.state[key], value) : value;
     current.state[key] = value;
-    console.log(current.key);
     scheduleWork(current, true);
   }
   function resetCursor () {
@@ -296,7 +295,7 @@
   }
 
   function scheduleWork (fiber, up) {
-    fiber.up = up;
+    fiber.updating = up;
     nextWork = fiber;
     scheduleCallback(performWork$1);
   }
@@ -400,8 +399,8 @@
       }
       prevFiber = newFiber;
     }
-    if (WIP.up) WIP.up = false;
     if (prevFiber) prevFiber.sibling = null;
+    if (WIP.updating) WIP.updating = false;
   }
 
   function createFiber (vnode, data) {
@@ -443,10 +442,7 @@
 
   function shouldPlace (fiber) {
     let p = fiber.parent;
-    if (p.tag === HOOK) {
-      if (p.key && !p.up) return true
-      return false
-    }
+    if (p.tag === HOOK) return p.key && !p.updating
     return fiber.key
   }
   function commit (fiber) {
