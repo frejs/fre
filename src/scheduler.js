@@ -76,10 +76,8 @@ const planWork = (() => {
     const channel = new MessageChannel()
     const port = channel.port2
     channel.port1.onmessage = performWork
-
     return () => port.postMessage(null)
   }
-
   return () => setTimeout(performWork, 0)
 })()
 
