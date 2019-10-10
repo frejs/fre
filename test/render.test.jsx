@@ -73,40 +73,63 @@ test('attach DOM event handler', async () => {
   expect(clicked).toBe(true)
 })
 
-test('update components; use state and effect hooks', async done => {
-  const Component = ({ effect }) => {
-    const [count, setCount] = useState(0)
+test('useEffect(f, [x]) should detect changes to x', async () => {
+  let effects = 0
+  let cleanUps = 0
 
-    useEffect(effect)
-
-    const onClick = () => setCount(count + 1)
-
-    return (
-      <button onclick={onClick}>
-        {count}
-      </button>
-    )
+  const cleanUp = () => {
+    cleanUps += 1
   }
 
-  let effectCalled = false
+  const effect = () => {
+    effects += 1
 
-  let afterEffect = () => effectCalled = true
-
-  let elements = await testRender(<Component effect={() => afterEffect()}/>)
-
-  expect(effectCalled).toBe(true)
-
-  expect(elements[0].firstChild.nodeValue).toBe("0")
-
-  afterEffect = checkEffect
-
-  elements[0].click()
-
-  function checkEffect() {
-    expect(elements[0].firstChild.nodeValue).toBe("1")
-
-    done()
+    return cleanUp
   }
+
+  const Component = ({ value }) => {
+    effects = 0
+    cleanUps = 0
+
+    useEffect(effect, [value])
+
+    return <div>foo</div>
+  }
+
+  await testUpdates([
+    // mounted: should trigger effect
+    {
+      content: <div><Component value={1}/></div>,
+      test: () => {
+        expect(effects).toBe(1)
+        expect(cleanUps).toBe(0)
+      }
+    },
+    // updated: should trigger effect
+    {
+      content: <div><Component value={2}/></div>,
+      test: () => {
+        expect(effects).toBe(1)
+        expect(cleanUps).toBe(1)
+      }
+    },
+    // no change: should NOT trigger effect
+    {
+      content: <div><Component value={2}/></div>,
+      test: () => {
+        expect(effects).toBe(0)
+        expect(cleanUps).toBe(0)
+      }
+    },
+    // removal: should trigger clean-up
+    {
+      content: <div>removed</div>,
+      test: () => {
+        expect(effects).toBe(0)
+        expect(cleanUps).toBe(1)
+      }
+    }
+  ])
 })
 
 test('obtain reference to DOM element', async () => {
