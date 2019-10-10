@@ -167,10 +167,7 @@ function traverse (fns) {
 
 function shouldPlace (fiber) {
   let p = fiber.parent
-  if (p.tag === HOOK) {
-    if (p.key && !p.updating) return true
-    return false
-  }
+  if (p.tag === HOOK) return p.key && !p.updating
   return fiber.key
 }
 function commit (fiber) {
