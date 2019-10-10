@@ -31,6 +31,7 @@ function performWork () {
   }
 
   if (pendingCommit) {
+    console.log(pendingCommit.patches)
     commitWork(pendingCommit)
     return null
   }
@@ -145,22 +146,12 @@ function completeWork (fiber) {
 }
 
 function commitWork (WIP) {
-  WIP.patches.forEach(p => {
-    p.patches = p.parent.patches = []
-    commit(p)
-    applyRef(p)
-    afterPaint(p)
-  })
+  WIP.patches.forEach(p => commit(p))
   WIP.done && WIP.done()
   WIP = pendingCommit = null
 }
 
-function applyRef (fiber) {
-  let ref = fiber.ref || {}
-  isFn(ref) ? ref(fiber.node) : (ref.current = fiber.node)
-}
-
-function afterPaint (fiber) {
+function applyEffect (fiber) {
   fiber.pending = fiber.pending || {}
   for (const k in fiber.effect) {
     const pend = fiber.pending[k]
@@ -176,6 +167,7 @@ function commit (fiber) {
   let parent = fiber.parentNode
   let dom = fiber.node
   let pend = fiber.pending
+  let ref = fiber.ref
   while (!dom) dom = fiber.child.node
 
   if (tag === DELETE) {
@@ -183,6 +175,7 @@ function commit (fiber) {
     for (const k in pend) pend[k]()
     fiber.pending = null
   } else if (fiber.tag === HOOK) {
+    applyEffect(fiber)
   } else if (tag === UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props)
   } else {
@@ -192,6 +185,9 @@ function commit (fiber) {
     if (after === null && dom === parent.lastChild) return
     parent.insertBefore(dom, after)
   }
+
+  if (ref) isFn(ref) ? ref(dom) : (ref.current = dom)
+  fiber.patches = fiber.parent.patches = []
 }
 
 function createFiber (vnode, data) {
