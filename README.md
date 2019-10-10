@@ -10,7 +10,7 @@
 
 ### Feature
 
-- :tada: FunctionalComponent and hooks API
+- :tada: Functional Component and hooks API
 - :confetti_ball: Async rendering like react Fiber（also called time slicing, concurrent mode）
 - :telescope: keyed reconcilation（also called diff） algorithm
 
@@ -25,12 +25,11 @@ Fre (pronounced `/fri:/`, like free) is a tiny and perfect js library, It means 
 | [`use-routes`](https://github.com/132yse/use-routes) | ![npm](https://img.shields.io/npm/v/use-routes.svg) | router for fre        |
 
 ### Demo
-```shell
-cd demo
-yarn install
-yarn start // run use cases for API
-yarn concurrent // run demo for concurrent mode (fiber scheduler)
-```
+[async rendering demo](https://codesandbox.io/s/suspicious-rosalind-i06mv)
+[key-based reconcilation demo](https://codesandbox.io/s/fre-demo-uxuic)
+
+Thanks for [Rasmus Schultz](https://github.com/mindplay-dk)
+
 
 ### Use
 
