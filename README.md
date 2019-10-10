@@ -19,15 +19,16 @@
 Fre (pronounced `/fri:/`, like free) is a tiny and perfect js library, It means [Free!](https://www.clicli.us/search/free) ~
 
 | Package                                              | Version                                             | About                 |
-|------------------------------------------------------|-----------------------------------------------------|-----------------------|
+| ---------------------------------------------------- | --------------------------------------------------- | --------------------- |
 | [`Fre`](https://github.com/132yse/fre)               | ![npm](https://img.shields.io/npm/v/fre.svg)        | fre core              |
 | [`Fard`](https://github.com/132yse/fard)             | ![npm](https://img.shields.io/npm/v/fard.svg)       | mini-program with fre |
 | [`use-routes`](https://github.com/132yse/use-routes) | ![npm](https://img.shields.io/npm/v/use-routes.svg) | router for fre        |
 
 ### Demo
-* [async rendering demo](https://codesandbox.io/s/suspicious-rosalind-i06mv)
 
-* [key-based reconcilation demo](https://codesandbox.io/s/fre-demo-uxuic)
+- [async rendering demo](https://codesandbox.io/s/suspicious-rosalind-i06mv)
+
+- [key-based reconcilation demo](https://codesandbox.io/s/fre-demo-uxuic)
 
 Thanks for [Rasmus Schultz](https://github.com/mindplay-dk)
 
@@ -55,17 +56,17 @@ render(<Counter />, document.getElementById('root'))
 
 ### Hooks API
 
-* [useState](https://github.com/132yse/fre#usestate)
+- [useState](https://github.com/132yse/fre#usestate)
 
-* [useEffect](https://github.com/132yse/fre#useeffect)
+- [useEffect](https://github.com/132yse/fre#useeffect)
 
-* [useReducer](https://github.com/132yse/fre#usereducer)
+- [useReducer](https://github.com/132yse/fre#usereducer)
 
-* [useCallback](https://github.com/132yse/fre#usecallback)
+- [useCallback](https://github.com/132yse/fre#usecallback)
 
-* [useMemo](https://github.com/132yse/fre#usememo)
+- [useMemo](https://github.com/132yse/fre#usememo)
 
-* [useRef](https://github.com/132yse/fre#useref)
+- [useRef](https://github.com/132yse/fre#useref)
 
 #### useState
 
@@ -127,6 +128,8 @@ When the array changes, the effect callback will run after commitWork, such as `
 if the array is empty, it means use once, such as `componentDidMount`
 
 if the second is undefined, it means use every time , such as `componentDidUpdate`
+
+if useEffect returns a function, the function will execute before next commitWork, such as `componentWillUnmount`
 
 ```js
 function Counter({ flag }) {
@@ -196,10 +199,10 @@ render(<Counter />, document.getElementById('root'))
 `useRef` will return a object which contains current node.
 
 ```js
-import { useRef,useEffect } from 'fre'
+import { useRef, useEffect } from 'fre'
 
 function Counter() {
-  useEffect(()=>{
+  useEffect(() => {
     console.log(t) // { current:<div>t</div> }
   })
   const t = useRef(null)
@@ -231,7 +234,11 @@ function Sex(props) {
     <div>
       <h2>{props.count}</h2>
       <h1>{sex}</h1>
-      <button onClick={() => { sex === 'boy' ? setSex('girl') : setSex('boy') }}>
+      <button
+        onClick={() => {
+          sex === 'boy' ? setSex('girl') : setSex('boy')
+        }}
+      >
         x
       </button>
     </div>
@@ -251,7 +258,7 @@ function App() {
   return (
     <div>
       <Sex sex={sex} />
-      <button onClick={() => (sex === 'boy' ? setSex('girl') : setSex('boy'))}/>
+      <button onClick={() => (sex === 'boy' ? setSex('girl') : setSex('boy'))} />
     </div>
   )
 }

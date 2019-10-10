@@ -50,6 +50,15 @@ function performWIP (WIP) {
   }
 }
 
+function updateHOOK (WIP) {
+  WIP.props = WIP.props || {}
+  WIP.state = WIP.state || {}
+  WIP.effect = {}
+  currentFiber = WIP
+  resetCursor()
+  reconcileChildren(WIP, WIP.type(WIP.props))
+}
+
 function updateHost (WIP) {
   if (!WIP.node) {
     if (WIP.type === 'svg') WIP.tag = SVG
@@ -60,15 +69,6 @@ function updateHost (WIP) {
   p.last = WIP
   WIP.node.last = null
   reconcileChildren(WIP, WIP.props.children)
-}
-
-function updateHOOK (WIP) {
-  WIP.props = WIP.props || {}
-  WIP.state = WIP.state || {}
-  WIP.effect = {}
-  currentFiber = WIP
-  resetCursor()
-  reconcileChildren(WIP, WIP.type(WIP.props))
 }
 
 function getParentNode (fiber) {
@@ -129,9 +129,10 @@ function reconcileChildren (WIP, children) {
   if (WIP.updating) WIP.updating = false
 }
 
-function createFiber (vnode, data) {
-  data.tag = isFn(vnode.type) ? HOOK : HOST
-  return merge(vnode, data)
+function shouldPlace (fiber) {
+  let p = fiber.parent
+  if (p.tag === HOOK) return p.key && !p.updating
+  return fiber.key
 }
 
 function completeWork (fiber) {
@@ -170,11 +171,6 @@ function afterPaint (fiber) {
   fiber.effect = null
 }
 
-function shouldPlace (fiber) {
-  let p = fiber.parent
-  if (p.tag === HOOK) return p.key && !p.updating
-  return fiber.key
-}
 function commit (fiber) {
   let tag = fiber.patchTag
   let parent = fiber.parentNode
@@ -193,6 +189,11 @@ function commit (fiber) {
     if (after === null && dom === parent.lastChild) return
     parent.insertBefore(dom, after)
   }
+}
+
+function createFiber (vnode, data) {
+  data.tag = isFn(vnode.type) ? HOOK : HOST
+  return merge(vnode, data)
 }
 
 function getWIP () {
