@@ -3,17 +3,9 @@ import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild } from './scheduler'
 
 const options = {}
-export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [
-  0,
-  1,
-  2,
-  3,
-  4,
-  5,
-  6
-]
+export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
 
-let nextWork = null
+let WIP = null
 let pendingCommit = null
 let currentFiber = null
 
@@ -29,13 +21,13 @@ function render (vnode, node, done) {
 
 function scheduleWork (fiber, up) {
   fiber.updating = up
-  nextWork = fiber
+  WIP = fiber
   scheduleCallback(performWork)
 }
 
 function performWork () {
-  while (nextWork && !shouldYeild()) {
-    nextWork = performNext(nextWork)
+  while (WIP && !shouldYeild()) {
+    WIP = performNext(WIP)
   }
 
   if (pendingCommit) {
@@ -47,8 +39,8 @@ function performWork () {
 }
 
 function performNext (WIP) {
-  WIP.parentNode = getParentNode(WIP)
   WIP.patches = []
+  WIP.parentNode = getParentNode(WIP)
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
   while (WIP) {
@@ -159,7 +151,7 @@ function commitWork (WIP) {
     afterPaint(p)
   })
   WIP.done && WIP.done()
-  nextWork = pendingCommit = null
+  WIP = pendingCommit = null
 }
 
 function applyRef (fiber) {
@@ -168,12 +160,12 @@ function applyRef (fiber) {
 }
 
 function afterPaint (fiber) {
-  fiber.pend = fiber.pend || {}
+  fiber.pending = fiber.pending || {}
   for (const k in fiber.effect) {
-    const pend = fiber.pend[k]
-    pend && pend()
+    const pending = fiber.pending[k]
+    pending && pending()
     const after = fiber.effect[k]()
-    after && (fiber.pend[k] = after)
+    after && (fiber.pending[k] = after)
   }
   fiber.effect = null
 }
@@ -216,9 +208,7 @@ function hashfy (arr) {
   arrayfy(arr).forEach(item => {
     if (item.pop) {
       item.forEach(item => {
-        item.key
-          ? (out['.' + i + '.' + item.key] = item)
-          : (out['.' + i + '.' + j] = item) && j++
+        item.key ? (out['.' + i + '.' + item.key] = item) : (out['.' + i + '.' + j] = item) && j++
       })
       i++
     } else {
