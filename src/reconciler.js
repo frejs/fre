@@ -163,8 +163,8 @@ function applyRef (fiber) {
 function afterPaint (fiber) {
   fiber.pending = fiber.pending || {}
   for (const k in fiber.effect) {
-    const pending = fiber.pending[k]
-    pending && pending()
+    const pend = fiber.pending[k]
+    pend && pend()
     const after = fiber.effect[k]()
     after && (fiber.pending[k] = after)
   }
@@ -175,11 +175,12 @@ function commit (fiber) {
   let tag = fiber.patchTag
   let parent = fiber.parentNode
   let dom = fiber.node
+  let pend = fiber.pending
   while (!dom) dom = fiber.child.node
 
   if (tag === DELETE) {
     parent.removeChild(dom)
-    for (const k in fiber.pending) fiber.pending[k]()
+    for (const k in pend) pend[k]()
     fiber.pending = null
   } else if (fiber.tag === HOOK) {
   } else if (tag === UPDATE) {
