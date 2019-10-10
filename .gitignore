@@ -8,3 +8,4 @@ packages/.fre/
 demo/**/node_modules/
 demo/**/.cache/
 demo/**/dist/
+/dist/
