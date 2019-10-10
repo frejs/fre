@@ -1,6 +1,6 @@
-// import { unstable_createRoot } from "react-dom"
-// import { createElement as h, useState, useEffect } from "react"
-import { h, render, useState, useEffect } from '../../src'
+import { unstable_createRoot } from "react-dom"
+import { createElement as h, useState, useEffect } from "react"
+// import { h, render, useState, useEffect } from '../../src'
 
 const UPDATE_EVERY = 1000
 const BLOCK_FOR = 3
@@ -36,6 +36,6 @@ const SlowComponent = ({ value }) => {
   return <li className='slow'>{value}</li>
 }
 
-render(<App />, document.getElementById('root'))
-// const root = unstable_createRoot(document.getElementById('root'))
-// root.render(<App />)
+// render(<App />, document.getElementById('root'))
+const root = unstable_createRoot(document.getElementById('root'))
+root.render(<App />)

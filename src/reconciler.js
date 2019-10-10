@@ -178,7 +178,9 @@ function commit (fiber) {
   while (!dom) dom = fiber.child.node
 
   if (tag === DELETE) {
+    for (const k in fiber.pending) fiber.pending[k]()
     parent.removeChild(dom)
+    fiber.pending = null
   } else if (fiber.tag === HOOK) {
   } else if (tag === UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props)
