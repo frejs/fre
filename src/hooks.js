@@ -29,10 +29,14 @@ export function useReducer (reducer, initState) {
 
 export function useEffect (cb, deps) {
   let wip = getWIP()
-  let key = '$' + cursor
-  wip.effect = wip.effect || {}
-  wip.effect[key] = useCallback(cb, deps)
-  cursor++
+  if (isChanged(wip._deps, deps)) {
+    let key = '$' + cursor
+    wip.effect = {}
+    wip.effect[key] = useCallback(cb, deps)
+    cursor++
+    wip._deps = deps
+    wip._cb = cb
+  }
 }
 
 export function useCallback (cb, deps) {
@@ -46,7 +50,6 @@ export function useMemo (cb, deps) {
     wip._cb = cb
     return (wip._memo = cb())
   }
-
   return wip._memo
 }
 

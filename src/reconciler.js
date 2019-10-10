@@ -155,7 +155,7 @@ function commitWork (WIP) {
     p.patches = p.parent.patches = []
     commit(p)
     applyRef(p)
-    traverse(p.effect)
+    afterPaint(p)
   })
   WIP.done && WIP.done()
   nextWork = pendingCommit = null
@@ -166,11 +166,18 @@ function applyRef (fiber) {
   isFn(ref) ? ref(fiber.node) : (ref.current = fiber.node)
 }
 
-function traverse (fns) {
-  for (const k in fns) {
-    const fn = fns[k]
-    fn()
+function afterPaint (fiber) {
+  for (const k in fiber._effect || {}) {
+    fiber.effect[k] && fiber._effect[k]()
   }
+  for (const k in fiber.effect) {
+    const after = fiber.effect[k]()
+    if (after) {
+      fiber._effect = {}
+      fiber._effect[k] = after
+    }
+  }
+  fiber.effect = {}
 }
 
 function shouldPlace (fiber) {
@@ -216,8 +223,8 @@ function hashfy (arr) {
           : (out['.' + i + '.' + j] = item) && j++
       })
       i++
-    } else { 
-      item.key ? (out['.' + item.key] = item) : (out['.' + i] = item) && i++ 
+    } else {
+      item.key ? (out['.' + item.key] = item) : (out['.' + i] = item) && i++
     }
   })
   return out
