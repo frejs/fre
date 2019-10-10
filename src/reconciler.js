@@ -172,7 +172,7 @@ function afterPaint (fiber) {
     const pend = fiber.pend[k]
     pend && pend()
     const after = fiber.effect[k]()
-    if (after) fiber.pend[k] = after
+    after && (fiber.pend[k] = after)
   }
   fiber.effect = null
 }
