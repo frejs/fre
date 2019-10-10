@@ -154,7 +154,7 @@ function applyEffect (fiber) {
   fiber.pending = fiber.pending || {}
   for (const k in fiber.effect) {
     const pend = fiber.pending[k]
-    pend && pend()
+    pend && (typeof pend === "function") && pend()
     const after = fiber.effect[k]()
     after && (fiber.pending[k] = after)
   }
