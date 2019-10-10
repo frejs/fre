@@ -1,6 +1,6 @@
-import { h, render, useState, useEffect } from '../src'
-// import { render } from "react-dom"
-// import { createElement as h, useState, useEffect,useRef } from "react"
+// import { h, render, useState, useEffect } from '../src'
+import { render } from "react-dom"
+import { createElement as h, useState, useEffect,useRef } from "react"
 
 function Counter ({ id, remove }) {
   const [count, setCount] = useState(0)
@@ -13,7 +13,7 @@ function Counter ({ id, remove }) {
         console.log(`Counter #${id} removed`);
       }
     },
-    [count]
+    []
   )
 
   return (

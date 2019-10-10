@@ -121,9 +121,9 @@ render(<Counter />, document.getElementById('root'))
 
 #### useEffect
 
-`useEffect` takes two parameters, the first is a effect callback and the second is an array, usually props
+`useEffect` takes two parameters, the first is a effect callback and the second is an array
 
-if the array changed, the effect callback will execute after commitWork, such as `pureComponentDidUpdate`
+if the array changed, the callback will execute after commitWork, such as `pureComponentDidUpdate`
 
 if the array is empty, it means execute once, such as `componentDidMount`
 

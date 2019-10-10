@@ -3,6 +3,7 @@ import { push, pop, peek } from './heapify'
 let taskQueue = []
 let currentTask = null
 let currentCallback = null
+let inMC = false
 let frameDeadline = 0
 
 export function scheduleCallback (callback) {
@@ -21,7 +22,7 @@ export function scheduleCallback (callback) {
 
   currentCallback = flushWork
 
-  planWork()
+  if (!inMC) planWork() && (inMC = true)
 
   return newTask
 }
@@ -61,14 +62,15 @@ function workLoop (iniTime) {
 function performWork () {
   if (currentCallback) {
     let currentTime = getTime()
-    frameDeadline = currentTime + 5
+    frameDeadline = currentTime
     let moreWork = currentCallback(currentTime)
     if (!moreWork) {
+      inMC = false
       currentCallback = null
     } else {
       planWork()
     }
-  }
+  } else inMC = false
 }
 
 const planWork = (() => {
@@ -76,8 +78,10 @@ const planWork = (() => {
     const channel = new MessageChannel()
     const port = channel.port2
     channel.port1.onmessage = performWork
+
     return () => port.postMessage(null)
   }
+
   return () => setTimeout(performWork, 0)
 })()
 
