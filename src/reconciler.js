@@ -167,11 +167,12 @@ function applyRef (fiber) {
 }
 
 function afterPaint (fiber) {
-  fiber._effect = fiber._effect || {}
+  fiber.pend = fiber.pend || {}
   for (const k in fiber.effect) {
-    fiber._effect[k] && fiber._effect[k]()
+    const pend = fiber.pend[k]
+    pend && pend()
     const after = fiber.effect[k]()
-    if (after) fiber._effect[k] = after
+    if (after) fiber.pend[k] = after
   }
   fiber.effect = null
 }

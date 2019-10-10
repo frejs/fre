@@ -35,7 +35,6 @@ export function useEffect (cb, deps) {
     wip.effect[key] = useCallback(cb, deps)
     cursor++
     wip._deps = deps
-    wip._cb = cb
   }
 }
 
@@ -47,7 +46,6 @@ export function useMemo (cb, deps) {
   let wip = getWIP()
   if (isChanged(wip._deps, deps)) {
     wip._deps = deps
-    wip._cb = cb
     return (wip._memo = cb())
   }
   return wip._memo
