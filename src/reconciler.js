@@ -31,7 +31,6 @@ function performWork () {
   }
 
   if (pendingCommit) {
-    console.log(pendingCommit.patches)
     commitWork(pendingCommit)
     return null
   }
