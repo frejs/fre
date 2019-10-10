@@ -3,7 +3,6 @@ import { push, pop, peek } from './heapify'
 let taskQueue = []
 let currentTask = null
 let currentCallback = null
-let inMC = false
 let frameDeadline = 0
 
 export function scheduleCallback (callback) {
@@ -20,17 +19,13 @@ export function scheduleCallback (callback) {
 
   push(taskQueue, newTask)
 
-  requestHostCallback(flushWork)
+  currentCallback = flushWork
+
+  planWork()
 
   return newTask
 }
-function requestHostCallback (cb) {
-  currentCallback = cb
-  if (!inMC) {
-    inMC = true
-    planWork()
-  }
-}
+
 function flushWork (iniTime) {
   try {
     return workLoop(iniTime)
@@ -69,12 +64,11 @@ function performWork () {
     frameDeadline = currentTime + 5
     let moreWork = currentCallback(currentTime)
     if (!moreWork) {
-      inMC = false
       currentCallback = null
     } else {
       planWork()
     }
-  } else inMC = false
+  }
 }
 
 const planWork = (() => {

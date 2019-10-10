@@ -27,7 +27,7 @@ function scheduleWork (fiber, up) {
 
 function performWork () {
   while (WIP && !shouldYeild()) {
-    WIP = performNext(WIP)
+    WIP = performWIP(WIP)
   }
 
   if (pendingCommit) {
@@ -38,7 +38,7 @@ function performWork () {
   return performWork.bind(null)
 }
 
-function performNext (WIP) {
+function performWIP (WIP) {
   WIP.patches = []
   WIP.parentNode = getParentNode(WIP)
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
