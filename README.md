@@ -25,11 +25,11 @@ Fre (pronounced `/fri:/`, like free) is a tiny and perfect js library, It means 
 | [`use-routes`](https://github.com/132yse/use-routes) | ![npm](https://img.shields.io/npm/v/use-routes.svg) | router for fre        |
 
 ### Demo
-[async rendering demo](https://codesandbox.io/s/suspicious-rosalind-i06mv)
-[key-based reconcilation demo](https://codesandbox.io/s/fre-demo-uxuic)
+* [async rendering demo](https://codesandbox.io/s/suspicious-rosalind-i06mv)
+
+* [key-based reconcilation demo](https://codesandbox.io/s/fre-demo-uxuic)
 
 Thanks for [Rasmus Schultz](https://github.com/mindplay-dk)
-
 
 ### Use
 
