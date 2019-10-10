@@ -3,7 +3,15 @@ import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild } from './scheduler'
 
 const options = {}
-export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
+export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6
+]
 
 let nextWork = null
 let pendingCommit = null
@@ -129,7 +137,7 @@ function reconcileChildren (WIP, children) {
 }
 
 function createFiber (vnode, data) {
-  data.tag = typeof vnode.type === 'function' ? HOOK : HOST
+  data.tag = isFn(vnode.type) ? HOOK : HOST
   return merge(vnode, data)
 }
 
@@ -154,8 +162,8 @@ function commitWork (WIP) {
 }
 
 function applyRef (fiber) {
-  let ref = fiber.ref || null
-  if (ref) ref.current = fiber.node
+  let ref = fiber.ref || {}
+  isFn(ref) ? ref(fiber.node) : (ref.current = fiber.node)
 }
 
 function traverse (fns) {
@@ -205,7 +213,9 @@ function hashfy (arr) {
     if (item.pop) {
       item.forEach(item => {
         let key = item.key
-        key ? (out['.' + i + '.' + key] = item) : (out['.' + i + '.' + j] = item) && j++
+        key
+          ? (out['.' + i + '.' + key] = item)
+          : (out['.' + i + '.' + j] = item) && j++
       })
       i++
     } else {
@@ -221,5 +231,7 @@ function merge (a, b) {
   for (const i in b) out[i] = b[i]
   return out
 }
+
+const isFn = fn => typeof fn === 'function'
 
 export { render, scheduleWork, getWIP, options }

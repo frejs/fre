@@ -1,7 +1,12 @@
-import { h, render, useState, useEffect,useRef } from '../src'
+import { render } from "react-dom"
+import { createElement as h, useCallback, useEffect,useRef } from "react"
+
+// import { h, render, useCallback, useEffect,useRef } from '../src'
 
 function Counter () {
-  const t = useRef(null)
+  const t = useCallback(node=>{
+    console.log(node)
+  })
   useEffect(() => {
     console.log(t)
   })
