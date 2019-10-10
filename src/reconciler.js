@@ -73,6 +73,7 @@ function updateHost (WIP) {
 function updateHOOK (WIP) {
   WIP.props = WIP.props || {}
   WIP.state = WIP.state || {}
+  WIP.effect = {}
   currentFiber = WIP
   resetCursor()
   reconcileChildren(WIP, WIP.type(WIP.props))

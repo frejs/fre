@@ -18,7 +18,7 @@ export function useReducer (reducer, initState) {
   let key = '$' + cursor
   let setter = update.bind(wip, key, reducer)
   cursor++
-  let state = wip.state || {}
+  let state = wip.state
   if (key in state) {
     return [state[key], setter]
   } else {
@@ -31,7 +31,6 @@ export function useEffect (cb, deps) {
   let wip = getWIP()
   if (isChanged(wip._deps, deps)) {
     let key = '$' + cursor
-    wip.effect = {}
     wip.effect[key] = useCallback(cb, deps)
     cursor++
     wip._deps = deps
