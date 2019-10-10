@@ -231,11 +231,7 @@ function Sex(props) {
     <div>
       <h2>{props.count}</h2>
       <h1>{sex}</h1>
-      <button
-        onClick={() => {
-          sex === 'boy' ? setSex('girl') : setSex('boy')
-        }}
-      >
+      <button onClick={() => { sex === 'boy' ? setSex('girl') : setSex('boy') }}>
         x
       </button>
     </div>
@@ -255,9 +251,7 @@ function App() {
   return (
     <div>
       <Sex sex={sex} />
-      <button
-        onClick={() => (sex === 'boy' ? setSex('girl') : setSex('boy'))}
-      />
+      <button onClick={() => (sex === 'boy' ? setSex('girl') : setSex('boy'))}/>
     </div>
   )
 }
@@ -329,13 +323,13 @@ If browser environment, recommend to use [htm](https://github.com/developit/htm)
 
 #### Async rendering
 
-Fre implement a tiny priority scheduler, which like react Fiber.
+Fre implements a tiny priority scheduler, which like react Fiber.
 
 Async rendering is also called `time slicing` or `concurrent mode`.
 
-#### keyed diff
+#### key-based reconcilation
 
-Fre implements a compact diff algorithm support keyed
+Fre implements a compact reconcilation algorithm support keyed, which also called diff.
 
 It uses hash to mark locations to reduce much size.
 
