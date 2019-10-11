@@ -19,8 +19,8 @@ function render (vnode, node, done) {
   scheduleWork(rootFiber)
 }
 
-function scheduleWork (fiber, up) {
-  fiber.updating = up
+function scheduleWork (fiber, lock) {
+  fiber.lock = lock
   WIP = fiber
   scheduleCallback(performWork)
 }
@@ -124,12 +124,12 @@ function reconcileChildren (WIP, children) {
     prevFiber = newFiber
   }
   if (prevFiber) prevFiber.sibling = null
-  if (WIP.updating) WIP.updating = false
+  if (WIP.lock) WIP.lock = false
 }
 
 function shouldPlace (fiber) {
   let p = fiber.parent
-  if (p.tag === HOOK) return p.key && !p.updating
+  if (p.tag === HOOK) return p.key && !p.lock
   return fiber.key
 }
 
