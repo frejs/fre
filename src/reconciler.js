@@ -163,14 +163,12 @@ function commit (fiber) {
   let tag = fiber.patchTag
   let parent = fiber.parentNode
   let dom = fiber.node
-  let pend = fiber.pending
   let ref = fiber.ref
 
   if (tag === DELETE) {
+    cleanup(fiber)
     while (fiber.tag === HOOK) fiber = fiber.child
     parent.removeChild(fiber.node)
-    for (const k in pend) pend[k]()
-    fiber.pending = null
   } else if (fiber.tag === HOOK) {
     applyEffect(fiber)
   } else if (tag === UPDATE) {
@@ -185,6 +183,12 @@ function commit (fiber) {
 
   if (ref) isFn(ref) ? ref(dom) : (ref.current = dom)
   fiber.patches = fiber.parent.patches = []
+}
+
+function cleanup (fiber) {
+  let pend = fiber.pending
+  for (const k in pend) pend[k]()
+  fiber.pending = null
 }
 
 function createFiber (vnode, data) {
