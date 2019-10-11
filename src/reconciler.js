@@ -3,7 +3,7 @@ import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild } from './scheduler'
 
 const options = {}
-export const [HOST, HOOK, ROOT, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
+export const [ROOT, HOST, HOOK, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
 
 let WIP = null
 let pendingCommit = null
@@ -70,12 +70,10 @@ function updateHost (WIP) {
   WIP.node.last = null
   reconcileChildren(WIP, WIP.props.children)
 }
-
 function getParentNode (fiber) {
-  let p = fiber.parent
-  if (!p) return null
-  while (p.tag === HOOK) p = p.parent
-  return p.node
+  while ((fiber = fiber.parent)) {
+    if (fiber.tag < HOOK) return fiber.node
+  }
 }
 
 function reconcileChildren (WIP, children) {
@@ -154,7 +152,7 @@ function applyEffect (fiber) {
   fiber.pending = fiber.pending || {}
   for (const k in fiber.effect) {
     const pend = fiber.pending[k]
-    pend && (typeof pend === "function") && pend()
+    pend && pend()
     const after = fiber.effect[k]()
     after && (fiber.pending[k] = after)
   }
@@ -167,10 +165,10 @@ function commit (fiber) {
   let dom = fiber.node
   let pend = fiber.pending
   let ref = fiber.ref
-  while (!dom) dom = fiber.child.node
 
   if (tag === DELETE) {
-    parent.removeChild(dom)
+    while (fiber.tag === HOOK) fiber = fiber.child
+    parent.removeChild(fiber.node)
     for (const k in pend) pend[k]()
     fiber.pending = null
   } else if (fiber.tag === HOOK) {

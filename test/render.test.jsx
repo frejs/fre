@@ -99,7 +99,7 @@ test('useEffect(f, [x]) should detect changes to x', async () => {
   await testUpdates([
     // mounted: should trigger effect
     {
-      content: <div><Component value={1}/></div>,
+      content: <Component value={1}/>,
       test: () => {
         expect(effects).toBe(1)
         expect(cleanUps).toBe(0)
@@ -107,7 +107,7 @@ test('useEffect(f, [x]) should detect changes to x', async () => {
     },
     // updated: should trigger effect
     {
-      content: <div><Component value={2}/></div>,
+      content: <Component value={2}/>,
       test: () => {
         expect(effects).toBe(1)
         expect(cleanUps).toBe(1)
@@ -115,7 +115,7 @@ test('useEffect(f, [x]) should detect changes to x', async () => {
     },
     // no change: should NOT trigger effect
     {
-      content: <div><Component value={2}/></div>,
+      content: <Component value={2}/>,
       test: () => {
         expect(effects).toBe(0)
         expect(cleanUps).toBe(0)
