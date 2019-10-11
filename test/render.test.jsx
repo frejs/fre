@@ -60,6 +60,52 @@ test('render range of HTML elements', async () => {
 
   expect(toString(elements)).toBe("<ul><li>1</li><li>2</li><li>3</li></ul>")
 })
+test('render/update object properties and DOM attributes', async () => {
+  let lastChildren = []
+
+  await testUpdates([
+    {
+      content: (
+        <ul>
+          <li class="foo"/>
+          <li className="bar"/>
+          <li data-something="baz" data-remove-me tabIndex={123}/>
+        </ul>
+      ),
+      test: elements => {
+        expect(elements[0].tagName).toBe("UL")
+        expect(elements[0].children.length).toBe(3)
+        expect(elements[0].children[0].getAttribute("class")).toBe("foo")
+        expect(elements[0].children[1].className).toBe("bar")
+        expect(elements[0].children[2].getAttribute("data-something")).toBe("baz")
+        expect(elements[0].children[2].hasAttribute("data-remove-me")).toBe(true)
+        expect(elements[0].children[2].tabIndex).toBe(123)
+
+        lastChildren = [...elements[0].children]
+      }
+    },
+    {
+      content: (
+        <ul>
+          <li class="foo2"/>
+          <li className="bar2"/>
+          <li data-something="baz2" tabIndex={99}/>
+        </ul>
+      ),
+      test: elements => {
+        expect(elements[0].tagName).toBe("UL")
+        expect(elements[0].children.length).toBe(3)
+        expect(elements[0].children[0].getAttribute("class")).toBe("foo2")
+        expect(elements[0].children[1].className).toBe("bar2")
+        expect(elements[0].children[2].getAttribute("data-something")).toBe("baz2")
+        expect(elements[0].children[2].hasAttribute("data-remove-me")).toBe(false)
+        expect(elements[0].children[2].tabIndex).toBe(99)
+
+        lastChildren.forEach((lastChild, index) => expect(elements[0].children[index]).toBe(lastChild))
+      }
+    }
+  ])
+})
 
 test('attach DOM event handler', async () => {
   let clicked = false
