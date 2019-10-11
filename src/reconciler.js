@@ -219,7 +219,7 @@ function hashfy (arr) {
   return out
 }
 
-function merge (a, b) {
+export function merge (a, b) {
   let out = {}
   for (const i in a) out[i] = a[i]
   for (const i in b) out[i] = b[i]

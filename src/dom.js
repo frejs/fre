@@ -1,12 +1,9 @@
-import { SVG } from './reconciler'
+import { SVG, merge } from './reconciler'
 
 export function updateElement (dom, oldProps, newProps) {
-  const names = Object.keys({...oldProps, ...newProps})
-
-  for (let name of names) {
-    if (name === "children") {
-      continue
-    }
+  const props = merge(oldProps, newProps)
+  for (let name in props) {
+    if (name === 'children') continue
 
     const oldValue = oldProps[name]
     const newValue = newProps[name]
@@ -29,12 +26,11 @@ export function updateElement (dom, oldProps, newProps) {
 }
 
 export function createElement (fiber) {
-  const dom =
-    fiber.type === 'text'
-      ? document.createTextNode(fiber.value)
-      : fiber.tag === SVG
-        ? document.createElementNS('http://www.w3.org/2000/svg', fiber.type)
-        : document.createElement(fiber.type)
+  const dom = fiber.type === 'text' 
+    ? document.createTextNode(fiber.value) 
+    : fiber.tag === SVG 
+      ? document.createElementNS('http://www.w3.org/2000/svg', fiber.type) 
+      : document.createElement(fiber.type)
   updateElement(dom, {}, fiber.props)
   return dom
 }
