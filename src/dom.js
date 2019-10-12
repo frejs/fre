@@ -2,8 +2,8 @@ import { SVG } from './reconciler'
 
 export function updateElement (dom, oldProps, newProps) {
   for (let name in { ...oldProps, ...newProps }) {
-    const oldValue = oldProps[name]
-    const newValue = newProps[name]
+    let oldValue = oldProps[name]
+    let newValue = newProps[name]
 
     if (oldValue == newValue || name === 'children') {
     } else if (name === 'style') {
