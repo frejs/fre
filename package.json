@@ -20,6 +20,7 @@
     "@babel/preset-typescript": "^7.3.3",
     "@types/jest": "^24.0.15",
     "babel-jest": "^24.8.0",
+    "coveralls": "^3.0.7",
     "cross-env": "^5.2.0",
     "gzip-size-cli": "^3.0.0",
     "jest": "^24.8.0",
