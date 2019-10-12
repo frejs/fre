@@ -6,6 +6,7 @@
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/dt/fre.svg?style=flat-square" alt="npm-d"></a>
 <a href="https://bundlephobia.com/result?p=fre"><img src="https://img.shields.io/bundlephobia/minzip/fre.svg?&style=flat-square" alt="gzip"></a>
 <a href="https://jq.qq.com/?_wv=1027&k=5Zyggbc"><img src="https://img.shields.io/badge/qq.group-813783512-ff69b4.svg?maxAge=2592000&style=flat-square"></a>
+<a href="https://coveralls.io/github/132yse/fre"><img src="https://img.shields.io/coveralls/github/132yse/fre?style=flat-square" alt="Code Coverage"></a>
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/travis/132yse/fre?style=flat-square" alt="Build Status"></a>
 </p>
 
@@ -40,7 +41,7 @@ yarn add fre
 ```
 
 ```js
-import { h, render, useState } from 'fre'
+import { h, render, useState } from "fre"
 
 function Counter() {
   const [count, setCount] = useState(0)
@@ -52,7 +53,7 @@ function Counter() {
   )
 }
 
-render(<Counter />, document.getElementById('root'))
+render(<Counter />, document.getElementById("root"))
 ```
 
 ### Hooks API
@@ -89,7 +90,7 @@ function Counter() {
   )
 }
 
-render(<Counter />, document.getElementById('root'))
+render(<Counter />, document.getElementById("root"))
 ```
 
 #### useReducer
@@ -99,9 +100,9 @@ render(<Counter />, document.getElementById('root'))
 ```js
 function reducer(state, action) {
   switch (action.type) {
-    case 'up':
+    case "up":
       return { count: state.count + 1 }
-    case 'down':
+    case "down":
       return { count: state.count - 1 }
   }
 }
@@ -111,13 +112,13 @@ function Counter() {
   return (
     <div>
       {state.count}
-      <button onClick={() => dispatch({ type: 'up' })}>+</button>
-      <button onClick={() => dispatch({ type: 'down' })}>+</button>
+      <button onClick={() => dispatch({ type: "up" })}>+</button>
+      <button onClick={() => dispatch({ type: "down" })}>+</button>
     </div>
   )
 }
 
-render(<Counter />, document.getElementById('root'))
+render(<Counter />, document.getElementById("root"))
 ```
 
 #### useEffect
@@ -136,7 +137,7 @@ if useEffect returns a function, the function will execute before next commitWor
 function Counter({ flag }) {
   const [count, setCount] = useState(0)
   useEffect(() => {
-    document.title = 'count is ' + count
+    document.title = "count is " + count
   }, [flag])
   return (
     <div>
@@ -146,7 +147,7 @@ function Counter({ flag }) {
   )
 }
 
-render(<Counter />, document.getElementById('root'))
+render(<Counter />, document.getElementById("root"))
 ```
 
 #### useCallback
@@ -159,7 +160,7 @@ const set = new Set()
 function Counter() {
   const [count, setCount] = useState(0)
   const cb = useCallback(() => {
-    console.log('cb was cached')
+    console.log("cb was cached")
   }, [count])
   set.add(cb)
 
@@ -192,7 +193,7 @@ function Counter() {
   )
 }
 
-render(<Counter />, document.getElementById('root'))
+render(<Counter />, document.getElementById("root"))
 ```
 
 #### useRef
@@ -200,7 +201,7 @@ render(<Counter />, document.getElementById('root'))
 `useRef` will return a object which contains current node.
 
 ```js
-import { useRef, useEffect } from 'fre'
+import { useRef, useEffect } from "fre"
 
 function Counter() {
   useEffect(() => {
@@ -210,7 +211,7 @@ function Counter() {
   return <div ref={t}>t</div>
 }
 
-render(<Counter />, document.getElementById('root'))
+render(<Counter />, document.getElementById("root"))
 ```
 
 ### FunctionalComponent
@@ -230,14 +231,14 @@ function App() {
 }
 
 function Sex(props) {
-  const [sex, setSex] = useState('boy')
+  const [sex, setSex] = useState("boy")
   return (
     <div>
       <h2>{props.count}</h2>
       <h1>{sex}</h1>
       <button
         onClick={() => {
-          sex === 'boy' ? setSex('girl') : setSex('boy')
+          sex === "boy" ? setSex("girl") : setSex("boy")
         }}
       >
         x
@@ -246,7 +247,7 @@ function Sex(props) {
   )
 }
 
-render(<App />, document.getElementById('root'))
+render(<App />, document.getElementById("root"))
 ```
 
 ### props
@@ -255,11 +256,11 @@ Props are used for component communication
 
 ```js
 function App() {
-  const [sex, setSex] = useState('boy')
+  const [sex, setSex] = useState("boy")
   return (
     <div>
       <Sex sex={sex} />
-      <button onClick={() => (sex === 'boy' ? setSex('girl') : setSex('boy'))} />
+      <button onClick={() => (sex === "boy" ? setSex("girl") : setSex("boy"))} />
     </div>
   )
 }
@@ -285,7 +286,7 @@ Hooks do not support HOC and extends, but render props are supported by default
 ```js
 const HelloBox = () => <Box render={value => <h1>{value}</h1>} />
 
-const Box = props => <div>{props.render('hello world!')}</div>
+const Box = props => <div>{props.render("hello world!")}</div>
 ```
 
 Also can be render children
@@ -299,7 +300,7 @@ const HelloBox = () => (
   </Box>
 )
 
-const Box = props => <div>{props.children('hello world!')}</div>
+const Box = props => <div>{props.children("hello world!")}</div>
 ```
 
 ### options
@@ -318,7 +319,7 @@ options.commitWork = fiber => {
 The default export h function needs to be configured
 
 ```js
-import { h } from 'fre'
+import { h } from "fre"
 ```
 
 ```json
