@@ -1,4 +1,4 @@
-import { SVG, merge } from './reconciler'
+import { SVG } from './reconciler'
 
 export function updateElement (dom, oldProps, newProps) {
   for (let name in { ...oldProps, ...newProps }) {
