@@ -6,6 +6,7 @@
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/dt/fre.svg?style=flat-square" alt="npm-d"></a>
 <a href="https://bundlephobia.com/result?p=fre"><img src="https://img.shields.io/bundlephobia/minzip/fre.svg?&style=flat-square" alt="gzip"></a>
 <a href="https://jq.qq.com/?_wv=1027&k=5Zyggbc"><img src="https://img.shields.io/badge/qq.group-813783512-ff69b4.svg?maxAge=2592000&style=flat-square"></a>
+<a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/travis/132yse/fre?style=flat-square" alt="Build Status"></a>
 </p>
 
 ### Feature
