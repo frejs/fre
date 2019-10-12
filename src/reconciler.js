@@ -103,7 +103,7 @@ function reconcileChildren (WIP, children) {
     if (oldFiber) {
       alternate = createFiber(oldFiber, { patchTag: UPDATE })
       newFiber.patchTag = UPDATE
-      newFiber = merge(alternate, newFiber)
+      newFiber = {...alternate, ...newFiber}
       newFiber.alternate = alternate
       if (shouldPlace(newFiber)) {
         newFiber.patchTag = PLACE
@@ -193,7 +193,7 @@ function cleanup (fiber) {
 
 function createFiber (vnode, data) {
   data.tag = isFn(vnode.type) ? HOOK : HOST
-  return merge(vnode, data)
+  return {...vnode, ...data}
 }
 
 function getWIP () {
@@ -216,13 +216,6 @@ function hashfy (arr) {
       item.key ? (out['.' + item.key] = item) : (out['.' + i] = item) && i++
     }
   })
-  return out
-}
-
-export function merge (a, b) {
-  let out = {}
-  for (const i in a) out[i] = a[i]
-  for (const i in b) out[i] = b[i]
   return out
 }
 

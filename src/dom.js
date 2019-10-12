@@ -1,8 +1,7 @@
 import { SVG, merge } from './reconciler'
 
 export function updateElement (dom, oldProps, newProps) {
-  const props = merge(oldProps, newProps)
-  for (let name in props) {
+  for (let name in {...oldProps,...newProps}) {
     if (name === 'children') continue
 
     const oldValue = oldProps[name]
