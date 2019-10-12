@@ -1,14 +1,13 @@
 import { SVG, merge } from './reconciler'
 
 export function updateElement (dom, oldProps, newProps) {
-  for (let name in {...oldProps,...newProps}) {
-    if (name === 'children') continue
-
+  for (let name in { ...oldProps, ...newProps }) {
     const oldValue = oldProps[name]
     const newValue = newProps[name]
 
-    if (name === 'style') {
-      for (var k in merge(oldValue, newValue)) {
+    if (oldValue == newValue || name === 'children') {
+    } else if (name === 'style') {
+      for (const k in { ...oldValue, ...newValue }) {
         oldValue = newValue == null || newValue[k] == null ? '' : newValue[k]
         dom[name][k] = oldValue
       }
@@ -27,11 +26,12 @@ export function updateElement (dom, oldProps, newProps) {
 }
 
 export function createElement (fiber) {
-  const dom = fiber.type === 'text' 
-    ? document.createTextNode(fiber.value) 
-    : fiber.tag === SVG 
-      ? document.createElementNS('http://www.w3.org/2000/svg', fiber.type) 
-      : document.createElement(fiber.type)
+  const dom =
+    fiber.type === 'text'
+      ? document.createTextNode(fiber.value)
+      : fiber.tag === SVG
+        ? document.createElementNS('http://www.w3.org/2000/svg', fiber.type)
+        : document.createElement(fiber.type)
   updateElement(dom, {}, fiber.props)
   return dom
 }

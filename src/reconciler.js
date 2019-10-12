@@ -101,15 +101,15 @@ function reconcileChildren (WIP, children) {
     let oldFiber = reused[k]
 
     if (oldFiber) {
-      alternate = createFiber(oldFiber, { patchTag: UPDATE })
+      alternate = createFiber(oldFiber, UPDATE)
       newFiber.patchTag = UPDATE
-      newFiber = {...alternate, ...newFiber}
+      newFiber = { ...alternate, ...newFiber }
       newFiber.alternate = alternate
       if (shouldPlace(newFiber)) {
         newFiber.patchTag = PLACE
       }
     } else {
-      newFiber = createFiber(newFiber, { patchTag: PLACE })
+      newFiber = createFiber(newFiber, PLACE)
     }
 
     newFibers[k] = newFiber
@@ -134,9 +134,8 @@ function shouldPlace (fiber) {
 }
 
 function completeWork (fiber) {
-  let p = fiber.parent
-  if (p) {
-    p.patches = p.patches.concat(fiber.patches, [fiber])
+  if (fiber.parent) {
+    fiber.parent.patches.push(...fiber.patches, fiber)
   } else {
     pendingCommit = fiber
   }
@@ -191,9 +190,10 @@ function cleanup (fiber) {
   fiber.pending = null
 }
 
-function createFiber (vnode, data) {
-  data.tag = isFn(vnode.type) ? HOOK : HOST
-  return {...vnode, ...data}
+function createFiber (vnode, tag) {
+  vnode.tag = isFn(vnode.type) ? HOOK : HOST
+  vnode.patchTag = tag
+  return vnode
 }
 
 function getWIP () {
