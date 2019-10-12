@@ -8,8 +8,9 @@ export function updateElement (dom, oldProps, newProps) {
     if (oldValue == newValue || name === 'children') {
     } else if (name === 'style') {
       for (const k in { ...oldValue, ...newValue }) {
-        oldValue = newValue == null || newValue[k] == null ? '' : newValue[k]
-        dom[name][k] = oldValue
+        if (!(oldValue && newValue && oldValue[k] === newValue[k])) {
+          dom[name][k] = newValue && newValue[k] || ''
+        }
       }
     } else if (name[0] === 'o' && name[1] === 'n') {
       name = name.slice(2).toLowerCase()
