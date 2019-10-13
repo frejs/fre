@@ -2,12 +2,12 @@
 <h1 align="center">Fre</h1>
 <p align="center">:ghost: Tiny React16 like library with Async rendering.</p>
 <p align="center">
+<a href="https://circleci.com/gh/132yse/fre"><img src="https://img.shields.io/circleci/project/github/132yse/fre.svg?style=flat-square" alt="Build Status"></a>
+<a href="https://codecov.io/gh/132yse/fre"><img src="https://img.shields.io/codecov/github/132yse/fre?style=flat-square" alt="Code Coverage"></a>
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/v/fre.svg?style=flat-square" alt="npm-v"></a>
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/dt/fre.svg?style=flat-square" alt="npm-d"></a>
 <a href="https://bundlephobia.com/result?p=fre"><img src="https://img.shields.io/bundlephobia/minzip/fre.svg?&style=flat-square" alt="gzip"></a>
-<a href="https://jq.qq.com/?_wv=1027&k=5Zyggbc"><img src="https://img.shields.io/badge/qq.group-813783512-ff69b4.svg?maxAge=2592000&style=flat-square"></a>
-<a href="https://coveralls.io/github/132yse/fre"><img src="https://img.shields.io/coveralls/github/132yse/fre?style=flat-square" alt="Code Coverage"></a>
-<a href="https://circleci.com/132yse/fre"><img src="https://img.shields.io/circleci/project/github/132yse/fre.svg?style=flat-square" alt="Build Status"></a>
+<!-- <a href="https://jq.qq.com/?_wv=1027&k=5Zyggbc"><img src="https://img.shields.io/badge/qq.group-813783512-ff69b4.svg?maxAge=2592000&style=flat-square"></a> -->
 </p>
 
 ### Feature
