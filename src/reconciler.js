@@ -45,7 +45,7 @@ function performWIP (WIP) {
   if (WIP.child) return WIP.child
   while (WIP) {
     completeWork(WIP)
-    if (WIP.sibling) return WIP.sibling
+    if (WIP.sibling && WIP.lock == null) return WIP.sibling
     WIP = WIP.parent
   }
 }

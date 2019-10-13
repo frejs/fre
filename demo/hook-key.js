@@ -1,7 +1,11 @@
 import { h, render, useState, useEffect } from '../src'
+// import { render } from "react-dom"
+// import { createElement as h, useState, useEffect,useRef } from "react"
 
 function Counter ({ id, remove }) {
   const [count, setCount] = useState(0)
+
+  console.log(id)
 
   useEffect(() => {
     document.title = `You clicked ${count} times`
@@ -25,8 +29,6 @@ let nextId = 3
 
 function App () {
   const [counters, setCounters] = useState([1, 2, 3])
-
-  console.log(counters)
 
   return (
     <div>
