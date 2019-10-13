@@ -6,7 +6,7 @@
   "unpkg": "dist/fre-umd.js",
   "module": "dist/fre-esm.js",
   "scripts": {
-    "test": "jest --coverage",
+    "test": "jest --coverage && codecov",
     "build": "rollup -c && gzip-size dist/fre.js"
   },
   "keywords": [],
@@ -33,7 +33,9 @@
     "typescript": "^3.5.2",
     "yarpm": "^0.2.1"
   },
-  "dependencies": {
-    "preact": "^10.0.0"
+  "dependencies": {},
+  "jest": {
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true
   }
 }
