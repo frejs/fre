@@ -8,4 +8,4 @@ jobs:
       - checkout
       - run: yarn install
       - run: yarn test
-      - run: ./node_modules/bin/codecov --file ./coverage/lcov.info
+      - run: codecov
