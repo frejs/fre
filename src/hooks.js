@@ -1,4 +1,4 @@
-import { scheduleWork, getHook } from './reconciler'
+import { scheduleWork, currentFiber } from './reconciler'
 let cursor = 0
 
 function update (key, reducer, value) {
@@ -13,8 +13,7 @@ export function useState (initState) {
   return useReducer(null, initState)
 }
 export function useReducer (reducer, initState) {
-  let wip = getHook()
-  let key = getKey()
+  let { wip, key } = getCurrent()
   let setter = update.bind(wip, key, reducer)
   if (key in wip.state) {
     return [wip.state[key], setter]
@@ -25,8 +24,7 @@ export function useReducer (reducer, initState) {
 }
 
 export function useEffect (cb, deps) {
-  let wip = getHook()
-  let key = getKey()
+  let { wip, key } = getCurrent()
   if (isChanged(wip.deps[key], deps)) {
     wip.effect[key] = useCallback(cb, deps)
     wip.deps[key] = deps
@@ -34,8 +32,7 @@ export function useEffect (cb, deps) {
 }
 
 export function useMemo (cb, deps) {
-  let wip = getHook()
-  let key = getKey()
+  let { wip, key } = getCurrent()
   if (isChanged(wip.deps[key], deps)) {
     wip.deps[key] = deps
     return (wip.memo[key] = cb())
@@ -55,6 +52,9 @@ function isChanged (a, b) {
   return !a || b.some((arg, index) => arg !== a[index])
 }
 
-function getKey(){
-  return '$' + cursor && cursor++
+function getCurrent () {
+  return {
+    wip: currentFiber,
+    key: '$' + cursor && cursor++
+  }
 }

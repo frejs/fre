@@ -5,9 +5,9 @@ import { scheduleCallback, shouldYeild } from './scheduler'
 const options = {}
 export const [ROOT, HOST, HOOK, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
 
-export let WIP = null
 let pendingCommit = null
-let currentFiber = null
+export let WIP = null
+export let currentFiber = null
 
 function render (vnode, node, done) {
   let rootFiber = {
@@ -198,10 +198,6 @@ function createFiber (vnode, tag) {
   return vnode
 }
 
-function getHook () {
-  return currentFiber || {}
-}
-
 const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr])
 
 function hashfy (arr) {
@@ -223,4 +219,4 @@ function hashfy (arr) {
 
 const isFn = fn => typeof fn === 'function'
 
-export { render, scheduleWork, getHook, options }
+export { render, scheduleWork, options }
