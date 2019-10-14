@@ -219,4 +219,8 @@ function hashfy (arr) {
 
 const isFn = fn => typeof fn === 'function'
 
-export { render, scheduleWork, options }
+function getHook () {
+  return currentFiber || {}
+}
+
+export { render, scheduleWork, options, getHook }
