@@ -1,3 +1,5 @@
+/* global MessageChannel, performance */
+
 import { push, pop, peek } from './heapify'
 
 let taskQueue = []
