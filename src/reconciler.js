@@ -2,14 +2,14 @@ import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild } from './scheduler'
 
-const options = {}
+export const options = {}
 export const [ROOT, HOST, HOOK, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
 
 let pendingCommit = null
 export let WIP = null
 export let currentFiber = null
 
-function render (vnode, node, done) {
+export function render (vnode, node, done) {
   let rootFiber = {
     tag: ROOT,
     node,
@@ -19,7 +19,7 @@ function render (vnode, node, done) {
   scheduleWork(rootFiber)
 }
 
-function scheduleWork (fiber, lock) {
+export function scheduleWork (fiber, lock) {
   fiber.lock = lock
   WIP = fiber
   scheduleCallback(performWork)
@@ -219,8 +219,6 @@ function hashfy (arr) {
 
 const isFn = fn => typeof fn === 'function'
 
-function getHook () {
+export function getHook () {
   return currentFiber || {}
 }
-
-export { render, scheduleWork, options, getHook }
