@@ -5,7 +5,7 @@ import { scheduleCallback, shouldYeild } from './scheduler'
 const options = {}
 export const [ROOT, HOST, HOOK, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
 
-let WIP = null
+export let WIP = null
 let pendingCommit = null
 let currentFiber = null
 
@@ -54,6 +54,8 @@ function updateHOOK (WIP) {
   WIP.props = WIP.props || {}
   WIP.state = WIP.state || {}
   WIP.effect = {}
+  WIP.deps = {}
+  WIP.memo = {}
   currentFiber = WIP
   resetCursor()
   reconcileChildren(WIP, WIP.type(WIP.props))
@@ -196,7 +198,7 @@ function createFiber (vnode, tag) {
   return vnode
 }
 
-function getWIP () {
+function getHook () {
   return currentFiber || {}
 }
 
@@ -221,4 +223,4 @@ function hashfy (arr) {
 
 const isFn = fn => typeof fn === 'function'
 
-export { render, scheduleWork, getWIP, options }
+export { render, scheduleWork, getHook, options }
