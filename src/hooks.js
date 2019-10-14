@@ -1,21 +1,25 @@
 import { scheduleWork, getHook } from './reconciler'
+
 let cursor = 0
 
-function update (key, reducer, value) {
-  value = reducer ? reducer(this.state[key], value) : value
-  this.state[key] = value
-  scheduleWork(this, true)
-}
 export function resetCursor () {
   cursor = 0
 }
+
 export function useState (initState) {
   return useReducer(null, initState)
 }
+
 export function useReducer (reducer, initState) {
   let wip = getHook()
   let key = getKey()
-  let setter = update.bind(wip, key, reducer)
+
+  function setter(value) {
+    value = reducer ? reducer(wip.state[key], value) : value
+    wip.state[key] = value
+    scheduleWork(wip, true)
+  }
+
   if (key in wip.state) {
     return [wip.state[key], setter]
   } else {
