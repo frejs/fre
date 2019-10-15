@@ -7,7 +7,8 @@
   "module": "dist/fre-esm.js",
   "scripts": {
     "test": "jest --coverage",
-    "build": "rollup -c && gzip-size dist/fre.js"
+    "build": "rollup -c && gzip-size dist/fre.js",
+    "format": "standard --fix 'src/**/*.js'"
   },
   "keywords": [],
   "author": "132yse",
@@ -29,6 +30,7 @@
     "rollup-plugin-cleanup": "^3.1.1",
     "rollup-plugin-license": "^0.8.1",
     "rollup-plugin-terser": "^5.1.2",
+    "standard": "^14.3.1",
     "terser": "^4.1.2",
     "typescript": "^3.5.2",
     "yarpm": "^0.2.1"
