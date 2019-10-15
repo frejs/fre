@@ -1,5 +1,3 @@
-/* global SVGElement */
-
 import { SVG } from './reconciler'
 
 export function updateElement (dom, oldProps, newProps) {
