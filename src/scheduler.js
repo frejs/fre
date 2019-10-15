@@ -57,13 +57,7 @@ function workLoop (iniTime) {
     currentTask = peek(taskQueue)
   }
 
-  if (currentTask) {
-    return true
-  } else {
-    return false
-  }
-
-  // return !!currentTask
+  return !!currentTask
 }
 
 function performWork () {
