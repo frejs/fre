@@ -31,17 +31,17 @@ export function useReducer (reducer, initState) {
 export function useEffect (cb, deps) {
   let wip = getHook()
   let key = getKey()
-  if (isChanged(wip.Edeps, deps)) {
+  if (isChanged(wip.__deps.e[key], deps)) {
     wip.effect[key] = useCallback(cb, deps)
-    wip.Edeps = deps
+    wip.__deps.e[key] = deps
   }
 }
 
 export function useMemo (cb, deps) {
   let wip = getHook()
   let key = getKey()
-  if (isChanged(wip.Mdeps, deps)) {
-    wip.Mdeps = deps
+  if (isChanged(wip.__deps.m[key], deps)) {
+    wip.__deps.m[key] = deps
     return (wip.memo[key] = cb())
   }
   return wip.memo[key]

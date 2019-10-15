@@ -54,8 +54,8 @@ function updateHOOK (WIP) {
   WIP.props = WIP.props || {}
   WIP.state = WIP.state || {}
   WIP.effect = {}
-  WIP.deps = {}
   WIP.memo = {}
+  WIP.__deps = WIP.__deps || { m: {}, e: {} }
   currentFiber = WIP
   resetCursor()
   reconcileChildren(WIP, WIP.type(WIP.props))
@@ -157,7 +157,6 @@ function applyEffect (fiber) {
     const after = fiber.effect[k]()
     after && (fiber.pending[k] = after)
   }
-  fiber.effect = null
 }
 
 function commit (fiber) {
