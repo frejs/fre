@@ -153,28 +153,24 @@ test('useEffect(f, [x]) should run on changes to x', async () => {
   }
 
   await testUpdates([
-    // mounted: should trigger effect
     {
       content: <Component value={1}/>,
       test: () => {
         expect(effects).toEqual(["effect 1"])
       }
     },
-    // updated: should trigger effect
     {
       content: <Component value={2}/>,
       test: () => {
         expect(effects).toEqual(["cleanUp 1", "effect 2"])
       }
     },
-    // no change: should NOT trigger effect
     {
       content: <Component value={2}/>,
       test: () => {
         expect(effects).toEqual([])
       }
     },
-    // removal: should trigger clean-up
     {
       content: <div>removed</div>,
       test: () => {
@@ -204,25 +200,66 @@ test('useEffect(f, []) should run only once', async () => {
   }
 
   await testUpdates([
-    // mounted: should trigger effect
     {
       content: <Component/>,
       test: () => {
         expect(effects).toEqual(['effect'])
       }
     },
-    // updated: should NOT trigger effect
     {
       content: <Component/>,
       test: () => {
         expect(effects).toEqual([])
       }
     },
-    // removal: should trigger clean-up
     {
       content: <div>removed</div>,
       test: () => {
         expect(effects).toEqual(['cleanUp'])
+      }
+    }
+  ])
+})
+
+test('useEffect(f) should run every time', async () => {
+  let effects = []
+  let effectNum = 1
+
+  const effect = () => {
+    const currentEffectNum = effectNum++
+
+    effects.push(`effect ${currentEffectNum}`)
+
+    return () => {
+      effects.push(`cleanUp ${currentEffectNum}`)
+    }
+  }
+
+  const Component = () => {
+    effects = []
+
+    useEffect(effect)
+
+    return <div>foo</div>
+  }
+
+  await testUpdates([
+    {
+      content: <Component/>,
+      test: () => {
+        expect(effects).toEqual(["effect 1"])
+      }
+    },
+    {
+      content: <Component/>,
+      test: () => {
+        expect(effects).toEqual(["cleanUp 1", "effect 2"])
+      }
+    },
+    {
+      content: <div>removed</div>,
+      test: () => {
+        expect(effects).toEqual(["cleanUp 2"])
       }
     }
   ])
