@@ -259,7 +259,7 @@ test('useEffect(f) should run every time', async () => {
     {
       content: <div>removed</div>,
       test: () => {
-        expect(effects).toEqual(["cleanUp 2"])
+        expect(effects).toEqual(["cleanUp 1", "effect 2", "cleanUp 2"])
       }
     }
   ])

@@ -7,13 +7,12 @@ function Counter ({ id, remove }) {
 
   useEffect(
     () => {
-      console.log(`Counter #${id} is ${count}!`)
+      console.log(`111`)
 
       return () => {
-        console.log(`Counter #${id} removed`);
+        console.log(`222`);
       }
-    },
-    []
+    }
   )
 
   return (
