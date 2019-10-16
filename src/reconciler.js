@@ -45,7 +45,9 @@ function performWIP (WIP) {
   if (WIP.child) return WIP.child
   while (WIP) {
     completeWork(WIP)
-    if (WIP.sibling && WIP.lock == null) return WIP.sibling
+    if (WIP.sibling && WIP.lock == null) {
+      return WIP.sibling
+    }
     WIP = WIP.parent
   }
 }
@@ -56,6 +58,7 @@ function updateHOOK (WIP) {
   WIP.effect = {}
   WIP.memo = WIP.memo || {}
   WIP.__deps = WIP.__deps || { m: {}, e: {} }
+
   currentFiber = WIP
   resetCursor()
   reconcileChildren(WIP, WIP.type(WIP.props))
@@ -126,7 +129,7 @@ function reconcileChildren (WIP, children) {
     prevFiber = newFiber
   }
   if (prevFiber) prevFiber.sibling = null
-  if (WIP.lock) WIP.lock = false
+  WIP.lock ? (WIP.lock = false) : (WIP.lock = null)
 }
 
 function shouldPlace (fiber) {

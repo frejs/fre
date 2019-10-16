@@ -5645,6 +5645,11 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+re@^0.1.4:
+  version "0.1.4"
+  resolved "https://registry.npm.taobao.org/re/download/re-0.1.4.tgz#d821067ee10b52011491ba1ad9342150f9ce7031"
+  integrity sha1-2CEGfuELUgEUkboa2TQhUPnOcDE=
+
 react-dom@^16.10.1:
   version "16.10.1"
   resolved "https://registry.npm.taobao.org/react-dom/download/react-dom-16.10.1.tgz#479a6511ba34a429273c213cbc2a9ac4d296dac1"
