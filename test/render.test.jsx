@@ -184,6 +184,50 @@ test('useEffect(f, [x]) should run on changes to x', async () => {
   ])
 })
 
+test('useEffect(f, []) should run only once', async () => {
+  let effects = []
+
+  const effect = () => {
+    effects.push('effect')
+
+    return () => {
+      effects.push('cleanUp')
+    }
+  }
+
+  const Component = () => {
+    effects = []
+
+    useEffect(effect, [])
+
+    return <div>foo</div>
+  }
+
+  await testUpdates([
+    // mounted: should trigger effect
+    {
+      content: <Component/>,
+      test: () => {
+        expect(effects).toEqual(['effect'])
+      }
+    },
+    // updated: should NOT trigger effect
+    {
+      content: <Component/>,
+      test: () => {
+        expect(effects).toEqual([])
+      }
+    },
+    // removal: should trigger clean-up
+    {
+      content: <div>removed</div>,
+      test: () => {
+        expect(effects).toEqual(['cleanUp'])
+      }
+    }
+  ])
+})
+
 test('obtain reference to DOM element', async () => {
   const ref = useRef()
 
