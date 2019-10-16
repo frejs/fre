@@ -54,7 +54,7 @@ function updateHOOK (WIP) {
   WIP.props = WIP.props || {}
   WIP.state = WIP.state || {}
   WIP.effect = {}
-  WIP.memo = {}
+  WIP.memo = WIP.memo || {}
   WIP.__deps = WIP.__deps || { m: {}, e: {} }
   currentFiber = WIP
   resetCursor()

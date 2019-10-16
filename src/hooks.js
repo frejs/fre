@@ -44,6 +44,7 @@ export function useMemo (cb, deps) {
     wip.__deps.m[key] = deps
     return (wip.memo[key] = cb())
   }
+  console.log(wip.memo)
   return wip.memo[key]
 }
 
