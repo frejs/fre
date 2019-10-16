@@ -133,60 +133,133 @@ test('attach/remove DOM event handler', async () => {
   ])
 })
 
-test('useEffect(f, [x]) should detect changes to x', async () => {
-  let effects = 0
-  let cleanUps = 0
+test('useEffect(f, [x]) should run on changes to x', async () => {
+  let effects = []
 
-  const cleanUp = () => {
-    cleanUps += 1
-  }
+  const effect = value => {
+    effects.push(`effect ${value}`)
 
-  const effect = () => {
-    effects += 1
-
-    return cleanUp
+    return () => {
+      effects.push(`cleanUp ${value}`)
+    }
   }
 
   const Component = ({ value }) => {
-    effects = 0
-    cleanUps = 0
+    effects = []
 
-    useEffect(effect, [value])
+    useEffect(() => effect(value), [value])
 
     return <div>foo</div>
   }
 
   await testUpdates([
-    // mounted: should trigger effect
     {
       content: <Component value={1}/>,
       test: () => {
-        expect(effects).toBe(1)
-        expect(cleanUps).toBe(0)
+        expect(effects).toEqual(["effect 1"])
       }
     },
-    // updated: should trigger effect
     {
       content: <Component value={2}/>,
       test: () => {
-        expect(effects).toBe(1)
-        expect(cleanUps).toBe(1)
+        expect(effects).toEqual(["cleanUp 1", "effect 2"])
       }
     },
-    // no change: should NOT trigger effect
     {
       content: <Component value={2}/>,
       test: () => {
-        expect(effects).toBe(0)
-        expect(cleanUps).toBe(0)
+        expect(effects).toEqual([])
       }
     },
-    // removal: should trigger clean-up
     {
       content: <div>removed</div>,
       test: () => {
-        expect(effects).toBe(0)
-        expect(cleanUps).toBe(1)
+        expect(effects).toEqual(["cleanUp 2"])
+      }
+    }
+  ])
+})
+
+test('useEffect(f, []) should run only once', async () => {
+  let effects = []
+
+  const effect = () => {
+    effects.push('effect')
+
+    return () => {
+      effects.push('cleanUp')
+    }
+  }
+
+  const Component = () => {
+    effects = []
+
+    useEffect(effect, [])
+
+    return <div>foo</div>
+  }
+
+  await testUpdates([
+    {
+      content: <Component/>,
+      test: () => {
+        expect(effects).toEqual(['effect'])
+      }
+    },
+    {
+      content: <Component/>,
+      test: () => {
+        expect(effects).toEqual([])
+      }
+    },
+    {
+      content: <div>removed</div>,
+      test: () => {
+        expect(effects).toEqual(['cleanUp'])
+      }
+    }
+  ])
+})
+
+test('useEffect(f) should run every time', async () => {
+  let effects = []
+  let effectNum = 1
+
+  const effect = () => {
+    const currentEffectNum = effectNum++
+
+    effects.push(`effect ${currentEffectNum}`)
+
+    return () => {
+      effects.push(`cleanUp ${currentEffectNum}`)
+    }
+  }
+
+  const Component = () => {
+    effects = []
+
+    useEffect(effect)
+
+    return <div>foo</div>
+  }
+
+  await testUpdates([
+    {
+      content: <Component/>,
+      test: () => {
+        expect(effects).toEqual(["effect 1"])
+      }
+    },
+    {
+      content: <Component/>,
+      test: () => {
+        expect(effects).toEqual(["cleanUp 1", "effect 2"])
+      }
+    },
+    {
+      content: <div>removed</div>,
+      test: () => {
+        expect(effects).toEqual(["cleanUp 2"])
       }
     }
   ])
