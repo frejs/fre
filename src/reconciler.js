@@ -160,6 +160,7 @@ function applyEffect (fiber) {
     const after = fiber.effect[k]()
     after && (fiber.pending[k] = after)
   }
+  fiber.effect = null
 }
 
 function commit (fiber) {
