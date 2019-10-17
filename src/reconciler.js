@@ -45,7 +45,7 @@ function performWIP (WIP) {
   if (WIP.child) return WIP.child
   while (WIP) {
     completeWork(WIP)
-    if (WIP.sibling && WIP.lock == null) {
+    if (WIP.sibling && !WIP.lock) {
       return WIP.sibling
     }
     WIP = WIP.parent
@@ -129,7 +129,7 @@ function reconcileChildren (WIP, children) {
     prevFiber = newFiber
   }
   if (prevFiber) prevFiber.sibling = null
-  WIP.lock ? (WIP.lock = false) : (WIP.lock = null)
+  WIP.lock--
 }
 
 function shouldPlace (fiber) {
@@ -160,6 +160,7 @@ function applyEffect (fiber) {
     const after = fiber.effect[k]()
     after && (fiber.pending[k] = after)
   }
+  fiber.effect = null
 }
 
 function commit (fiber) {
