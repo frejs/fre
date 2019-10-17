@@ -314,7 +314,7 @@ options.commitWork = fiber => {
 }
 ```
 
-#### JSX
+#### JSX(JavaScript extension)
 
 The default export h function needs to be configured
 
