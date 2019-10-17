@@ -17,7 +17,7 @@ export function useReducer (reducer, initState) {
   function setter(value) {
     value = reducer ? reducer(wip.state[key], value) : value
     wip.state[key] = value
-    scheduleWork(wip, 2)
+    scheduleWork(wip, true)
   }
 
   if (key in wip.state) {
