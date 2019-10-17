@@ -236,8 +236,6 @@ test('useEffect(f) should run every time', async () => {
   }
 
   const Component = () => {
-    effects = []
-
     useEffect(effect)
 
     return <div>foo</div>
@@ -248,18 +246,22 @@ test('useEffect(f) should run every time', async () => {
       content: <Component/>,
       test: () => {
         expect(effects).toEqual(["effect 1"])
+
+        effects = []
       }
     },
     {
       content: <Component/>,
       test: () => {
         expect(effects).toEqual(["cleanUp 1", "effect 2"])
+
+        effects = []
       }
     },
     {
       content: <div>removed</div>,
       test: () => {
-        expect(effects).toEqual(["cleanUp 1", "effect 2", "cleanUp 2"])
+        expect(effects).toEqual(["cleanUp 2"])
       }
     }
   ])
