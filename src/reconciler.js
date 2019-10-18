@@ -5,7 +5,7 @@ import { scheduleCallback, shouldYeild } from './scheduler'
 export const options = {}
 export const [ROOT, HOST, HOOK, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
 
-let pendingCommit = null
+let preCommit = null
 export let WIP = null
 export let currentFiber = null
 
@@ -30,8 +30,8 @@ function performWork () {
     WIP = performWIP(WIP)
   }
 
-  if (pendingCommit) {
-    commitWork(pendingCommit)
+  if (preCommit) {
+    commitWork(preCommit)
     return null
   }
 
@@ -129,7 +129,7 @@ function reconcileChildren (WIP, children) {
     prevFiber = newFiber
   }
   if (prevFiber) prevFiber.sibling = null
-  WIP.lock ? (WIP.lock = false) : (WIP.lock = null)
+  WIP.lock = WIP.lock ? false : null
 }
 
 function shouldPlace (fiber) {
@@ -142,14 +142,14 @@ function completeWork (fiber) {
   if (fiber.parent) {
     fiber.parent.patches.push(...fiber.patches, fiber)
   } else {
-    pendingCommit = fiber
+    preCommit = fiber
   }
 }
 
 function commitWork (WIP) {
   WIP.patches.forEach(p => commit(p))
   WIP.done && WIP.done()
-  WIP = pendingCommit = null
+  WIP = preCommit = null
 }
 
 function applyEffect (fiber) {

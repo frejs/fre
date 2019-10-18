@@ -23,7 +23,10 @@ export function scheduleCallback (callback) {
 
   currentCallback = flushWork
 
-  if (!inMC) planWork() && (inMC = true)
+  if (!inMC) {
+    planWork()
+    inMC = true
+  }
 
   return newTask
 }
@@ -71,7 +74,7 @@ function performWork () {
     } else {
       planWork()
     }
-  } else inMC = false
+  }
 }
 
 const planWork = (() => {
