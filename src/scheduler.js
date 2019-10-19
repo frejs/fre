@@ -5,6 +5,7 @@ let currentTask = null
 let currentCallback = null
 let scheduling = false
 let frameDeadline = 0
+let frameLength = 5
 
 export function scheduleCallback (callback) {
   const currentTime = getTime()
@@ -41,6 +42,7 @@ function flushWork (iniTime) {
 function workLoop (iniTime) {
   let currentTime = iniTime
   currentTask = peek(taskQueue)
+  console.log(111)
 
   while (currentTask) {
     if (currentTask.dueTime > currentTime && shouldYeild()) break
@@ -65,7 +67,8 @@ function workLoop (iniTime) {
 function performWork () {
   if (currentCallback) {
     let currentTime = getTime()
-    frameDeadline = currentTime + 5
+    frameDeadline = currentTime + frameLength
+    frameLength += 0.1
     let moreWork = currentCallback(currentTime)
 
     if (!moreWork) {
@@ -90,7 +93,7 @@ const planWork = (() => {
 })()
 
 export function shouldYeild () {
-  return getTime() > frameDeadline
+  return getTime() >= frameDeadline
 }
 
 const getTime = () => performance.now()

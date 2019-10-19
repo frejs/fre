@@ -9,16 +9,6 @@ class Counter extends Component {
     this.state = { count: props.count || 0 }
   }
 
-  componentDidMount () {}
-
-  componentDidUpdate () {
-    console.log(`[Counter.componentDidUpdate] #${this.props.id} is ${this.state.count}!`)
-  }
-
-  componentWillUnmount () {
-    console.log(`[Counter.componentWillUnmount] #${this.props.id}`)
-  }
-
   render () {
     const { id, remove } = this.props
     const { count } = this.state
