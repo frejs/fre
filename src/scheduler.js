@@ -74,6 +74,7 @@ function performWork () {
     if (!moreWork) {
       scheduling = false
       currentCallback = null
+      frameLength = 5
     } else {
       planWork()
     }
