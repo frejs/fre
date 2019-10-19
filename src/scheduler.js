@@ -42,8 +42,7 @@ function flushWork (iniTime) {
 function workLoop (iniTime) {
   let currentTime = iniTime
   currentTask = peek(taskQueue)
-  console.log(111)
-
+  
   while (currentTask) {
     if (currentTask.dueTime > currentTime && shouldYeild()) break
     let callback = currentTask.callback
