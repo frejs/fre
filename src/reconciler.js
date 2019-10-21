@@ -6,8 +6,8 @@ export const options = {}
 export const [ROOT, HOST, HOOK, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
 
 let preCommit = null
+let currentHook = null
 export let WIP = null
-export let currentFiber = null
 
 export function render (vnode, node, done) {
   let rootFiber = {
@@ -59,7 +59,7 @@ function updateHOOK (WIP) {
   WIP.memo = WIP.memo || {}
   WIP.__deps = WIP.__deps || { m: {}, e: {} }
 
-  currentFiber = WIP
+  currentHook = WIP
   resetCursor()
   reconcileChildren(WIP, WIP.type(WIP.props))
 }
@@ -223,5 +223,5 @@ function hashfy (arr) {
 const isFn = fn => typeof fn === 'function'
 
 export function getHook () {
-  return currentFiber || {}
+  return currentHook || {}
 }

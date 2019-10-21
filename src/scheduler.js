@@ -77,12 +77,12 @@ function performWork () {
     frameDeadline = currentTime + (frameLength += 0.1)
     let moreWork = currentCallback(currentTime)
 
-    if (!moreWork) {
+    if (moreWork) {
+      planWork()
+    } else {
       scheduling = false
       currentCallback = null
       frameLength = 5
-    } else {
-      planWork()
     }
   }
 }
