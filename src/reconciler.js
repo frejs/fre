@@ -25,8 +25,8 @@ export function scheduleWork (fiber, lock) {
   scheduleCallback(performWork)
 }
 
-function performWork () {
-  while (WIP && !shouldYeild()) {
+function performWork (didout) {
+  while (WIP && (!shouldYeild() || didout)) {
     WIP = performWIP(WIP)
   }
 
