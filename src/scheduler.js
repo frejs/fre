@@ -45,7 +45,9 @@ function workLoop (iniTime) {
   let didout
 
   while (currentTask) {
-    if (currentTask.dueTime > currentTime && shouldYeild()) break
+    if (currentTask.dueTime > currentTime && shouldYeild()) {
+      break
+    }
     let callback = currentTask.callback
     if (callback) {
       currentTask.callback = null
@@ -72,8 +74,7 @@ function workLoop (iniTime) {
 function performWork () {
   if (currentCallback) {
     let currentTime = getTime()
-    frameDeadline = currentTime + frameLength
-    frameLength += 0.1
+    frameDeadline = currentTime + (frameLength += 0.1)
     let moreWork = currentCallback(currentTime)
 
     if (!moreWork) {
