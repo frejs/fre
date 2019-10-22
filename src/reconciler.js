@@ -95,6 +95,7 @@ function reconcileChildren (WIP, children) {
       reused[k] = oldFiber
     } else {
       oldFiber.patchTag = DELETE
+      WIP.patches.push(oldFiber)
     }
   }
 
@@ -174,7 +175,11 @@ function commit (fiber) {
   if (tag === DELETE) {
     cleanup(fiber)
     while (fiber.tag === HOOK) fiber = fiber.child
-    parent.removeChild(fiber.node)
+    try {
+      parent.removeChild(fiber.node)
+    } catch(e) {
+      fiber.node = null
+    }
   } else if (fiber.tag === HOOK) {
     applyEffect(fiber)
   } else if (tag === UPDATE && fiber.alternate) {
