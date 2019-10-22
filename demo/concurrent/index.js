@@ -4,7 +4,7 @@ import { h, render, useState, useEffect } from '../../src'
 
 const UPDATE_EVERY = 1000
 const BLOCK_FOR = 3
-const NUM_COMPONENTS = 1500
+const NUM_COMPONENTS = 500
 
 const App = () => {
   const [count, setCount] = useState(0)

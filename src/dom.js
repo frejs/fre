@@ -9,7 +9,7 @@ export function updateElement (dom, oldProps, newProps) {
     } else if (name === 'style') {
       for (const k in { ...oldValue, ...newValue }) {
         if (!(oldValue && newValue && oldValue[k] === newValue[k])) {
-          dom[name][k] = newValue && newValue[k] || ''
+          dom[name][k] = (newValue && newValue[k]) || ''
         }
       }
     } else if (name[0] === 'o' && name[1] === 'n') {

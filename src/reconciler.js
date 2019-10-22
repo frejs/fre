@@ -3,7 +3,7 @@ import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild } from './scheduler'
 
 export const options = {}
-export const [ROOT, HOST, HOOK, SVG, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
+export const [ROOT, HOST, HOOK, SVG, PLACE, UPDATE, DELETE, NOWORK] = [0, 1, 2, 3, 4, 5, 6, 7]
 
 let preCommit = null
 let currentHook = null
@@ -29,17 +29,18 @@ function performWork (didout) {
   while (WIP && (!shouldYeild() || didout)) {
     WIP = performWIP(WIP)
   }
-
   if (preCommit) {
     commitWork(preCommit)
     return null
   }
-
-  return performWork.bind(null)
+  if (!didout) {
+    return performWork.bind(null)
+  }
+  return null
 }
 
 function performWIP (WIP) {
-  WIP.patches = []
+  WIP.patches = WIP.patches || []
   WIP.parentNode = getParentNode(WIP)
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
@@ -94,7 +95,6 @@ function reconcileChildren (WIP, children) {
       reused[k] = oldFiber
     } else {
       oldFiber.patchTag = DELETE
-      WIP.patches.push(oldFiber)
     }
   }
 
@@ -128,6 +128,7 @@ function reconcileChildren (WIP, children) {
     }
     prevFiber = newFiber
   }
+
   if (prevFiber) prevFiber.sibling = null
   WIP.lock = WIP.lock ? false : null
 }
@@ -148,6 +149,7 @@ function completeWork (fiber) {
 
 function commitWork (WIP) {
   WIP.patches.forEach(p => commit(p))
+  WIP.patches = []
   WIP.done && WIP.done()
   WIP = preCommit = null
 }
@@ -175,7 +177,7 @@ function commit (fiber) {
     parent.removeChild(fiber.node)
   } else if (fiber.tag === HOOK) {
     applyEffect(fiber)
-  } else if (tag === UPDATE) {
+  } else if (tag === UPDATE && fiber.alternate) {
     updateElement(dom, fiber.alternate.props, fiber.props)
   } else {
     let point = fiber.insertPoint ? fiber.insertPoint.node : null

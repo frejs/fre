@@ -1,32 +1,24 @@
 import { h, render, useReducer } from '../src'
 
-function count(state, action) {
+function d (state, action) {
   switch (action.type) {
-    case 'add':
-      return { count: state.count + 1 }
-    case 'cut':
-      return { count: state.count - 1 }
+    case 'clear':
+      return { data: [] }
+    case 'create':
+      return { data: [1, 2] }
   }
 }
 
-function sex(state, action) {
-  switch (action.type) {
-    case 'boy':
-      return { sex: 'boy' }
-    case 'girl':
-      return { sex: 'girl' }
-  }
-}
-
-function Counter() {
-  const [counter, dispatch] = useReducer(count, { count: 0 })
-  const [sexer, change] = useReducer(sex, { sex: 'boy' })
+function Counter () {
+  const [data, dispatch] = useReducer(d, { data: [1, 2] })
   return (
     <div>
-      {counter.count}
-      {sexer.sex}
-      <button onClick={() => dispatch({ type: 'add' })}>+</button>
-      <button onClick={() => sexer.sex==='boy'?change({ type: 'girl' }):change({ type: 'boy' })}>x</button>
+      <button onClick={() => dispatch({ type: 'clear' })}>-</button>
+      <ul>
+        {data.data.map(item => (
+          <li>{item}</li>
+        ))}
+      </ul>
     </div>
   )
 }

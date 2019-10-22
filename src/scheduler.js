@@ -10,7 +10,7 @@ let frameLength = 5
 export function scheduleCallback (callback) {
   const currentTime = getTime()
   let startTime = currentTime
-  let timeout = 5000
+  let timeout = 2000
   let dueTime = startTime + timeout
 
   let newTask = {
@@ -42,7 +42,6 @@ function flushWork (iniTime) {
 function workLoop (iniTime) {
   let currentTime = iniTime
   currentTask = peek(taskQueue)
-  let didout
 
   while (currentTask) {
     if (currentTask.dueTime > currentTime && shouldYeild()) {
@@ -52,20 +51,19 @@ function workLoop (iniTime) {
     if (callback) {
       currentTask.callback = null
 
-      if (currentTime > currentTask.dueTime) {
-        didout = true
-      }
+      const didout = currentTask.dueTime <= currentTime
 
       let next = callback(didout)
+
       if (next) {
         currentTask.callback = next
       } else {
-        if (currentTask === peek(taskQueue)) {
-          pop(taskQueue)
-        }
+        pop(taskQueue)
       }
     } else pop(taskQueue)
+
     currentTask = peek(taskQueue)
+    currentTime = getTime()
   }
 
   return !!currentTask
