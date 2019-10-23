@@ -138,7 +138,8 @@ function shouldPlace (fiber) {
 function commitWork (fiber) {
   walk(fiber.child)
   fiber.done && fiber.done()
-  WIP = preCommit = null
+  WIP = null
+  preCommit = null
 }
 
 function walk (fiber) {
