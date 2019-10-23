@@ -144,18 +144,14 @@ function commitWork (fiber) {
 }
 
 function walk (fiber) {
-  if (fiber.child) {
-    walk(fiber.child)
-  }
+  commit(fiber)
+  if (fiber.child) walk(fiber.child)
   let node = fiber
   while (node) {
-    if (node.sibling) {
-      if (node == fiber) break
-      walk(node.sibling)
-    }
+    if (node != fiber) break
+    if (node.sibling) walk(node.sibling)
     node = node.parent
   }
-  commit(fiber)
 }
 
 function applyEffect (fiber) {
