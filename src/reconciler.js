@@ -40,11 +40,9 @@ function performWork (didout) {
 }
 
 function performWIP (WIP) {
-  WIP.patches = WIP.patches || []
   WIP.parentNode = getParentNode(WIP)
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
-  console.log(WIP)
   while (WIP) {
     if (!WIP.parent) preCommit = WIP
     if (WIP.sibling && WIP.lock == null) return WIP.sibling
@@ -94,7 +92,6 @@ function reconcileChildren (WIP, children) {
       reused[k] = oldFiber
     } else {
       oldFiber.patchTag = DELETE
-      WIP.patches.push(oldFiber)
     }
   }
 
@@ -147,13 +144,18 @@ function commitWork (fiber) {
 }
 
 function walk (fiber) {
-  commit(fiber)
-  if (fiber.child) walk(fiber.child)
+  if (fiber.child) {
+    walk(fiber.child)
+  }
   let node = fiber
   while (node) {
-    if (node.sibling) walk(node.sibling)
+    if (node.sibling) {
+      if (node == fiber) break
+      walk(node.sibling)
+    }
     node = node.parent
   }
+  commit(fiber)
 }
 
 function applyEffect (fiber) {
@@ -168,6 +170,7 @@ function applyEffect (fiber) {
 }
 
 function commit (fiber) {
+  // console.log(fiber)
   let tag = fiber.patchTag
   let parent = fiber.parentNode
   let dom = fiber.node
@@ -176,14 +179,10 @@ function commit (fiber) {
   if (tag === DELETE) {
     cleanup(fiber)
     while (fiber.tag === HOOK) fiber = fiber.child
-    try {
-      parent.removeChild(fiber.node)
-    } catch (e) {
-      fiber.node = null
-    }
+    parent.removeChild(fiber.node)
   } else if (fiber.tag === HOOK) {
     applyEffect(fiber)
-  } else if (tag === UPDATE && fiber.alternate) {
+  } else if (tag === UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props)
   } else {
     let point = fiber.insertPoint ? fiber.insertPoint.node : null
@@ -194,7 +193,6 @@ function commit (fiber) {
   }
 
   if (ref) isFn(ref) ? ref(dom) : (ref.current = dom)
-  fiber.patches = fiber.parent.patches = []
 }
 
 function cleanup (fiber) {

@@ -5,12 +5,12 @@ function d (state, action) {
     case 'clear':
       return { data: [] }
     case 'create':
-      return { data: [1, 2] }
+      return { data: [1] }
   }
 }
 
 function Counter () {
-  const [data, dispatch] = useReducer(d, { data: [1, 2] })
+  const [data, dispatch] = useReducer(d, { data: [1] })
   return (
     <div>
       <button onClick={() => dispatch({ type: 'clear' })}>-</button>
