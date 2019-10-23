@@ -45,7 +45,9 @@ function performWIP (WIP) {
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
   while (WIP) {
-    completeWork(WIP)
+    if (!WIP.parent) {
+      preCommit = fiber
+    }
     if (WIP.sibling && WIP.lock == null) {
       return WIP.sibling
     }
@@ -138,14 +140,6 @@ function shouldPlace (fiber) {
   let p = fiber.parent
   if (p.tag === HOOK) return p.key && !p.lock
   return fiber.key
-}
-
-function completeWork (fiber) {
-  if (fiber.parent) {
-    fiber.parent.patches.push(...fiber.patches, fiber)
-  } else {
-    preCommit = fiber
-  }
 }
 
 function commitWork (WIP) {
