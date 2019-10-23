@@ -152,7 +152,7 @@ function walk (fiber) {
   if (fiber.child) walk(fiber.child)
   let node = fiber
   while (node) {
-    if (node != fiber) break
+    if (node !== fiber) break
     if (node.sibling) walk(node.sibling)
     node = node.parent
   }
