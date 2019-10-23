@@ -33,9 +33,7 @@ function performWork (didout) {
     commitWork(preCommit)
     return null
   }
-  if (!didout) {
-    return performWork.bind(null)
-  }
+  if (!didout) return performWork.bind(null)
   return null
 }
 
@@ -92,6 +90,7 @@ function reconcileChildren (WIP, children) {
       reused[k] = oldFiber
     } else {
       oldFiber.patchTag = DELETE
+      WIP.bastard = oldFiber
     }
   }
 
@@ -138,13 +137,17 @@ function shouldPlace (fiber) {
 
 function commitWork (fiber) {
   walk(fiber.child)
-
   fiber.done && fiber.done()
   WIP = preCommit = null
 }
 
 function walk (fiber) {
   commit(fiber)
+  if (fiber.bastard) {
+    commit(fiber.bastard)
+    fiber.bastard = null
+  }
+
   if (fiber.child) walk(fiber.child)
   let node = fiber
   while (node) {
@@ -166,7 +169,6 @@ function applyEffect (fiber) {
 }
 
 function commit (fiber) {
-  // console.log(fiber)
   let tag = fiber.patchTag
   let parent = fiber.parentNode
   let dom = fiber.node
@@ -176,7 +178,7 @@ function commit (fiber) {
     cleanup(fiber)
     while (fiber.tag === HOOK) fiber = fiber.child
     parent.removeChild(fiber.node)
-  } else if (fiber.tag === HOOK) {
+  } else if (fiber.tag === HOOK || tag === NOWORK) {
     applyEffect(fiber)
   } else if (tag === UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props)

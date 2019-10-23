@@ -14,13 +14,15 @@ function Counter () {
   return (
     <div>
       <button onClick={() => dispatch({ type: 'clear' })}>-</button>
-      <ul>
-        {data.data.map(item => (
-          <li>{item}</li>
-        ))}
-      </ul>
+      {data.data.map(item => (
+        <A item={item} key={item}/>
+      ))}
     </div>
   )
+}
+
+function A (props) {
+  return <li>{props.item}</li>
 }
 
 render(<Counter />, document.getElementById('root'))
