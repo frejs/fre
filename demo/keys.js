@@ -1,12 +1,10 @@
-// import { h, render, useState, useEffect } from '../src'
-import { render } from "react-dom"
-import { createElement as h, useState, useEffect,useRef } from "react"
+import { h, render, useState, useEffect } from '../src'
+// import { render } from "react-dom"
+// import { createElement as h, useState, useEffect,useRef } from "react"
 // import { h, render } from 'preact'
 // import {useState, useEffect } from 'preact/hooks'
 
 // A B C D -> B A D C √
-
-
 
 // function App () {
 //   const [arr, setArr] = useState(1)
@@ -54,13 +52,15 @@ import { createElement as h, useState, useEffect,useRef } from "react"
 // }
 
 function App () {
-  const [arr, setArr] = useState([1,2,3,4,5,6,7,8,9,10])
+  const [arr, setArr] = useState([1, 2, 3])
   return (
     <div>
-      {arr.map(i => (
-        <A key={i} value={i}/>
-      ))}
-      <button onClick={() => setArr([1,9,3,4,5,6,7,8,2,10])}>+</button>
+      <button onClick={() => setArr([2,3])}>+</button>
+      <ul>
+        {arr.map(i => (
+          <A key={i} value={i} />
+        ))}
+      </ul>
     </div>
   )
 }
