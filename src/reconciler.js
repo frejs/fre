@@ -44,13 +44,10 @@ function performWIP (WIP) {
   WIP.parentNode = getParentNode(WIP)
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
+  console.log(WIP)
   while (WIP) {
-    if (!WIP.parent) {
-      preCommit = fiber
-    }
-    if (WIP.sibling && WIP.lock == null) {
-      return WIP.sibling
-    }
+    if (!WIP.parent) preCommit = WIP
+    if (WIP.sibling && WIP.lock == null) return WIP.sibling
     WIP = WIP.parent
   }
 }
@@ -142,11 +139,21 @@ function shouldPlace (fiber) {
   return fiber.key
 }
 
-function commitWork (WIP) {
-  WIP.patches.forEach(p => commit(p))
-  WIP.patches = []
-  WIP.done && WIP.done()
+function commitWork (fiber) {
+  walk(fiber.child)
+
+  fiber.done && fiber.done()
   WIP = preCommit = null
+}
+
+function walk (fiber) {
+  commit(fiber)
+  if (fiber.child) walk(fiber.child)
+  let node = fiber
+  while (node) {
+    if (node.sibling) walk(node.sibling)
+    node = node.parent
+  }
 }
 
 function applyEffect (fiber) {
@@ -171,7 +178,7 @@ function commit (fiber) {
     while (fiber.tag === HOOK) fiber = fiber.child
     try {
       parent.removeChild(fiber.node)
-    } catch(e) {
+    } catch (e) {
       fiber.node = null
     }
   } else if (fiber.tag === HOOK) {
