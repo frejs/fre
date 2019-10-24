@@ -136,25 +136,25 @@ function shouldPlace (fiber) {
 }
 
 function commitWork (fiber) {
-  walk(fiber.child)
+  let commit = fiber.child
+  while (commit) commit = commitWIP(commit)
+
   fiber.done && fiber.done()
   WIP = null
   preCommit = null
 }
 
-function walk (fiber) {
+function commitWIP (fiber) {
   commit(fiber)
   if (fiber.bastard) {
     commit(fiber.bastard)
     fiber.bastard = null
   }
 
-  if (fiber.child) walk(fiber.child)
-  let node = fiber
-  while (node) {
-    if (node !== fiber) break
-    if (node.sibling) walk(node.sibling)
-    node = node.parent
+  if (fiber.child) return fiber.child
+  while (fiber) {
+    if (fiber.sibling) return fiber.sibling
+    fiber = fiber.parent
   }
 }
 
