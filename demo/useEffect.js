@@ -1,6 +1,6 @@
-import { h, render, useState, useEffect } from '../src'
-// import { render } from "react-dom"
-// import { createElement as h, useState, useEffect,useRef } from "react"
+// import { h, render, useState, useEffect } from '../src'
+import { render } from "react-dom"
+import { createElement as h, useState, useEffect,useRef } from "react"
 
 function Counter ({ id, remove }) {
   const [count, setCount] = useState(0)
@@ -12,7 +12,7 @@ function Counter ({ id, remove }) {
       return () => {
         console.log(`222`);
       }
-    }
+    },[]
   )
 
   return (
@@ -64,3 +64,32 @@ function App () {
 }
 
 render(<App />, document.body)
+
+
+// 111
+// useEffect.js:10 111
+// useEffect.js:10 111
+// useEffect.js:13 222
+// useEffect.js:10 111
+// useEffect.js:35 (4) [1, 2, 3, 4]
+// useEffect.js:13 222
+// useEffect.js:10 111
+// useEffect.js:13 222
+// useEffect.js:10 111
+// useEffect.js:13 222
+// useEffect.js:10 111
+// useEffect.js:10 111
+// useEffect.js:35 (3) [1, 2, 3]
+// useEffect.js:13 222
+// useEffect.js:13 222
+// useEffect.js:10 111
+// useEffect.js:13 222
+// useEffect.js:10 111
+// useEffect.js:13 222
+// useEffect.js:10 111
+// useEffect.js:35 (2) [1, 3]
+// useEffect.js:13 222
+// useEffect.js:13 222
+// useEffect.js:10 111
+// useEffect.js:13 222
+// useEffect.js:10 111

@@ -143,7 +143,6 @@ function commitWork (fiber) {
 }
 
 function walk (fiber) {
-  console.log(fiber)
   commit(fiber)
   if (fiber.bastard) {
     commit(fiber.bastard)
@@ -164,7 +163,8 @@ function applyEffect (fiber) {
   for (const k in fiber.effect) {
     const pend = fiber.pending[k]
     pend && pend()
-    const after = fiber.effect[k]()
+    let after = null
+    after = fiber.effect[k]()
     after && (fiber.pending[k] = after)
   }
   fiber.effect = null
