@@ -90,8 +90,11 @@ function reconcileChildren (WIP, children) {
       reused[k] = oldFiber
     } else {
       oldFiber.op = DELETE
+      WIP.dels = WIP.dels || []
+      WIP.dels.push(oldFiber)
     }
   }
+
 
   let prevFiber = null
   let alternate = null
@@ -99,6 +102,8 @@ function reconcileChildren (WIP, children) {
   for (const k in newFibers) {
     let newFiber = newFibers[k]
     let oldFiber = reused[k]
+
+    console.log(WIP,newFiber)
 
     if (oldFiber) {
       alternate = createFiber(oldFiber, UPDATE)
@@ -145,7 +150,12 @@ function commitWork (fiber) {
 
 function commit (fiber) {
   patch(fiber)
-  if (fiber.op < DELETE && fiber.child) {
+  if (fiber.dels) {
+    fiber.dels.forEach(f => patch(f))
+    fiber.dels = []
+  }
+
+  if (fiber.child) {
     return fiber.child
   }
   while (fiber) {
@@ -171,7 +181,6 @@ function patch (fiber) {
   let parent = fiber.parentNode
   let dom = fiber.node
   let ref = fiber.ref
-
   if (op === DELETE) {
     cleanup(fiber)
     while (fiber.tag === HOOK) fiber = fiber.child

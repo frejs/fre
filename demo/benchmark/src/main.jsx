@@ -75,7 +75,7 @@ function listReducer (state, action) {
   const { data, selected } = state
   switch (action.type) {
     case 'RUN':
-      return { data: buildData(1000), selected: 0 }
+      return { data: buildData(10), selected: 0 }
     case 'RUN_LOTS':
       return { data: buildData(10000), selected: 0 }
     case 'ADD':
