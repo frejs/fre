@@ -37,5 +37,5 @@ const SlowComponent = ({ value }) => {
 }
 
 render(<App />, document.getElementById('root'))
-// const root = unstable_createRoot(document.getElementById('root'))
+// const root = createRoot(document.getElementById('root'))
 // root.render(<App />)
