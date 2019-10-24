@@ -90,7 +90,6 @@ function reconcileChildren (WIP, children) {
       reused[k] = oldFiber
     } else {
       oldFiber.op = DELETE
-      WIP.bastard = oldFiber
     }
   }
 
@@ -146,12 +145,9 @@ function commitWork (fiber) {
 
 function commit (fiber) {
   patch(fiber)
-  if (fiber.bastard) {
-    patch(fiber.bastard)
-    fiber.bastard = null
+  if (fiber.op < DELETE && fiber.child) {
+    return fiber.child
   }
-
-  if (fiber.child) return fiber.child
   while (fiber) {
     if (fiber.sibling) return fiber.sibling
     fiber = fiber.parent
