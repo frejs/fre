@@ -22,22 +22,22 @@ export function render (vnode, node, done) {
 export function scheduleWork (fiber, lock) {
   fiber.lock = lock
   WIP = fiber
-  scheduleCallback(performWork)
+  scheduleCallback(reconcileWork)
 }
 
-function performWork (didout) {
+function reconcileWork (didout) {
   while (WIP && (!shouldYeild() || didout)) {
-    WIP = performWIP(WIP)
+    WIP = reconcile(WIP)
   }
   if (preCommit) {
     commitWork(preCommit)
     return null
   }
-  if (!didout) return performWork.bind(null)
+  if (!didout) return reconcileWork.bind(null)
   return null
 }
 
-function performWIP (WIP) {
+function reconcile (WIP) {
   WIP.parentNode = getParentNode(WIP)
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
@@ -89,7 +89,7 @@ function reconcileChildren (WIP, children) {
     if (newFiber && newFiber.type === oldFiber.type) {
       reused[k] = oldFiber
     } else {
-      oldFiber.patchTag = DELETE
+      oldFiber.op = DELETE
       WIP.bastard = oldFiber
     }
   }
@@ -103,11 +103,11 @@ function reconcileChildren (WIP, children) {
 
     if (oldFiber) {
       alternate = createFiber(oldFiber, UPDATE)
-      newFiber.patchTag = UPDATE
+      newFiber.op = UPDATE
       newFiber = { ...alternate, ...newFiber }
       newFiber.alternate = alternate
       if (shouldPlace(newFiber)) {
-        newFiber.patchTag = PLACE
+        newFiber.op = PLACE
       }
     } else {
       newFiber = createFiber(newFiber, PLACE)
@@ -136,18 +136,18 @@ function shouldPlace (fiber) {
 }
 
 function commitWork (fiber) {
-  let commit = fiber.child
-  while (commit) commit = commitWIP(commit)
+  let node = fiber.child
+  while (node) node = commit(node)
 
   fiber.done && fiber.done()
   WIP = null
   preCommit = null
 }
 
-function commitWIP (fiber) {
-  commit(fiber)
+function commit (fiber) {
+  patch(fiber)
   if (fiber.bastard) {
-    commit(fiber.bastard)
+    patch(fiber.bastard)
     fiber.bastard = null
   }
 
@@ -170,19 +170,19 @@ function applyEffect (fiber) {
   fiber.effect = null
 }
 
-function commit (fiber) {
-  let tag = fiber.patchTag
+function patch (fiber) {
+  let op = fiber.op
   let parent = fiber.parentNode
   let dom = fiber.node
   let ref = fiber.ref
 
-  if (tag === DELETE) {
+  if (op === DELETE) {
     cleanup(fiber)
     while (fiber.tag === HOOK) fiber = fiber.child
     parent.removeChild(fiber.node)
-  } else if (fiber.tag === HOOK || tag === NOWORK) {
+  } else if (fiber.tag === HOOK) {
     applyEffect(fiber)
-  } else if (tag === UPDATE) {
+  } else if (op === UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props)
   } else {
     let point = fiber.insertPoint ? fiber.insertPoint.node : null
@@ -201,9 +201,9 @@ function cleanup (fiber) {
   fiber.pending = null
 }
 
-function createFiber (vnode, tag) {
+function createFiber (vnode, op) {
   vnode.tag = isFn(vnode.type) ? HOOK : HOST
-  vnode.patchTag = tag
+  vnode.op = op
   return vnode
 }
 
