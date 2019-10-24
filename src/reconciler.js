@@ -3,7 +3,7 @@ import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild } from './scheduler'
 
 export const options = {}
-export const [ROOT, HOST, HOOK, SVG, PLACE, UPDATE, DELETE, NOWORK] = [0, 1, 2, 3, 4, 5, 6, 7]
+export const [ROOT, HOST, SVG, HOOK, PLACE, UPDATE, DELETE, NOWORK] = [0, 1, 2, 3, 4, 5, 6, 7]
 
 let preCommit = null
 let currentHook = null
@@ -143,6 +143,7 @@ function commitWork (fiber) {
 }
 
 function walk (fiber) {
+  console.log(fiber)
   commit(fiber)
   if (fiber.bastard) {
     commit(fiber.bastard)
