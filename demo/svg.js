@@ -20,4 +20,4 @@ function App () {
     </div>
   )
 }
-render(<App />, document.getElementById('root'))
+render(<App />, document.body)

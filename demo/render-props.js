@@ -2,15 +2,11 @@ import { h, render } from '../src'
 // const HelloBox = () => <Box render={value => <h1>{value}</h1>} />
 
 const HelloBox = () => (
-  <Box>
-    {value => {
-      return <h1>{value}</h1>
-    }}
-  </Box>
+  <ul>
+    <li class='foo2' />
+    <li className='bar2' />
+    <li data-something='baz2' tabIndex={99} />
+  </ul>
 )
-
-const Box = props => {
-  return <div>{props.render('hello world!')}</div>
-}
 
 render(<HelloBox />, document.getElementById('root'))

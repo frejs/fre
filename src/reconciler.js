@@ -3,7 +3,7 @@ import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild } from './scheduler'
 
 export const options = {}
-export const [ROOT, HOST, HOOK, SVG, PLACE, UPDATE, DELETE, NOWORK] = [0, 1, 2, 3, 4, 5, 6, 7]
+export const [ROOT, HOST, SVG, HOOK, PLACE, UPDATE, DELETE, NOWORK] = [0, 1, 2, 3, 4, 5, 6, 7]
 
 let preCommit = null
 let currentHook = null
@@ -33,22 +33,17 @@ function performWork (didout) {
     commitWork(preCommit)
     return null
   }
-  if (!didout) {
-    return performWork.bind(null)
-  }
+  if (!didout) return performWork.bind(null)
   return null
 }
 
 function performWIP (WIP) {
-  WIP.patches = WIP.patches || []
   WIP.parentNode = getParentNode(WIP)
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
   while (WIP) {
-    completeWork(WIP)
-    if (WIP.sibling && WIP.lock == null) {
-      return WIP.sibling
-    }
+    if (!WIP.parent) preCommit = WIP
+    if (WIP.sibling && WIP.lock == null) return WIP.sibling
     WIP = WIP.parent
   }
 }
@@ -95,7 +90,7 @@ function reconcileChildren (WIP, children) {
       reused[k] = oldFiber
     } else {
       oldFiber.patchTag = DELETE
-      WIP.patches.push(oldFiber)
+      WIP.bastard = oldFiber
     }
   }
 
@@ -140,19 +135,27 @@ function shouldPlace (fiber) {
   return fiber.key
 }
 
-function completeWork (fiber) {
-  if (fiber.parent) {
-    fiber.parent.patches.push(...fiber.patches, fiber)
-  } else {
-    preCommit = fiber
-  }
+function commitWork (fiber) {
+  walk(fiber.child)
+  fiber.done && fiber.done()
+  WIP = null
+  preCommit = null
 }
 
-function commitWork (WIP) {
-  WIP.patches.forEach(p => commit(p))
-  WIP.patches = []
-  WIP.done && WIP.done()
-  WIP = preCommit = null
+function walk (fiber) {
+  commit(fiber)
+  if (fiber.bastard) {
+    commit(fiber.bastard)
+    fiber.bastard = null
+  }
+
+  if (fiber.child) walk(fiber.child)
+  let node = fiber
+  while (node) {
+    if (node !== fiber) break
+    if (node.sibling) walk(node.sibling)
+    node = node.parent
+  }
 }
 
 function applyEffect (fiber) {
@@ -160,7 +163,8 @@ function applyEffect (fiber) {
   for (const k in fiber.effect) {
     const pend = fiber.pending[k]
     pend && pend()
-    const after = fiber.effect[k]()
+    let after = null
+    after = fiber.effect[k]()
     after && (fiber.pending[k] = after)
   }
   fiber.effect = null
@@ -175,14 +179,10 @@ function commit (fiber) {
   if (tag === DELETE) {
     cleanup(fiber)
     while (fiber.tag === HOOK) fiber = fiber.child
-    try {
-      parent.removeChild(fiber.node)
-    } catch(e) {
-      fiber.node = null
-    }
-  } else if (fiber.tag === HOOK) {
+    parent.removeChild(fiber.node)
+  } else if (fiber.tag === HOOK || tag === NOWORK) {
     applyEffect(fiber)
-  } else if (tag === UPDATE && fiber.alternate) {
+  } else if (tag === UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props)
   } else {
     let point = fiber.insertPoint ? fiber.insertPoint.node : null
@@ -193,7 +193,6 @@ function commit (fiber) {
   }
 
   if (ref) isFn(ref) ? ref(dom) : (ref.current = dom)
-  fiber.patches = fiber.parent.patches = []
 }
 
 function cleanup (fiber) {

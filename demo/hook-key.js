@@ -39,7 +39,6 @@ function App () {
           remove={() => setCounters(counters.filter(c => c !== id))}
         />
       ))}
-      <hr />
       <button onClick={() => setCounters(counters.concat(++nextId))}>
         Add new
       </button>
