@@ -3,7 +3,7 @@ import { h, render, useReducer } from '../src'
 function d (state, action) {
   switch (action.type) {
     case 'clear':
-      return { data: [1] }
+      return { data: [] }
     case 'create':
       return { data: [1, 2, 3] }
   }

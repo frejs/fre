@@ -79,8 +79,8 @@ function getParentNode (fiber) {
 
 function reconcileChildren (WIP, children) {
   if (!children) return
-  if (!children[0]) WIP.child = null
-  
+  if (!children.length) WIP.child = null
+
   const oldFibers = WIP.kids
   const newFibers = (WIP.kids = hashfy(children))
 
@@ -142,27 +142,28 @@ function shouldPlace (fiber) {
 
 function commitWork (fiber) {
   let node = fiber.child
-  while (node) node = commit(node)
+  while (node) {
+    commit(node)
+    if (node.dels) {
+      node.dels.forEach(f => commit(f))
+      node.dels = []
+    }
+    if (node.child) {
+      node = node.child
+      continue
+    }
+    while (node) {
+      if (node.sibling) {
+        node = node.sibling
+        break
+      }
+      node = node.parent
+    }
+  }
 
   fiber.done && fiber.done()
   WIP = null
   preCommit = null
-}
-
-function commit (fiber) {
-  patch(fiber)
-  if (fiber.dels) {
-    fiber.dels.forEach(f => patch(f))
-    fiber.dels = []
-  }
-
-  if (fiber.child) {
-    return fiber.child
-  }
-  while (fiber) {
-    if (fiber.sibling) return fiber.sibling
-    fiber = fiber.parent
-  }
 }
 
 function applyEffect (fiber) {
@@ -177,7 +178,7 @@ function applyEffect (fiber) {
   fiber.effect = null
 }
 
-function patch (fiber) {
+function commit (fiber) {
   let op = fiber.op
   let parent = fiber.parentNode
   let dom = fiber.node
