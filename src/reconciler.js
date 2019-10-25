@@ -78,8 +78,12 @@ function getParentNode (fiber) {
 }
 
 function reconcileChildren (WIP, children) {
+  if (!children) return
+  if (!children[0]) WIP.child = null
+  
   const oldFibers = WIP.kids
-  const newFibers = (WIP.kids = hashfy(children, WIP.kids))
+  const newFibers = (WIP.kids = hashfy(children))
+
   let reused = {}
 
   for (const k in oldFibers) {
@@ -95,15 +99,12 @@ function reconcileChildren (WIP, children) {
     }
   }
 
-
   let prevFiber = null
   let alternate = null
 
   for (const k in newFibers) {
     let newFiber = newFibers[k]
     let oldFiber = reused[k]
-
-    console.log(WIP,newFiber)
 
     if (oldFiber) {
       alternate = createFiber(oldFiber, UPDATE)
