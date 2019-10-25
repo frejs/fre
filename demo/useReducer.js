@@ -3,18 +3,17 @@ import { h, render, useReducer } from '../src'
 function d (state, action) {
   switch (action.type) {
     case 'clear':
-      return { data: [] }
+      return { data: [1] }
     case 'create':
-      return { data: [1, 2] }
+      return { data: [1, 2, 3] }
   }
 }
 
 function Counter () {
-  const [data, dispatch] = useReducer(d, { data: [] })
+  const [data, dispatch] = useReducer(d, { data: [1,2,3] })
   return (
     <div>
       <button onClick={() => dispatch({ type: 'clear' })}>-</button>
-      <button onClick={() => dispatch({ type: 'create' })}>+</button>
       <ul>
         {data.data.map(item => (
           <A item={item} key={item} />
@@ -25,8 +24,7 @@ function Counter () {
 }
 
 function A (props) {
-  const Span = <span className='111'/>
-  return <li>{props.item}{Span}</li>
+  return <li>{props.item}</li>
 }
 
 render(<Counter />, document.getElementById('root'))

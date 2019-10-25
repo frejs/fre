@@ -78,8 +78,12 @@ function getParentNode (fiber) {
 }
 
 function reconcileChildren (WIP, children) {
+  if (!children) return
+  if (!children[0]) WIP.child = null
+  
   const oldFibers = WIP.kids
-  const newFibers = (WIP.kids = hashfy(children, WIP.kids))
+  const newFibers = (WIP.kids = hashfy(children))
+
   let reused = {}
 
   for (const k in oldFibers) {
@@ -90,7 +94,8 @@ function reconcileChildren (WIP, children) {
       reused[k] = oldFiber
     } else {
       oldFiber.op = DELETE
-      WIP.bastard = oldFiber
+      WIP.dels = WIP.dels || []
+      WIP.dels.push(oldFiber)
     }
   }
 
@@ -146,12 +151,14 @@ function commitWork (fiber) {
 
 function commit (fiber) {
   patch(fiber)
-  if (fiber.bastard) {
-    patch(fiber.bastard)
-    fiber.bastard = null
+  if (fiber.dels) {
+    fiber.dels.forEach(f => patch(f))
+    fiber.dels = []
   }
 
-  if (fiber.child) return fiber.child
+  if (fiber.child) {
+    return fiber.child
+  }
   while (fiber) {
     if (fiber.sibling) return fiber.sibling
     fiber = fiber.parent
@@ -175,7 +182,6 @@ function patch (fiber) {
   let parent = fiber.parentNode
   let dom = fiber.node
   let ref = fiber.ref
-
   if (op === DELETE) {
     cleanup(fiber)
     while (fiber.tag === HOOK) fiber = fiber.child
