@@ -3,7 +3,7 @@ import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild } from './scheduler'
 
 export const options = {}
-export const [ROOT, HOST, SVG, HOOK, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5, 6]
+export const [HOST, SVG, HOOK, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5]
 
 let preCommit = null
 let currentHook = null
@@ -11,7 +11,7 @@ export let WIP = null
 
 export function render (vnode, node, done) {
   let rootFiber = {
-    tag: ROOT,
+    tag: HOST,
     node,
     props: { children: vnode },
     done
@@ -79,7 +79,7 @@ function getParentNode (fiber) {
 
 function reconcileChildren (WIP, children) {
   if (!children) return
-  if (!children.length) WIP.child = null
+  delete WIP.child
 
   const oldFibers = WIP.kids
   const newFibers = (WIP.kids = hashfy(children))
@@ -231,7 +231,7 @@ function hashfy (arr) {
   return out
 }
 
-const isFn = fn => typeof fn === 'function'
+export const isFn = fn => typeof fn === 'function'
 
 export function getHook () {
   return currentHook || {}

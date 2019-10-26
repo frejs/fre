@@ -12,7 +12,7 @@ function Counter ({ id, remove }) {
       return () => {
         console.log(`222`);
       }
-    },[]
+    }
   )
 
   return (
