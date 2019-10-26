@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import { h, render, useReducer, useCallback, useEffect } from 'fre';
+import { h, render, useReducer, useCallback, useEffect } from '../../../src';
 
 function random(max) { return Math.round(Math.random() * 1000) % max; }
 

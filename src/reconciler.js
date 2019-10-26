@@ -189,6 +189,7 @@ function commit (fiber) {
     cleanup(fiber)
     while (fiber.tag === HOOK) fiber = fiber.child
     parent.removeChild(fiber.node)
+    fiber.node = null
   } else if (fiber.tag === HOOK) {
     applyEffect(fiber)
   } else if (op === UPDATE) {
