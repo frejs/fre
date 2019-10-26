@@ -42,7 +42,9 @@ function reconcile (WIP) {
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
   while (WIP) {
-    if (!WIP.parent) preCommit = WIP
+    if (WIP.lock == false || !WIP.parent) {
+      preCommit = WIP
+    }
     if (WIP.sibling && WIP.lock == null) return WIP.sibling
     WIP = WIP.parent
   }
