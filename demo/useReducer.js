@@ -10,21 +10,24 @@ function d (state, action) {
 }
 
 function Counter () {
-  const [data, dispatch] = useReducer(d, { data: [1,2,3] })
+  const [data, dispatch] = useReducer(d, { data: [] })
+
   return (
     <div>
-      <button onClick={() => dispatch({ type: 'clear' })}>-</button>
+      <button onClick={() => dispatch({ type: 'create' })}>-</button>
       <ul>
-        {data.data.map(item => (
-          <A item={item} key={item} />
-        ))}
+        {data.data.map(item => {
+          const val = <p>hello</p>
+          return (
+            <li>
+              {item}
+              {val}
+            </li>
+          )
+        })}
       </ul>
     </div>
   )
-}
-
-function A (props) {
-  return <li>{props.item}</li>
 }
 
 render(<Counter />, document.getElementById('root'))
