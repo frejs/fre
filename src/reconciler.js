@@ -33,24 +33,17 @@ function reconcileWork (didout) {
     commitWork(preCommit)
     return null
   }
-  if (!didout) {
-    return reconcileWork.bind(null)
-  }
+  if (!didout) return reconcileWork.bind(null)
   return null
 }
 
 function reconcile (WIP) {
   WIP.parentNode = getParentNode(WIP)
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
-
   if (WIP.child) return WIP.child
   while (WIP) {
-    if (!WIP.parent) {
-      preCommit = WIP
-    }
-    if (WIP.sibling && WIP.lock == null) {
-      return WIP.sibling
-    }
+    if (!WIP.parent) preCommit = WIP
+    if (WIP.sibling && WIP.lock == null) return WIP.sibling
     WIP = WIP.parent
   }
 }
@@ -76,8 +69,7 @@ function updateHost (WIP) {
   WIP.insertPoint = p.last || null
   p.last = WIP
   WIP.node.last = null
-  const children = WIP.props.children
-  reconcileChildren(WIP, children)
+  reconcileChildren(WIP, WIP.props.children)
 }
 function getParentNode (fiber) {
   while ((fiber = fiber.parent)) {
@@ -87,12 +79,13 @@ function getParentNode (fiber) {
 
 function reconcileChildren (WIP, children) {
   if (!children) return
-  delete WIP.child
+  if (!children.length) WIP.child = null
 
   const oldFibers = WIP.kids
-  const newFibers = hashfy(children, WIP)
+  const newFibers = (WIP.kids = hashfy(children))
 
   let reused = {}
+
   for (const k in oldFibers) {
     let newFiber = newFibers[k]
     let oldFiber = oldFibers[k]
@@ -106,12 +99,12 @@ function reconcileChildren (WIP, children) {
     }
   }
 
-  let prevFiber = void 0
+  let prevFiber = null
+  let alternate = null
 
   for (const k in newFibers) {
     let newFiber = newFibers[k]
     let oldFiber = reused[k]
-    let alternate = null
 
     if (oldFiber) {
       alternate = createFiber(oldFiber, UPDATE)
@@ -126,7 +119,7 @@ function reconcileChildren (WIP, children) {
     }
 
     newFibers[k] = newFiber
-    delete WIP.kids
+    newFiber.parent = WIP
 
     if (prevFiber) {
       prevFiber.sibling = newFiber
@@ -135,12 +128,9 @@ function reconcileChildren (WIP, children) {
       WIP.child = newFiber
     }
     prevFiber = newFiber
-    newFiber.parent = WIP
   }
 
-  if (prevFiber) {
-    prevFiber.sibling = null
-  }
+  if (prevFiber) prevFiber.sibling = null
   WIP.lock = WIP.lock ? false : null
 }
 
@@ -152,7 +142,7 @@ function shouldPlace (fiber) {
 
 function commitWork (fiber) {
   let node = fiber.child
-  cycle: while (node) {
+  while (node) {
     commit(node)
     if (node.dels) {
       node.dels.forEach(f => commit(f))
@@ -165,7 +155,7 @@ function commitWork (fiber) {
     while (node) {
       if (node.sibling) {
         node = node.sibling
-        continue cycle
+        break
       }
       node = node.parent
     }
@@ -174,6 +164,18 @@ function commitWork (fiber) {
   fiber.done && fiber.done()
   WIP = null
   preCommit = null
+}
+
+function applyEffect (fiber) {
+  fiber.pending = fiber.pending || {}
+  for (const k in fiber.effect) {
+    const pend = fiber.pending[k]
+    pend && pend()
+    let after = null
+    after = fiber.effect[k]()
+    after && (fiber.pending[k] = after)
+  }
+  fiber.effect = null
 }
 
 function commit (fiber) {
@@ -206,33 +208,19 @@ function cleanup (fiber) {
   fiber.pending = null
 }
 
-function applyEffect (fiber) {
-  fiber.pending = fiber.pending || {}
-  for (const k in fiber.effect) {
-    const pend = fiber.pending[k]
-    pend && pend()
-    let after = null
-    after = fiber.effect[k]()
-    after && (fiber.pending[k] = after)
-  }
-  fiber.effect = null
-}
-
 function createFiber (vnode, op) {
-  vnode.tag = isFn(vnode.type) ? HOOK : HOST
-  vnode.op = op
-  return vnode
+  return { ...vnode, op, tag: isFn(vnode.type) ? HOOK : HOST }
 }
 
 const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr])
 
-function hashfy (children, fiber) {
+function hashfy (arr) {
   let out = {}
   let i = 0
   let j = 0
-  arrayfy(children).map(item => {
+  arrayfy(arr).forEach(item => {
     if (item.pop) {
-      item.map(item => {
+      item.forEach(item => {
         item.key ? (out['.' + i + '.' + item.key] = item) : (out['.' + i + '.' + j] = item) && j++
       })
       i++
@@ -240,7 +228,7 @@ function hashfy (children, fiber) {
       item.key ? (out['.' + item.key] = item) : (out['.' + i] = item) && i++
     }
   })
-  return (fiber.kids = out)
+  return out
 }
 
 const isFn = fn => typeof fn === 'function'
