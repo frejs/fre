@@ -7,14 +7,13 @@
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/v/fre.svg?style=flat-square" alt="npm-v"></a>
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/dt/fre.svg?style=flat-square" alt="npm-d"></a>
 <a href="https://bundlephobia.com/result?p=fre"><img src="https://img.shields.io/bundlephobia/minzip/fre.svg?&style=flat-square" alt="gzip"></a>
-<!-- <a href="https://jq.qq.com/?_wv=1027&k=5Zyggbc"><img src="https://img.shields.io/badge/qq.group-813783512-ff69b4.svg?maxAge=2592000&style=flat-square"></a> -->
 </p>
 
 ### Feature
 
 - :tada: Functional Component and hooks API
-- :confetti_ball: Async rendering like react Fiber（also called time slicing, concurrent mode）
-- :telescope: keyed reconcilation（also called diff） algorithm
+- :confetti_ball: Concurrent mode (also called time slicing) and Suspense
+- :telescope: keyed reconcilation (also called diff) algorithm
 
 ### Introduction
 
@@ -31,6 +30,8 @@ Fre (pronounced `/fri:/`, like free) is a tiny and perfect js library, It means 
 - [async rendering demo](https://codesandbox.io/s/suspicious-rosalind-i06mv)
 
 - [key-based reconcilation demo](https://codesandbox.io/s/fre-demo-uxuic)
+
+- [suspense demo](https://codesandbox.io/s/fre-suspense-demo-h5nfy)
 
 Thanks for [Rasmus Schultz](https://github.com/mindplay-dk)
 
@@ -330,11 +331,18 @@ import { h } from "fre"
 
 If browser environment, recommend to use [htm](https://github.com/developit/htm)
 
-#### Async rendering
-
+#### Concurrent Mode
 Fre implements a tiny priority scheduler, which like react Fiber.
 
-Async rendering is also called `time slicing` or `concurrent mode`.
+It can break the work, and when there are idle time, the work will continue.
+
+Concurrent Mode is also called `time slicing` or `concurrent mode`.
+
+#### Suspense
+
+Suspense is another way to break the work. 
+
+It throws promise, and fre catches promise then suspend the work. It waits until resolve to the promise.
 
 #### key-based reconcilation
 
