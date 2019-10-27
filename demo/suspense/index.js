@@ -1,20 +1,20 @@
 import { h, render, useState } from '../../src'
-import { createSuspense } from './use-suspense'
+import { createFetch } from './use-suspense'
 
-function fetchUsers (num) {
+function fetchUsers (size) {
   console.log('fetch users from clicli...')
-  return fetch('https://api.clicli.us/users?level=4&page=1&pageSize=' + num)
+  return fetch(`https://api.clicli.us/users?level=4&page=1&pageSize=${size}`)
     .then(res => res.json())
     .then(data => {
       return data.users
     })
 }
 
-const { useSuspense } = createSuspense(fetchUsers)
+const { useFetch } = createFetch(fetchUsers)
 
 function App () {
   const [state, setState] = useState(1)
-  const users = useSuspense(state)
+  const users = useFetch(state)
 
   return (
     <main>

@@ -1,10 +1,10 @@
-export function createSuspense (promise) {
+export function createFetch (promise) {
   let pending = true
   let result
   let currentState = null
 
   return {
-    useSuspense (state) {
+    useFetch (state) {
       if (currentState !== state) {
         pending = true
         currentState = state
