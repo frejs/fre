@@ -1,20 +1,19 @@
-export function useSuspense (promise) {
-  let status = 'pending'
+export function createSuspense (promise) {
+  let pending = true
   let result
   let currentState = null
-  let suspense = arg =>
-    promise(arg).then(res => {
-      status = 'success'
-      result = res
-    })
+
   return {
-    read (state) {
+    useSuspense (state) {
       if (currentState !== state) {
-        status = 'pending'
+        pending = true
         currentState = state
       }
-      if (status === 'pending') {
-        throw suspense(state)
+      if (pending) {
+        throw promise(state).then(res => {
+          pending = false
+          result = res
+        })
       } else {
         return result
       }
