@@ -37,9 +37,7 @@ function reconcileWork (didout) {
         err.then(() => {
           WIP = suspendWork
         })
-      } else {
-        throw err
-      }
+      } else throw err
     }
   }
   if (preCommit) {
