@@ -1,10 +1,22 @@
-import { h, render, useState } from '../../src'
-import { createResource } from './dogApi'
-const resource = createResource()
+import { h, render, useState, useEffect } from '../../src'
+import { useSuspense } from './use-suspense'
+
+function fetchUsers (num) {
+  console.log('fetch users from clicli...')
+  return fetch('https://api.clicli.us/users?level=4&page=1&pageSize=' + num)
+    .then(res => res.json())
+    .then(data => {
+      return data.users
+    })
+}
+
+const result = useSuspense(fetchUsers)
+
 function App () {
   const [state, setState] = useState(1)
-  const users = resource.read(state)
+  const users = result.read(state)
   const handler = () => setState(state + 1)
+
   return (
     <main>
       <h1>Fetching clicli users</h1>
