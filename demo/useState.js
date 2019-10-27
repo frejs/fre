@@ -1,22 +1,13 @@
-import { h, render, useState } from '../src'
+import { h, render, useState } from "../src"
 
-function Counter () {
-  const [data] = useState(['a','b'])
-  var num = <p>hello</p>
-
+function Counter() {
+  const [count, setCount] = useState(0)
   return (
     <div>
-      {data.map(item => {
-        console.log(num)
-        return (
-          <li key={item}>
-            {item}
-            {num}
-          </li>
-        )
-      })}
+      <h1>{count}</h1>
+      <button onClick={() => setCount(count => count + 1)}>+</button>
     </div>
   )
 }
 
-render(<Counter />, document.getElementById('root'))
+render(<Counter />, document.getElementById("root"))

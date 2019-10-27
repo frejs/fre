@@ -1,4 +1,4 @@
-import { scheduleWork, getHook } from './reconciler'
+import { scheduleWork, getHook, isFn } from './reconciler'
 
 let cursor = 0
 
@@ -14,9 +14,9 @@ export function useReducer (reducer, initState) {
   let wip = getHook()
   let key = getKey()
 
-  function setter(value) {
-    value = reducer ? reducer(wip.state[key], value) : value
-    wip.state[key] = value
+  function setter (value) {
+    let newValue = reducer ? reducer(wip.state[key], value) : isFn(value) ? value(wip.state[key]) : value
+    wip.state[key] = newValue
     scheduleWork(wip, true)
   }
 
@@ -61,6 +61,6 @@ function isChanged (a, b) {
 
 function getKey () {
   let key = '$' + cursor
-  cursor ++
+  cursor++
   return key
 }
