@@ -26,8 +26,21 @@ export function scheduleWork (fiber, lock) {
 }
 
 function reconcileWork (didout) {
+  let suspendWork = null
   while (WIP && (!shouldYeild() || didout)) {
-    WIP = reconcile(WIP)
+    try {
+      WIP = reconcile(WIP)
+    } catch (err) {
+      if (!!err && typeof err.then === 'function') {
+        suspendWork = WIP
+        WIP = null
+        err.then(() => {
+          WIP = suspendWork
+        })
+      } else {
+        throw err
+      }
+    }
   }
   if (preCommit) {
     commitWork(preCommit)

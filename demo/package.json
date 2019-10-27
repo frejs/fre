@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "parcel index.html",
-    "concurrent": "parcel ./concurrent/index.html"
+    "concurrent": "parcel ./concurrent/index.html",
+    "suspense": "parcel ./suspense/index.html"
   },
   "keywords": [],
   "author": "",
