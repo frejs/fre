@@ -52,7 +52,7 @@ export function useCallback (cb, deps) {
 }
 
 export function useRef (current) {
-  return { current }
+  return useMemo(() => ({ current }), [])
 }
 
 function isChanged (a, b) {

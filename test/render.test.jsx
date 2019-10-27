@@ -287,6 +287,33 @@ test('obtain reference to DOM element', async () => {
   expect(ref.current).toBe(elements[0])
 })
 
+test('persist reference to any value', async () => {
+  const Component = () => {
+    const ref = useRef("")
+
+    ref.current = ref.current + "x"
+
+    return <p>{ref.current}</p>
+  }
+
+  const content = <Component/>
+
+  await testUpdates([
+    {
+      content,
+      test: ([p]) => {
+        expect(p.textContent).toBe("x")
+      }
+    },
+    {
+      content,
+      test: ([p]) => {
+        expect(p.textContent).toBe("xx")
+      }
+    }
+  ])
+})
+
 test('reorder and reuse elements during key-based reconciliation of child-nodes', async () => {
   const states = [
     [1, 2, 3],
