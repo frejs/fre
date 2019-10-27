@@ -34,9 +34,7 @@ function reconcileWork (didout) {
       if (!!err && typeof err.then === 'function') {
         suspendWork = WIP
         WIP = null
-        err.then(() => {
-          WIP = suspendWork
-        })
+        err.then(() => (WIP = suspendWork))
       } else throw err
     }
   }
