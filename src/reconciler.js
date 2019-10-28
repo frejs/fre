@@ -71,7 +71,8 @@ function updateHOOK (WIP) {
 
   currentHook = WIP
   resetCursor()
-  reconcileChildren(WIP, WIP.type(WIP.props))
+  let children = WIP.type(WIP.props)
+  reconcileChildren(WIP, children)
 }
 
 function updateHost (WIP) {
@@ -83,7 +84,9 @@ function updateHost (WIP) {
   WIP.insertPoint = p.last || null
   p.last = WIP
   WIP.node.last = null
-  reconcileChildren(WIP, WIP.props.children)
+  const children = WIP.props.children
+
+  reconcileChildren(WIP, children)
 }
 function getParentNode (fiber) {
   while ((fiber = fiber.parent)) {
@@ -92,9 +95,10 @@ function getParentNode (fiber) {
 }
 
 function reconcileChildren (WIP, children) {
+  children = wrieText(children)
   if (!children) return
-  delete WIP.child
 
+  delete WIP.child
   const oldFibers = WIP.kids
   const newFibers = (WIP.kids = hashfy(children))
 
@@ -246,6 +250,11 @@ function hashfy (arr) {
   })
   return out
 }
+
+function wrieText (str) {
+  return typeof str === 'string' || typeof str === 'number' ? { type: 'text', props: { nodeValue: str } } : str
+}
+
 
 export const isFn = fn => typeof fn === 'function'
 
