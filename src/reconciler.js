@@ -30,12 +30,12 @@ function reconcileWork (didout) {
   while (WIP && (!shouldYeild() || didout)) {
     try {
       WIP = reconcile(WIP)
-    } catch (err) {
-      if (!!err && typeof err.then === 'function') {
+    } catch (e) {
+      if (!!e && typeof e.then === 'function') {
         suspendWork = WIP
         WIP = null
-        err.then(() => (WIP = suspendWork))
-      } else throw err
+        e.then(() => (WIP = suspendWork))
+      } else throw e
     }
   }
   if (preCommit) {
@@ -95,8 +95,8 @@ function getParentNode (fiber) {
 }
 
 function reconcileChildren (WIP, children) {
-  children = wrieText(children)
   if (!children) return
+  children = wrieText(children)
 
   delete WIP.child
   const oldFibers = WIP.kids
