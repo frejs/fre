@@ -50,12 +50,15 @@ function reconcile (WIP) {
   WIP.parentNode = getParentNode(WIP)
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
-  while (WIP) {
-    if (WIP.lock == false || !WIP.parent) {
-      preCommit = WIP
+  let node = WIP
+  while (node) {
+    if (node.lock == false || !node.parent) {
+      preCommit = node
     }
-    if (WIP.sibling && WIP.lock == null) return WIP.sibling
-    WIP = WIP.parent
+    if (node.sibling && node.lock == null) {
+      return node.sibling
+    }
+    node = node.parent
   }
 }
 
@@ -152,8 +155,10 @@ function shouldPlace (fiber) {
 }
 
 function commitWork (fiber) {
+  let root = fiber.child
   let node = fiber.child
-  while (node) {
+
+  O: while (true) {
     commit(node)
     if (node.dels) {
       node.dels.forEach(f => commit(f))
@@ -163,13 +168,12 @@ function commitWork (fiber) {
       node = node.child
       continue
     }
-    while (node) {
-      if (node.sibling) {
-        node = node.sibling
-        break
-      }
+    if (node === root) break O
+    while (!node.sibling) {
+      if (!node.parent || node.parent === root) break O
       node = node.parent
     }
+    node = node.sibling
   }
 
   fiber.done && fiber.done()
