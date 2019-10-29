@@ -7,7 +7,8 @@ export const [HOST, SVG, HOOK, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5]
 
 let preCommit = null
 let currentHook = null
-export let WIP = null
+let WIP = null
+let commitQueue = []
 
 export function render (vnode, node, done) {
   let rootFiber = {
@@ -26,15 +27,15 @@ export function scheduleWork (fiber, lock) {
 }
 
 function reconcileWork (didout) {
-  let suspendWork = null
+  let suspend = null
   while (WIP && (!shouldYeild() || didout)) {
     try {
       WIP = reconcile(WIP)
     } catch (e) {
       if (!!e && typeof e.then === 'function') {
-        suspendWork = WIP
+        suspend = WIP
         WIP = null
-        e.then(() => (WIP = suspendWork))
+        e.then(() => (WIP = suspend))
       } else throw e
     }
   }
@@ -49,6 +50,8 @@ function reconcileWork (didout) {
 function reconcile (WIP) {
   WIP.parentNode = getParentNode(WIP)
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
+  commitQueue.push(WIP)
+
   if (WIP.child) return WIP.child
   let node = WIP
   while (node) {
@@ -96,7 +99,7 @@ function getParentNode (fiber) {
 
 function reconcileChildren (WIP, children) {
   if (!children) return
-  children = wrieText(children)
+  // children = wrieText(children)
 
   delete WIP.child
   const oldFibers = WIP.kids
@@ -159,30 +162,20 @@ function shouldPlace (fiber) {
 }
 
 function commitWork (fiber) {
-  let root = fiber.child
-  let node = fiber.child
+  commitQueue.forEach(c => {
+    if (c.parent) {
+      commit(c)
+      if (c.dels) {
+        c.dels.forEach(d => commit(d))
+        c.dels = []
+      }
+    }
+  })
 
-  O: while (true) {
-    commit(node)
-    if (node.dels) {
-      node.dels.forEach(f => commit(f))
-      node.dels = []
-    }
-    if (node.child) {
-      node = node.child
-      continue
-    }
-    if (node === root) break O
-    while (!node.sibling) {
-      if (!node.parent || node.parent === root) break O
-      node = node.parent
-    }
-    node = node.sibling
-  }
-
-  fiber.done && fiber.done()
   WIP = null
+  commitQueue = []
   preCommit = null
+  fiber.done && fiber.done()
 }
 
 function applyEffect (fiber) {
@@ -250,11 +243,6 @@ function hashfy (arr) {
   })
   return out
 }
-
-function wrieText (str) {
-  return typeof str === 'string' || typeof str === 'number' ? { type: 'text', props: { nodeValue: str } } : str
-}
-
 
 export const isFn = fn => typeof fn === 'function'
 

@@ -7,7 +7,11 @@ export function h (type, attrs) {
   for (let i = 2; i < arguments.length; i++) {
     let vnode = arguments[i]
     if (vnode == null || vnode === true || vnode === false) {
-    } else children.push(vnode)
+    } else if (typeof vnode === 'string' || typeof vnode === 'number') {
+      children.push({ type: 'text', props: { nodeValue: vnode } })
+    } else {
+      children.push(vnode)
+    }
   }
 
   if (children.length) {
