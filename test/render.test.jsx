@@ -116,12 +116,6 @@ test('render/update object properties and DOM attributes', async () => {
 
         lastChildren.forEach((lastChild, index) => expect(elements[0].children[index]).toBe(lastChild))
       }
-    },
-    {
-      content: "removed",
-      test: ([text]) => {
-        expect(text.textContent).toBe("removed")
-      }
     }
   ])
 })

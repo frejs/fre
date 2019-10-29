@@ -78,9 +78,9 @@ test('emit JSX string/number literals', () => {
     ref: null,
     props: {
       children: [
-        "hello",
-        "",
-        123,
+        { type: "text", props: { nodeValue: "hello" } },
+        { type: "text", props: { nodeValue: "" } },
+        { type: "text", props: { nodeValue: 123 } },
       ]
     }
   })
@@ -97,7 +97,10 @@ test('emit JSX component nodes', () => {
     ref: null,
     props: {
       value: "foo",
-      children:  "bar" 
+      children: {
+        type: "text",
+        props: { nodeValue: "bar" }
+      }
     }
   })
 })
