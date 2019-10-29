@@ -1,6 +1,7 @@
 /** @jsx h */
 
-import { h, render, useReducer, useCallback, useEffect } from '../../../dist/fre-esm';
+// import { h, render, useReducer, useCallback, useEffect } from 'fre/src/index';
+import { h, render, useReducer, useCallback, useEffect } from '../../../src/index';
 
 //import { h, render } from "preact";
 //import { useState, useEffect } from "preact/hooks";

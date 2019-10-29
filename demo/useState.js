@@ -1,7 +1,7 @@
 import { h, render, useState } from '../src'
 
 function Counter () {
-  return <div>hello world</div>
+  return 'hello world'
 }
 
 render(<Counter />, document.getElementById('root'),()=>{

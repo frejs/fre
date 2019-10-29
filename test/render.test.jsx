@@ -116,6 +116,12 @@ test('render/update object properties and DOM attributes', async () => {
 
         lastChildren.forEach((lastChild, index) => expect(elements[0].children[index]).toBe(lastChild))
       }
+    },
+    {
+      content: 'removed',
+      test: ([text]) => {
+        expect(text.textContent).toBe('removed')
+      }
     }
   ])
 })
@@ -289,26 +295,26 @@ test('obtain reference to DOM element', async () => {
 
 test('persist reference to any value', async () => {
   const Component = () => {
-    const ref = useRef("")
+    const ref = useRef('')
 
-    ref.current = ref.current + "x"
+    ref.current = ref.current + 'x'
 
     return <p>{ref.current}</p>
   }
 
-  const content = <Component/>
+  const content = <Component />
 
   await testUpdates([
     {
       content,
       test: ([p]) => {
-        expect(p.textContent).toBe("x")
+        expect(p.textContent).toBe('x')
       }
     },
     {
       content,
       test: ([p]) => {
-        expect(p.textContent).toBe("xx")
+        expect(p.textContent).toBe('xx')
       }
     }
   ])
@@ -340,7 +346,7 @@ test('reorder and reuse elements during key-based reconciliation of child-nodes'
           {state.map(value => (
             <li key={value}>{value}</li>
           ))}
-          <p/>
+          <p />
         </ul>
       ),
       test: elements => {
@@ -407,7 +413,7 @@ test('async state update', async () => {
     return <button onClick={() => setState(count => count + 1)}>{count}</button>
   }
 
-  const content = <Component/>
+  const content = <Component />
 
   await testUpdates([
     {
@@ -426,7 +432,7 @@ test('async state update', async () => {
       content,
       test: ([button]) => {
         expect(+button.textContent).toBe(3) // all 3 state updates applied
-        expect(updates).toBe(2)             // but component only renders once
+        expect(updates).toBe(2) // but component only renders once
       }
     }
   ])

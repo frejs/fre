@@ -1,6 +1,7 @@
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild } from './scheduler'
+import { createText } from './h'
 
 export const options = {}
 export const [HOST, SVG, HOOK, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5]
@@ -76,7 +77,11 @@ function updateHOOK (WIP) {
   WIP.__deps = WIP.__deps || { m: {}, e: {} }
   currentHook = WIP
   resetCursor()
-  reconcileChildren(WIP, WIP.type(WIP.props))
+  let children = WIP.type(WIP.props)
+  if (!children.type) {
+    children = createText(children)
+  }
+  reconcileChildren(WIP, children)
 }
 
 function updateHost (WIP) {
@@ -98,8 +103,6 @@ function getParentNode (fiber) {
 
 function reconcileChildren (WIP, children) {
   if (!children) return
-  // children = wrieText(children)
-
   delete WIP.child
   const oldFibers = WIP.kids
   const newFibers = (WIP.kids = hashfy(children))
