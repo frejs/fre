@@ -26,15 +26,15 @@ export function scheduleWork (fiber, lock) {
 }
 
 function reconcileWork (didout) {
-  let suspendWork = null
+  let suspend = null
   while (WIP && (!shouldYeild() || didout)) {
     try {
       WIP = reconcile(WIP)
     } catch (e) {
       if (!!e && typeof e.then === 'function') {
-        suspendWork = WIP
+        suspend = WIP
         WIP = null
-        e.then(() => (WIP = suspendWork))
+        e.then(() => (WIP = suspend))
       } else throw e
     }
   }
