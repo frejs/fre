@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "fre": "^1.8.8",
+    "preact": "^10.0.3",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.9"
   }

@@ -1,6 +1,9 @@
 /** @jsx h */
 
-import { h, render, useReducer, useCallback, useEffect } from '../../../src';
+import { h, render, useReducer, useCallback, useEffect } from '../../../dist/fre-esm';
+
+//import { h, render } from "preact";
+//import { useState, useEffect } from "preact/hooks";
 
 function random(max) { return Math.round(Math.random() * 1000) % max; }
 
