@@ -10,7 +10,7 @@ let frameLength = 5
 export function scheduleCallback (callback) {
   const currentTime = getTime()
   let startTime = currentTime
-  let timeout = 2000
+  let timeout = 5000
   let dueTime = startTime + timeout
 
   let newTask = {
@@ -50,11 +50,9 @@ function workLoop (iniTime) {
     let callback = currentTask.callback
     if (callback) {
       currentTask.callback = null
-
       const didout = currentTask.dueTime <= currentTime
-
+      
       let next = callback(didout)
-
       if (next) {
         currentTask.callback = next
       } else {
@@ -72,7 +70,7 @@ function workLoop (iniTime) {
 function performWork () {
   if (currentCallback) {
     let currentTime = getTime()
-    frameDeadline = currentTime + (frameLength += 0.1)
+    frameDeadline = currentTime + frameLength
     let moreWork = currentCallback(currentTime)
 
     if (moreWork) {
@@ -80,7 +78,6 @@ function performWork () {
     } else {
       scheduling = false
       currentCallback = null
-      frameLength = 5
     }
   }
 }

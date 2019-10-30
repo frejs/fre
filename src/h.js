@@ -8,7 +8,7 @@ export function h (type, attrs) {
     let vnode = arguments[i]
     if (vnode == null || vnode === true || vnode === false) {
     } else if (typeof vnode === 'string' || typeof vnode === 'number') {
-      children.push({ type: 'text', props: { nodeValue: vnode } })
+      children.push(createText(vnode))
     } else {
       children.push(vnode)
     }
@@ -21,4 +21,8 @@ export function h (type, attrs) {
   delete props.key
   delete props.ref
   return { type, props, key, ref }
+}
+
+export function createText(vnode){
+  return { type: 'text', props: { nodeValue: vnode } }
 }

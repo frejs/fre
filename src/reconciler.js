@@ -1,6 +1,7 @@
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild } from './scheduler'
+import { createText } from './h'
 
 export const options = {}
 export const [HOST, SVG, HOOK, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5]
@@ -35,7 +36,9 @@ function reconcileWork (didout) {
       if (!!e && typeof e.then === 'function') {
         suspend = WIP
         WIP = null
-        e.then(() => (WIP = suspend))
+        e.then(() => {
+          WIP = suspend
+        })
       } else throw e
     }
   }
@@ -43,7 +46,9 @@ function reconcileWork (didout) {
     commitWork(preCommit)
     return null
   }
-  if (!didout) return reconcileWork.bind(null)
+  if (!didout) {
+    return reconcileWork.bind(null)
+  }
   return null
 }
 
@@ -53,15 +58,14 @@ function reconcile (WIP) {
   commitQueue.push(WIP)
 
   if (WIP.child) return WIP.child
-  let node = WIP
-  while (node) {
-    if (node.lock == false || !node.parent) {
-      preCommit = node
+  while (WIP) {
+    if (WIP.lock == false || !WIP.parent) {
+      preCommit = WIP
     }
-    if (node.sibling && node.lock == null) {
-      return node.sibling
+    if (WIP.sibling && WIP.lock == null) {
+      return WIP.sibling
     }
-    node = node.parent
+    WIP = WIP.parent
   }
 }
 
@@ -71,10 +75,12 @@ function updateHOOK (WIP) {
   WIP.effect = {}
   WIP.memo = WIP.memo || {}
   WIP.__deps = WIP.__deps || { m: {}, e: {} }
-
   currentHook = WIP
   resetCursor()
   let children = WIP.type(WIP.props)
+  if (!children.type) {
+    children = createText(children)
+  }
   reconcileChildren(WIP, children)
 }
 
@@ -87,9 +93,7 @@ function updateHost (WIP) {
   WIP.insertPoint = p.last || null
   p.last = WIP
   WIP.node.last = null
-  const children = WIP.props.children
-
-  reconcileChildren(WIP, children)
+  reconcileChildren(WIP, WIP.props.children)
 }
 function getParentNode (fiber) {
   while ((fiber = fiber.parent)) {
@@ -99,8 +103,6 @@ function getParentNode (fiber) {
 
 function reconcileChildren (WIP, children) {
   if (!children) return
-  // children = wrieText(children)
-
   delete WIP.child
   const oldFibers = WIP.kids
   const newFibers = (WIP.kids = hashfy(children))
@@ -115,8 +117,7 @@ function reconcileChildren (WIP, children) {
       reused[k] = oldFiber
     } else {
       oldFiber.op = DELETE
-      WIP.dels = WIP.dels || []
-      WIP.dels.push(oldFiber)
+      commitQueue.push(oldFiber)
     }
   }
 
@@ -163,13 +164,7 @@ function shouldPlace (fiber) {
 
 function commitWork (fiber) {
   commitQueue.forEach(c => {
-    if (c.parent) {
-      commit(c)
-      if (c.dels) {
-        c.dels.forEach(d => commit(d))
-        c.dels = []
-      }
-    }
+    if (c.parent) commit(c)
   })
 
   WIP = null
@@ -183,8 +178,7 @@ function applyEffect (fiber) {
   for (const k in fiber.effect) {
     const pend = fiber.pending[k]
     pend && pend()
-    let after = null
-    after = fiber.effect[k]()
+    const after = fiber.effect[k]()
     after && (fiber.pending[k] = after)
   }
   fiber.effect = null
