@@ -1,4 +1,4 @@
-import { scheduleWork, getHook, isFn } from './reconciler'
+import { scheduleWork, getHook, isFn, currentHook } from './reconciler'
 
 let cursor = 0
 
@@ -11,40 +11,40 @@ export function useState (initState) {
 }
 
 export function useReducer (reducer, initState) {
-  let wip = getHook()
-  let key = getKey()
+  let hook = getHook(cursor++)
 
   function setter (value) {
-    let newValue = reducer ? reducer(wip.state[key], value) : isFn(value) ? value(wip.state[key]) : value
-    wip.state[key] = newValue
-    scheduleWork(wip, true)
+    let newValue = reducer ? reducer(hook[0], value) : isFn(value) ? value(hook[0]) : value
+    hook[0] = newValue
+    scheduleWork(currentHook, true)
   }
 
-  if (key in wip.state) {
-    return [wip.state[key], setter]
+  if (hook.length) {
+    return [hook[0], setter]
   } else {
-    wip.state[key] = initState
+    hook[0] = initState
     return [initState, setter]
   }
 }
 
 export function useEffect (cb, deps) {
-  let wip = getHook()
-  let key = getKey()
-  if (isChanged(wip.__deps.e[key], deps)) {
-    wip.effect[key] = useCallback(cb, deps)
-    wip.__deps.e[key] = deps
+  let hook = getHook(cursor++)
+
+  if (isChanged(hook[1], deps)) {
+    hook[0] = useCallback(cb, deps)
+    hook[1] = deps
+    currentHook.hooks.pendingEffects.push(hook)
   }
 }
 
 export function useMemo (cb, deps) {
-  let wip = getHook()
-  let key = getKey()
-  if (isChanged(wip.__deps.m[key], deps)) {
-    wip.__deps.m[key] = deps
-    return (wip.memo[key] = cb())
+  let hook = getHook(cursor++)
+
+  if (isChanged(hook[1], deps)) {
+    hook[1] = deps
+    return (hook[0] = cb())
   }
-  return wip.memo[key]
+  return hook[0]
 }
 
 export function useCallback (cb, deps) {
@@ -57,10 +57,4 @@ export function useRef (current) {
 
 function isChanged (a, b) {
   return !a || b.some((arg, index) => arg !== a[index])
-}
-
-function getKey () {
-  let key = '$' + cursor
-  cursor++
-  return key
 }

@@ -7,7 +7,7 @@ export const options = {}
 export const [HOST, SVG, HOOK, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5]
 
 let preCommit = null
-let currentHook = null
+export let currentHook = null
 let WIP = null
 let commitQueue = []
 
@@ -71,10 +71,6 @@ function reconcile (WIP) {
 
 function updateHOOK (WIP) {
   WIP.props = WIP.props || {}
-  WIP.state = WIP.state || {}
-  WIP.effect = {}
-  WIP.memo = WIP.memo || {}
-  WIP.__deps = WIP.__deps || { m: {}, e: {} }
   currentHook = WIP
   resetCursor()
   let children = WIP.type(WIP.props)
@@ -174,14 +170,18 @@ function commitWork (fiber) {
 }
 
 function applyEffect (fiber) {
-  fiber.pending = fiber.pending || {}
-  for (const k in fiber.effect) {
-    const pend = fiber.pending[k]
-    pend && pend()
-    const after = fiber.effect[k]()
-    after && (fiber.pending[k] = after)
-  }
-  fiber.effect = null
+  fiber.hooks.pendingEffects.forEach(invokeCleanup)
+  fiber.hooks.pendingEffects.forEach(invokeEffect)
+  fiber.hooks.pendingEffects = []
+}
+
+function invokeCleanup(hook) {
+	if (hook[2]) hook[2]()
+}
+
+function invokeEffect(item) {
+	const result = item[0]()
+	if (typeof result === 'function') item[2] = result
 }
 
 function commit (fiber) {
@@ -240,6 +240,10 @@ function hashfy (arr) {
 
 export const isFn = fn => typeof fn === 'function'
 
-export function getHook () {
-  return currentHook || {}
+export function getHook (cursor) {
+  let hooks = currentHook.hooks || (currentHook.hooks = { list: [], pendingEffects: [] })
+  if (cursor >= hooks.list.length) {
+    hooks.list.push([])
+  }
+  return hooks.list[cursor] || []
 }
