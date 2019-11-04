@@ -1,7 +1,6 @@
 import { scheduleWork, getHook, isFn, currentHook } from './reconciler'
 
 let cursor = 0
-
 export function resetCursor () {
   cursor = 0
 }
@@ -34,7 +33,7 @@ export function useEffect (cb, deps) {
   if (isChanged(hook[1], deps)) {
     hook[0] = useCallback(cb, deps)
     hook[1] = deps
-    currentHook.hooks.pendingEffects.push(hook)
+    currentHook.hooks.effects.push(hook)
   }
 }
 

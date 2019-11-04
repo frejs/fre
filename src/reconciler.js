@@ -180,9 +180,9 @@ function invokeEffect (hook) {
 
 function flushEffects (fiber) {
   if (fiber.hooks) {
-    fiber.hooks.pendingEffects.forEach(invokeCleanup)
-    fiber.hooks.pendingEffects.forEach(invokeEffect)
-    fiber.hooks.pendingEffects = []
+    fiber.hooks.effects.forEach(invokeCleanup)
+    fiber.hooks.effects.forEach(invokeEffect)
+    fiber.hooks.effects = []
   }
 }
 
@@ -235,7 +235,7 @@ function hashfy (arr) {
 export const isFn = fn => typeof fn === 'function'
 
 export function getHook (cursor) {
-  let hooks = currentHook.hooks || (currentHook.hooks = { list: [], pendingEffects: [] })
+  let hooks = currentHook.hooks || (currentHook.hooks = { list: [], effects: [] })
   if (cursor >= hooks.list.length) {
     hooks.list.push([])
   }
