@@ -169,19 +169,19 @@ function commitWork (fiber) {
   fiber.done && fiber.done()
 }
 
-function applyEffect (fiber) {
+function invokeCleanup (hook) {
+  if (hook[2]) hook[2]()
+}
+
+function invokeEffect (item) {
+  const result = item[0]()
+  if (typeof result === 'function') item[2] = result
+}
+
+function flushEffects (fiber) {
   fiber.hooks.pendingEffects.forEach(invokeCleanup)
   fiber.hooks.pendingEffects.forEach(invokeEffect)
   fiber.hooks.pendingEffects = []
-}
-
-function invokeCleanup(hook) {
-	if (hook[2]) hook[2]()
-}
-
-function invokeEffect(item) {
-	const result = item[0]()
-	if (typeof result === 'function') item[2] = result
 }
 
 function commit (fiber) {
@@ -190,12 +190,10 @@ function commit (fiber) {
   let dom = fiber.node
   let ref = fiber.ref
   if (op === DELETE) {
-    cleanup(fiber)
     while (fiber.tag === HOOK) fiber = fiber.child
     parent.removeChild(fiber.node)
-    fiber.node = null
   } else if (fiber.tag === HOOK) {
-    applyEffect(fiber)
+    requestAnimationFrame(() => flushEffects(fiber))
   } else if (op === UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props)
   } else {
@@ -207,12 +205,6 @@ function commit (fiber) {
   }
 
   if (ref) isFn(ref) ? ref(dom) : (ref.current = dom)
-}
-
-function cleanup (fiber) {
-  let pend = fiber.pending
-  for (const k in pend) pend[k]()
-  fiber.pending = null
 }
 
 function createFiber (vnode, op) {

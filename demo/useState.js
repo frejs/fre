@@ -7,7 +7,7 @@ function App () {
     return () => {
       console.log(222)
     }
-  },[])
+  },[state])
   return (
     <div>
       {state}
