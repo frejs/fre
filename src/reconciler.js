@@ -173,15 +173,17 @@ function invokeCleanup (hook) {
   if (hook[2]) hook[2]()
 }
 
-function invokeEffect (item) {
-  const result = item[0]()
-  if (typeof result === 'function') item[2] = result
+function invokeEffect (hook) {
+  const result = hook[0]()
+  if (typeof result === 'function') hook[2] = result
 }
 
 function flushEffects (fiber) {
-  fiber.hooks.pendingEffects.forEach(invokeCleanup)
-  fiber.hooks.pendingEffects.forEach(invokeEffect)
-  fiber.hooks.pendingEffects = []
+  if (fiber.hooks) {
+    fiber.hooks.pendingEffects.forEach(invokeCleanup)
+    fiber.hooks.pendingEffects.forEach(invokeEffect)
+    fiber.hooks.pendingEffects = []
+  }
 }
 
 function commit (fiber) {
@@ -193,7 +195,7 @@ function commit (fiber) {
     while (fiber.tag === HOOK) fiber = fiber.child
     parent.removeChild(fiber.node)
   } else if (fiber.tag === HOOK) {
-    requestAnimationFrame(() => flushEffects(fiber))
+    setTimeout(() => flushEffects(fiber), 0)
   } else if (op === UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props)
   } else {

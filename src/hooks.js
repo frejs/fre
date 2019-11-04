@@ -11,12 +11,13 @@ export function useState (initState) {
 }
 
 export function useReducer (reducer, initState) {
-  let hook = getHook(cursor++)
+  const hook = getHook(cursor++)
+  const current = currentHook
 
   function setter (value) {
     let newValue = reducer ? reducer(hook[0], value) : isFn(value) ? value(hook[0]) : value
     hook[0] = newValue
-    scheduleWork(currentHook, true)
+    scheduleWork(current, true)
   }
 
   if (hook.length) {

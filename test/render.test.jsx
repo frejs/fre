@@ -32,10 +32,8 @@ const testUpdates = async updates => {
   for (let i = 1; i < updates.length; i++) {
     await new Promise(resolve => {
       effect = () => {
-        setTimeout(() => {
-          run(i)
-          resolve()
-        }, 0)
+        run(i)
+        resolve()
       }
 
       setContent(updates[i].content)

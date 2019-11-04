@@ -1,6 +1,8 @@
 import { h, render, useState, useEffect } from '../src'
 // import { render } from "react-dom"
 // import { createElement as h, useState, useEffect,useRef } from "react"
+// import { h, render } from 'preact'
+// import {useState, useEffect } from 'preact/hooks'
 
 function Counter ({ id, remove }) {
   const [count, setCount] = useState(0)
@@ -32,8 +34,6 @@ let nextId = 3
 function App () {
   const [counters, setCounters] = useState([1, 2, 3])
 
-  console.log(counters)
-
   return (
     <div>
       {counters.map(id => (
@@ -43,7 +43,6 @@ function App () {
           remove={() => setCounters(counters.filter(c => c !== id))}
         />
       ))}
-      <hr />
       <button onClick={() => setCounters(counters.concat(++nextId))}>
         Add new
       </button>
@@ -66,30 +65,14 @@ function App () {
 render(<App />, document.body)
 
 
-// 111
-// useEffect.js:10 111
 // useEffect.js:10 111
 // useEffect.js:13 222
 // useEffect.js:10 111
-// useEffect.js:35 (4) [1, 2, 3, 4]
 // useEffect.js:13 222
 // useEffect.js:10 111
 // useEffect.js:13 222
 // useEffect.js:10 111
 // useEffect.js:13 222
 // useEffect.js:10 111
-// useEffect.js:10 111
-// useEffect.js:35 (3) [1, 2, 3]
 // useEffect.js:13 222
-// useEffect.js:13 222
-// useEffect.js:10 111
-// useEffect.js:13 222
-// useEffect.js:10 111
-// useEffect.js:13 222
-// useEffect.js:10 111
-// useEffect.js:35 (2) [1, 3]
-// useEffect.js:13 222
-// useEffect.js:13 222
-// useEffect.js:10 111
-// useEffect.js:13 222
-// useEffect.js:10 111
+// 2useEffect.js:10 111
