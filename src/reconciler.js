@@ -118,17 +118,17 @@ function reconcileChildren (WIP, children) {
   }
 
   let prevFiber = null
-  let alternate = null
+  let copy = null
 
   for (const k in newFibers) {
     let newFiber = newFibers[k]
     let oldFiber = reused[k]
 
     if (oldFiber) {
-      alternate = createFiber(oldFiber, UPDATE)
+      copy = createFiber(oldFiber, UPDATE)
       newFiber.op = UPDATE
-      newFiber = { ...alternate, ...newFiber }
-      newFiber.alternate = alternate
+      newFiber = { ...copy, ...newFiber }
+      newFiber.copy = copy
       if (shouldPlace(newFiber)) {
         newFiber.op = PLACE
       }
@@ -192,7 +192,7 @@ function commit (fiber) {
   } else if (fiber.tag === HOOK) {
     setTimeout(() => flushEffects(fiber), 0)
   } else if (op === UPDATE) {
-    updateElement(dom, fiber.alternate.props, fiber.props)
+    updateElement(dom, fiber.copy.props, fiber.props)
   } else {
     let point = fiber.insertPoint ? fiber.insertPoint.node : null
     let after = point ? point.nextSibling : parent.firstChild
