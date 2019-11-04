@@ -24,7 +24,6 @@ export function render (vnode, node, done) {
 export function scheduleWork (fiber, lock) {
   fiber.lock = lock
   WIP = fiber
-  console.log(fiber)
   scheduleCallback(reconcileWork)
 }
 
@@ -172,8 +171,13 @@ function commitWork (fiber) {
 
 function flushEffects (fiber) {
   if (fiber.hooks) {
-    fiber.hooks.effects.forEach(cleanup)
-    fiber.hooks.effects.forEach(effect)
+    fiber.hooks.effects.forEach(hook => {
+      if (hook[2]) hook[2]()
+    })
+    fiber.hooks.effects.forEach(hook => {
+      const result = hook[0]()
+      if (typeof result === 'function') hook[2] = result
+    })
     fiber.hooks.effects = []
   }
 }
@@ -182,9 +186,7 @@ function commit (fiber) {
   let op = fiber.op
   let parent = fiber.parentNode
   let dom = fiber.node
-  let ref = fiber.ref
   if (op === DELETE) {
-    flushEffects(fiber)
     while (fiber.tag === HOOK) fiber = fiber.child
     parent.removeChild(fiber.node)
   } else if (fiber.tag === HOOK) {
@@ -198,8 +200,15 @@ function commit (fiber) {
     if (after === null && dom === parent.lastChild) return
     parent.insertBefore(dom, after)
   }
+  applyRef(fiber)
+}
 
-  if (ref) isFn(ref) ? ref(dom) : (ref.current = dom)
+function applyRef(fiber){
+  let ref = fiber.ref
+  if (ref) {
+    isFn(ref) ? ref(dom) : (ref.current = dom)
+    ref.current = null
+  }
 }
 
 function createFiber (vnode, op) {
@@ -233,13 +242,4 @@ export function getHook (cursor) {
     hooks.list.push([])
   }
   return hooks.list[cursor] || []
-}
-
-function cleanup (hook) {
-  if (hook[2]) hook[2]()
-}
-
-function effect (hook) {
-  const result = hook[0]()
-  if (typeof result === 'function') hook[2] = result
 }
