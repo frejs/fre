@@ -118,17 +118,17 @@ function reconcileChildren (WIP, children) {
   }
 
   let prevFiber = null
-  let copy = null
+  let alternate = null
 
   for (const k in newFibers) {
     let newFiber = newFibers[k]
     let oldFiber = reused[k]
 
     if (oldFiber) {
-      copy = createFiber(oldFiber, UPDATE)
+      alternate = createFiber(oldFiber, UPDATE)
       newFiber.op = UPDATE
-      newFiber = { ...copy, ...newFiber }
-      newFiber.copy = copy
+      newFiber = { ...alternate, ...newFiber }
+      newFiber.alternate = alternate
       if (shouldPlace(newFiber)) {
         newFiber.op = PLACE
       }
@@ -169,30 +169,19 @@ function commitWork (fiber) {
   fiber.done && fiber.done()
 }
 
-function flushEffects (fiber) {
-  if (fiber.hooks) {
-    fiber.hooks.effects.forEach(hook => {
-      if (hook[2]) hook[2]()
-    })
-    fiber.hooks.effects.forEach(hook => {
-      const result = hook[0]()
-      if (typeof result === 'function') hook[2] = result
-    })
-    fiber.hooks.effects = []
-  }
-}
-
 function commit (fiber) {
   let op = fiber.op
   let parent = fiber.parentNode
   let dom = fiber.node
+  let ref = fiber.ref
   if (op === DELETE) {
+    defer(fiber)
     while (fiber.tag === HOOK) fiber = fiber.child
     parent.removeChild(fiber.node)
   } else if (fiber.tag === HOOK) {
-    setTimeout(() => flushEffects(fiber), 0)
+    defer(fiber)
   } else if (op === UPDATE) {
-    updateElement(dom, fiber.copy.props, fiber.props)
+    updateElement(dom, fiber.alternate.props, fiber.props)
   } else {
     let point = fiber.insertPoint ? fiber.insertPoint.node : null
     let after = point ? point.nextSibling : parent.firstChild
@@ -200,14 +189,9 @@ function commit (fiber) {
     if (after === null && dom === parent.lastChild) return
     parent.insertBefore(dom, after)
   }
-  applyRef(fiber)
-}
-
-function applyRef(fiber){
-  let ref = fiber.ref
   if (ref) {
     isFn(ref) ? ref(dom) : (ref.current = dom)
-    ref.current = null
+    ref = null
   }
 }
 
@@ -237,9 +221,24 @@ function hashfy (arr) {
 export const isFn = fn => typeof fn === 'function'
 
 export function getHook (cursor) {
-  let hooks = currentHook.hooks || (currentHook.hooks = { list: [], effects: [] })
+  let hooks = currentHook.hooks || (currentHook.hooks = { list: [], effects: [], cleans: [] })
   if (cursor >= hooks.list.length) {
     hooks.list.push([])
   }
   return hooks.list[cursor] || []
+}
+
+function defer (fiber) {
+  requestAnimationFrame(() => {
+    if (fiber.hooks) {
+      fiber.hooks.cleans.forEach(hook => hook())
+      fiber.hooks.effects.forEach((hook, index) => {
+        const clean = hook[0]()
+        if (typeof clean === 'function') {
+          fiber.hooks.cleans[index] = clean
+          fiber.hooks.effects = []
+        }
+      })
+    }
+  })
 }

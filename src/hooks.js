@@ -29,7 +29,6 @@ export function useReducer (reducer, initState) {
 
 export function useEffect (cb, deps) {
   let hook = getHook(cursor++)
-
   if (isChanged(hook[1], deps)) {
     hook[0] = useCallback(cb, deps)
     hook[1] = deps
