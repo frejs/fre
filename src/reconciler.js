@@ -194,21 +194,6 @@ function commit (fiber) {
   }
 }
 
-
-function defer (fiber) {
-  requestAnimationFrame(() => {
-    if (fiber.hooks) {
-      fiber.hooks.cleans.forEach(c => c())
-      fiber.hooks.cleans = []
-      fiber.hooks.effects.forEach((e, i) => {
-        const clean = e[0]()
-        if (clean) fiber.hooks.cleans[i] = clean
-      })
-      fiber.hooks.effects = []
-    }
-  })
-}
-
 function createFiber (vnode, op) {
   return { ...vnode, op, tag: isFn(vnode.type) ? HOOK : HOST }
 }
@@ -233,3 +218,16 @@ function hashfy (arr) {
 }
 
 export const isFn = fn => typeof fn === 'function'
+
+function defer (fiber) {
+  requestAnimationFrame(() => {
+    if (fiber.hooks) {
+      fiber.hooks.cleanup.forEach(c => c())
+      fiber.hooks.effect.forEach((e, i) => {
+        const res = e[0]()
+        if (res) fiber.hooks.cleanup[i] = res
+      })
+      fiber.hooks.effect = []
+    }
+  })
+}

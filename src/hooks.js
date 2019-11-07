@@ -32,13 +32,12 @@ export function useEffect (cb, deps) {
   if (isChanged(hook[1], deps)) {
     hook[0] = useCallback(cb, deps)
     hook[1] = deps
-    currentHook.hooks.effects.push(hook)
+    currentHook.hooks.effect.push(hook)
   }
 }
 
 export function useMemo (cb, deps) {
   let hook = getHook(cursor++)
-
   if (isChanged(hook[1], deps)) {
     hook[1] = deps
     return (hook[0] = cb())
@@ -55,7 +54,7 @@ export function useRef (current) {
 }
 
 export function getHook (cursor) {
-  let hooks = currentHook.hooks || (currentHook.hooks = { list: [], effects: [], cleans: [] })
+  let hooks = currentHook.hooks || (currentHook.hooks = { list: [], effect: [], cleanup: [] })
   if (cursor >= hooks.list.length) {
     hooks.list.push([])
   }
