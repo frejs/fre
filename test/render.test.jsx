@@ -355,7 +355,7 @@ test('reorder and reuse elements during key-based reconciliation of child-nodes'
         if (stateNumber >= 1) {
           const lastState = states[stateNumber - 1]
 
-          // console.log(`transition from ${lastState.join(", ")} to ${state.join(", ")}`)
+          console.log(`transition from ${lastState.join(", ")} to ${state.join(", ")}`)
 
           state.forEach((value, index) => {
             const lastIndex = lastState.indexOf(value)

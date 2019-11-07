@@ -4,13 +4,13 @@ import { h, render, useState, useEffect } from '../../src'
 
 const UPDATE_EVERY = 1000
 const BLOCK_FOR = 3
-const NUM_COMPONENTS = 500
+const NUM_COMPONENTS = 20
 
 const App = () => {
   const [count, setCount] = useState(0)
 
   useEffect(() => {
-    setTimeout(() => setCount(count + 1), UPDATE_EVERY)
+      setTimeout(() => setCount(count + 1), UPDATE_EVERY)
   })
 
   const values = []

@@ -162,9 +162,9 @@ function commitWork (fiber) {
   commitQueue.forEach(c => {
     if (c.parent) commit(c)
   })
+  commitQueue = []
 
   WIP = null
-  commitQueue = []
   preCommit = null
   fiber.done && fiber.done()
 }
@@ -231,14 +231,12 @@ export function getHook (cursor) {
 function defer (fiber) {
   requestAnimationFrame(() => {
     if (fiber.hooks) {
-      fiber.hooks.cleans.forEach(hook => hook())
-      fiber.hooks.effects.forEach((hook, index) => {
-        const clean = hook[0]()
-        if (typeof clean === 'function') {
-          fiber.hooks.cleans[index] = clean
-          fiber.hooks.effects = []
-        }
+      fiber.hooks.cleans.forEach(c => c())
+      fiber.hooks.cleans = []
+      fiber.hooks.effects.forEach((e, i) => {
+        if (e[0]()) fiber.hooks.cleans[i] = clean
       })
+      fiber.hooks.effects = []
     }
   })
 }

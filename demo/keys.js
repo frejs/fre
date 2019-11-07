@@ -55,12 +55,12 @@ function App () {
   const [arr, setArr] = useState([1, 2, 3])
   return (
     <div>
-      <button onClick={() => setArr([2,3])}>+</button>
-      <ul>
+      <button onClick={() => setArr([3,1,2])}>+</button>
+
         {arr.map(i => (
-          <A key={i} value={i} />
+          // <A key={i} value={i} />
+          <li key={i}>{i}</li>
         ))}
-      </ul>
     </div>
   )
 }

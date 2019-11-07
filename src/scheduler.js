@@ -33,6 +33,7 @@ export function scheduleCallback (callback) {
 
 function flushWork (iniTime) {
   try {
+    console.log(111)
     return workLoop(iniTime)
   } finally {
     currentTask = null
@@ -51,7 +52,7 @@ function workLoop (iniTime) {
     if (callback) {
       currentTask.callback = null
       const didout = currentTask.dueTime <= currentTime
-      
+
       let next = callback(didout)
       if (next) {
         currentTask.callback = next
@@ -64,7 +65,11 @@ function workLoop (iniTime) {
     currentTime = getTime()
   }
 
-  return !!currentTask
+  if (currentTask) {
+    return true
+  } else {
+    return false
+  }
 }
 
 function performWork () {
