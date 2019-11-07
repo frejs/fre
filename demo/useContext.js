@@ -1,36 +1,13 @@
-import { createContext, useContext, render, h } from '../src'
-
-const ctx = createContext(0)
+import { useContext, Context, render, h } from 'fre'
 
 function App () {
-  const [count, setCount] = useContext(ctx)
-  return (
-    <div>
-      <h1>{count}</h1>
-      <button onClick={() => setCount(count + 1)}>+</button>
-      <Other />
-    </div>
-  )
+  const context = useContext(Context)
+  return <main>{context}</main>
 }
 
-function Other () {
-  const [count] = useContext(ctx)
-  return (
-    <div>
-      <h1>{count}</h1>
-      <button onClick={() => setCount(count + 1)}>+</button>
-    </div>
-  )
-}
-
-function Thrid () {
-  const [count, setCount] = useContext(ctx)
-  return (
-    <div>
-      <h1>{count}</h1>
-      <button onClick={() => setCount(count + 1)}>+</button>
-    </div>
-  )
-}
-
-render(<App />, document.getElementById('root'))
+render(
+  <Context value='hello world!'>
+    <App />
+  </Context>,
+  document.body
+)

@@ -1,6 +1,6 @@
 <p align="center"><img src="http://wx2.sinaimg.cn/mw690/0060lm7Tly1ftpm5b3ihfj3096097aaj.jpg" alt="fre logo" width="180"></p>
 <h1 align="center">Fre</h1>
-<p align="center">:ghost: Tiny React16 like library with Concurrent mode and Suspense.</p>
+<p align="center">:ghost: Tiny React16 like library with Concurrent and Suspense.</p>
 <p align="center">
 <a href="https://circleci.com/gh/132yse/fre"><img src="https://img.shields.io/circleci/project/github/132yse/fre.svg?style=flat-square" alt="Build Status"></a>
 <a href="https://codecov.io/gh/132yse/fre"><img src="https://img.shields.io/codecov/c/github/132yse/fre.svg?style=flat-square" alt="Code Coverage"></a>
@@ -12,8 +12,8 @@
 ### Feature
 
 - :tada: Functional Component and hooks API
-- :confetti_ball: Concurrent mode (also called time slicing) and Suspense
-- :telescope: keyed reconcilation (also called diff) algorithm
+- :confetti_ball: Concurrent and Suspense
+- :telescope: keyed reconcilation algorithm
 
 ### Introduction
 
@@ -214,43 +214,6 @@ function Counter() {
 
 render(<Counter />, document.getElementById("root"))
 ```
-
-### FunctionalComponent
-
-functionalComponent is a new components scheme
-
-```js
-function App() {
-  const [count, setCount] = useState(0)
-  return (
-    <div>
-      <h1>{count}</h1>
-      <button onClick={() => setCount(count + 1)}>+</button>
-      <Sex count={count} />
-    </div>
-  )
-}
-
-function Sex(props) {
-  const [sex, setSex] = useState("boy")
-  return (
-    <div>
-      <h2>{props.count}</h2>
-      <h1>{sex}</h1>
-      <button
-        onClick={() => {
-          sex === "boy" ? setSex("girl") : setSex("boy")
-        }}
-      >
-        x
-      </button>
-    </div>
-  )
-}
-
-render(<App />, document.getElementById("root"))
-```
-
 ### props
 
 Props are used for component communication
@@ -309,7 +272,6 @@ const Box = props => <div>{props.children("hello world!")}</div>
 If you want to rewrite any function, please use options, such as:
 
 ```js
-options.end = false
 options.commitWork = fiber => {
   // something you will rewrite commitWork
 }
@@ -331,7 +293,7 @@ import { h } from "fre"
 
 If browser environment, recommend to use [htm](https://github.com/developit/htm)
 
-#### Concurrent Mode
+#### Concurrent
 Fre implements a tiny priority scheduler, which like react Fiber.
 
 It can break the work, and when there are idle time, the work will continue.
