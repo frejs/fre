@@ -33,7 +33,6 @@ export function scheduleCallback (callback) {
 
 function flushWork (iniTime) {
   try {
-    console.log(111)
     return workLoop(iniTime)
   } finally {
     currentTask = null

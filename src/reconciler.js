@@ -234,7 +234,8 @@ function defer (fiber) {
       fiber.hooks.cleans.forEach(c => c())
       fiber.hooks.cleans = []
       fiber.hooks.effects.forEach((e, i) => {
-        if (e[0]()) fiber.hooks.cleans[i] = clean
+        const clean = e[0]()
+        if (clean) fiber.hooks.cleans[i] = clean
       })
       fiber.hooks.effects = []
     }
