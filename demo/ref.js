@@ -1,21 +1,55 @@
 // import { render } from "react-dom"
-// import { createElement as h, useCallback, useEffect,useRef } from "react"
+// import { createElement as h, useCallback, useEffect,useRef,useState } from "react"
 
-import { h, render, useCallback, useEffect,useRef } from '../src'
+import { render, h, useState, useEffect, useRef } from '../src'
 
-function Counter () {
-  const t = useCallback(node=>{
-    console.log(node)
-  })
-  useEffect(() => {
-    console.log(t)
-  })
+const refNum = { div: 0, h1: 0 }
+
+const makeRef = name => el => console.log(`- <${name}> updated: ` + ((el && el.tagName) || el) + ` [#${++refNum[name]}]`)
+
+const App = () => {
+  console.log('App render')
+
+  const [count, setCount] = useState(0)
+
+  useEffect(
+    () => {
+      console.log(`- App effect, deps: [${count}]`)
+
+      return () => {
+        console.log(`- App effect, deps: [${count}] -> clean-up`)
+      }
+    },
+    [count]
+  )
+
+  if (count < 2) {
+    setTimeout(() => {
+      console.log('App update')
+
+      setCount(count + 1)
+    }, 500)
+  }
+
   return (
-    <div ref={t}>
-      111
+    <div ref={makeRef('div')}>
+      <h1 ref={makeRef('h1')}>Hello World</h1>
+      <p id='test'>{count}</p>
     </div>
   )
 }
 
+const Wrapper = () => {
+  const [showApp, setShowApp] = useState(true)
 
-render(<Counter />, document.getElementById('root'))
+  if (showApp) {
+    setTimeout(() => {
+      console.log('Removing App...')
+      setShowApp(false)
+    }, 2000)
+  }
+
+  return showApp ? <App /> : <p>App removed...</p>
+}
+
+render(<Wrapper />, document.getElementById('root'))

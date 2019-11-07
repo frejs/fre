@@ -191,8 +191,22 @@ function commit (fiber) {
   }
   if (ref) {
     isFn(ref) ? ref(dom) : (ref.current = dom)
-    ref = null
   }
+}
+
+
+function defer (fiber) {
+  requestAnimationFrame(() => {
+    if (fiber.hooks) {
+      fiber.hooks.cleans.forEach(c => c())
+      fiber.hooks.cleans = []
+      fiber.hooks.effects.forEach((e, i) => {
+        const clean = e[0]()
+        if (clean) fiber.hooks.cleans[i] = clean
+      })
+      fiber.hooks.effects = []
+    }
+  })
 }
 
 function createFiber (vnode, op) {
@@ -219,25 +233,3 @@ function hashfy (arr) {
 }
 
 export const isFn = fn => typeof fn === 'function'
-
-export function getHook (cursor) {
-  let hooks = currentHook.hooks || (currentHook.hooks = { list: [], effects: [], cleans: [] })
-  if (cursor >= hooks.list.length) {
-    hooks.list.push([])
-  }
-  return hooks.list[cursor] || []
-}
-
-function defer (fiber) {
-  requestAnimationFrame(() => {
-    if (fiber.hooks) {
-      fiber.hooks.cleans.forEach(c => c())
-      fiber.hooks.cleans = []
-      fiber.hooks.effects.forEach((e, i) => {
-        const clean = e[0]()
-        if (clean) fiber.hooks.cleans[i] = clean
-      })
-      fiber.hooks.effects = []
-    }
-  })
-}

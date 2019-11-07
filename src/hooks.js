@@ -1,4 +1,4 @@
-import { scheduleWork, getHook, isFn, currentHook } from './reconciler'
+import { scheduleWork, isFn, currentHook } from './reconciler'
 
 let cursor = 0
 export function resetCursor () {
@@ -52,6 +52,14 @@ export function useCallback (cb, deps) {
 
 export function useRef (current) {
   return useMemo(() => ({ current }), [])
+}
+
+export function getHook (cursor) {
+  let hooks = currentHook.hooks || (currentHook.hooks = { list: [], effects: [], cleans: [] })
+  if (cursor >= hooks.list.length) {
+    hooks.list.push([])
+  }
+  return hooks.list[cursor] || []
 }
 
 function isChanged (a, b) {
