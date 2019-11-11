@@ -212,7 +212,7 @@ function App() {
 ```
 If it use a function, It can return a cleanup and exectes when removed.
 ```js
-function Counter () {
+function App () {
   const t = useRef(dom => {
     console.log(dom) // span
     return dom => {
