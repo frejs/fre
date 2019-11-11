@@ -178,7 +178,7 @@ function commit (fiber) {
     defer(fiber)
     while (fiber.tag === HOOK) fiber = fiber.child
     parent.removeChild(fiber.node)
-    dom = null
+    fiber.node = dom = null
   } else if (fiber.tag === HOOK) {
     defer(fiber)
   } else if (op === UPDATE) {
@@ -190,13 +190,7 @@ function commit (fiber) {
     if (after === null && dom === parent.lastChild) return
     parent.insertBefore(dom, after)
   }
-  if (ref) refer(ref, dom)
-}
-
-function refer (ref, dom) {
-  if (isFn(ref.current)) {
-    ref.current(dom)
-  } else ref.current = dom
+  if (ref) isFn(ref) ? ref(dom) : (ref.current = dom)
 }
 
 function createFiber (vnode, op) {
