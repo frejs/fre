@@ -174,8 +174,10 @@ function commit (fiber) {
   let parent = fiber.parentNode
   let dom = fiber.node
   let ref = fiber.ref
+  let del = false
   if (op === DELETE) {
     defer(fiber)
+    ref && refer(ref, dom, (del = true))
     while (fiber.tag === HOOK) fiber = fiber.child
     parent.removeChild(fiber.node)
   } else if (fiber.tag === HOOK) {
@@ -189,8 +191,17 @@ function commit (fiber) {
     if (after === null && dom === parent.lastChild) return
     parent.insertBefore(dom, after)
   }
-  if (ref) {
-    isFn(ref) ? ref(dom) : (ref.current = dom)
+  if (!del && ref) refer(ref, dom, del)
+}
+
+function refer (ref, dom, del) {
+  if (del) {
+    ref.cleanup(null)
+  } else {
+    if (isFn(ref.current)) {
+      const res = ref.current(dom)
+      if (res) ref.cleanup = res
+    } else ref.current = dom
   }
 }
 
