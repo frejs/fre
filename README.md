@@ -199,21 +199,30 @@ render(<Counter />, document.getElementById("root"))
 
 #### useRef
 
-`useRef` will return a object which contains current node.
+`useRef` will return a function or an object.
 
 ```js
-import { useRef, useEffect } from "fre"
-
-function Counter() {
+function App() {
   useEffect(() => {
     console.log(t) // { current:<div>t</div> }
   })
   const t = useRef(null)
   return <div ref={t}>t</div>
 }
-
-render(<Counter />, document.getElementById("root"))
 ```
+If it use a function, It can return a cleanup and exectes when removed.
+```js
+function Counter () {
+  const t = useRef(dom => {
+    console.log(dom) // span
+    return dom => {
+      console.log(dom) // null
+    }
+  })
+  return flag && <span ref={t}>I will removed</span>
+}
+```
+
 ### props
 
 Props are used for component communication
