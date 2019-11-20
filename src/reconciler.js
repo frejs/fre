@@ -176,9 +176,9 @@ function commit (fiber) {
   let ref = fiber.ref
   if (op === DELETE) {
     defer(fiber)
+    for (const k in fiber.kids) refer(fiber.kids[k].ref, (dom = null))
     while (fiber.tag === HOOK) fiber = fiber.child
     parent.removeChild(fiber.node)
-    fiber.node = dom = null
   } else if (fiber.tag === HOOK) {
     defer(fiber)
   } else if (op === UPDATE) {
@@ -190,7 +190,7 @@ function commit (fiber) {
     if (after === null && dom === parent.lastChild) return
     parent.insertBefore(dom, after)
   }
-  if (ref) isFn(ref) ? ref(dom) : (ref.current = dom)
+  refer(ref, dom)
 }
 
 function createFiber (vnode, op) {
@@ -206,7 +206,9 @@ function hashfy (arr) {
   arrayfy(arr).forEach(item => {
     if (item.pop) {
       item.forEach(item => {
-        item.key ? (out['.' + i + '.' + item.key] = item) : (out['.' + i + '.' + j] = item) && j++
+        item.key
+          ? (out['.' + i + '.' + item.key] = item)
+          : (out['.' + i + '.' + j] = item) && j++
       })
       i++
     } else {
@@ -229,4 +231,8 @@ function defer (fiber) {
       fiber.hooks.effect = []
     }
   })
+}
+
+function refer (ref, dom) {
+  if (ref) isFn(ref) ? ref(dom) : (ref.current = dom)
 }

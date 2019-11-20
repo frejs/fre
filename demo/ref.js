@@ -5,24 +5,28 @@ import { h, render, useRef, useEffect, useState } from '../src'
 
 function Counter () {
   const [count, setCount] = useState(true)
-  const t = useRef(null)
   return (
     <div>
-      {count && (
-        <span
-          ref={dom => {
-            if (dom) {
-              console.log('dosomething')
-            } else {
-              console.log('cleanup')
-            }
-          }}
-        >
-          111
-        </span>
-      )}
+      {count && <B />}
       <button onClick={() => setCount(!count)}>+</button>
     </div>
+  )
+}
+
+function B () {
+  return (
+    <span
+      ref={dom => {
+        console.log(dom)
+        if (dom) {
+          console.log('dosomething')
+        } else {
+          console.log('cleanup')
+        }
+      }}
+    >
+      111
+    </span>
   )
 }
 
