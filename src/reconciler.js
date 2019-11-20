@@ -190,6 +190,7 @@ function commit (fiber) {
     if (after === null && dom === parent.lastChild) return
     parent.insertBefore(dom, after)
   }
+  refer(ref, null)
   refer(ref, dom)
 }
 
@@ -219,9 +220,10 @@ function hashfy (arr) {
 }
 
 export const isFn = fn => typeof fn === 'function'
+const raf = requestAnimationFrame || setTimeout
 
 function defer (fiber) {
-  requestAnimationFrame(() => {
+  raf(() => {
     if (fiber.hooks) {
       fiber.hooks.cleanup.forEach(c => c())
       fiber.hooks.effect.forEach((e, i) => {
@@ -238,7 +240,7 @@ function refer (ref, dom) {
 }
 
 function delRef (kids) {
-  setTimeout(() => {
+  raf(() => {
     for (const k in kids) {
       const kid = kids[k]
       refer(kid.ref, null)
