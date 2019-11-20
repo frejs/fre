@@ -159,6 +159,7 @@ function shouldPlace (fiber) {
 }
 
 function commitWork (fiber) {
+  let refStack = []
   commitQueue.forEach(c => {
     if (c.parent) commit(c)
   })
@@ -183,6 +184,7 @@ function commit (fiber) {
     defer(fiber)
   } else if (op === UPDATE) {
     updateElement(dom, fiber.alternate.props, fiber.props)
+    refer(ref, null)
   } else {
     let point = fiber.insertPoint ? fiber.insertPoint.node : null
     let after = point ? point.nextSibling : parent.firstChild
@@ -190,7 +192,6 @@ function commit (fiber) {
     if (after === null && dom === parent.lastChild) return
     parent.insertBefore(dom, after)
   }
-  refer(ref, null)
   refer(ref, dom)
 }
 
