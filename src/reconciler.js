@@ -159,7 +159,6 @@ function shouldPlace (fiber) {
 }
 
 function commitWork (fiber) {
-  let refStack = []
   commitQueue.forEach(c => {
     if (c.parent) commit(c)
   })
@@ -221,7 +220,7 @@ function hashfy (arr) {
 }
 
 export const isFn = fn => typeof fn === 'function'
-const raf = requestAnimationFrame || setTimeout
+let raf = requestAnimationFrame || setTimeout
 
 function defer (fiber) {
   raf(() => {

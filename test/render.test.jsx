@@ -1,6 +1,12 @@
 /** @jsx h */
 
 import { h, render, useState, useEffect, useRef } from '../src/index'
+const nextTick = fn => {
+  let start = Date.now()
+  while(Date.now() < start + 16){
+      // defer 16ms
+  }
+}
 
 const testRender = jsx =>
   new Promise(resolve => {
@@ -162,7 +168,6 @@ test('useEffect(f, [x]) should run on changes to x', async () => {
 
   const Component = ({ value }) => {
     effects = []
-
     useEffect(() => effect(value), [value])
 
     return <div>foo</div>
@@ -219,6 +224,9 @@ test('useEffect(f, []) should run only once', async () => {
     {
       content: <Component />,
       test: () => {
+        setTimeout(() => {
+          console.log(effects) // this is correct
+        }, 16)
         expect(effects).toEqual(['effect'])
       }
     },
@@ -344,19 +352,15 @@ test('reorder and reuse elements during key-based reconciliation of child-nodes'
           {state.map(value => (
             <li key={value}>{value}</li>
           ))}
-          <p />
         </ul>
       ),
       test: elements => {
         const children = [...elements[0].children]
-        children.pop()
+        nextTick()
         expect(children.map(el => el.textContent)).toStrictEqual(state.map(value => '' + value))
 
         if (stateNumber >= 1) {
           const lastState = states[stateNumber - 1]
-
-          console.log(`transition from ${lastState.join(", ")} to ${state.join(", ")}`)
-
           state.forEach((value, index) => {
             const lastIndex = lastState.indexOf(value)
 
