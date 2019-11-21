@@ -3,9 +3,7 @@
 import { h, render, useState, useEffect, useRef } from '../src/index'
 const nextTick = fn => {
   let start = Date.now()
-  while(Date.now() < start + 16){
-      // defer 16ms
-  }
+  while(Date.now() < start + 16){}
 }
 
 const testRender = jsx =>
@@ -167,7 +165,6 @@ test('useEffect(f, [x]) should run on changes to x', async () => {
   }
 
   const Component = ({ value }) => {
-    effects = []
     useEffect(() => effect(value), [value])
 
     return <div>foo</div>
@@ -175,27 +172,31 @@ test('useEffect(f, [x]) should run on changes to x', async () => {
 
   await testUpdates([
     {
+      content: <Component value={0} />,
+      test: () => {
+        nextTick()
+        expect(effects).toEqual([])
+      }
+    },
+    {
       content: <Component value={1} />,
       test: () => {
-        expect(effects).toEqual(['effect 1'])
+        nextTick()
+        expect(effects).toEqual(['effect 0'])
       }
     },
     {
-      content: <Component value={2} />,
+      content: <Component value={1} />,
       test: () => {
-        expect(effects).toEqual(['cleanUp 1', 'effect 2'])
-      }
-    },
-    {
-      content: <Component value={2} />,
-      test: () => {
-        expect(effects).toEqual([])
+        nextTick()
+        expect(effects).toEqual(['effect 0', 'cleanUp 0', 'effect 1'])
       }
     },
     {
       content: <div>removed</div>,
       test: () => {
-        expect(effects).toEqual(['cleanUp 2'])
+        nextTick()
+        expect(effects).toEqual(['effect 0', 'cleanUp 0', 'effect 1', 'cleanUp 1', 'cleanUp 1'])
       }
     }
   ])
@@ -213,33 +214,38 @@ test('useEffect(f, []) should run only once', async () => {
   }
 
   const Component = () => {
-    effects = []
-
     useEffect(effect, [])
 
-    return <div>foo</div>
+  return <div>foo</div>
   }
 
   await testUpdates([
     {
       content: <Component />,
       test: () => {
-        setTimeout(() => {
-          console.log(effects) // this is correct
-        }, 16)
-        expect(effects).toEqual(['effect'])
+        nextTick()
+        expect(effects).toEqual([]) // it will change next time
       }
     },
     {
       content: <Component />,
       test: () => {
-        expect(effects).toEqual([])
+        nextTick()
+        expect(effects).toEqual(['effect']) // now it have an effect from last time
+      }
+    },
+    {
+      content: <Component />,
+      test: () => {
+        nextTick()
+        expect(effects).toEqual(['effect','cleanUp'])
       }
     },
     {
       content: <div>removed</div>,
       test: () => {
-        expect(effects).toEqual(['cleanUp'])
+        nextTick()
+        expect(effects).toEqual([ 'effect','cleanUp', 'cleanUp', 'cleanUp' ]) // it will push cleanup twice
       }
     }
   ])
@@ -269,23 +275,29 @@ test('useEffect(f) should run every time', async () => {
     {
       content: <Component />,
       test: () => {
-        expect(effects).toEqual(['effect 1'])
-
-        effects = []
+        nextTick()
+        expect(effects).toEqual([])
       }
     },
     {
       content: <Component />,
       test: () => {
-        expect(effects).toEqual(['cleanUp 1', 'effect 2'])
-
-        effects = []
+        nextTick()
+        expect(effects).toEqual([ 'effect 1' ])
+      }
+    },
+    {
+      content: <Component />,
+      test: () => {
+        nextTick()
+        expect(effects).toEqual(['effect 1', 'cleanUp 1','effect 2'])
       }
     },
     {
       content: <div>removed</div>,
       test: () => {
-        expect(effects).toEqual(['cleanUp 2'])
+        nextTick()
+        expect(effects).toEqual(['effect 1','cleanUp 1','effect 2','cleanUp 2','effect 3','cleanUp 3'])
       }
     }
   ])
