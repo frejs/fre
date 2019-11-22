@@ -1,22 +1,25 @@
-import { scheduleWork, isFn, currentHook } from './reconciler'
-
+import { scheduleWork, isFn, currentHook as currentFiber } from './reconciler'
+import { currentVnode } from './server/index'
 let cursor = 0
 export function resetCursor () {
   cursor = 0
 }
-
+const isSSR = typeof window === "undefined"
+const getCurrentHook = () => {
+  return isSSR ? currentVnode : currentFiber
+}
 export function useState (initState) {
   return useReducer(null, initState)
 }
 
 export function useReducer (reducer, initState) {
   const hook = getHook(cursor++)
-  const current = currentHook
+  const current = getCurrentHook()
 
   function setter (value) {
     let newValue = reducer ? reducer(hook[0], value) : isFn(value) ? value(hook[0]) : value
     hook[0] = newValue
-    scheduleWork(current, true)
+    !isSSR && scheduleWork(current, true)
   }
 
   if (hook.length) {
@@ -32,7 +35,7 @@ export function useEffect (cb, deps) {
   if (isChanged(hook[1], deps)) {
     hook[0] = useCallback(cb, deps)
     hook[1] = deps
-    currentHook.hooks.effect.push(hook)
+    getCurrentHook().hooks.effect.push(hook)
   }
 }
 
@@ -54,11 +57,12 @@ export function useRef (current) {
 }
 
 export function getHook (cursor) {
+  const currentHook = getCurrentHook()
   let hooks = currentHook.hooks || (currentHook.hooks = { list: [], effect: [], cleanup: [] })
   if (cursor >= hooks.list.length) {
     hooks.list.push([])
   }
-  return hooks.list[cursor] || []
+  return hooks.list[cursor]
 }
 
 function isChanged (a, b) {

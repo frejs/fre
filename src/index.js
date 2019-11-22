@@ -1,5 +1,6 @@
 import { h } from './h'
 import { render, scheduleWork, options } from './reconciler'
+import renderToString from './server/index'
 import {
   useState,
   useReducer,
@@ -12,6 +13,7 @@ import {
 export {
   h,
   h as createElement,
+  renderToString,
   render,
   scheduleWork,
   options,
