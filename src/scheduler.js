@@ -5,12 +5,12 @@ let currentTask = null
 let currentCallback = null
 let scheduling = false
 let frameDeadline = 0
-let frameLength = 5
+let frameLength = 1000 / 60
 
 export function scheduleCallback (callback) {
   const currentTime = getTime()
   let startTime = currentTime
-  let timeout = 5000
+  let timeout = 3000
   let dueTime = startTime + timeout
 
   let newTask = {
