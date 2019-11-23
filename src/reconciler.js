@@ -7,7 +7,7 @@ export const options = {}
 export const [HOST, SVG, HOOK, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5]
 
 let preCommit = null
-export let currentHook = null
+export let currentFiber = null
 let updateQueue = []
 let commitQueue = []
 
@@ -72,7 +72,7 @@ function reconcile (WIP) {
 
 function updateHOOK (WIP) {
   WIP.props = WIP.props || {}
-  currentHook = WIP
+  currentFiber = WIP
   resetCursor()
   let children = WIP.type(WIP.props)
   if (!children.type) {

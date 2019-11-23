@@ -1,10 +1,9 @@
-import { scheduleWork, isFn, currentHook as currentFiber } from './reconciler'
-import { currentVnode } from '../server-render/index'
+import { scheduleWork, isFn, currentFiber } from './reconciler'
 let cursor = 0
+
 export function resetCursor () {
   cursor = 0
 }
-
 const getCurrentHook = () => {
   return currentFiber
 }
