@@ -3,21 +3,20 @@
 const Router = require('koa-router')
 const path = require('path')
 const fs = require('fs')
-const { h, useState } = require('../dist/fre.js')
+const { h, useState } = require('./fre-cjs')
 const Koa = require('koa')
 const { renderToString, useAction } = require('./index')
 const template = fs.readFileSync(path.join(__dirname, './index.html'), 'utf-8')
 const axios = require('axios')
 
 function App () {
-  const post = useAction(() => {
-    return new Promise(resolve => {
-      axios.get('https://api.clicli.us/rank').then(res => {
-        resolve(res.data.posts)
-      })
+  const [posts, setPosts] = useState([])
+  useAction(async () => {
+    await axios.get('https://api.clicli.us/rank').then(res => {
+      setPosts(res.data.posts)
     })
   })
-  return <div>{post && post.map(item => <li>{item.title}</li>)}</div>
+  return <div>{posts.map(item => <li>{item.title}</li>)}</div>
 }
 const router = new Router()
 const app = new Koa()

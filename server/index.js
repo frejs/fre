@@ -1,7 +1,7 @@
 /** @jsx h */
 
-const { h } = require('../dist/fre.js')
-let currentVnode = null
+const { h, options, resetCursor } = require('./fre-cjs.js')
+options.currentFiber = null
 
 const VOID_ELEMENTS = /^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/
 function attributeHook (name, value, isComponent) {
@@ -36,21 +36,20 @@ async function renderToString (vnode, isSvgMode, selectValue) {
   }
   if (typeof nodeName === 'function') {
     isComponent = true
-    currentVnode = vnode
+    resetCursor()
+    options.currentFiber = vnode
     let tempVnode = nodeName.call(vnode, props)
     if (vnode.action.length) {
-      vnode.action.map((fn,index) => {
-        Promise.resolve(fn()).then(res=>{
-          currentVnode.state = currentVnode.state || {}
-          currentVnode.state[index] = res
-          nodeName.call(vnode, props)
-        })
-      })
-      tempVnode = nodeName.call(vnode, props)
+      resetCursor()
+      const cleanups = await Promise.all(
+        vnode.action.map(e => Promise.resolve(e()))
+      )
       vnode.action = []
+      tempVnode = nodeName.call(vnode, props)
+      cleanups.filter(c => !!c).map(c => c())
     }
     delete vnode.action
-    currentVnode = null
+    options.currentFiber = null
     return await renderToString(tempVnode, isSvgMode, selectValue)
   }
   let s = ''
@@ -183,8 +182,8 @@ function getChildren (accumulator, children) {
 }
 
 function useAction (fn) {
-  currentVnode.action = currentVnode.action || []
-  currentVnode.action.push(fn)
+  options.currentFiber.action = options.currentFiber.action || []
+  options.currentFiber.action.push(fn)
 }
 
 module.exports = {
