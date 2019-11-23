@@ -3,11 +3,11 @@ import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild } from './scheduler'
 import { createText } from './h'
 
-export const options = {}
+export var options = {}
 export const [HOST, SVG, HOOK, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5]
 
 let preCommit = null
-export let currentFiber = null
+let currentFiber = options.currentFiber || null
 let WIP = null
 let updateQueue = []
 let commitQueue = []
@@ -255,4 +255,8 @@ function delRef (kids) {
       if (kid.kids) delRef(kid.kids)
     }
   })
+}
+
+export function getCurrentHook() {
+  return currentFiber || null
 }

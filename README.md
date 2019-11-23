@@ -19,11 +19,24 @@
 
 Fre (pronounced `/fri:/`, like free) is a tiny and perfect js library, It means [Free!](https://www.clicli.us/search/free) ~
 
-| Package                                              | Version                                             | About                 |
-| ---------------------------------------------------- | --------------------------------------------------- | --------------------- |
-| [`Fre`](https://github.com/132yse/fre)               | ![npm](https://img.shields.io/npm/v/fre.svg)        | fre core              |
-| [`Fard`](https://github.com/132yse/fard)             | ![npm](https://img.shields.io/npm/v/fard.svg)       | mini-program with fre |
-| [`use-routes`](https://github.com/132yse/use-routes) | ![npm](https://img.shields.io/npm/v/use-routes.svg) | router for fre        |
+#### Contributors
+
+Fre has wonderful code, we need anyone to join us improve together.
+
+<table><tbody><tr>
+<td><a target="_blank" href="https://github.com/132yse"><img width="60px" src="https://avatars0.githubusercontent.com/u/12951461?s=60&v=4"></a></td>
+<td><a target="_blank" href="https://github.com/132yse"><img width="60px" src="https://avatars3.githubusercontent.com/u/103348?s=60&v=4"></a></td>
+<td><a target="_blank" href="https://github.com/132yse"><img width="60px" src="https://avatars2.githubusercontent.com/u/3286658?s=60&v=4"></a></td>
+</tr></table></tbody>
+
+#### Users or sponsors
+
+Thanks for the following websites and sponsors, If you do the same, please tell us with issue~
+
+<table><tbody><tr>
+<td><a target="_blank" href="https://ke.qq.com/course/368629?flowToken=1015240"><img height="40px" src="https://ws1.sinaimg.cn/large/0065Zy9ely1g983ljrhuoj30m808e0t5.jpg"></a></td>
+<td><a target="_blank" href="https://www.clicli.me"><img height="40px" src="https://ws1.sinaimg.cn/large/0065Zy9ely1g983rcrcyuj30a305sgm2.jpg"></a></td>
+</tr></table></tbody>
 
 ### Demo
 
@@ -39,10 +52,10 @@ Thanks for [Rasmus Schultz](https://github.com/mindplay-dk)
 
 ```shell
 yarn add fre
-```
+````
 
 ```js
-import { h, render, useState } from "fre"
+import { h, render, useState } from 'fre'
 
 function Counter() {
   const [count, setCount] = useState(0)
@@ -54,7 +67,7 @@ function Counter() {
   )
 }
 
-render(<Counter />, document.getElementById("root"))
+render(<Counter />, document.getElementById('root'))
 ```
 
 ### Hooks API
@@ -91,7 +104,7 @@ function Counter() {
   )
 }
 
-render(<Counter />, document.getElementById("root"))
+render(<Counter />, document.getElementById('root'))
 ```
 
 #### useReducer
@@ -101,9 +114,9 @@ render(<Counter />, document.getElementById("root"))
 ```js
 function reducer(state, action) {
   switch (action.type) {
-    case "up":
+    case 'up':
       return { count: state.count + 1 }
-    case "down":
+    case 'down':
       return { count: state.count - 1 }
   }
 }
@@ -113,13 +126,13 @@ function Counter() {
   return (
     <div>
       {state.count}
-      <button onClick={() => dispatch({ type: "up" })}>+</button>
-      <button onClick={() => dispatch({ type: "down" })}>+</button>
+      <button onClick={() => dispatch({ type: 'up' })}>+</button>
+      <button onClick={() => dispatch({ type: 'down' })}>+</button>
     </div>
   )
 }
 
-render(<Counter />, document.getElementById("root"))
+render(<Counter />, document.getElementById('root'))
 ```
 
 #### useEffect
@@ -138,7 +151,7 @@ if useEffect returns a function, the function will execute before next commitWor
 function Counter({ flag }) {
   const [count, setCount] = useState(0)
   useEffect(() => {
-    document.title = "count is " + count
+    document.title = 'count is ' + count
   }, [flag])
   return (
     <div>
@@ -148,7 +161,7 @@ function Counter({ flag }) {
   )
 }
 
-render(<Counter />, document.getElementById("root"))
+render(<Counter />, document.getElementById('root'))
 ```
 
 #### useCallback
@@ -161,7 +174,7 @@ const set = new Set()
 function Counter() {
   const [count, setCount] = useState(0)
   const cb = useCallback(() => {
-    console.log("cb was cached")
+    console.log('cb was cached')
   }, [count])
   set.add(cb)
 
@@ -194,7 +207,7 @@ function Counter() {
   )
 }
 
-render(<Counter />, document.getElementById("root"))
+render(<Counter />, document.getElementById('root'))
 ```
 
 #### useRef
@@ -210,13 +223,16 @@ function App() {
   return <div ref={t}>t</div>
 }
 ```
+
 If it use a function, It can return a cleanup and exectes when removed.
+
 ```js
-function App () {
+function App() {
   const t = useRef(dom => {
-    console.log(dom) // span
-    return dom => {
-      console.log(dom) // null
+    if (dom) {
+      doSomething()
+    } else {
+      cleanUp()
     }
   })
   return flag && <span ref={t}>I will removed</span>
@@ -229,11 +245,13 @@ Props are used for component communication
 
 ```js
 function App() {
-  const [sex, setSex] = useState("boy")
+  const [sex, setSex] = useState('boy')
   return (
     <div>
       <Sex sex={sex} />
-      <button onClick={() => (sex === "boy" ? setSex("girl") : setSex("boy"))} />
+      <button
+        onClick={() => (sex === 'boy' ? setSex('girl') : setSex('boy'))}
+      />
     </div>
   )
 }
@@ -259,7 +277,7 @@ Hooks do not support HOC and extends, but render props are supported by default
 ```js
 const HelloBox = () => <Box render={value => <h1>{value}</h1>} />
 
-const Box = props => <div>{props.render("hello world!")}</div>
+const Box = props => <div>{props.render('hello world!')}</div>
 ```
 
 Also can be render children
@@ -273,17 +291,7 @@ const HelloBox = () => (
   </Box>
 )
 
-const Box = props => <div>{props.children("hello world!")}</div>
-```
-
-### options
-
-If you want to rewrite any function, please use options, such as:
-
-```js
-options.commitWork = fiber => {
-  // something you will rewrite commitWork
-}
+const Box = props => <div>{props.children('hello world!')}</div>
 ```
 
 #### JSX(JavaScript extension)
@@ -291,7 +299,7 @@ options.commitWork = fiber => {
 The default export h function needs to be configured
 
 ```js
-import { h } from "fre"
+import { h } from 'fre'
 ```
 
 ```json
@@ -303,6 +311,7 @@ import { h } from "fre"
 If browser environment, recommend to use [htm](https://github.com/developit/htm)
 
 #### Concurrent
+
 Fre implements a tiny priority scheduler, which like react Fiber.
 
 It can break the work, and when there are idle time, the work will continue.
@@ -311,7 +320,7 @@ Concurrent Mode is also called `time slicing` or `concurrent mode`.
 
 #### Suspense
 
-Suspense is another way to break the work. 
+Suspense is another way to break the work.
 
 It throws promise, and fre catches promise then suspend the work. It waits until resolve to the promise.
 

@@ -50,3 +50,5 @@ useAction(async () => {
 ```
 `useAction` is more like `useEffect`, but it has no cleanups, and it receives a promise function. the requests will excutes in server side.
 
+##### 
+MIT ©[hkc452](https://github.com/hkc452) inspired by [preact]()

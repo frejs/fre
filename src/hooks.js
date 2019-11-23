@@ -1,12 +1,10 @@
-import { scheduleWork, isFn, currentFiber } from './reconciler'
+import { scheduleWork, isFn, getCurrentHook } from './reconciler'
 let cursor = 0
 
 export function resetCursor () {
   cursor = 0
 }
-const getCurrentHook = () => {
-  return currentFiber
-}
+
 export function useState (initState) {
   return useReducer(null, initState)
 }
