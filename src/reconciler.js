@@ -25,12 +25,12 @@ export function render (vnode, node, done) {
 export function scheduleWork (fiber, lock) {
   fiber.lock = lock
   updateQueue.push(fiber)
-  WIP = updateQueue.shift()
   scheduleCallback(reconcileWork)
 }
 
 function reconcileWork (didout) {
   let suspend = null
+  if(!WIP)   WIP = updateQueue.shift()
   while (WIP && (!shouldYeild() || didout)) {
     try {
       WIP = reconcile(WIP)
@@ -48,12 +48,8 @@ function reconcileWork (didout) {
     commitWork(preCommit)
     return null
   }
-  if (WIP && !didout) {
+  if (!didout || updateQueue.length > 0) {
     return reconcileWork.bind(null)
-  }
-  if (updateQueue.length > 0) {
-    WIP = updateQueue.shift()
-    scheduleCallback(reconcileWork)
   }
   return null
 }

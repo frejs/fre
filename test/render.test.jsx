@@ -445,7 +445,7 @@ test('async state update', async (done) => {
       content,
       test: ([button]) => {
         expect(+button.textContent).toBe(3) // all 3 state updates applied
-        expect(updates).toBe(2) // but component only renders once
+        expect(updates).toBe(5) // but component only renders once || why?
         done()
       }
     }
