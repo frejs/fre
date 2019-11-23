@@ -38,9 +38,15 @@ async function renderToString (vnode, isSvgMode, selectValue) {
     isComponent = true
     currentVnode = vnode
     let tempVnode = nodeName.call(vnode, props)
-    console.log(vnode)
     if (vnode.action.length) {
-      vnode.action.map(a => Promise.resolve(a()))
+      vnode.action.map((fn,index) => {
+        Promise.resolve(fn()).then(res=>{
+          currentVnode.state = currentVnode.state || {}
+          currentVnode.state[index] = res
+          nodeName.call(vnode, props)
+        })
+      })
+      tempVnode = nodeName.call(vnode, props)
       vnode.action = []
     }
     delete vnode.action
