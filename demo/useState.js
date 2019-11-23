@@ -1,11 +1,11 @@
 import { h, render, useState, useEffect } from '../src'
 
 function App () {
-  const [state, setState] = useState(true)
+  const [state, setState] = useState(0)
   return (
     <div>
-      {state&& <A/>}
-      <button onClick={() => setState(!state)}>+</button>
+      {state}
+      <button onClick={() => setState(state+1)}>+</button>
     </div>
   )
 }
