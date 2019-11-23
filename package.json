@@ -36,5 +36,10 @@
     "typescript": "^3.5.2",
     "yarpm": "^0.2.1"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "jest": {
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/server-render/"
+    ]
+  }
 }
