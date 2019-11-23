@@ -1,6 +1,7 @@
 /** @jsx h */
 
 const { h } = require('../dist/fre.js')
+let currentVnode = null
 
 const VOID_ELEMENTS = /^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/
 function attributeHook (name, value, isComponent) {
@@ -12,7 +13,9 @@ function attributeHook (name, value, isComponent) {
     !isComponent &&
     (value === false ||
       ((name === 'class' || name === 'style') && value === ''))
-  ) { return '' }
+  ) {
+    return ''
+  }
 
   let indentChar = '\t'
   if (type !== 'string') {
@@ -20,7 +23,7 @@ function attributeHook (name, value, isComponent) {
   }
   return `\n${indentChar}${name}="${encodeEntities(value)}"`
 }
-let currentVnode
+
 async function renderToString (vnode, isSvgMode, selectValue) {
   if (vnode == null || typeof vnode === 'boolean') return ''
   let nodeName = vnode.type
@@ -28,7 +31,6 @@ async function renderToString (vnode, isSvgMode, selectValue) {
   let props = vnode.props
 
   let isComponent = false
-  resetCursor()
   if (nodeName === 'text' && props.nodeValue) {
     return encodeEntities(props.nodeValue)
   }
@@ -36,17 +38,12 @@ async function renderToString (vnode, isSvgMode, selectValue) {
     isComponent = true
     currentVnode = vnode
     let tempVnode = nodeName.call(vnode, props)
-    if (vnode.hooks.effect.length) {
-      resetCursor()
-      const effect = vnode.hooks.effect
-      const cleanups = await Promise.all(
-        effect.map(e => Promise.resolve(e[0]()))
-      )
-      vnode.hooks.effect = []
-      tempVnode = nodeName.call(vnode, props)
-      cleanups.filter(c => !!c).map(c => c())
+    console.log(vnode)
+    if (vnode.action.length) {
+      vnode.action.map(a => Promise.resolve(a()))
+      vnode.action = []
     }
-    delete vnode.hooks
+    delete vnode.action
     currentVnode = null
     return await renderToString(tempVnode, isSvgMode, selectValue)
   }
@@ -116,11 +113,11 @@ async function renderToString (vnode, isSvgMode, selectValue) {
       let child = children[i]
       if (child != null && child !== false) {
         let childSvgMode =
-            nodeName === 'svg'
-              ? true
-              : nodeName === 'foreignObject'
-                ? false
-                : isSvgMode
+          nodeName === 'svg'
+            ? true
+            : nodeName === 'foreignObject'
+              ? false
+              : isSvgMode
 
         let ret = await renderToString(child, childSvgMode, selectValue)
         if (ret) {
@@ -168,18 +165,7 @@ function styleObjToCss (s) {
   }
   return str || undefined
 }
-let indent = (s, char) =>
-  String(s).replace(/(\n+)/g, '$1' + (char || '\t'))
-
-let isLargeString = (s, length, ignoreLines) =>
-  String(s).length > (length || 40) ||
-  (!ignoreLines && String(s).indexOf('\n') !== -1) ||
-  String(s).indexOf('<') !== -1
-
-function assign (obj, props) {
-  for (let i in props) obj[i] = props[i]
-  return obj
-}
+let indent = (s, char) => String(s).replace(/(\n+)/g, '$1' + (char || '\t'))
 
 function getChildren (accumulator, children) {
   if (Array.isArray(children)) {
@@ -190,5 +176,12 @@ function getChildren (accumulator, children) {
   return accumulator
 }
 
+function useAction (fn) {
+  currentVnode.action = currentVnode.action || []
+  currentVnode.action.push(fn)
+}
 
-module.exports = renderToString
+module.exports = {
+  renderToString,
+  useAction
+}

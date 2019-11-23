@@ -5,13 +5,13 @@ const path = require('path')
 const fs = require('fs')
 const { h } = require('../dist/fre.js')
 const Koa = require('koa')
-const renderToString = require('./index')
+const { renderToString, useAction } = require('./index')
 const template = fs.readFileSync(path.join(__dirname, './index.html'), 'utf-8')
 
 const App = props => {
-  useEffect(async () => {
+  useAction(async () => {
     console.log(111)
-  }, [])
+  })
   return (<div>hello world</div>)
 }
 const router = new Router()
