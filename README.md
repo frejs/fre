@@ -24,9 +24,10 @@ Fre (pronounced `/fri:/`, like free) is a tiny and perfect js library, It means 
 Fre has wonderful code, we need anyone to join us improve together.
 
 <table><tbody><tr>
-<td><a target="_blank" href="https://github.com/132yse"><img width="60px" src="https://avatars0.githubusercontent.com/u/12951461?s=60&v=4"></a></td>
-<td><a target="_blank" href="https://github.com/132yse"><img width="60px" src="https://avatars3.githubusercontent.com/u/103348?s=60&v=4"></a></td>
-<td><a target="_blank" href="https://github.com/132yse"><img width="60px" src="https://avatars2.githubusercontent.com/u/3286658?s=60&v=4"></a></td>
+<td><a target="_blank" href="https://github.com/132yse"><img width="70px" src="https://avatars0.githubusercontent.com/u/12951461?s=70&v=4"></a></td>
+<td><a target="_blank" href="https://github.com/mindplay-dk"><img width="70px" src="https://avatars3.githubusercontent.com/u/103348?s=70&v=4"></a></td>
+<td><a target="_blank" href="https://github.com/hkc452"><img width="70px" src="https://avatars2.githubusercontent.com/u/3286658?s=70&v=4"></a></td>
+<td><a target="_blank" href="https://github.com/yiliang114"><img width="70px" src="https://avatars1.githubusercontent.com/u/11473889?s=70&v=4"></a></td>
 </tr></table></tbody>
 
 #### Users or sponsors
