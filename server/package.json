@@ -1,0 +1,17 @@
+{
+  "name": "@fre/server-render",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start":""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "koa": "^2.11.0",
+    "koa-router": "^7.4.0"
+  }
+}
