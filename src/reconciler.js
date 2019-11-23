@@ -47,7 +47,7 @@ function reconcileWork (didout) {
     commitWork(preCommit)
     return null
   }
-  if (!didout || updateQueue.length > 0) {
+  if ((WIP && !didout) || updateQueue.length > 0) {
     return reconcileWork.bind(null)
   }
   return null
