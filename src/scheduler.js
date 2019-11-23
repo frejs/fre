@@ -58,7 +58,7 @@ function workLoop (iniTime) {
       } else {
         pop(taskQueue)
       }
-    } else pop(taskQueue)
+    }
 
     currentTask = peek(taskQueue)
     currentTime = getTime()
