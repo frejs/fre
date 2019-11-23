@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
-import { scheduleCallback, shouldYeild, scheduling } from './scheduler'
+import { scheduleCallback, shouldYeild } from './scheduler'
 import { createText } from './h'
 
 export const options = {}
@@ -170,7 +170,6 @@ function commitWork (fiber) {
   })
   fiber.done && fiber.done()
   commitQueue = []
-  updateQueue = []
   preCommit = null
   WIP = null
 }
