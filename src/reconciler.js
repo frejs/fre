@@ -225,7 +225,10 @@ function hashfy (arr) {
 }
 
 export const isFn = fn => typeof fn === 'function'
-let raf = requestAnimationFrame || setTimeout
+let raf =
+  typeof requestAnimationFrame === 'undefined'
+    ? setTimeout
+    : requestAnimationFrame
 
 function defer (fiber) {
   raf(() => {
