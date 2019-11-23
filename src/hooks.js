@@ -4,9 +4,9 @@ let cursor = 0
 export function resetCursor () {
   cursor = 0
 }
-const isSSR = typeof window === 'undefined'
+
 const getCurrentHook = () => {
-  return isSSR ? currentVnode : currentFiber
+  return currentFiber
 }
 export function useState (initState) {
   return useReducer(null, initState)
@@ -23,7 +23,7 @@ export function useReducer (reducer, initState) {
         ? value(hook[0])
         : value
     hook[0] = newValue
-    !isSSR && scheduleWork(current, true)
+    scheduleWork(current, true)
   }
 
   if (hook.length) {

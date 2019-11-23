@@ -163,10 +163,10 @@ function commitWork (fiber) {
   commitQueue.forEach(c => {
     if (c.parent) commit(c)
   })
+  fiber.done && fiber.done()
   commitQueue = []
   updateQueue = []
   preCommit = null
-  fiber.done && fiber.done()
 }
 
 function commit (fiber) {
