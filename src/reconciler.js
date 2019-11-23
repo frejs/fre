@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
-import { scheduleCallback, shouldYeild } from './scheduler'
+import { scheduleCallback, shouldYeild, getTime } from './scheduler'
 import { createText } from './h'
 
 export const options = {}
@@ -8,7 +8,7 @@ export const [HOST, SVG, HOOK, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5]
 
 let preCommit = null
 export let currentHook = null
-let WIP = null
+let updateQueue = []
 let commitQueue = []
 
 export function render (vnode, node, done) {
@@ -23,12 +23,13 @@ export function render (vnode, node, done) {
 
 export function scheduleWork (fiber, lock) {
   fiber.lock = lock
-  WIP = fiber
+  updateQueue.push(fiber)
   scheduleCallback(reconcileWork)
 }
 
 function reconcileWork (didout) {
   let suspend = null
+  let WIP = updateQueue.shift()
   while (WIP && (!shouldYeild() || didout)) {
     try {
       WIP = reconcile(WIP)
@@ -46,7 +47,7 @@ function reconcileWork (didout) {
     commitWork(preCommit)
     return null
   }
-  if (!didout) {
+  if (!didout || updateQueue.length > 0) {
     return reconcileWork.bind(null)
   }
   return null
@@ -163,8 +164,7 @@ function commitWork (fiber) {
     if (c.parent) commit(c)
   })
   commitQueue = []
-
-  WIP = null
+  updateQueue = []
   preCommit = null
   fiber.done && fiber.done()
 }
