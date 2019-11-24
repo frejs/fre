@@ -30,7 +30,7 @@ export function scheduleWork (fiber, lock) {
 
 function reconcileWork (didout) {
   let suspend = null
-  if(!WIP)   WIP = updateQueue.shift()
+  if (!WIP) WIP = updateQueue.shift()
   while (WIP && (!shouldYeild() || didout)) {
     try {
       WIP = reconcile(WIP)
@@ -40,6 +40,7 @@ function reconcileWork (didout) {
         WIP = null
         e.then(() => {
           WIP = suspend
+          reconcileWork(true)
         })
       } else throw e
     }
@@ -48,7 +49,7 @@ function reconcileWork (didout) {
     commitWork(preCommit)
     return null
   }
-  if (!didout || updateQueue.length > 0) {
+  if ((!didout && WIP) || updateQueue.length > 0) {
     return reconcileWork.bind(null)
   }
   return null
@@ -253,6 +254,6 @@ function delRef (kids) {
   })
 }
 
-export function getCurrentHook() {
+export function getCurrentHook () {
   return currentFiber || null
 }

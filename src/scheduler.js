@@ -34,6 +34,8 @@ export function scheduleCallback (callback) {
 function flushWork (iniTime) {
   try {
     return workLoop(iniTime)
+  } catch (e) {
+    throw e
   } finally {
     currentTask = null
   }

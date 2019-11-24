@@ -2,6 +2,7 @@ import { h, render, useState, useEffect } from '../src'
 
 function App () {
   const [state, setState] = useState(0)
+  console.log(111)
   return (
     <div>
       {state}
