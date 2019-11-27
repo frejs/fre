@@ -12,7 +12,7 @@ let WIP = null
 let updateQueue = []
 let commitQueue = []
 
-export function render (vnode, node, done) {
+export function render(vnode, node, done) {
   let rootFiber = {
     tag: HOST,
     node,
@@ -22,15 +22,17 @@ export function render (vnode, node, done) {
   scheduleWork(rootFiber)
 }
 
-export function scheduleWork (fiber, lock) {
+export function scheduleWork(fiber, lock) {
   fiber.lock = lock
   updateQueue.push(fiber)
   scheduleCallback(reconcileWork)
 }
 
-function reconcileWork (didout) {
+function reconcileWork(didout) {
   let suspend = null
-  if (!WIP) WIP = updateQueue.shift()
+  if (!WIP) {
+    WIP = updateQueue.shift()
+  }
   while (WIP && (!shouldYeild() || didout)) {
     try {
       WIP = reconcile(WIP)
@@ -55,7 +57,7 @@ function reconcileWork (didout) {
   return null
 }
 
-function reconcile (WIP) {
+function reconcile(WIP) {
   WIP.parentNode = getParentNode(WIP)
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
   commitQueue.push(WIP)
@@ -72,7 +74,7 @@ function reconcile (WIP) {
   }
 }
 
-function updateHOOK (WIP) {
+function updateHOOK(WIP) {
   WIP.props = WIP.props || {}
   currentFiber = WIP
   resetCursor()
@@ -83,7 +85,7 @@ function updateHOOK (WIP) {
   reconcileChildren(WIP, children)
 }
 
-function updateHost (WIP) {
+function updateHost(WIP) {
   if (!WIP.node) {
     if (WIP.type === 'svg') WIP.tag = SVG
     WIP.node = createElement(WIP)
@@ -94,13 +96,13 @@ function updateHost (WIP) {
   WIP.node.last = null
   reconcileChildren(WIP, WIP.props.children)
 }
-function getParentNode (fiber) {
+function getParentNode(fiber) {
   while ((fiber = fiber.parent)) {
     if (fiber.tag < HOOK) return fiber.node
   }
 }
 
-function reconcileChildren (WIP, children) {
+function reconcileChildren(WIP, children) {
   if (!children) return
   delete WIP.child
   const oldFibers = WIP.kids
@@ -155,23 +157,24 @@ function reconcileChildren (WIP, children) {
   WIP.lock = WIP.lock ? false : null
 }
 
-function shouldPlace (fiber) {
+function shouldPlace(fiber) {
   let p = fiber.parent
   if (p.tag === HOOK) return p.key && !p.lock
   return fiber.key
 }
 
-function commitWork (fiber) {
+function commitWork(fiber) {
   commitQueue.forEach(c => {
     if (c.parent) commit(c)
   })
   fiber.done && fiber.done()
   commitQueue = []
+  // updateQueue = []
   preCommit = null
   WIP = null
 }
 
-function commit (fiber) {
+function commit(fiber) {
   let op = fiber.op
   let parent = fiber.parentNode
   let dom = fiber.node
@@ -196,13 +199,13 @@ function commit (fiber) {
   refer(ref, dom)
 }
 
-function createFiber (vnode, op) {
+function createFiber(vnode, op) {
   return { ...vnode, op, tag: isFn(vnode.type) ? HOOK : HOST }
 }
 
 const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr])
 
-function hashfy (arr) {
+function hashfy(arr) {
   let out = {}
   let i = 0
   let j = 0
@@ -227,24 +230,27 @@ let raf =
     ? setTimeout
     : requestAnimationFrame
 
-function defer (fiber) {
+function defer(fiber) {
   raf(() => {
     if (fiber.hooks) {
-      fiber.hooks.cleanup.forEach(c => c())
+      fiber.hooks.cleanup.forEach(c =>
+        c[1] && c[1].length === 0 ? fiber.op === DELETE && c[0]() : c[0]()
+      )
+      fiber.hooks.cleanup = []
       fiber.hooks.effect.forEach((e, i) => {
         const res = e[0]()
-        if (res) fiber.hooks.cleanup[i] = res
+        if (typeof res === 'function') fiber.hooks.cleanup[i] = [res, e[1]]
       })
       fiber.hooks.effect = []
     }
   })
 }
 
-function refer (ref, dom) {
+function refer(ref, dom) {
   if (ref) isFn(ref) ? ref(dom) : (ref.current = dom)
 }
 
-function delRef (kids) {
+function delRef(kids) {
   raf(() => {
     for (const k in kids) {
       const kid = kids[k]
@@ -254,6 +260,6 @@ function delRef (kids) {
   })
 }
 
-export function getCurrentHook () {
+export function getCurrentHook() {
   return currentFiber || null
 }

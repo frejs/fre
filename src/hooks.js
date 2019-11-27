@@ -1,27 +1,27 @@
 import { scheduleWork, isFn, getCurrentHook } from './reconciler'
 let cursor = 0
 
-export function resetCursor () {
+export function resetCursor() {
   cursor = 0
 }
 
-export function useState (initState) {
+export function useState(initState) {
   return useReducer(null, initState)
 }
 
-export function useReducer (reducer, initState) {
+export function useReducer(reducer, initState) {
   const hook = getHook(cursor++)
   const current = getCurrentHook()
 
-  function setter (value) {
+  const setter = useCallback(value => {
     let newValue = reducer
       ? reducer(hook[0], value)
       : isFn(value)
-        ? value(hook[0])
-        : value
+      ? value(hook[0])
+      : value
     hook[0] = newValue
     scheduleWork(current, true)
-  }
+  }, [])
 
   if (hook.length) {
     return [hook[0], setter]
@@ -31,7 +31,7 @@ export function useReducer (reducer, initState) {
   }
 }
 
-export function useEffect (cb, deps) {
+export function useEffect(cb, deps) {
   let hook = getHook(cursor++)
   if (isChanged(hook[1], deps)) {
     hook[0] = useCallback(cb, deps)
@@ -40,7 +40,7 @@ export function useEffect (cb, deps) {
   }
 }
 
-export function useMemo (cb, deps) {
+export function useMemo(cb, deps) {
   let hook = getHook(cursor++)
   if (isChanged(hook[1], deps)) {
     hook[1] = deps
@@ -49,15 +49,15 @@ export function useMemo (cb, deps) {
   return hook[0]
 }
 
-export function useCallback (cb, deps) {
+export function useCallback(cb, deps) {
   return useMemo(() => cb, deps)
 }
 
-export function useRef (current) {
+export function useRef(current) {
   return useMemo(() => ({ current }), [])
 }
 
-export function getHook (cursor) {
+export function getHook(cursor) {
   const currentHook = getCurrentHook()
   let hooks =
     currentHook.hooks ||
@@ -68,6 +68,6 @@ export function getHook (cursor) {
   return hooks.list[cursor]
 }
 
-function isChanged (a, b) {
+function isChanged(a, b) {
   return !a || b.some((arg, index) => arg !== a[index])
 }

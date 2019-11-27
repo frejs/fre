@@ -195,7 +195,7 @@ test('useEffect(f, [x]) should run on changes to x', async () => {
       content: <div>removed</div>,
       test: () => {
         nextTick()
-        expect(effects).toEqual(['effect 0', 'cleanUp 0', 'effect 1', 'cleanUp 1', 'cleanUp 1'])
+        expect(effects).toEqual(['effect 0', 'cleanUp 0', 'effect 1', 'cleanUp 1'])
       }
     }
   ])
@@ -237,14 +237,14 @@ test('useEffect(f, []) should run only once', async () => {
       content: <Component />,
       test: () => {
         nextTick()
-        expect(effects).toEqual(['effect','cleanUp'])
+        expect(effects).toEqual(['effect'])
       }
     },
     {
       content: <div>removed</div>,
       test: () => {
         nextTick()
-        expect(effects).toEqual([ 'effect','cleanUp', 'cleanUp', 'cleanUp' ]) // it will push cleanup twice
+        expect(effects).toEqual([ 'effect' ])
       }
     }
   ])
