@@ -68,6 +68,6 @@ export function getHook(cursor) {
   return hooks.list[cursor]
 }
 
-function isChanged(a, b) {
+export function isChanged(a, b) {
   return !a || b.some((arg, index) => arg !== a[index])
 }

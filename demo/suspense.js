@@ -21,18 +21,11 @@ export function createSuspense(promise) {
   }
 }
 
-function fetchUsers(pageSize) {
-  console.log('fetch users from clicli...')
-  return fetch(
-    `https://api.clicli.us/users?level=4&page=1&pageSize=${pageSize}`
-  )
+const useUser = createSuspense(pageSize =>
+  fetch(`https://api.clicli.us/users?level=4&page=1&pageSize=${pageSize}`)
     .then(res => res.json())
-    .then(data => {
-      return data.users
-    })
-}
-
-const useUser = createSuspense(fetchUsers)
+    .then(data => data.users)
+)
 
 function App() {
   const [pageSize, setPageSize] = useState(1)

@@ -96,6 +96,7 @@ function updateHost(WIP) {
   WIP.node.last = null
   reconcileChildren(WIP, WIP.props.children)
 }
+
 function getParentNode(fiber) {
   while ((fiber = fiber.parent)) {
     if (fiber.tag < HOOK) return fiber.node
