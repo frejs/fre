@@ -5,7 +5,7 @@ function App () {
   console.log(111)
   return (
     <div>
-      <A />
+      <A count={1}/>
       <button onClick={() => setState(state+1)}>+</button>
     </div>
   )
@@ -13,7 +13,7 @@ function App () {
 
 function A(props){
   console.log(222)
-  return <div>111</div>
+  return <div>{props.count}</div>
 }
 
 

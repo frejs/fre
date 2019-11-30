@@ -22,3 +22,18 @@ export {
   useCallback,
   useRef
 }
+
+const fre = {
+  h,
+  render,
+  scheduleWork,
+  options,
+  useState,
+  useReducer,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef
+}
+
+export default fre

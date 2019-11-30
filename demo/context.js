@@ -51,15 +51,4 @@ function A() {
   return <div>{theme}</div>
 }
 
-// function App() {
-//   const [count, setCount] = useState(0)
-//   useEffect(() => {
-//     console.log(111)
-//     return () => {
-//       console.log(222)
-//     }
-//   }, [])
-//   return <button onClick={() => setCount(count + 1)}>{count}</button>
-// }
-
 render(<App />, document.getElementById('root'))

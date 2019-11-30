@@ -11,6 +11,7 @@ let currentFiber = options.currentFiber || null
 let WIP = null
 let updateQueue = []
 let commitQueue = []
+const EMPTY_OBJ = {}
 
 export function render(vnode, node, done) {
   let rootFiber = {
@@ -75,7 +76,7 @@ function reconcile(WIP) {
 }
 
 function updateHOOK(WIP) {
-  WIP.props = WIP.props || {}
+  WIP.props = WIP.props || EMPTY_OBJ
   currentFiber = WIP
   resetCursor()
   let children = WIP.type(WIP.props)
@@ -83,6 +84,7 @@ function updateHOOK(WIP) {
     children = createText(children)
   }
   reconcileChildren(WIP, children)
+  return WIP
 }
 
 function updateHost(WIP) {
