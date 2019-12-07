@@ -1,10 +1,10 @@
-import { h, render, useState, useEffect } from '../src'
+import { h, render, useState } from '../src'
 
 function App () {
   const [state, setState] = useState(0)
-  console.log(111)
   return (
     <div>
+      {state}
       <A count={1}/>
       <button onClick={() => setState(state+1)}>+</button>
     </div>

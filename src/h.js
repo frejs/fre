@@ -1,9 +1,7 @@
-let oldProps = null
 export function h(type, attrs) {
   let props = attrs || {}
   let key = props.key || null
   let ref = props.ref || null
-  let compare = false
   let children = []
 
   for (let i = 2; i < arguments.length; i++) {
@@ -23,7 +21,7 @@ export function h(type, attrs) {
   delete props.key
   delete props.ref
 
-  return { type, props, key, ref, compare }
+  return { type, props, key, ref }
 }
 
 export function createText(vnode) {
