@@ -78,13 +78,12 @@ function reconcile(WIP) {
 function updateHOOK(WIP) {
   const oldProps = WIP.pendingProps
   let newProps = WIP.props
-  currentFiber = WIP
-  resetCursor()
   if (WIP.lock === null && !shouldUpdate(oldProps, newProps)) {
-    console.log(WIP,oldProps,newProps)
     cloneChildren(WIP)
     return
   }
+  currentFiber = WIP
+  resetCursor()
   let children = WIP.type(newProps)
   if (!children.type) {
     children = createText(children)

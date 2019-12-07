@@ -32,15 +32,15 @@ export function createContext(defaultValue) {
 const useTheme = createContext('light')
 
 function App() {
-  console.log(111)
   const [theme, setTheme] = useTheme()
+  const setMemoTheme = useCallback(() =>
+    setTheme(theme === 'dark' ? 'light' : 'dark')
+  )
   return (
     <div>
       {theme}
       <A />
-      <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
-        change
-      </button>
+      <button onClick={setMemoTheme}>change</button>
     </div>
   )
 }
