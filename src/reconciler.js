@@ -60,7 +60,7 @@ function reconcileWork(didout) {
 function reconcile(WIP) {
   WIP.parentNode = getParentNode(WIP)
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
-  WIP.alter = WIP
+  WIP.pendingProps = WIP.props
   commitQueue.push(WIP)
 
   if (WIP.child) return WIP.child
@@ -76,11 +76,12 @@ function reconcile(WIP) {
 }
 
 function updateHOOK(WIP) {
-  const oldProps = (WIP.alter || {}).props
+  const oldProps = WIP.pendingProps
   let newProps = WIP.props
   currentFiber = WIP
   resetCursor()
   if (WIP.lock === null && !shouldUpdate(oldProps, newProps)) {
+    console.log(WIP,oldProps,newProps)
     cloneChildren(WIP)
     return
   }
@@ -140,7 +141,7 @@ function reconcileChildren(WIP, children) {
       alternate = createFiber(oldFiber, UPDATE)
       newFiber.op = UPDATE
       newFiber = { ...alternate, ...newFiber }
-      newFiber.alternate = alternate
+      newFiber.lastProps = alternate.props
       if (shouldPlace(newFiber)) {
         newFiber.op = PLACE
       }
@@ -183,7 +184,9 @@ function cloneChildren(fiber) {
 
 function shouldUpdate(a, b) {
   for (let i in a) if (!(i in b)) return true
-  for (let i in b) if (a[i] !== b[i]) return true
+  for (let i in b) {
+    if (a[i] !== b[i]) return true
+  }
   return false
 }
 
@@ -216,7 +219,7 @@ function commit(fiber) {
   } else if (fiber.tag === HOOK) {
     defer(fiber)
   } else if (op === UPDATE) {
-    updateElement(dom, fiber.alternate.props, fiber.props)
+    updateElement(dom, fiber.lastProps, fiber.props)
     refer(ref, null)
   } else {
     let point = fiber.insertPoint ? fiber.insertPoint.node : null
@@ -254,7 +257,7 @@ function hashfy(arr) {
 }
 
 export const isFn = fn => typeof fn === 'function'
-let raf =
+const raf =
   typeof requestAnimationFrame === 'undefined'
     ? setTimeout
     : requestAnimationFrame

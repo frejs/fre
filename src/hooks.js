@@ -13,7 +13,7 @@ export function useReducer(reducer, initState) {
   const hook = getHook(cursor++)
   const current = getCurrentHook()
 
-  const setter = useCallback(value => {
+  const setter = value => {
     let newValue = reducer
       ? reducer(hook[0], value)
       : isFn(value)
@@ -21,7 +21,7 @@ export function useReducer(reducer, initState) {
       : value
     hook[0] = newValue
     scheduleWork(current, true)
-  }, [])
+  }
 
   if (hook.length) {
     return [hook[0], setter]
