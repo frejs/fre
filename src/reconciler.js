@@ -11,7 +11,6 @@ let currentFiber = options.currentFiber || null
 let WIP = null
 let updateQueue = []
 let commitQueue = []
-const EMPTY_OBJ = {}
 
 export function render(vnode, node, done) {
   let rootFiber = {
@@ -61,6 +60,7 @@ function reconcileWork(didout) {
 function reconcile(WIP) {
   WIP.parentNode = getParentNode(WIP)
   WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
+  WIP.pendingProps = WIP.props
   commitQueue.push(WIP)
 
   if (WIP.child) return WIP.child
@@ -76,15 +76,19 @@ function reconcile(WIP) {
 }
 
 function updateHOOK(WIP) {
-  WIP.props = WIP.props || EMPTY_OBJ
+  const oldProps = WIP.pendingProps
+  let newProps = WIP.props
+  if (WIP.lock === null && !shouldUpdate(oldProps, newProps)) {
+    cloneChildren(WIP)
+    return
+  }
   currentFiber = WIP
   resetCursor()
-  let children = WIP.type(WIP.props)
+  let children = WIP.type(newProps)
   if (!children.type) {
     children = createText(children)
   }
   reconcileChildren(WIP, children)
-  return WIP
 }
 
 function updateHost(WIP) {
@@ -136,7 +140,7 @@ function reconcileChildren(WIP, children) {
       alternate = createFiber(oldFiber, UPDATE)
       newFiber.op = UPDATE
       newFiber = { ...alternate, ...newFiber }
-      newFiber.alternate = alternate
+      newFiber.lastProps = alternate.props
       if (shouldPlace(newFiber)) {
         newFiber.op = PLACE
       }
@@ -160,6 +164,31 @@ function reconcileChildren(WIP, children) {
   WIP.lock = WIP.lock ? false : null
 }
 
+function cloneChildren(fiber) {
+  if (!fiber.child) return
+
+  let currentChild = fiber.child
+  let newChild = currentChild
+  fiber.child = newChild
+  newChild.parent = fiber
+
+  while (currentChild.sibling) {
+    currentChild = currentChild.sibling
+    newChild = newChild.sibling = currentChild
+    newChild.parent = fiber
+  }
+
+  newChild.sibling = null
+}
+
+function shouldUpdate(a, b) {
+  for (let i in a) if (!(i in b)) return true
+  for (let i in b) {
+    if (a[i] !== b[i]) return true
+  }
+  return false
+}
+
 function shouldPlace(fiber) {
   let p = fiber.parent
   if (p.tag === HOOK) return p.key && !p.lock
@@ -172,7 +201,6 @@ function commitWork(fiber) {
   })
   fiber.done && fiber.done()
   commitQueue = []
-  // updateQueue = []
   preCommit = null
   WIP = null
 }
@@ -190,7 +218,7 @@ function commit(fiber) {
   } else if (fiber.tag === HOOK) {
     defer(fiber)
   } else if (op === UPDATE) {
-    updateElement(dom, fiber.alternate.props, fiber.props)
+    updateElement(dom, fiber.lastProps, fiber.props)
     refer(ref, null)
   } else {
     let point = fiber.insertPoint ? fiber.insertPoint.node : null
@@ -228,7 +256,7 @@ function hashfy(arr) {
 }
 
 export const isFn = fn => typeof fn === 'function'
-let raf =
+const raf =
   typeof requestAnimationFrame === 'undefined'
     ? setTimeout
     : requestAnimationFrame

@@ -289,14 +289,14 @@ test('useEffect(f) should run every time', async () => {
       content: <Component />,
       test: () => {
         nextTick()
-        expect(effects).toEqual(['effect 1', 'cleanUp 1','effect 2'])
+        expect(effects).toEqual(['effect 1', 'cleanUp 1'])
       }
     },
     {
       content: <div>removed</div>,
       test: () => {
         nextTick()
-        expect(effects).toEqual(['effect 1','cleanUp 1','effect 2','cleanUp 2','effect 3','cleanUp 3'])
+        expect(effects).toEqual(['effect 1','cleanUp 1'])
       }
     }
   ])
@@ -325,13 +325,15 @@ test('persist reference to any value', async () => {
     {
       content,
       test: ([p]) => {
+        nextTick()
         expect(p.textContent).toBe('x')
       }
     },
     {
       content,
       test: ([p]) => {
-        expect(p.textContent).toBe('xx')
+        nextTick()
+        expect(p.textContent).toBe('x')
       }
     }
   ])
@@ -445,7 +447,7 @@ test('async state update', async (done) => {
       content,
       test: ([button]) => {
         expect(+button.textContent).toBe(3) // all 3 state updates applied
-        expect(updates).toBe(5) // but component only renders once || why?
+        expect(updates).toBe(3)
         done()
       }
     }
