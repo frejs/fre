@@ -1,4 +1,4 @@
-export function push (heap, node) {
+export function push(heap, node) {
   let index = heap.length
   heap.push(node)
 
@@ -14,7 +14,7 @@ export function push (heap, node) {
   }
 }
 
-export function pop (heap) {
+export function pop(heap) {
   let first = heap[0]
   if (first) {
     let last = heap.pop()
@@ -50,10 +50,10 @@ export function pop (heap) {
   } else return null
 }
 
-function compare (a, b) {
+function compare(a, b) {
   return a.dueTime - b.dueTime
 }
 
-export function peek (heap) {
+export function peek(heap) {
   return heap[0] || null
 }

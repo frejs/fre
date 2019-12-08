@@ -1,15 +1,14 @@
 import { useState, useMemo } from '../../src'
 
 export class Component {
-  constructor (props) {
-
+  constructor(props) {
     this.props = props
   }
 }
 
-export function useComponent (Component) {
-  return function (props) {
-    const component = useMemo(() => new Component(props),[])
+export function useComponent(Component) {
+  return function(props) {
+    const component = useMemo(() => new Component(props), [])
 
     let [state, setState] = useState(component.state)
 

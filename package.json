@@ -8,7 +8,7 @@
   "scripts": {
     "test": "jest --coverage",
     "build": "rollup -c && gzip-size dist/fre.js",
-    "format": "standard --fix 'src/**/*.js'"
+    "format": "prettier --write \"{src,test,demo}/**/*.js\""
   },
   "keywords": [],
   "author": "132yse",
@@ -26,12 +26,12 @@
     "cross-env": "^5.2.0",
     "gzip-size-cli": "^3.0.0",
     "jest": "^24.8.0",
+    "prettier": "^1.19.1",
     "rollup": "^1.10.1",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-cleanup": "^3.1.1",
     "rollup-plugin-license": "^0.8.1",
     "rollup-plugin-terser": "^5.1.2",
-    "standard": "^14.3.1",
     "terser": "^4.1.2",
     "typescript": "^3.5.2",
     "yarpm": "^0.2.1"
@@ -41,5 +41,9 @@
     "coveragePathIgnorePatterns": [
       "<rootDir>/server-render/"
     ]
+  },
+  "prettier": {
+    "singleQuote": true,
+    "semi": false
   }
 }

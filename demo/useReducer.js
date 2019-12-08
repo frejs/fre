@@ -1,6 +1,6 @@
 import { h, render, useReducer } from '../src'
 
-function d (state, action) {
+function d(state, action) {
   switch (action.type) {
     case 'clear':
       return { data: [] }
@@ -9,7 +9,7 @@ function d (state, action) {
   }
 }
 
-function Counter () {
+function Counter() {
   const [data, dispatch] = useReducer(d, { data: [] })
 
   return (

@@ -8,8 +8,8 @@ function Counter() {
       <h1>{up}</h1>
       <button onClick={() => setUp(up + 1)}>+</button>
       <h1>{down}</h1>
-      <button onClick={() => setDown(down -1)}>-</button>
-      <Count count={up}/>
+      <button onClick={() => setDown(down - 1)}>-</button>
+      <Count count={up} />
     </div>
   )
 }
@@ -23,7 +23,7 @@ function Count(props) {
       <h1>{add}</h1>
       <button onClick={() => setAdd(add + 1)}>+</button>
       <h1>{cut}</h1>
-      <button onClick={() => setCut(cut -1)}>-</button>
+      <button onClick={() => setCut(cut - 1)}>-</button>
     </div>
   )
 }
