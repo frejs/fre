@@ -244,7 +244,13 @@ function App() {
 
 ### Awesome API
 
-There are some awesome APIs, It used outside of component, Usually a `with` prefix is used
+There are some awesome APIs, It used outside of component, Usually a `with` prefix is used.
+
+
+- [with-context](https://github.com/132yse/fre#withcontext)
+
+- [with-suspense](https://github.com/132yse/fre#useeffect)
+
 
 #### withContext
 
@@ -310,7 +316,7 @@ const HelloBox = () => (
 const Box = props => <div>{props.children('hello world!')}</div>
 ```
 
-#### Concurrent
+### Concurrent
 
 Fre implements a tiny priority scheduler, which called [Concurrent Mode](https://reactjs.org/docs/concurrent-mode-intro.html).
 
