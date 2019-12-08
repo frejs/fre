@@ -1,31 +1,10 @@
 import { h, render, useState } from '../src'
+import { lazy } from './lazy'
 
-export function createSuspense(fn) {
-  let pending = true
-  let result = null
-  let error = null
-  let oldParams = null
-
-  return params => {
-    if (oldParams !== params) {
-      pending = true
-      oldParams = params
-    }
-    if (error) throw error
-    if (pending) {
-      throw fn(params).then(
-        res => (result = res),
-        err => (error = err)
-      )
-    }
-    return result
-  }
-}
-
-const useUser = createSuspense(pageSize =>
+const useUser = lazy(pageSize =>
   fetch(`https://api.clicli.us/users?level=4&page=1&pageSize=${pageSize}`)
     .then(res => res.json())
-    .then(params => params.users)
+    .then(next => next.users)
 )
 
 function App() {

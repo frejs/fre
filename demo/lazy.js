@@ -2,16 +2,24 @@ import { h, render } from '../src'
 
 export function lazy(fn) {
   let error = null
+  let last = null
   let component = null
+  let data = null
+  let promise = fn().then(
+    res => (res.default ? (component = res.default) : (data = res)),
+    err => (error = err)
+  )
 
-  return props => {
+  return next => {
+    if (last != next) {
+      component = null
+      last = next
+    }
     if (error) throw error
-    if (!component)
-      throw fn().then(
-        data => (component = data.default),
-        error => (error = error)
-      )
-    return h(component, props)
+
+    if (component) return h(component, next)
+    if (data) return data
+    if (promise) throw promise
   }
 }
 
