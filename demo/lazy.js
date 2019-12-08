@@ -9,10 +9,7 @@ export function lazy(fn) {
     error: void 0,
     done: void 0,
     promise: fn().then(
-      data => {
-        cache[key].data = data.default
-        cache[key].done = true
-      },
+      data => (cache[key].data = data.default),
       error => (cache[key].error = error)
     )
   }
@@ -22,13 +19,11 @@ export function lazy(fn) {
     }
     if (cache[key].data) {
       const Component = cache[key].data
-      const newProps = { done: cache[key].done, ...props }
-      return h(Component, newProps)
+      return h(Component, props)
     }
     if (cache[key].promise) {
       throw cache[key].promise
     }
-    throw new Error()
   }
 }
 
