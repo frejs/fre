@@ -8,6 +8,7 @@ import {
   useCallback,
   useRef
 } from './hooks'
+import { lazy } from './lazy'
 
 export {
   h,
@@ -20,7 +21,8 @@ export {
   useEffect,
   useMemo,
   useCallback,
-  useRef
+  useRef,
+  lazy
 }
 
 const fre = {
@@ -33,7 +35,8 @@ const fre = {
   useEffect,
   useMemo,
   useCallback,
-  useRef
+  useRef,
+  lazy
 }
 
 export default fre
