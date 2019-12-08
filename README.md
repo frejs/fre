@@ -16,13 +16,9 @@
 - :confetti_ball: Concurrent and Suspense
 - :telescope: keyed reconcilation algorithm
 
-### Introduction
-
-Fre (pronounced `/fri:/`, like free) is a tiny and perfect js library, It means [Free!](https://www.clicli.us/search/free) ~
-
 #### Contributors
 
-Fre has wonderful code, we need anyone to join us improve together.
+Fre has wonderful code, we need more to join us and improve together.
 
 <table><tbody><tr>
 <td><a target="_blank" href="https://github.com/132yse"><img width="70px" src="https://avatars0.githubusercontent.com/u/12951461?s=70&v=4"></a></td>
@@ -41,15 +37,9 @@ Thanks for the following websites and sponsors, If you do the same, please tell 
 <td><a target="_blank" href="https://www.clicli.me"><img height="60px" src="https://ws1.sinaimg.cn/large/0065Zy9ely1g983rcrcyuj30a305sgm2.jpg"></a></td>
 </tr></table></tbody>
 
-### Demo
+#### Demo
 
-- [async rendering demo](https://codesandbox.io/s/suspicious-rosalind-i06mv)
-
-- [key-based reconcilation demo](https://codesandbox.io/s/fre-demo-d7vm7)
-
-- [suspense demo](https://codesandbox.io/s/fre-suspense-demo-h5nfy)
-
-Thanks for [Rasmus Schultz](https://github.com/mindplay-dk)
+All demos [click here](https://github.com/132yse/fre/tree/master/demo/src)
 
 ### Use
 
@@ -205,7 +195,7 @@ const cb = useCallback(() => {
 The implement amount to
 
 ```js
-useMemo(()=>cb,deps)
+useMemo(() => cb, deps)
 ```
 
 #### useRef
