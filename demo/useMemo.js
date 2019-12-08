@@ -1,8 +1,8 @@
 // import {h, render} from 'preact'
 // import {useEffect,useMemo,useState,useCallback} from './preact/dist/hooks'
-import {h,render,useState,useMemo,useEffect} from '../src'
+import { h, render, useState, useMemo, useEffect } from '../src'
 
-function Counter () {
+function Counter() {
   const [count, setCount] = useState(0)
   const one = useMemo(() => 1, [])
 

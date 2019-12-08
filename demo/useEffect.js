@@ -4,18 +4,16 @@ import { h, render, useState, useEffect } from '../src'
 // import { h, render } from 'preact'
 // import {useState, useEffect } from 'preact/hooks'
 
-function Counter ({ id, remove }) {
+function Counter({ id, remove }) {
   const [count, setCount] = useState(0)
 
-  useEffect(
-    () => {
-      console.log(`111`)
+  useEffect(() => {
+    console.log(`111`)
 
-      return () => {
-        console.log(`222`);
-      }
-    },
-  )
+    return () => {
+      console.log(`222`)
+    }
+  })
 
   return (
     <div>
@@ -31,7 +29,7 @@ function Counter ({ id, remove }) {
 
 let nextId = 3
 
-function App () {
+function App() {
   const [counters, setCounters] = useState([1, 2, 3])
 
   return (
@@ -63,7 +61,6 @@ function App () {
 }
 
 render(<App />, document.body)
-
 
 // useEffect.js:10 111
 // useEffect.js:13 222

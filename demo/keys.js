@@ -51,21 +51,21 @@ import { h, render, useState, useEffect } from '../src'
 //   )
 // }
 
-function App () {
+function App() {
   const [arr, setArr] = useState([1, 2, 3])
   return (
     <div>
-      <button onClick={() => setArr([3,1,2])}>+</button>
+      <button onClick={() => setArr([3, 1, 2])}>+</button>
 
-        {arr.map(i => (
-          // <A key={i} value={i} />
-          <li key={i}>{i}</li>
-        ))}
+      {arr.map(i => (
+        // <A key={i} value={i} />
+        <li key={i}>{i}</li>
+      ))}
     </div>
   )
 }
 
-function A (props) {
+function A(props) {
   return <li>{props.value}</li>
 }
 

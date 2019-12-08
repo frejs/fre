@@ -7,7 +7,7 @@ let scheduling = false
 let frameDeadline = 0
 let frameLength = 1000 / 60
 
-export function scheduleCallback (callback) {
+export function scheduleCallback(callback) {
   const currentTime = getTime()
   let startTime = currentTime
   let timeout = 3000
@@ -31,7 +31,7 @@ export function scheduleCallback (callback) {
   return newTask
 }
 
-function flushWork (iniTime) {
+function flushWork(iniTime) {
   try {
     return workLoop(iniTime)
   } catch (e) {
@@ -41,7 +41,7 @@ function flushWork (iniTime) {
   }
 }
 
-function workLoop (iniTime) {
+function workLoop(iniTime) {
   let currentTime = iniTime
   currentTask = peek(taskQueue)
 
@@ -75,7 +75,7 @@ function workLoop (iniTime) {
   }
 }
 
-function performWork () {
+function performWork() {
   if (currentCallback) {
     let currentTime = getTime()
     frameDeadline = currentTime + frameLength
@@ -102,7 +102,7 @@ const planWork = (() => {
   return () => setTimeout(performWork, 0)
 })()
 
-export function shouldYeild () {
+export function shouldYeild() {
   return getTime() >= frameDeadline
 }
 

@@ -10,7 +10,7 @@ const App = () => {
   const [count, setCount] = useState(0)
 
   useEffect(() => {
-      setTimeout(() => setCount(count + 1), UPDATE_EVERY)
+    setTimeout(() => setCount(count + 1), UPDATE_EVERY)
   })
 
   const values = []
@@ -20,9 +20,9 @@ const App = () => {
   }
 
   return (
-    <div className='wraper'>
+    <div className="wraper">
       <h1>Count: {count}</h1>
-      {values.map((value,index) => (
+      {values.map((value, index) => (
         <SlowComponent key={value} value={value} />
       ))}
     </div>
@@ -33,7 +33,7 @@ const SlowComponent = ({ value }) => {
   const start = performance.now()
   while (performance.now() - start < BLOCK_FOR);
 
-  return <li className='slow'>{value}</li>
+  return <li className="slow">{value}</li>
 }
 
 render(<App />, document.getElementById('root'))
