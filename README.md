@@ -142,6 +142,7 @@ It is the execution and cleanup of effects, which is represented by the second p
 useEffect(f)       //  effect (and clean-up) every time
 useEffect(f, [])   //  effect (and clean-up) only once in a component's life
 useEffect(f, [x])  //  effect (and clean-up) when property x changes
+removed            //  clean-up
 ```
 
 ```js
