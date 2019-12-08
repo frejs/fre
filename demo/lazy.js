@@ -12,7 +12,6 @@ export function lazy(fn) {
       last = next
     }
     if (error) throw error
-
     if (component) return h(component, next)
     if (data) return data
     throw fn(next).then(
