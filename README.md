@@ -138,7 +138,7 @@ function App() {
 
 It is the execution and cleanup of effects, which is represented by the second parameter
 
-```console
+```
 useEffect(f)       //  effect (and clean-up) every time
 useEffect(f, [])   //  effect (and clean-up) only once in a component's life
 useEffect(f, [x])  //  effect (and clean-up) when property x changes
