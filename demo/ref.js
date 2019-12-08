@@ -9,53 +9,57 @@
 // import { render } from "react-dom";
 
 // // fre:
-import { render, h, useState, useEffect, useRef } from "../src";
+import { render, h, useState, useEffect, useRef } from '../src'
 
-const refNum = { div: 0, h1: 0 };
+const refNum = { div: 0, h1: 0 }
 
 const makeRef = name => el =>
-  console.log(`- <${name}> updated: ` + ((el && el.tagName) || el) + ` [#${++refNum[name]}]`);
+  console.log(
+    `- <${name}> updated: ` +
+      ((el && el.tagName) || el) +
+      ` [#${++refNum[name]}]`
+  )
 
 const App = () => {
-  console.log("App render");
+  console.log('App render')
 
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(0)
 
   useEffect(() => {
-    console.log(`- App effect, deps: [${count}]`);
+    console.log(`- App effect, deps: [${count}]`)
 
     return () => {
-      console.log(`- App effect, deps: [${count}] -> clean-up`);
-    };
-  }, [count]);
+      console.log(`- App effect, deps: [${count}] -> clean-up`)
+    }
+  }, [count])
 
   if (count < 2) {
     setTimeout(() => {
-      console.log("App update");
+      console.log('App update')
 
-      setCount(count + 1);
-    }, 500);
+      setCount(count + 1)
+    }, 500)
   }
 
   return (
-    <div ref={makeRef("div")}>
-      <h1 ref={makeRef("h1")}>Hello World</h1>
+    <div ref={makeRef('div')}>
+      <h1 ref={makeRef('h1')}>Hello World</h1>
       <p id="test">{count}</p>
     </div>
-  );
-};
+  )
+}
 
 const Wrapper = () => {
-  const [showApp, setShowApp] = useState(true);
+  const [showApp, setShowApp] = useState(true)
 
   if (showApp) {
     setTimeout(() => {
-      console.log("Removing App...");
-      setShowApp(false);
-    }, 2000);
+      console.log('Removing App...')
+      setShowApp(false)
+    }, 2000)
   }
 
-  return showApp ? <App /> : <p>App removed...</p>;
-};
+  return showApp ? <App /> : <p>App removed...</p>
+}
 
-render(<Wrapper />, document.getElementById("root"));
+render(<Wrapper />, document.getElementById('root'))

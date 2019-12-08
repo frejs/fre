@@ -33,7 +33,8 @@ const fre = {
   useEffect,
   useMemo,
   useCallback,
-  useRef
+  useRef,
+  lazy
 }
 
 export default fre

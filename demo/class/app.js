@@ -1,15 +1,14 @@
-
 import { h, render } from '../../src'
 import { Component, useComponent } from './fre-component'
 
 class Counter extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = { count: props.count || 0 }
   }
 
-  render () {
+  render() {
     const { id, remove } = this.props
     const { count } = this.state
 
@@ -35,29 +34,39 @@ Counter = useComponent(Counter)
 let nextId = 3
 
 class App extends Component {
-  constructor () {
+  constructor() {
     super()
 
     this.state = { counters: [1, 2, 3] }
   }
 
-  render () {
+  render() {
     const { counters } = this.state
 
     const setCounters = counters => this.setState({ counters })
 
-
     return (
       <div>
         {counters.map(id => (
-          <Counter key={id} id={id} remove={() => setCounters(counters.filter(c => c !== id))} />
+          <Counter
+            key={id}
+            id={id}
+            remove={() => setCounters(counters.filter(c => c !== id))}
+          />
         ))}
         <hr />
-        <button onClick={() => setCounters(counters.concat(++nextId))}>Add new</button>
-        <button onClick={() => setCounters(counters.slice(0, counters.length - 1))} disabled={counters.length === 1}>
+        <button onClick={() => setCounters(counters.concat(++nextId))}>
+          Add new
+        </button>
+        <button
+          onClick={() => setCounters(counters.slice(0, counters.length - 1))}
+          disabled={counters.length === 1}
+        >
           Remove last
         </button>
-        <button onClick={() => setCounters(counters.slice().reverse())}>Reverse</button>
+        <button onClick={() => setCounters(counters.slice().reverse())}>
+          Reverse
+        </button>
       </div>
     )
   }
