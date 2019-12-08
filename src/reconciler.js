@@ -29,7 +29,7 @@ export function scheduleWork(fiber, lock) {
 }
 
 function reconcileWork(didout) {
-  let suspend = null
+  let lazy = null
   if (!WIP) {
     WIP = updateQueue.shift()
   }
@@ -38,10 +38,10 @@ function reconcileWork(didout) {
       WIP = reconcile(WIP)
     } catch (e) {
       if (!!e && typeof e.then === 'function') {
-        suspend = WIP
+        lazy = WIP
         WIP = null
         e.then(() => {
-          WIP = suspend
+          WIP = lazy
           reconcileWork(true)
         })
       } else throw e

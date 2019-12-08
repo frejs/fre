@@ -1,29 +1,17 @@
 import { h, render } from '../src'
 
-const cache = {}
-
 export function lazy(fn) {
-  const key = Symbol()
-  cache[key] = {
-    data: void 0,
-    error: void 0,
-    done: void 0,
-    promise: fn().then(
-      data => (cache[key].data = data.default),
-      error => (cache[key].error = error)
-    )
-  }
+  let error = null
+  let component = null
+
   return function Lazy(props) {
-    if (cache[key].error) {
-      throw cache[key].error
-    }
-    if (cache[key].data) {
-      const Component = cache[key].data
-      return h(Component, props)
-    }
-    if (cache[key].promise) {
-      throw cache[key].promise
-    }
+    if (error) throw error
+    if (!component)
+      throw fn().then(
+        data => (component = data.default),
+        error => (error = error)
+      )
+    return h(component, props)
   }
 }
 
@@ -32,26 +20,15 @@ const OtherComponent = lazy(() => {
     setTimeout(
       () =>
         resolve({
-          default: function Hello() {
-            return <div>Hello</div>
-          }
+          default: () => <div>Hello</div>
         }),
       1000
     )
   )
 })
 
-function Suspense(props) {
-  const { fallback, children } = props
-  return children
-}
-
 function App() {
-  return (
-    <Suspense fallback={() => 'loading'}>
-      <OtherComponent />
-    </Suspense>
-  )
+  return <OtherComponent />
 }
 
 render(<App />, document.getElementById('root'))
