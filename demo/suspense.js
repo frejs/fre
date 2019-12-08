@@ -1,30 +1,31 @@
 import { h, render, useState } from '../src'
 
-export function createSuspense(promise) {
+export function createSuspense(fn) {
   let pending = true
-  let result
-  let backupData = null
+  let result = null
+  let error = null
+  let oldParams = null
 
-  return data => {
-    if (backupData !== data) {
+  return params => {
+    if (oldParams !== params) {
       pending = true
-      backupData = data
+      oldParams = params
     }
+    if (error) throw error
     if (pending) {
-      throw promise(data).then(res => {
-        pending = false
-        result = res
-      })
-    } else {
-      return result
+      throw fn(params).then(
+        res => (result = res),
+        err => (error = err)
+      )
     }
+    return result
   }
 }
 
 const useUser = createSuspense(pageSize =>
   fetch(`https://api.clicli.us/users?level=4&page=1&pageSize=${pageSize}`)
     .then(res => res.json())
-    .then(data => data.users)
+    .then(params => params.users)
 )
 
 function App() {

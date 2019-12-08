@@ -4,7 +4,7 @@ export function lazy(fn) {
   let error = null
   let component = null
 
-  return function Lazy(props) {
+  return props => {
     if (error) throw error
     if (!component)
       throw fn().then(
