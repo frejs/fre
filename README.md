@@ -106,8 +106,6 @@ function App() {
     </div>
   )
 }
-
-render(<App />, document.getElementById('root'))
 ```
 
 #### useReducer
@@ -134,21 +132,17 @@ function App() {
     </div>
   )
 }
-
-render(<App />, document.getElementById('root'))
 ```
 
 #### useEffect
 
-`useEffect` takes two parameters, the first is a effect callback and the second is an array
+It is the execution and cleanup of effects, which is represented by the second parameter
 
-if the array changed, the callback will execute after commitWork, such as `pureComponentDidUpdate`
-
-if the array is empty, it means execute once, such as `componentDidMount`
-
-if no array, it means execute every time , such as `componentDidUpdate`
-
-if useEffect returns a function, the function will execute before next commitWork, such as `componentWillUnmount`
+```console
+useEffect(f)       //  effect (and clean-up) every time
+useEffect(f, [])   //  effect (and clean-up) only once in a component's life
+useEffect(f, [x])  //  effect (and clean-up) when property x changes
+```
 
 ```js
 function App({ flag }) {
@@ -163,31 +157,17 @@ function App({ flag }) {
     </div>
   )
 }
-
-render(<App />, document.getElementById('root'))
 ```
 
-#### useCallback
-
-`useCallback` has the same parameters as `useEffect`, but `useCallback` will return a cached function.
+If it return a function, the function can do cleanups:
 
 ```js
-const set = new Set()
-
-function App() {
-  const [count, setCount] = useState(0)
-  const cb = useCallback(() => {
-    console.log('cb was cached')
-  }, [count])
-  set.add(cb)
-
-  return (
-    <div>
-      <h1>{set.size}</h1>
-      <button onClick={() => setCount(count + 1)}>+</button>
-    </div>
-  )
-}
+useEffect(() => {
+    document.title = 'count is ' + count
+    reutn () => {
+      store.unsubscribe()
+    }
+}, [])
 ```
 
 #### useMemo
@@ -209,8 +189,22 @@ function App() {
     </div>
   )
 }
+```
 
-render(<App />, document.getElementById('root'))
+#### useCallback
+
+`useCallback` is based `useMemo`, it will return a cached function.
+
+```js
+const cb = useCallback(() => {
+  console.log('cb was cached')
+}, [])
+```
+
+The implement amount to
+
+```js
+useMemo(()=>cb,deps)
 ```
 
 #### useRef
@@ -246,11 +240,9 @@ function App() {
 
 There are some awesome APIs, It used outside of component, Usually a `with` prefix is used.
 
-
 - [with-context](https://github.com/132yse/fre#withcontext)
 
 - [with-suspense](https://github.com/132yse/fre#useeffect)
-
 
 #### withContext
 
