@@ -60,7 +60,7 @@ yarn add fre
 ```js
 import { h, render, useState } from 'fre'
 
-function Counter() {
+function App() {
   const [count, setCount] = useState(0)
   return (
     <div>
@@ -70,7 +70,7 @@ function Counter() {
   )
 }
 
-render(<Counter />, document.getElementById('root'))
+render(<App />, document.getElementById('root'))
 ```
 
 ### Hooks API
@@ -94,7 +94,7 @@ render(<Counter />, document.getElementById('root'))
 You can use it many times, new state is available when component is rerender
 
 ```js
-function Counter() {
+function App() {
   const [up, setUp] = useState(0)
   const [down, setDown] = useState(0)
   return (
@@ -107,7 +107,7 @@ function Counter() {
   )
 }
 
-render(<Counter />, document.getElementById('root'))
+render(<App />, document.getElementById('root'))
 ```
 
 #### useReducer
@@ -124,7 +124,7 @@ function reducer(state, action) {
   }
 }
 
-function Counter() {
+function App() {
   const [state, dispatch] = useReducer(reducer, { count: 1 })
   return (
     <div>
@@ -135,7 +135,7 @@ function Counter() {
   )
 }
 
-render(<Counter />, document.getElementById('root'))
+render(<App />, document.getElementById('root'))
 ```
 
 #### useEffect
@@ -151,7 +151,7 @@ if no array, it means execute every time , such as `componentDidUpdate`
 if useEffect returns a function, the function will execute before next commitWork, such as `componentWillUnmount`
 
 ```js
-function Counter({ flag }) {
+function App({ flag }) {
   const [count, setCount] = useState(0)
   useEffect(() => {
     document.title = 'count is ' + count
@@ -164,7 +164,7 @@ function Counter({ flag }) {
   )
 }
 
-render(<Counter />, document.getElementById('root'))
+render(<App />, document.getElementById('root'))
 ```
 
 #### useCallback
@@ -174,7 +174,7 @@ render(<Counter />, document.getElementById('root'))
 ```js
 const set = new Set()
 
-function Counter() {
+function App() {
   const [count, setCount] = useState(0)
   const cb = useCallback(() => {
     console.log('cb was cached')
@@ -195,7 +195,7 @@ function Counter() {
 `useMemo` has the same parameters as `useEffect`, but `useMemo` will return a cached value.
 
 ```js
-function Counter() {
+function App() {
   const [count, setCount] = useState(0)
   const val = useMemo(() => {
     return new Date()
@@ -210,7 +210,7 @@ function Counter() {
   )
 }
 
-render(<Counter />, document.getElementById('root'))
+render(<App />, document.getElementById('root'))
 ```
 
 #### useRef
@@ -239,6 +239,54 @@ function App() {
     }
   })
   return flag && <span ref={t}>I will removed</span>
+}
+```
+
+### Awesome API
+
+There are some awesome APIs, It used outside of component, Usually a `with` prefix is used
+
+#### withContext
+
+Simplify context implement for hooks, no need Provider or useContext, share state easier.
+
+```js
+const useTheme = withContext('light')
+
+function App() {
+  const [theme, setTheme] = useTheme()
+  return (
+    <div>
+      {theme}
+      <A />
+      <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+        change
+      </button>
+    </div>
+  )
+}
+
+function A() {
+  const [theme] = useTheme()
+  return <div>{theme}</div>
+}
+```
+
+#### withSuspense
+
+
+
+```js
+const useUser = withSuspense(pageSize =>
+  fetch(`https://api.clicli.us/users?level=4&page=1&pageSize=${pageSize}`)
+    .then(res => res.json())
+    .then(next => next.users)
+)
+const OtherComponent = withSuspense(()=>import('./other-component'))
+
+function App() {
+  const users = useUser(pageSize)
+  return <OtherComponent users={users}/>
 }
 ```
 

@@ -1,4 +1,4 @@
-import { h, render } from '../src'
+import { h, render } from '../../src'
 
 export function lazy(fn) {
   let error = null

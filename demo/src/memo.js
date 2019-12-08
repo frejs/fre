@@ -1,4 +1,4 @@
-import { h, render, useState } from '../src'
+import { h, render, useState } from '../../src'
 
 function App () {
   const [state, setState] = useState(0)

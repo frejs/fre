@@ -9,7 +9,7 @@
 // import { render } from "react-dom";
 
 // // fre:
-import { render, h, useState, useEffect, useRef } from '../src'
+import { render, h, useState, useEffect, useRef } from '../../src'
 
 const refNum = { div: 0, h1: 0 }
 

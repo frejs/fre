@@ -1,4 +1,4 @@
-import { h, render, useReducer } from '../src'
+import { h, render, useReducer } from '../../src'
 
 function d(state, action) {
   switch (action.type) {

@@ -1,4 +1,4 @@
-import { h, useState, useEffect, render } from '../src'
+import { h, useState, useEffect, render } from '../../src'
 
 // import { render, createElement as h } from 'preact/compat'
 // import { useState, useEffect } from 'preact/hooks'
@@ -6,7 +6,7 @@ import { h, useState, useEffect, render } from '../src'
 // import { render } from 'react-dom'
 // import { createElement as h, useState, useEffect } from 'react'
 
-export function createContext(defaultValue) {
+export function withContext(defaultValue) {
   const listeners = new Set()
   let backupValue = defaultValue
 
@@ -29,7 +29,7 @@ export function createContext(defaultValue) {
   }
 }
 
-const useTheme = createContext('light')
+const useTheme = withContext('light')
 
 function App() {
   const [theme, setTheme] = useTheme()

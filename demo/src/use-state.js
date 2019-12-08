@@ -1,4 +1,4 @@
-import { h, render, useState } from '../src'
+import { h, render, useState } from '../../src'
 
 function Counter() {
   const [up, setUp] = useState(0)

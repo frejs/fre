@@ -1,4 +1,4 @@
-import { h, render, useState } from '../src'
+import { h, render, useState } from '../../src'
 
 const useUser = lazy(pageSize =>
   fetch(`https://api.clicli.us/users?level=4&page=1&pageSize=${pageSize}`)
