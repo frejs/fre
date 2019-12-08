@@ -274,7 +274,7 @@ function A() {
 
 #### withSuspense
 
-
+One API to suspense not only fetch data but also dynamic component.
 
 ```js
 const useUser = withSuspense(pageSize =>
@@ -282,56 +282,21 @@ const useUser = withSuspense(pageSize =>
     .then(res => res.json())
     .then(next => next.users)
 )
-const OtherComponent = withSuspense(()=>import('./other-component'))
+const OtherComponent = withSuspense(() => import('./other-component'))
 
 function App() {
   const users = useUser(pageSize)
-  return <OtherComponent users={users}/>
+  return <OtherComponent users={users} />
 }
 ```
 
-### props
-
-Props are used for component communication
-
-```js
-function App() {
-  const [sex, setSex] = useState('boy')
-  return (
-    <div>
-      <Sex sex={sex} />
-      <button
-        onClick={() => (sex === 'boy' ? setSex('girl') : setSex('boy'))}
-      />
-    </div>
-  )
-}
-function Sex(props) {
-  return <div>{props.sex}</div>
-}
-```
-
-Props contains children to render all the child elements of itself
-
-```js
-const HelloBox = () => (
-  <Box>
-    <h1>Hello world !</h1>
-  </Box>
-)
-
-const Box = props => <div>{props.children}</div>
-```
-
-Hooks do not support HOC and extends, but render props are supported by default
+### render props / children
 
 ```js
 const HelloBox = () => <Box render={value => <h1>{value}</h1>} />
 
 const Box = props => <div>{props.render('hello world!')}</div>
 ```
-
-Also can be render children
 
 ```js
 const HelloBox = () => (
@@ -345,35 +310,23 @@ const HelloBox = () => (
 const Box = props => <div>{props.children('hello world!')}</div>
 ```
 
-#### JSX(JavaScript extension)
-
-The default export h function needs to be configured
-
-```js
-import { h } from 'fre'
-```
-
-```json
-{
-  "plugins": [["transform-react-jsx", { "pragma": "h" }]]
-}
-```
-
-If browser environment, recommend to use [htm](https://github.com/developit/htm)
-
 #### Concurrent
 
-Fre implements a tiny priority scheduler, which like react Fiber.
+Fre implements a tiny priority scheduler, which called [Concurrent Mode](https://reactjs.org/docs/concurrent-mode-intro.html).
 
-It can break the work, and when there are idle time, the work will continue.
+It uses the `linked list` data struct to iterate a tree, which can better break, continue, and fallback.
 
-Concurrent Mode is also called `time slicing` or `concurrent mode`.
+At the same time, it uses double buffering to separate reading and writing.
+
+Of course, the new data struct brings different algorithms and many possibilities.
+
+#### time slicing
+
+Time slicing is the scheduling of reconcilation, synchronous tasks, sacrifice CPU and reduce blocking time
 
 #### Suspense
 
-Suspense is another way to break the work.
-
-It throws promise, and fre catches promise then suspend the work. It waits until resolve to the promise.
+Suspense is the scheduling of promise, asynchronous tasks, break current tasks, and continue tasks after promise resolve
 
 #### key-based reconcilation
 
