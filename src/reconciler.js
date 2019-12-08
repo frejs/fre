@@ -3,7 +3,7 @@ import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild } from './scheduler'
 import { createText } from './h'
 
-export var options = {}
+export const options = {}
 export const [HOST, SVG, HOOK, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5]
 
 let preCommit = null
@@ -77,7 +77,7 @@ function reconcile(WIP) {
 
 function updateHOOK(WIP) {
   const oldProps = WIP.pendingProps
-  let newProps = WIP.props
+  const newProps = WIP.props
   if (WIP.lock === null && !shouldUpdate(oldProps, newProps)) {
     cloneChildren(WIP)
     return
