@@ -167,14 +167,14 @@ function reconcileChildren(WIP, children) {
 function cloneChildren(fiber) {
   if (!fiber.child) return
 
-  let currentChild = fiber.child
-  let newChild = currentChild
+  let child = fiber.child
+  let newChild = child
   fiber.child = newChild
   newChild.parent = fiber
 
-  while (currentChild.sibling) {
-    currentChild = currentChild.sibling
-    newChild = newChild.sibling = currentChild
+  while (child.sibling) {
+    child = child.sibling
+    newChild = newChild.sibling = child
     newChild.parent = fiber
   }
 
