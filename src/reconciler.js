@@ -201,6 +201,7 @@ function commitWork(fiber) {
   })
   fiber.done && fiber.done()
   commitQueue = []
+  updateQueue = []
   preCommit = null
   WIP = null
 }

@@ -28,4 +28,4 @@ function Count(props) {
   )
 }
 
-render(<Counter />, document.getElementById('root'))
+render(<Counter />, document.body)
