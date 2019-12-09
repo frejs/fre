@@ -6,7 +6,8 @@ import {
   useEffect,
   useMemo,
   useCallback,
-  useRef
+  useRef,
+  useLayout
 } from './hooks'
 
 export {
@@ -20,7 +21,9 @@ export {
   useEffect,
   useMemo,
   useCallback,
-  useRef
+  useRef,
+  useLayout,
+  useLayout as useLayoutEffect
 }
 
 const fre = {

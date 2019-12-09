@@ -32,11 +32,19 @@ export function useReducer(reducer, initState) {
 }
 
 export function useEffect(cb, deps) {
+  return effectImpl(cb, deps, 'effect')
+}
+
+export function useLayout(cb, deps) {
+  return effectImpl(cb, deps, 'layout')
+}
+
+function effectImpl(cb, deps, key) {
   let hook = getHook(cursor++)
   if (isChanged(hook[1], deps)) {
     hook[0] = useCallback(cb, deps)
     hook[1] = deps
-    getCurrentHook().hooks.effect.push(hook)
+    getCurrentHook().hooks[key].push(hook)
   }
 }
 
@@ -61,7 +69,7 @@ export function getHook(cursor) {
   const currentHook = getCurrentHook()
   let hooks =
     currentHook.hooks ||
-    (currentHook.hooks = { list: [], effect: [], cleanup: [] })
+    (currentHook.hooks = { list: [], effect: [], cleanup: [], layout: [] })
   if (cursor >= hooks.list.length) {
     hooks.list.push([])
   }
