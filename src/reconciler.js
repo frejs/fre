@@ -229,7 +229,6 @@ function commit(fiber) {
     }
   } else if (op === UPDATE) {
     updateElement(dom, fiber.lastProps, fiber.props)
-    refer(ref, null)
   } else {
     let point = fiber.insertPoint ? fiber.insertPoint.node : null
     let after = point ? point.nextSibling : parent.firstChild
