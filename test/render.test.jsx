@@ -158,29 +158,29 @@ test('useEffect(f, [x]) should run on changes to x', async () => {
     }
   }
 
-  const Component = ({ value }) => {
-    useEffect(() => effect(value), [value])
+  const Component = ({ deps }) => {
+    useEffect(() => effect(deps[0]), deps)
 
     return <div>foo</div>
   }
 
   await testUpdates([
     {
-      content: <Component value={1} />,
+      content: <Component deps={[1]} />,
       test: () => {
         expect(effects).toEqual(['effect 1'])
         effects = []
       }
     },
     {
-      content: <Component value={2} />,
+      content: <Component deps={[2]} />,
       test: () => {
         expect(effects).toEqual(['cleanUp 1', 'effect 2'])
         effects = []
       }
     },
     {
-      content: <Component value={2} />,
+      content: <Component deps={[2]} />,
       test: () => {
         expect(effects).toEqual([])
         effects = []
