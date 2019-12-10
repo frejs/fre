@@ -1,4 +1,4 @@
-import { scheduleWork, isFn, getCurrentHook } from './reconciler'
+import { scheduleWork, isFn, getCurrentFiber } from './reconciler'
 let cursor = 0
 
 export function resetCursor() {
@@ -11,7 +11,7 @@ export function useState(initState) {
 
 export function useReducer(reducer, initState) {
   const hook = getHook(cursor++)
-  const current = getCurrentHook()
+  const current = getCurrentFiber()
 
   const setter = value => {
     let newValue = reducer
@@ -44,7 +44,7 @@ function effectImpl(cb, deps, key) {
   if (isChanged(hook[1], deps)) {
     hook[0] = useCallback(cb, deps)
     hook[1] = deps
-    getCurrentHook().hooks[key].push(hook)
+    getCurrentFiber().hooks[key].push(hook)
   }
 }
 
@@ -66,7 +66,7 @@ export function useRef(current) {
 }
 
 export function getHook(cursor) {
-  const currentHook = getCurrentHook()
+  const currentHook = getCurrentFiber()
   let hooks =
     currentHook.hooks ||
     (currentHook.hooks = { list: [], effect: [], layout: [] })

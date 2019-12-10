@@ -7,7 +7,7 @@ export const options = {}
 export const [HOST, SVG, HOOK, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5]
 
 let preCommit = null
-let currentFiber = options.currentFiber || null
+let currentFiber =  null
 let WIP = null
 let updateQueue = []
 let commitQueue = []
@@ -294,6 +294,6 @@ function delRef(kids) {
   })
 }
 
-export function getCurrentHook() {
+export function getCurrentFiber() {
   return currentFiber || null
 }
