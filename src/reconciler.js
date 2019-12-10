@@ -80,7 +80,10 @@ function reconcile(WIP) {
 function updateHOOK(WIP) {
   const oldProps = WIP.pendingProps
   const newProps = WIP.props
-  if (WIP.lock === false && !shouldUpdate(oldProps, newProps)) {
+  if (
+    (WIP.lock === false || WIP.lock === null) &&
+    !shouldUpdate(oldProps, newProps)
+  ) {
     cloneChildren(WIP)
     return
   }
