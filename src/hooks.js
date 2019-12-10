@@ -20,7 +20,7 @@ export function useReducer(reducer, initState) {
       ? value(hook[0])
       : value
     hook[0] = newValue
-    scheduleWork(current, true)
+    scheduleWork(current)
   }
 
   if (hook.length) {
@@ -69,7 +69,7 @@ export function getHook(cursor) {
   const currentHook = getCurrentHook()
   let hooks =
     currentHook.hooks ||
-    (currentHook.hooks = { list: [], effect: [], cleanup: [], layout: [] })
+    (currentHook.hooks = { list: [], effect: [], layout: [] })
   if (cursor >= hooks.list.length) {
     hooks.list.push([])
   }

@@ -22,9 +22,10 @@ export function render(vnode, node, done) {
   scheduleWork(rootFiber)
 }
 
-export function scheduleWork(fiber, lock) {
-  fiber.lock = lock
-  updateQueue.push(fiber)
+export function scheduleWork(fiber) {
+  if (!fiber.dirty && (fiber.dirty = true)) {
+    updateQueue.push(fiber)
+  }
   scheduleCallback(reconcileWork)
 }
 
@@ -50,12 +51,7 @@ function reconcileWork(didout) {
   if (!didout && WIP) {
     return reconcileWork.bind(null)
   }
-  if (preCommit) {
-    commitWork(preCommit)
-    if (updateQueue.length > 0) {
-      return reconcileWork.bind(null)
-    }
-  }
+  if (preCommit) commitWork(preCommit)
   return null
 }
 
@@ -67,10 +63,10 @@ function reconcile(WIP) {
 
   if (WIP.child) return WIP.child
   while (WIP) {
-    if (WIP.lock == false || !WIP.parent) {
+    if (!preCommit && WIP.dirty === false) {
       preCommit = WIP
     }
-    if (WIP.sibling && WIP.lock == null) {
+    if (WIP.sibling && WIP.dirty == null) {
       return WIP.sibling
     }
     WIP = WIP.parent
@@ -81,7 +77,7 @@ function updateHOOK(WIP) {
   const oldProps = WIP.pendingProps
   const newProps = WIP.props
   if (
-    (WIP.lock === false || WIP.lock === null) &&
+    (WIP.dirty === false || WIP.dirty === null) &&
     !shouldUpdate(oldProps, newProps)
   ) {
     cloneChildren(WIP)
@@ -165,8 +161,10 @@ function reconcileChildren(WIP, children) {
     prevFiber = newFiber
   }
 
-  if (prevFiber) prevFiber.sibling = null
-  WIP.lock = WIP.lock ? false : null
+  if (prevFiber) {
+    prevFiber.sibling = null
+  }
+  WIP.dirty = WIP.dirty ? false : null
 }
 
 function cloneChildren(fiber) {
@@ -194,7 +192,7 @@ function shouldUpdate(a, b) {
 
 function shouldPlace(fiber) {
   let p = fiber.parent
-  if (p.tag === HOOK) return p.key && !p.lock
+  if (p.tag === HOOK) return p.key && !p.dirty
   return fiber.key
 }
 
