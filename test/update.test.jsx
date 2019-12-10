@@ -156,3 +156,28 @@ test('render/update object properties and DOM attributes', async () => {
     }
   ])
 })
+
+test('attach/remove DOM event handler', async () => {
+    let clicks = 0
+  
+    const handler = () => (clicks += 1)
+  
+    await testUpdates([
+      {
+        content: <button onclick={handler}>OK</button>,
+        test: ([button]) => {
+          button.click()
+  
+          expect(clicks).toBe(1)
+        }
+      },
+      {
+        content: <button>OK</button>,
+        test: ([button]) => {
+          button.click()
+  
+          expect(clicks).toBe(1) // doesn't trigger handler, which has been removed
+        }
+      }
+    ])
+  })
