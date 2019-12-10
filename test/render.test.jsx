@@ -1,10 +1,6 @@
 /** @jsx h */
 
 import { h, render, useState, useEffect, useRef } from '../src/index'
-const nextTick = fn => {
-  let start = Date.now()
-  while(Date.now() < start + 16){}
-}
 
 const testRender = jsx =>
   new Promise(resolve => {
@@ -18,11 +14,12 @@ const testUpdates = async updates => {
   let setContent
 
   const Component = () => {
-    const [content, _setContent] = useState(updates[0].content)
+    const [content, _setContent] = useState('')
 
     setContent = _setContent
 
     useEffect(effect)
+
     return content
   }
 
@@ -30,15 +27,13 @@ const testUpdates = async updates => {
 
   await testRender(<Component />)
 
-  run(0)
-
-  for (let i = 1; i < updates.length; i++) {
+  for (let i = 0; i < updates.length; i++) {
     await new Promise(resolve => {
       effect = () => {
-        run(i)
-        resolve()
+        console.log("run test ", i) // TODO remove
+        setTimeout(() => { run(i); resolve() }, 20) // TODO remove timeout hack
       }
-
+      console.log("set content ", i) // TODO remove hack (?!?!?)
       setContent(updates[i].content)
     })
   }
@@ -171,31 +166,31 @@ test('useEffect(f, [x]) should run on changes to x', async () => {
 
   await testUpdates([
     {
-      content: <Component value={0} />,
+      content: <Component value={1} />,
       test: () => {
-        nextTick()
+        expect(effects).toEqual(['effect 1'])
+        effects = []
+      }
+    },
+    {
+      content: <Component value={2} />,
+      test: () => {
+        expect(effects).toEqual(['cleanUp 1', 'effect 2'])
+        effects = []
+      }
+    },
+    {
+      content: <Component value={2} />,
+      test: () => {
         expect(effects).toEqual([])
-      }
-    },
-    {
-      content: <Component value={1} />,
-      test: () => {
-        nextTick()
-        expect(effects).toEqual(['effect 0'])
-      }
-    },
-    {
-      content: <Component value={1} />,
-      test: () => {
-        nextTick()
-        expect(effects).toEqual(['effect 0', 'cleanUp 0', 'effect 1'])
+        effects = []
       }
     },
     {
       content: <div>removed</div>,
       test: () => {
-        nextTick()
-        expect(effects).toEqual(['effect 0', 'cleanUp 0', 'effect 1', 'cleanUp 1'])
+        expect(effects).toEqual(['cleanUp 2'])
+        effects = []
       }
     }
   ])
@@ -203,48 +198,46 @@ test('useEffect(f, [x]) should run on changes to x', async () => {
 
 test('useEffect(f, []) should run only once', async () => {
   let effects = []
+  let effectNum = 1
 
   const effect = () => {
-    effects.push('effect')
+    const currentEffectNum = effectNum++
+
+    effects.push(`effect ${currentEffectNum}`)
 
     return () => {
-      effects.push('cleanUp')
+      effects.push(`cleanUp ${currentEffectNum}`)
     }
   }
 
   const Component = () => {
     useEffect(effect, [])
 
-  return <div>foo</div>
+    return <div>foo</div>
   }
 
   await testUpdates([
+    // mounted: should trigger effect
     {
-      content: <Component />,
+      content: <Component/>,
       test: () => {
-        nextTick()
-        expect(effects).toEqual([]) // it will change next time
+        expect(effects).toEqual(['effect 1'])
+        effects = []
       }
     },
+    // updated: should NOT trigger effect
     {
-      content: <Component />,
+      content: <Component/>,
       test: () => {
-        nextTick()
-        expect(effects).toEqual(['effect']) // now it have an effect from last time
+        expect(effects).toEqual([])
       }
     },
-    {
-      content: <Component />,
-      test: () => {
-        nextTick()
-        expect(effects).toEqual(['effect'])
-      }
-    },
+    // removal: should trigger clean-up
     {
       content: <div>removed</div>,
       test: () => {
-        nextTick()
-        expect(effects).toEqual([ 'effect' ])
+        expect(effects).toEqual(['cleanUp 1'])
+        effects = []
       }
     }
   ])
@@ -272,31 +265,24 @@ test('useEffect(f) should run every time', async () => {
 
   await testUpdates([
     {
-      content: <Component />,
+      content: <Component/>,
       test: () => {
-        nextTick()
-        expect(effects).toEqual([])
+        expect(effects).toEqual(["effect 1"])
+        effects = []
       }
     },
     {
-      content: <Component />,
+      content: <Component/>,
       test: () => {
-        nextTick()
-        expect(effects).toEqual([ 'effect 1' ])
-      }
-    },
-    {
-      content: <Component />,
-      test: () => {
-        nextTick()
-        expect(effects).toEqual(['effect 1', 'cleanUp 1'])
+        expect(effects).toEqual(["cleanUp 1", "effect 2"])
+        effects = []
       }
     },
     {
       content: <div>removed</div>,
       test: () => {
-        nextTick()
-        expect(effects).toEqual(['effect 1','cleanUp 1'])
+        expect(effects).toEqual(["cleanUp 2"])
+        effects = []
       }
     }
   ])
@@ -325,14 +311,12 @@ test('persist reference to any value', async () => {
     {
       content,
       test: ([p]) => {
-        nextTick()
         expect(p.textContent).toBe('x')
       }
     },
     {
       content,
       test: ([p]) => {
-        nextTick()
         expect(p.textContent).toBe('x')
       }
     }
@@ -369,7 +353,7 @@ test('reorder and reuse elements during key-based reconciliation of child-nodes'
       ),
       test: elements => {
         const children = [...elements[0].children]
-        nextTick()
+
         expect(children.map(el => el.textContent)).toStrictEqual(state.map(value => '' + value))
 
         if (stateNumber >= 1) {
@@ -417,7 +401,7 @@ test('diff style-object properties', async () => {
   ])
 })
 
-test('async state update', async (done) => {
+test('async state update', async () => {
   let updates = 0
 
   const Component = () => {
@@ -447,8 +431,7 @@ test('async state update', async (done) => {
       content,
       test: ([button]) => {
         expect(+button.textContent).toBe(3) // all 3 state updates applied
-        expect(updates).toBe(3)
-        done()
+        expect(updates).toBe(2)             // but component only renders once
       }
     }
   ])
