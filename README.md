@@ -2,8 +2,8 @@
 <h1 align="center">Fre</h1>
 <p align="center">:ghost: Tiny React16 like library with Concurrent and Suspense.</p>
 <p align="center">
-<a href="https://circleci.com/gh/132yse/fre"><img src="https://img.shields.io/circleci/project/github/132yse/fre.svg?style=flat-square" alt="Build Status"></a>
-<a href="https://codecov.io/gh/132yse/fre"><img src="https://img.shields.io/codecov/c/github/132yse/fre.svg?style=flat-square" alt="Code Coverage"></a>
+<a href="https://circleci.com/gh/yisar/fre"><img src="https://img.shields.io/circleci/project/github/yisar/fre.svg?style=flat-square" alt="Build Status"></a>
+<a href="https://codecov.io/gh/yisar/fre"><img src="https://img.shields.io/codecov/c/github/yisar/fre.svg?style=flat-square" alt="Code Coverage"></a>
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/v/fre.svg?style=flat-square" alt="npm-v"></a>
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/dt/fre.svg?style=flat-square" alt="npm-d"></a>
 <a href="https://bundlephobia.com/result?p=fre"><img src="https://img.shields.io/bundlephobia/minzip/fre.svg?&style=flat-square" alt="gzip"></a>
@@ -21,7 +21,7 @@
 Fre has wonderful code, we need more to join us and improve together.
 
 <table><tbody><tr>
-<td><a target="_blank" href="https://github.com/132yse"><img width="70px" src="https://avatars0.githubusercontent.com/u/12951461?s=70&v=4"></a></td>
+<td><a target="_blank" href="https://github.com/yisar"><img width="70px" src="https://avatars0.githubusercontent.com/u/12951461?s=70&v=4"></a></td>
 <td><a target="_blank" href="https://github.com/mindplay-dk"><img width="70px" src="https://avatars3.githubusercontent.com/u/103348?s=70&v=4"></a></td>
 <td><a target="_blank" href="https://github.com/hkc452"><img width="70px" src="https://avatars2.githubusercontent.com/u/3286658?s=70&v=4"></a></td>
 <td><a target="_blank" href="https://github.com/wu-yu-xuan"><img width="70px" src="https://avatars3.githubusercontent.com/u/35450080?s=70&v=4"></a></td>
@@ -38,9 +38,10 @@ Thanks for the following websites and sponsors, If you do the same, please tell 
 </tr></table></tbody>
 
 ### Real world
+
 [clicli.me](https://www.clicli.me)
 
-Any other demos [click here](https://github.com/132yse/fre/tree/master/demo/src)
+Any other demos [click here](https://github.com/yisar/fre/tree/master/demo/src)
 
 ### Use
 
@@ -66,17 +67,19 @@ render(<App />, document.getElementById('root'))
 
 ### Hooks API
 
-- [useState](https://github.com/132yse/fre#usestate)
+- [useState](https://github.com/yisar/fre#usestate)
 
-- [useEffect](https://github.com/132yse/fre#useeffect)
+- [useEffect](https://github.com/yisar/fre#useeffect)
 
-- [useReducer](https://github.com/132yse/fre#usereducer)
+- [useReducer](https://github.com/yisar/fre#usereducer)
 
-- [useCallback](https://github.com/132yse/fre#usecallback)
+- [useLayout](https://github.com/yisar/fre#uselayout)
 
-- [useMemo](https://github.com/132yse/fre#usememo)
+- [useCallback](https://github.com/yisar/fre#usecallback)
 
-- [useRef](https://github.com/132yse/fre#useref)
+- [useMemo](https://github.com/yisar/fre#usememo)
+
+- [useRef](https://github.com/yisar/fre#useref)
 
 #### useState
 
@@ -132,8 +135,7 @@ It is the execution and cleanup of effects, which is represented by the second p
 ```
 useEffect(f)       //  effect (and clean-up) every time
 useEffect(f, [])   //  effect (and clean-up) only once in a component's life
-useEffect(f, [x])  //  effect (and clean-up) when property x changes
-removed            //  clean-up
+useEffect(f, [x])  //  effect (and clean-up) when property x changes in a component's life
 ```
 
 ```js
@@ -160,6 +162,16 @@ useEffect(() => {
       store.unsubscribe()
     }
 }, [])
+```
+
+#### useLayout
+
+More like useEffect, but useEffect queue in `requestAnimationFrame`, but useLayout is sync and block commitWork.
+
+```js
+useLayout(() => {
+  document.title = 'count is ' + count
+}, [flag])
 ```
 
 #### useMemo
@@ -232,9 +244,9 @@ function App() {
 
 There are some awesome APIs, It used outside of component, Usually a `with` prefix is used.
 
-- [with-context](https://github.com/132yse/fre#withcontext)
+- [with-context](https://github.com/yisar/fre#withcontext)
 
-- [with-suspense](https://github.com/132yse/fre#useeffect)
+- [with-suspense](https://github.com/yisar/fre#useeffect)
 
 #### withContext
 
@@ -326,4 +338,4 @@ It uses hash to mark locations to reduce much size.
 
 #### License
 
-_MIT_ ©132yse inspired by [react](https://github.com/facebook/react) [anu](https://github.com/RubyLouvre/anu)
+_MIT_ ©yisar inspired by [react](https://github.com/facebook/react) [anu](https://github.com/RubyLouvre/anu)
