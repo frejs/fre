@@ -47,12 +47,14 @@ function reconcileWork(didout) {
       } else throw e
     }
   }
+  if (!didout && WIP) {
+    return reconcileWork.bind(null)
+  }
   if (preCommit) {
     commitWork(preCommit)
-    return null
-  }
-  if ((!didout && WIP) || updateQueue.length > 0) {
-    return reconcileWork.bind(null)
+    if (updateQueue.length > 0) {
+      return reconcileWork.bind(null)
+    }
   }
   return null
 }
@@ -199,7 +201,6 @@ function commitWork(fiber) {
   })
   fiber.done && fiber.done()
   commitQueue = []
-  updateQueue = []
   preCommit = null
   WIP = null
 }
