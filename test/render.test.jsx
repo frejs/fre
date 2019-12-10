@@ -1,5 +1,5 @@
 /** @jsx h */
-import { h } from '../src/index'
+import { h, useRef, useLayout, useEffect } from '../src/index'
 import { testRender } from './test-util'
 
 const toString = elements => elements.map(child => child.outerHTML).join('')

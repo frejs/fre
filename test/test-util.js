@@ -1,5 +1,5 @@
 /** @jsx h */
-import { h, render, useLayout, useState } from '../src'
+import { h, render, useEffect, useState } from '../src'
 
 export const testRender = jsx =>
   new Promise(resolve => {
@@ -17,7 +17,7 @@ export const testUpdates = async updates => {
 
     setContent = _setContent
 
-    useLayout(effect)
+    useEffect(effect)
     return content
   }
 
