@@ -4,7 +4,7 @@ function App() {
   const [count, setCount] = useState(0)
   return (
     <div>
-      {count < 3 && <A />}
+      {count < 5 && <A count={count < 1 ? count : 2} />}
       <h1>{count}</h1>
       <button onClick={() => setCount(count + 1)}>+</button>
     </div>
@@ -17,13 +17,13 @@ function A(props) {
     return () => {
       console.log(222)
     }
-  })
-  useEffect(() => {
-    console.log(333)
-    return () => {
-      console.log(444)
-    }
-  })
+  }, [props.count])
+  //   useEffect(() => {
+  //     console.log(333)
+  //     return () => {
+  //       console.log(444)
+  //     }
+  //   })
   return 'hello'
 }
 

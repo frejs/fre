@@ -210,7 +210,7 @@ function commit(fiber) {
   let dom = fiber.node
   let ref = fiber.ref
   if (op === DELETE) {
-    defer(fiber)
+    fiber.hooks && fiber.hooks.list.forEach(e => e[2] && e[2]())
     delRef(fiber.kids)
     while (fiber.tag === HOOK) fiber = fiber.child
     parent.removeChild(fiber.node)
@@ -261,23 +261,17 @@ const raf =
     : requestAnimationFrame
 
 function defer(fiber) {
-  const cleanup = c => {
-    if (c[1] && c[1].length === 0) {
-      fiber.op === DELETE && c[0]()
-    } else {
-      c[0] && c[0]()
-      fiber.hooks.cleanup = fiber.hooks.cleanup.filter(i => i != c)
-    }
-  }
+  const cleanup = e => e[2] && e[2]()
   const effect = e => {
     const res = e[0]()
-    if (isFn(res)) fiber.hooks.cleanup.push([res, e[1]])
+    if (isFn(res)) e[2] = res
   }
   if (fiber.hooks) {
-    fiber.hooks.cleanup.forEach(cleanup)
+    fiber.hooks.layout.forEach(cleanup)
     fiber.hooks.layout.forEach(effect)
     fiber.hooks.layout = []
     raf(() => {
+      fiber.hooks.effect.forEach(cleanup)
       fiber.hooks.effect.forEach(effect)
       fiber.hooks.effect = []
     })
