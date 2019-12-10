@@ -7,7 +7,7 @@ export const options = {}
 export const [HOST, SVG, HOOK, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5]
 
 let preCommit = null
-let currentFiber = options.currentFiber || null
+let currentFiber = null
 let WIP = null
 let updateQueue = []
 let commitQueue = []
@@ -217,10 +217,18 @@ function commit(fiber) {
     while (fiber.tag === HOOK) fiber = fiber.child
     parent.removeChild(fiber.node)
   } else if (fiber.tag === HOOK) {
-    defer(fiber)
+    if (fiber.hooks) {
+      fiber.hooks.layout.forEach(cleanup)
+      fiber.hooks.layout.forEach(effect)
+      fiber.hooks.layout = []
+      defer(() => {
+        fiber.hooks.effect.forEach(cleanup)
+        fiber.hooks.effect.forEach(effect)
+        fiber.hooks.effect = []
+      })
+    }
   } else if (op === UPDATE) {
     updateElement(dom, fiber.lastProps, fiber.props)
-    refer(ref, null)
   } else {
     let point = fiber.insertPoint ? fiber.insertPoint.node : null
     let after = point ? point.nextSibling : parent.firstChild
@@ -257,27 +265,15 @@ function hashfy(arr) {
 }
 
 export const isFn = fn => typeof fn === 'function'
-const raf =
+const defer =
   typeof requestAnimationFrame === 'undefined'
     ? setTimeout
     : requestAnimationFrame
 
-function defer(fiber) {
-  const cleanup = e => e[2] && e[2]()
-  const effect = e => {
-    const res = e[0]()
-    if (isFn(res)) e[2] = res
-  }
-  if (fiber.hooks) {
-    fiber.hooks.layout.forEach(cleanup)
-    fiber.hooks.layout.forEach(effect)
-    fiber.hooks.layout = []
-    raf(() => {
-      fiber.hooks.effect.forEach(cleanup)
-      fiber.hooks.effect.forEach(effect)
-      fiber.hooks.effect = []
-    })
-  }
+const cleanup = e => e[2] && e[2]()
+const effect = e => {
+  const res = e[0]()
+  if (isFn(res)) e[2] = res
 }
 
 function refer(ref, dom) {
@@ -285,7 +281,7 @@ function refer(ref, dom) {
 }
 
 function delRef(kids) {
-  raf(() => {
+  defer(() => {
     for (const k in kids) {
       const kid = kids[k]
       refer(kid.ref, null)
@@ -294,6 +290,6 @@ function delRef(kids) {
   })
 }
 
-export function getCurrentHook() {
+export function getCurrentFiber() {
   return currentFiber || null
 }
