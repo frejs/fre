@@ -39,7 +39,7 @@
   "dependencies": {},
   "jest": {
     "coveragePathIgnorePatterns": [
-      "<rootDir>/server-render/"
+      "<rootDir>/test/test-util.js"
     ]
   },
   "prettier": {
