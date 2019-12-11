@@ -13,18 +13,18 @@ function App() {
 }
 
 function A(props) {
-  useLayout(() => {
-    console.log(111)
-    return () => {
-      console.log(222)
-    }
-  }, [props.count])
-  //   useEffect(() => {
-  //     console.log(333)
-  //     return () => {
-  //       console.log(444)
-  //     }
-  //   })
+  // useLayout(() => {
+  //   console.log(111)
+  //   return () => {
+  //     console.log(222)
+  //   }
+  // }, [props.count])
+    useEffect(() => {
+      console.log(333)
+      return () => {
+        console.log(444)
+      }
+    })
   return 'hello'
 }
 

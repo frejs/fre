@@ -84,15 +84,12 @@ function performWork() {
 
 export const planWork = (() => {
   if (typeof MessageChannel !== 'undefined') {
-    return cb => {
-      const channel = new MessageChannel()
-      const port = channel.port2
-      channel.port1.onmessage = cb || performWork
-      port.postMessage(null)
-    }
+    const channel = new MessageChannel()
+    const port = channel.port2
+    channel.port1.onmessage = performWork
+    return () => port.postMessage(null)
   }
-
-  return cb => setTimeout(cb || performWork, 0)
+  return () => setTimeout(performWork, 0)
 })()
 
 export function shouldYeild() {
