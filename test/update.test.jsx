@@ -181,3 +181,29 @@ test('attach/remove DOM event handler', async () => {
       }
     ])
   })
+
+  test('diff style-object properties', async () => {
+    await testUpdates([
+      {
+        content: <div style={{ color: 'red', backgroundColor: 'blue' }} />,
+        test: ([div]) => {
+          expect(div.style.color).toBe('red')
+          expect(div.style.backgroundColor).toBe('blue')
+        }
+      },
+      {
+        content: <div style={{ color: 'yellow', fontSize: '99px' }} />,
+        test: ([div]) => {
+          expect(div.style.color).toBe('yellow')
+          expect(div.style.backgroundColor).toBe('')
+          expect(div.style.fontSize).toBe('99px')
+        }
+      },
+      {
+        content: <div />,
+        test: ([div]) => {
+          expect(div.style.color).toBe('')
+        }
+      }
+    ])
+  })
