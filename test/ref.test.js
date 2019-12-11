@@ -1,5 +1,5 @@
 /** @jsx h */
-import { h, useState, useRef } from '../src/index'
+import { h, useRef } from '../src/index'
 import { testUpdates } from './test-util'
 
 test('persist reference to any value', async () => {
@@ -24,6 +24,48 @@ test('persist reference to any value', async () => {
       content,
       test: ([p]) => {
         expect(p.textContent).toBe('x')
+      }
+    }
+  ])
+})
+
+test('refs with callback and clenups', async done => {
+  let refs = []
+  const Component = () => {
+    const p = dom => {
+      if (dom) {
+        refs.push('ref')
+      } else {
+        refs.push('cleanup')
+      }
+    }
+    const c = dom => {
+      if (dom) {
+        refs.push('ref2')
+      } else {
+        refs.push('cleanup2')
+      }
+    }
+    return (
+      <div ref={p}>
+        <p ref={c}>before</p>
+      </div>
+    )
+  }
+
+  await testUpdates([
+    {
+      content: <Component />,
+      test: () => {
+        expect(refs).toEqual(['ref', 'ref2'])
+        refs = [] // next time the Component will not rerender, we need clean here
+      }
+    },
+    {
+      content: <div>removed</div>,
+      test: () => {
+        expect(refs).toEqual(['cleanup', 'cleanup2'])
+        done()
       }
     }
   ])
