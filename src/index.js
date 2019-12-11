@@ -26,7 +26,7 @@ export {
   useLayout as useLayoutEffect
 }
 
-const fre = {
+const Fre = {
   h,
   render,
   scheduleWork,
@@ -39,4 +39,4 @@ const fre = {
   useRef
 }
 
-export default fre
+export default Fre
