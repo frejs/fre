@@ -281,13 +281,11 @@ function refer(ref, dom) {
 }
 
 function delRef(kids) {
-  defer(() => {
-    for (const k in kids) {
-      const kid = kids[k]
-      refer(kid.ref, null)
-      if (kid.kids) delRef(kid.kids)
-    }
-  })
+  for (const k in kids) {
+    const kid = kids[k]
+    refer(kid.ref, null)
+    if (kid.kids) delRef(kid.kids)
+  }
 }
 
 export function getCurrentFiber() {
