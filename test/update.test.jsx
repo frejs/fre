@@ -2,7 +2,7 @@
 import { h, useState, useRef } from '../src/index'
 import { testUpdates } from './test-util'
 
-test('async state update', async done => {
+test('async state update', async () => {
   let updates = 0
 
   const Component = () => {
@@ -33,13 +33,12 @@ test('async state update', async done => {
       test: ([button]) => {
         expect(+button.textContent).toBe(3) // all 3 state updates applied
         expect(updates).toBe(2)
-        done()
       }
     }
   ])
 })
 
-test('persist reference to any value', async done => {
+test('persist reference to any value', async () => {
   const Component = () => {
     const ref = useRef('')
 
@@ -61,7 +60,6 @@ test('persist reference to any value', async done => {
       content,
       test: ([p]) => {
         expect(p.textContent).toBe('x')
-        done()
       }
     }
   ])

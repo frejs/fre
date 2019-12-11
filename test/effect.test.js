@@ -2,7 +2,7 @@
 import { h, useLayout } from '../src/index'
 import { testUpdates } from './test-util'
 
-test('useLayout(f, [x]) should run on changes to x', async done => {
+test('useLayout(f, [x]) should run on changes to x', async () => {
   let effects = []
 
   const effect = value => {
@@ -43,13 +43,12 @@ test('useLayout(f, [x]) should run on changes to x', async done => {
       content: <div>removed</div>,
       test: () => {
         expect(effects).toEqual(['cleanUp 1'])
-        done()
       }
     }
   ])
 })
 
-test('useEffect(f, []) should run only once', async done => {
+test('useEffect(f, []) should run only once', async () => {
   let effects = []
 
   const effect = () => {
@@ -84,13 +83,12 @@ test('useEffect(f, []) should run only once', async done => {
       content: <div>removed</div>,
       test: () => {
         expect(effects).toEqual(['cleanUp'])
-        done()
       }
     }
   ])
 })
 
-test('useLayout(f) should run every time', async done => {
+test('useLayout(f) should run every time', async () => {
   let effects = []
 
   const effect = value => {
@@ -132,7 +130,6 @@ test('useLayout(f) should run every time', async done => {
       content: <div>removed</div>,
       test: () => {
         expect(effects).toEqual(['cleanUp 2'])
-        done()
       }
     }
   ])

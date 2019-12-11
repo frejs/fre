@@ -29,7 +29,7 @@ test('persist reference to any value', async () => {
   ])
 })
 
-test('refs with callback and clenups', async done => {
+test('refs with callback and clenups', async () => {
   let refs = []
   const Component = () => {
     const p = dom => {
@@ -65,7 +65,6 @@ test('refs with callback and clenups', async done => {
       content: <div>removed</div>,
       test: () => {
         expect(refs).toEqual(['cleanup', 'cleanup2'])
-        done()
       }
     }
   ])

@@ -2,7 +2,7 @@
 import { h, useState } from '../src/index'
 import { testUpdates } from './test-util'
 
-test('reorder and reuse elements during key-based reconciliation of child-nodes', async done => {
+test('reorder and reuse elements during key-based reconciliation of child-nodes', async () => {
   const states = [
     [1, 2, 3],
     [3, 1, 2], // shift right
@@ -52,7 +52,6 @@ test('reorder and reuse elements during key-based reconciliation of child-nodes'
         }
 
         lastChildren = children
-        done()
       }
     }))
   )
