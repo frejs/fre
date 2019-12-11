@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
-import { scheduleCallback, shouldYeild } from './scheduler'
+import { scheduleCallback, shouldYeild,planWork } from './scheduler'
 import { createText } from './h'
 
 export const options = {}
@@ -213,7 +213,7 @@ function commit(fiber) {
       fiber.hooks.layout.forEach(cleanup)
       fiber.hooks.layout.forEach(effect)
       fiber.hooks.layout = []
-      defer(() => {
+      planWork(() => {
         fiber.hooks.effect.forEach(cleanup)
         fiber.hooks.effect.forEach(effect)
         fiber.hooks.effect = []
@@ -257,10 +257,6 @@ function hashfy(arr) {
 }
 
 export const isFn = fn => typeof fn === 'function'
-const defer =
-  typeof requestAnimationFrame === 'undefined'
-    ? setTimeout
-    : requestAnimationFrame
 
 const cleanup = e => e[2] && e[2]()
 const effect = e => {

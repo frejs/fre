@@ -3,7 +3,6 @@ import { push, pop, peek } from './heapify'
 let taskQueue = []
 let currentTask = null
 let currentCallback = null
-let scheduling = false
 let frameDeadline = 0
 let frameLength = 1000 / 60
 
@@ -20,14 +19,8 @@ export function scheduleCallback(callback) {
   }
 
   push(taskQueue, newTask)
-
   currentCallback = flushWork
-
-  if (!scheduling) {
-    planWork()
-    scheduling = true
-  }
-
+  planWork()
   return newTask
 }
 
@@ -84,22 +77,22 @@ function performWork() {
     if (moreWork) {
       planWork()
     } else {
-      scheduling = false
       currentCallback = null
     }
   }
 }
 
-const planWork = (() => {
+export const planWork = (() => {
   if (typeof MessageChannel !== 'undefined') {
-    const channel = new MessageChannel()
-    const port = channel.port2
-    channel.port1.onmessage = performWork
-
-    return () => port.postMessage(null)
+    return cb => {
+      const channel = new MessageChannel()
+      const port = channel.port2
+      channel.port1.onmessage = cb || performWork
+      port.postMessage(null)
+    }
   }
 
-  return () => setTimeout(performWork, 0)
+  return cb => setTimeout(cb || performWork, 0)
 })()
 
 export function shouldYeild() {
