@@ -38,14 +38,13 @@ test('reorder and reuse elements during key-based reconciliation of child-nodes'
           state.map(value => '' + value)
         )
 
-        if (stateNumber >= 1) {
+        if (stateNumber > 1) {
           const lastState = states[stateNumber - 1]
           state.forEach((value, index) => {
             const lastIndex = lastState.indexOf(value)
 
             if (lastIndex !== -1) {
               // console.log(`item ${value} position ${lastIndex} -> ${index}`)
-
               expect(children[index]).toBe(lastChildren[lastIndex])
             }
           })

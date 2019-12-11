@@ -5,6 +5,11 @@ import { createText } from './h'
 
 export const options = {}
 export const [HOST, SVG, HOOK, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5]
+export const isFn = fn => typeof fn === 'function'
+const defer =
+  typeof requestAnimationFrame === 'undefined'
+    ? setTimeout
+    : requestAnimationFrame
 
 let preCommit = null
 let currentFiber = null
@@ -255,12 +260,6 @@ function hashfy(arr) {
   })
   return out
 }
-
-export const isFn = fn => typeof fn === 'function'
-const defer =
-  typeof requestAnimationFrame === 'undefined'
-    ? setTimeout
-    : requestAnimationFrame
 
 const cleanup = e => e[2] && e[2]()
 const effect = e => {
