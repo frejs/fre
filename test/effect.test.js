@@ -13,8 +13,8 @@ test('useLayout(f, [x]) should run on changes to x', async done => {
     }
   }
 
-  const Component = ({ value }) => {
-    useLayout(() => effect(value), [value])
+  const Component = ({ deps }) => {
+    useLayout(() => effect(deps[0]), deps)
     effects = []
 
     return <div>foo</div>
@@ -22,19 +22,19 @@ test('useLayout(f, [x]) should run on changes to x', async done => {
 
   await testUpdates([
     {
-      content: <Component value={0} />,
+      content: <Component deps={[0]} />,
       test: () => {
         expect(effects).toEqual(['effect 0'])
       }
     },
     {
-      content: <Component value={1} />,
+      content: <Component deps={[1]} />,
       test: () => {
         expect(effects).toEqual(['cleanUp 0', 'effect 1'])
       }
     },
     {
-      content: <Component value={1} count={0} />,
+      content: <Component deps={[1]} />,
       test: () => {
         expect(effects).toEqual([])
       }
