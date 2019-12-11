@@ -30,7 +30,6 @@ export function scheduleWork(fiber) {
 }
 
 function reconcileWork(didout) {
-  let lazy = null
   if (!WIP) {
     WIP = updateQueue.shift()
   }
@@ -38,14 +37,7 @@ function reconcileWork(didout) {
     try {
       WIP = reconcile(WIP)
     } catch (e) {
-      if (!!e && typeof e.then === 'function') {
-        lazy = WIP
-        WIP = null
-        e.then(() => {
-          WIP = lazy
-          reconcileWork(true)
-        })
-      } else throw e
+      throw e
     }
   }
   if (!didout && WIP) {
