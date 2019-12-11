@@ -210,7 +210,7 @@ function commit(fiber) {
   let ref = fiber.ref
   if (op === DELETE) {
     fiber.hooks && fiber.hooks.list.forEach(e => e[2] && e[2]())
-    delRef(fiber.kids)
+    cleanupRef(fiber.kids)
     while (fiber.tag === HOOK) fiber = fiber.child
     parent.removeChild(fiber.node)
   } else if (fiber.tag === HOOK) {
@@ -271,11 +271,11 @@ function refer(ref, dom) {
   if (ref) isFn(ref) ? ref(dom) : (ref.current = dom)
 }
 
-function delRef(kids) {
+function cleanupRef(kids) {
   for (const k in kids) {
     const kid = kids[k]
     refer(kid.ref, null)
-    if (kid.kids) delRef(kid.kids)
+    if (kid.kids) cleanupRef(kid.kids)
   }
 }
 
