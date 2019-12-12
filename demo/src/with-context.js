@@ -15,7 +15,7 @@ export function withContext(defaultValue) {
 
     useEffect(() => {
       backupValue = value
-      listeners.forEach(f => f !== setValue && f(value))
+      listeners.forEach(f => f(value))
     }, [value])
 
     useEffect(() => {
@@ -24,7 +24,6 @@ export function withContext(defaultValue) {
         listeners.delete(setValue)
       }
     }, [])
-
     return [value, setValue]
   }
 }
@@ -32,14 +31,15 @@ export function withContext(defaultValue) {
 const useTheme = withContext('light')
 
 function App() {
+  console.log(111)
   const [theme, setTheme] = useTheme()
-  const setMemoTheme = setTheme(theme === 'dark' ? 'light' : 'dark')
-
   return (
     <div>
       {theme}
       <A />
-      <button onClick={setMemoTheme}>change</button>
+      <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+        change
+      </button>
     </div>
   )
 }
@@ -50,4 +50,4 @@ function A() {
   return <div>{theme}</div>
 }
 
-render(<App />, document.getElementById('root'))
+render(<App />, document.body)
