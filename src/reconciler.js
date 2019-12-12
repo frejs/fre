@@ -4,7 +4,15 @@ import { scheduleCallback, shouldYeild } from './scheduler'
 import { createText } from './h'
 
 export const options = {}
-export const [HOST, SVG, HOOK, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5]
+export const [HOST, SVG, HOOK, PLACE, UPDATE, DELETE, NOWOEK] = [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6
+]
 export const isFn = fn => typeof fn === 'function'
 const defer =
   typeof requestAnimationFrame === 'undefined'
@@ -63,7 +71,7 @@ function reconcile(WIP) {
     if (!preCommit && WIP.dirty === false) {
       preCommit = WIP
     }
-    if (WIP.sibling) {
+    if (WIP.sibling && WIP.dirty == null) {
       return WIP.sibling
     }
     WIP = WIP.parent
@@ -74,7 +82,7 @@ function updateHOOK(WIP) {
   const oldProps = WIP.pendingProps
   const newProps = WIP.props
   if (
-    (WIP.dirty === false) &&
+    (WIP.dirty === false || WIP.dirty === null) &&
     !shouldUpdate(oldProps, newProps)
   ) {
     cloneChildren(WIP)
@@ -87,7 +95,6 @@ function updateHOOK(WIP) {
     children = createText(children)
   }
   reconcileChildren(WIP, children)
-  WIP.dirty = false
 }
 
 function updateHost(WIP) {
@@ -162,6 +169,7 @@ function reconcileChildren(WIP, children) {
   if (prevFiber) {
     prevFiber.sibling = null
   }
+  WIP.dirty = WIP.dirty ? false : null
 }
 
 function cloneChildren(fiber) {
@@ -169,15 +177,9 @@ function cloneChildren(fiber) {
 
   let child = fiber.child
   let newChild = child
+  newChild.op = NOWOEK
   fiber.child = newChild
   newChild.parent = fiber
-
-  while (child.sibling) {
-    child = child.sibling
-    newChild = newChild.sibling = child
-    newChild.parent = fiber
-  }
-
   newChild.sibling = null
 }
 
@@ -208,7 +210,8 @@ function commit(fiber) {
   let parent = fiber.parentNode
   let dom = fiber.node
   let ref = fiber.ref
-  if (op === DELETE) {
+  if (op === NOWOEK) {
+  } else if (op === DELETE) {
     fiber.hooks && fiber.hooks.list.forEach(e => e[2] && e[2]())
     cleanupRef(fiber.kids)
     while (fiber.tag === HOOK) fiber = fiber.child
