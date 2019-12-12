@@ -4,7 +4,15 @@ import { scheduleCallback, shouldYeild } from './scheduler'
 import { createText } from './h'
 
 export const options = {}
-export const [HOST, SVG, HOOK, PLACE, UPDATE, DELETE] = [0, 1, 2, 3, 4, 5]
+export const [HOST, SVG, HOOK, PLACE, UPDATE, DELETE, NOWORK] = [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6
+]
 export const isFn = fn => typeof fn === 'function'
 const defer =
   typeof requestAnimationFrame === 'undefined'
@@ -61,7 +69,7 @@ function reconcile(WIP) {
     if (!preCommit && WIP.dirty === false) {
       preCommit = WIP
     }
-    if (WIP.sibling) {
+    if (WIP.sibling && WIP.sibling.dirty == null) {
       return WIP.sibling
     }
     WIP = WIP.parent
@@ -136,6 +144,7 @@ function reconcileChildren(WIP, children) {
       newFiber = { ...alternate, ...newFiber }
       newFiber.lastProps = alternate.props
       if (shouldPlace(newFiber)) {
+        console.log(newFiber)
         newFiber.op = PLACE
       }
     } else {
@@ -161,18 +170,11 @@ function reconcileChildren(WIP, children) {
 
 function cloneChildren(fiber) {
   if (!fiber.child) return
-
   let child = fiber.child
   let newChild = child
+  newChild.op = NOWORK
   fiber.child = newChild
   newChild.parent = fiber
-
-  while (child.sibling) {
-    child = child.sibling
-    newChild = newChild.sibling = child
-    newChild.parent = fiber
-  }
-
   newChild.sibling = null
 }
 
@@ -221,6 +223,7 @@ function commit(fiber) {
     }
   } else if (op === UPDATE) {
     updateElement(dom, fiber.lastProps, fiber.props)
+  } else if (op === NOWORK) {
   } else {
     let point = fiber.insertPoint ? fiber.insertPoint.node : null
     let after = point ? point.nextSibling : parent.firstChild

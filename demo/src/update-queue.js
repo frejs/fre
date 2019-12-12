@@ -1,11 +1,12 @@
 import { h, render, useState, useEffect } from '../../src'
+// import { render, createElement as h } from 'preact'
+// import { useState, useEffect } from 'preact/hooks'
 
 function App() {
-  const [state, setState] = useState(0)
   return (
     <div>
-      <B />
       <A />
+      <B />
     </div>
   )
 }
@@ -15,7 +16,7 @@ function A(props) {
   const [state, setState] = useState(0)
   useEffect(() => {
     setTimeout(() => {
-      setState()
+      setState(state+1)
     }, 1000)
   }, [])
   return <C count={0} />
@@ -25,15 +26,15 @@ function B(props) {
   const [state, setState] = useState(0)
   useEffect(() => {
     setTimeout(() => {
-      setState()
+      setState(state+1)
     }, 1000)
   }, [])
   return <button onClick={() => setState(state + 1)}>{state}</button>
 }
 
 function C() {
-  console.log(333)
-  return <div>{333}</div>
+  console.log('c')
+  return <div>{'c'}</div>
 }
 
 render(<App />, document.body)

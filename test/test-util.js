@@ -17,7 +17,7 @@ export const testUpdates = async updates => {
 
     setContent = _setContent
 
-    useEffect(effect)
+    useEffect(effect,[content])
     return content
   }
 
