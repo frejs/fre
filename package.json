@@ -1,13 +1,13 @@
 {
   "name": "fre",
-  "version": "1.11.5",
+  "version": "1.11.6",
   "description": "",
   "main": "dist/fre.js",
   "unpkg": "dist/fre-umd.js",
   "module": "dist/fre-esm.js",
   "scripts": {
     "test": "jest --coverage",
-    "test-key":"jest ./test/reconcilation.test.js",
+    "test-key": "jest ./test/reconcilation.test.js",
     "build": "rollup -c && gzip-size dist/fre.js",
     "format": "prettier --write \"{src,test,demo}/**/*.js\""
   },
