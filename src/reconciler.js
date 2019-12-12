@@ -167,9 +167,7 @@ function reconcileChildren(WIP, children) {
     prevFiber = newFiber
   }
 
-  if (prevFiber) {
-    prevFiber.sibling = null
-  }
+  if (prevFiber) prevFiber.sibling = null
   WIP.dirty = WIP.dirty ? false : null
 }
 
