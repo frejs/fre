@@ -22,7 +22,7 @@ const defer =
 let preCommit = null
 let currentFiber = null
 let WIP = null
-let updateQueue = []
+let updateStack = []
 let commitQueue = []
 
 export function render(vnode, node, done) {
@@ -37,13 +37,13 @@ export function render(vnode, node, done) {
 
 export function scheduleWork(fiber) {
   if (!fiber.dirty && (fiber.dirty = true)) {
-    updateQueue.push(fiber)
+    updateStack.push(fiber)
   }
   scheduleCallback(reconcileWork)
 }
 
 function reconcileWork(didout) {
-  if (!WIP) WIP = updateQueue.shift()
+  if (!WIP) WIP = updateStack.pop()
   while (WIP && (!shouldYeild() || didout)) {
     try {
       WIP = reconcile(WIP)
@@ -69,7 +69,7 @@ function reconcile(WIP) {
     if (!preCommit && WIP.dirty === false) {
       preCommit = WIP
     }
-    if (WIP.sibling && WIP.sibling.dirty == null) {
+    if (WIP.sibling) {
       return WIP.sibling
     }
     WIP = WIP.parent
