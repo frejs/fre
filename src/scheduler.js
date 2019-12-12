@@ -61,11 +61,7 @@ function workLoop(iniTime) {
     currentTime = getTime()
   }
 
-  if (currentTask) {
-    return true
-  } else {
-    return false
-  }
+  return !!currentTask
 }
 
 function performWork() {
