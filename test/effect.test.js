@@ -48,7 +48,7 @@ test('useLayout(f, [x]) should run on changes to x', async () => {
   ])
 })
 
-test('useEffect(f, []) should run only once', async () => {
+test('useLayout(f, []) should run only once', async () => {
   let effects = []
 
   const effect = () => {

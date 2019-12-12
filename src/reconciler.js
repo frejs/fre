@@ -35,9 +35,7 @@ export function scheduleWork(fiber) {
 }
 
 function reconcileWork(didout) {
-  if (!WIP) {
-    WIP = updateQueue.shift()
-  }
+  if (!WIP) WIP = updateQueue.shift()
   while (WIP && (!shouldYeild() || didout)) {
     try {
       WIP = reconcile(WIP)
@@ -73,10 +71,7 @@ function reconcile(WIP) {
 function updateHOOK(WIP) {
   const oldProps = WIP.pendingProps
   const newProps = WIP.props
-  if (
-    (WIP.dirty === false) &&
-    !shouldUpdate(oldProps, newProps)
-  ) {
+  if (WIP.dirty === false && !shouldUpdate(oldProps, newProps)) {
     cloneChildren(WIP)
     return
   }
