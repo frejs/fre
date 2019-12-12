@@ -70,6 +70,7 @@ function reconcile(WIP) {
   while (WIP) {
     if (!preCommit && WIP.dirty === false) {
       preCommit = WIP
+      return null
     }
     if (WIP.sibling && WIP.dirty == null) {
       return WIP.sibling
