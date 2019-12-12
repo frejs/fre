@@ -17,6 +17,7 @@ function A(props) {
   useEffect(() => {
     setTimeout(() => {
       setState(state+1)
+      setState(state+1)
     }, 1000)
   }, [])
   return <C count={0} />
@@ -33,7 +34,13 @@ function B(props) {
 }
 
 function C() {
-  console.log('c')
+    console.log('c')
+    // const [state, setState] = useState(0)
+    // useEffect(() => {
+    //   setTimeout(() => {
+    //     setState(state+1)
+    //   }, 1000)
+    // }, [])
   return <div>{'c'}</div>
 }
 
