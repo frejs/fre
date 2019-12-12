@@ -1,4 +1,4 @@
-import { h, useState, useEffect, render } from '../../src'
+import { h, useState, useEffect, render, useCallback } from '../../src'
 
 // import { render, createElement as h } from 'preact/compat'
 // import { useState, useEffect } from 'preact/hooks'
@@ -33,9 +33,8 @@ const useTheme = withContext('light')
 
 function App() {
   const [theme, setTheme] = useTheme()
-  const setMemoTheme = useCallback(() =>
-    setTheme(theme === 'dark' ? 'light' : 'dark')
-  )
+  const setMemoTheme = setTheme(theme === 'dark' ? 'light' : 'dark')
+
   return (
     <div>
       {theme}

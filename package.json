@@ -7,6 +7,7 @@
   "module": "dist/fre-esm.js",
   "scripts": {
     "test": "jest --coverage",
+    "test-key":"jest ./test/reconcilation.test.js",
     "build": "rollup -c && gzip-size dist/fre.js",
     "format": "prettier --write \"{src,test,demo}/**/*.js\""
   },
