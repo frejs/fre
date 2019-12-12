@@ -63,7 +63,7 @@ function reconcile(WIP) {
     if (!preCommit && WIP.dirty === false) {
       preCommit = WIP
     }
-    if (WIP.sibling && WIP.dirty == null) {
+    if (WIP.sibling) {
       return WIP.sibling
     }
     WIP = WIP.parent
@@ -74,7 +74,7 @@ function updateHOOK(WIP) {
   const oldProps = WIP.pendingProps
   const newProps = WIP.props
   if (
-    (WIP.dirty === false || WIP.dirty === null) &&
+    (WIP.dirty === false) &&
     !shouldUpdate(oldProps, newProps)
   ) {
     cloneChildren(WIP)
@@ -87,6 +87,7 @@ function updateHOOK(WIP) {
     children = createText(children)
   }
   reconcileChildren(WIP, children)
+  WIP.dirty = false
 }
 
 function updateHost(WIP) {
@@ -161,7 +162,6 @@ function reconcileChildren(WIP, children) {
   if (prevFiber) {
     prevFiber.sibling = null
   }
-  WIP.dirty = WIP.dirty ? false : null
 }
 
 function cloneChildren(fiber) {
