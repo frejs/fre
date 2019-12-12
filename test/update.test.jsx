@@ -13,11 +13,9 @@ test('async state update', async () => {
     return <button onClick={() => setState(count => count + 1)}>{count}</button>
   }
 
-  const content = <Component />
-
   await testUpdates([
     {
-      content,
+      content: <Component/>,
       test: ([button]) => {
         expect(+button.textContent).toBe(0)
         expect(updates).toBe(1)
@@ -29,7 +27,7 @@ test('async state update', async () => {
       }
     },
     {
-      content,
+      content: <Component/>,
       test: ([button]) => {
         expect(+button.textContent).toBe(3) // all 3 state updates applied
         expect(updates).toBe(2)
@@ -102,52 +100,52 @@ test('render/update object properties and DOM attributes', async () => {
 })
 
 test('attach/remove DOM event handler', async () => {
-    let clicks = 0
-  
-    const handler = () => (clicks += 1)
-  
-    await testUpdates([
-      {
-        content: <button onclick={handler}>OK</button>,
-        test: ([button]) => {
-          button.click()
-  
-          expect(clicks).toBe(1)
-        }
-      },
-      {
-        content: <button>OK</button>,
-        test: ([button]) => {
-          button.click()
-  
-          expect(clicks).toBe(1) // doesn't trigger handler, which has been removed
-        }
-      }
-    ])
-  })
+  let clicks = 0
 
-  test('diff style-object properties', async () => {
-    await testUpdates([
-      {
-        content: <div style={{ color: 'red', backgroundColor: 'blue' }} />,
-        test: ([div]) => {
-          expect(div.style.color).toBe('red')
-          expect(div.style.backgroundColor).toBe('blue')
-        }
-      },
-      {
-        content: <div style={{ color: 'yellow', fontSize: '99px' }} />,
-        test: ([div]) => {
-          expect(div.style.color).toBe('yellow')
-          expect(div.style.backgroundColor).toBe('')
-          expect(div.style.fontSize).toBe('99px')
-        }
-      },
-      {
-        content: <div />,
-        test: ([div]) => {
-          expect(div.style.color).toBe('')
-        }
+  const handler = () => (clicks += 1)
+
+  await testUpdates([
+    {
+      content: <button onclick={handler}>OK</button>,
+      test: ([button]) => {
+        button.click()
+
+        expect(clicks).toBe(1)
       }
-    ])
-  })
+    },
+    {
+      content: <button>OK</button>,
+      test: ([button]) => {
+        button.click()
+
+        expect(clicks).toBe(1) // doesn't trigger handler, which has been removed
+      }
+    }
+  ])
+})
+
+test('diff style-object properties', async () => {
+  await testUpdates([
+    {
+      content: <div style={{ color: 'red', backgroundColor: 'blue' }} />,
+      test: ([div]) => {
+        expect(div.style.color).toBe('red')
+        expect(div.style.backgroundColor).toBe('blue')
+      }
+    },
+    {
+      content: <div style={{ color: 'yellow', fontSize: '99px' }} />,
+      test: ([div]) => {
+        expect(div.style.color).toBe('yellow')
+        expect(div.style.backgroundColor).toBe('')
+        expect(div.style.fontSize).toBe('99px')
+      }
+    },
+    {
+      content: <div />,
+      test: ([div]) => {
+        expect(div.style.color).toBe('')
+      }
+    }
+  ])
+})

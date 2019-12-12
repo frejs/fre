@@ -1,6 +1,6 @@
 import { h, useState, useEffect, render, useCallback } from '../../src'
 
-// import { render, createElement as h } from 'preact/compat'
+// import { render, createElement as h } from 'preact'
 // import { useState, useEffect } from 'preact/hooks'
 
 // import { render } from 'react-dom'

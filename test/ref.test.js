@@ -11,17 +11,15 @@ test('persist reference to any value', async () => {
     return <p>{ref.current}</p>
   }
 
-  const content = <Component />
-
   await testUpdates([
     {
-      content,
+      content: <Component/>,
       test: ([p]) => {
         expect(p.textContent).toBe('x')
       }
     },
     {
-      content,
+      content: <Component/>,
       test: ([p]) => {
         expect(p.textContent).toBe('x')
       }

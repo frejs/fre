@@ -19,8 +19,10 @@ export function useReducer(reducer, initState) {
       : isFn(value)
       ? value(hook[0])
       : value
-    hook[0] = newValue
-    scheduleWork(current)
+    if (newValue !== hook[0]) {
+      hook[0] = newValue
+      scheduleWork(current)
+    }
   }
 
   if (hook.length) {
