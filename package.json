@@ -7,9 +7,7 @@
   "module": "dist/fre-esm.js",
   "files": [
     "src/**/*",
-    "dist/fre.js",
-    "dist/fre-esm.js",
-    "dist/fre-umd.js",
+    "dist/*.js",
     "dist/*.map"
   ],
   "scripts": {
