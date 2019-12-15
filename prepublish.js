@@ -2,11 +2,10 @@ const fs = require('fs')
 
 const paths = [
   "dist/fre.js",
-  "dist/fre-esm.js",
-  "dist/fre-umd.js",
+  "dist/fre.esm.js",
 ]
 
-for (path of paths) {
+for (const path of paths) {
   if (! fs.existsSync(path)) {
     process.stderr.write(`ERROR: missing required file "${path}"\n\n`)
     process.exit(1)

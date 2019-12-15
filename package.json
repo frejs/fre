@@ -3,8 +3,8 @@
   "version": "1.11.5",
   "description": "",
   "main": "dist/fre.js",
-  "unpkg": "dist/fre-umd.js",
-  "module": "dist/fre-esm.js",
+  "unpkg": "dist/fre.js",
+  "module": "dist/fre.esm.js",
   "files": [
     "src/**/*",
     "dist/*.js",
@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "test": "jest --coverage",
-    "test-key":"jest ./test/reconcilation.test.js",
+    "test-key": "jest ./test/reconcilation.test.js",
     "build": "rollup -c && gzip-size dist/fre.js",
     "format": "prettier --write \"{src,test,demo}/**/*.js\"",
     "prepublish": "node prepublish.js"
