@@ -245,7 +245,7 @@ function App() {
 
 This optimization mainly includes two aspects:
 
-1. Shallow comparison props
+1. Shallow compare props
 
 ```js
 <Compoent />
@@ -256,7 +256,7 @@ This optimization mainly includes two aspects:
 <Compoent value={[]}/>
 <Compoent value={[]}/> // √
 ```
-2. === comparison state
+2. `===` compare state
 ```
 const [content, setContent] = useState('hello')
 setConetent('hello') // × because state have not changed
