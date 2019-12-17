@@ -309,4 +309,4 @@ It uses hash to mark locations to reduce much size.
 
 #### License
 
-_MIT_ ©yisar inspired by [react](https://github.com/facebook/react) [anu](https://github.com/preactjs/preact) [anu](https://github.com/RubyLouvre/anu)
+_MIT_ ©yisar inspired by [react](https://github.com/facebook/react) [preact](https://github.com/preactjs/preact) [anu](https://github.com/RubyLouvre/anu)
