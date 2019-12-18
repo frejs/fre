@@ -6,6 +6,6 @@ jobs:
       
     steps:
       - checkout
-      - run: yarn install
-      - run: yarn test
+      - run: npm install
+      - run: npm test
       - run: ./node_modules/codecov/bin/codecov
