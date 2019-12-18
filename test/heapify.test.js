@@ -46,11 +46,11 @@ test('test pop', () => {
   expect(heap2).toStrictEqual([{ dueTime: 1 }, { dueTime: 2 }])
   expect(heap3).toStrictEqual(null)
   expect(heap4).toStrictEqual([])
-  expect(heap5).toStrictEqual([{ dueTime: 2 }, { dueTime: 5 }, { dueTime: 3 }])
+  expect(heap5).toStrictEqual([{ dueTime: 3 }, { dueTime: 5 }, { dueTime: 2 }])
   expect(heap6).toStrictEqual([
-    { dueTime: 2 },
     { dueTime: 5 },
-    { dueTime: 6 },
-    { dueTime: 3 }
+    { dueTime: 3 },
+    { dueTime: 2 },
+    { dueTime: 6 }
   ])
 })

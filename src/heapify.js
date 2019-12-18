@@ -1,56 +1,48 @@
 export function push(heap, node) {
-  let index = heap.length
+  const i = heap.length
   heap.push(node)
-
-  while (true) {
-    let parentIndex = Math.floor((index - 1) / 2)
-    let parent = heap[parentIndex]
-
-    if (parent && compare(parent, node) > 0) {
-      heap[parentIndex] = node
-      heap[index] = parent
-      index = parentIndex
-    } else return
-  }
+  siftUp(heap, node, i)
 }
 
 export function pop(heap) {
-  let first = heap[0]
-  if (first) {
-    let last = heap.pop()
-    if (first !== last) {
-      heap[0] = last
-      let index = 0
-      let length = heap.length
-
-      while (index < length) {
-        let leftIndex = (index + 1) * 2 - 1
-        let left = heap[leftIndex]
-        let rightIndex = leftIndex + 1
-        let right = heap[rightIndex]
-
-        if (left && compare(left, last) < 0) {
-          if (right && compare(right, left) < 0) {
-            heap[index] = right
-            heap[rightIndex] = last
-            index = rightIndex
-          } else {
-            heap[index] = left
-            heap[leftIndex] = last
-            index = leftIndex
-          }
-        } else if (right && compare(right, last) < 0) {
-          heap[index] = right
-          heap[rightIndex] = last
-          index = rightIndex
-        } else return
-      }
-    }
-    return first
-  } else return null
+  const first = heap[0]
+  if (!first) return null
+  const last = heap.pop()
+  if (last !== first) {
+    heap[0] = last
+    siftDown(heap, last, 0)
+  }
+  return first
 }
 
-function compare(a, b) {
+function siftUp(heap, node, i) {
+  while (i > 0) {
+    const pi = (i - 1) >>> 1
+    const parent = heap[pi]
+    if (cmp(parent, node) <= 0) return
+    heap[pi] = node
+    heap[i] = parent
+    i = pi
+  }
+}
+
+function siftDown(heap, node, i) {
+  for (;;) {
+    const li = i * 2 + 1
+    const left = heap[li]
+    if (li >= heap.length) return
+    const ri = li + 1
+    const right = heap[ri]
+    const ci = right < heap.length && cmp(right, left) < 0 ? ri : li
+    const child = heap[ci]
+    if (cmp(child, node) > 0) return
+    heap[ci] = node
+    heap[i] = child
+    i = ci
+  }
+}
+
+function cmp(a, b) {
   return a.dueTime - b.dueTime
 }
 

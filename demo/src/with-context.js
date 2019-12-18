@@ -1,7 +1,7 @@
-import { h, useState, useEffect, render, useCallback } from '../../src'
+// import { h, useState, useEffect, render, useCallback } from '../../src'
 
-// import { render } from 'react-dom'
-// import { createElement as h, useState, useEffect } from 'react'
+import { render } from 'react-dom'
+import { createElement as h, useState, useEffect } from 'react'
 
 export function withContext(defaultValue) {
   const listeners = new Set()
@@ -28,7 +28,7 @@ export function withContext(defaultValue) {
 const useTheme = withContext('light')
 
 function App() {
-  console.log(111)
+  console.log('A')
   const [theme, setTheme] = useTheme()
   return (
     <div>
@@ -42,7 +42,7 @@ function App() {
 }
 
 function A() {
-  console.log(222)
+  console.log('B')
   const [theme] = useTheme()
   return <div>{theme}</div>
 }

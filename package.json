@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "test": "jest --coverage",
-    "test-key": "jest ./test/reconcilation.test.js",
+    "test-heap": "jest ./test/heapify.test.js",
     "build": "rollup -c && gzip-size dist/fre.js",
     "format": "prettier --write \"{src,test,demo}/**/*.js\"",
     "prepublishOnly": "node prepublish.js"
