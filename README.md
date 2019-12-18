@@ -15,7 +15,7 @@
 - :tada: Functional Component and hooks API
 - :confetti_ball: Concurrent and Suspense
 - :telescope: keyed reconcilation algorithm
-- :shaved_ice: extra updating without dependence collection
+- :shaved_ice: exact updating(UI = F(state))
 
 #### Contributors
 
