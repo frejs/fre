@@ -257,10 +257,10 @@ This optimization mainly includes two aspects:
 <Compoent value={[]}/> // √
 ```
 2. `===` compare state
-```
-const [content, setContent] = useState('hello')
-setConetent('hello') // × because state have not changed
-setContent('world') // √
+```js
+const [state, setState] = useState('hello')
+setState('hello') // × because state have not changed
+setState('world') // √
 ```
 
 ### render props / children
