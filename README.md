@@ -15,6 +15,7 @@
 - :tada: Functional Component and hooks API
 - :confetti_ball: Concurrent and Suspense
 - :telescope: keyed reconcilation algorithm
+- :shaved_ice: exact updating(UI = f(state))
 
 #### Contributors
 
@@ -240,56 +241,26 @@ function App() {
 }
 ```
 
-### Awesome API
+### Exact updating
 
-There are some awesome APIs, It used outside of component, Usually a `with` prefix is used.
+This optimization mainly includes two aspects:
 
-- [with-context](https://github.com/yisar/fre#withcontext)
-
-- [with-suspense](https://github.com/yisar/fre#useeffect)
-
-#### withContext
-
-Simplify context implement for hooks, no need Provider or useContext, share state easier.
+1. Shallow compare props
 
 ```js
-const useTheme = withContext('light')
-
-function App() {
-  const [theme, setTheme] = useTheme()
-  return (
-    <div>
-      {theme}
-      <A />
-      <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
-        change
-      </button>
-    </div>
-  )
-}
-
-function A() {
-  const [theme] = useTheme()
-  return <div>{theme}</div>
-}
+<Compoent />
+<Compoent /> // ×
+<Compoent value={111}/>
+<Compoent value={111}/> // ×
+<Compoent value={222}/> // √
+<Compoent value={[]}/>
+<Compoent value={[]}/> // √
 ```
-
-#### withSuspense
-
-One API to suspense not only fetch data but also dynamic component.
-
+2. `===` compare state
 ```js
-const useUser = withSuspense(pageSize =>
-  fetch(`https://api.clicli.us/users?level=4&page=1&pageSize=${pageSize}`)
-    .then(res => res.json())
-    .then(next => next.users)
-)
-const OtherComponent = withSuspense(() => import('./other-component'))
-
-function App() {
-  const users = useUser(pageSize)
-  return <OtherComponent users={users} />
-}
+const [state, setState] = useState('hello')
+setState('hello') // × because state have not changed
+setState('world') // √
 ```
 
 ### render props / children
@@ -338,4 +309,4 @@ It uses hash to mark locations to reduce much size.
 
 #### License
 
-_MIT_ ©yisar inspired by [react](https://github.com/facebook/react) [anu](https://github.com/RubyLouvre/anu)
+_MIT_ ©yisar inspired by [react](https://github.com/facebook/react) [preact](https://github.com/preactjs/preact) [anu](https://github.com/RubyLouvre/anu)
