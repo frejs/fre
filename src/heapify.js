@@ -33,7 +33,7 @@ function siftDown(heap, node, i) {
     if (li >= heap.length) return
     const ri = li + 1
     const right = heap[ri]
-    const ci = right < heap.length && cmp(right, left) < 0 ? ri : li
+    const ci = ri < heap.length && cmp(right, left) < 0 ? ri : li
     const child = heap[ci]
     if (cmp(child, node) > 0) return
     heap[ci] = node
