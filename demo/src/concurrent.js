@@ -1,10 +1,12 @@
 // import { unstable_createRoot } from "react-dom"
 // import { createElement as h, useState, useEffect } from "react"
+// import { h, render } from 'preact'
+// import {useState, useEffect } from 'preact/hooks'
 import { h, render, useState, useEffect } from '../../src'
 
 const UPDATE_EVERY = 1000
-const BLOCK_FOR = 3
-const NUM_COMPONENTS = 20
+const BLOCK_FOR = 10
+const NUM_COMPONENTS = 100
 
 const App = () => {
   const [count, setCount] = useState(0)
@@ -31,7 +33,7 @@ const App = () => {
 
 const SlowComponent = ({ value }) => {
   const start = performance.now()
-  while (performance.now() - start < BLOCK_FOR);
+  while (performance.now() - start < BLOCK_FOR){};
 
   return <li className="slow">{value}</li>
 }

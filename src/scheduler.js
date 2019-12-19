@@ -19,22 +19,11 @@ export function scheduleCallback(callback) {
   }
 
   push(taskQueue, newTask)
-  currentCallback = flushWork
+  currentCallback = flush
   planWork()
-  return newTask
 }
 
-function flushWork(iniTime) {
-  try {
-    return workLoop(iniTime)
-  } catch (e) {
-    throw e
-  } finally {
-    currentTask = null
-  }
-}
-
-function workLoop(iniTime) {
+function flush(iniTime) {
   let currentTime = iniTime
   currentTask = peek(taskQueue)
 
@@ -43,42 +32,25 @@ function workLoop(iniTime) {
       break
     }
     let callback = currentTask.callback
-    if (callback) {
-      currentTask.callback = null
-      const didout = currentTask.dueTime <= currentTime
+    currentTask.callback = null
+    const didout = currentTask.dueTime <= currentTime
 
-      let next = callback(didout)
-      if (next) {
-        currentTask.callback = next
-      } else {
-        pop(taskQueue)
-      }
-    } else {
-      pop(taskQueue)
-    }
+    let next = callback(didout)
+    next ? (currentTask.callback = next) : pop(taskQueue)
 
     currentTask = peek(taskQueue)
     currentTime = getTime()
   }
 
-  if (currentTask) {
-    return true
-  } else {
-    return false
-  }
+  return !!currentTask
 }
 
-function performWork() {
+function flushWork() {
   if (currentCallback) {
     let currentTime = getTime()
     frameDeadline = currentTime + frameLength
-    let moreWork = currentCallback(currentTime)
-
-    if (moreWork) {
-      planWork()
-    } else {
-      currentCallback = null
-    }
+    let more = currentCallback(currentTime)
+    more ? planWork() : (currentCallback = null)
   }
 }
 
@@ -86,10 +58,10 @@ export const planWork = (() => {
   if (typeof MessageChannel !== 'undefined') {
     const channel = new MessageChannel()
     const port = channel.port2
-    channel.port1.onmessage = performWork
+    channel.port1.onmessage = flushWork
     return () => port.postMessage(null)
   }
-  return () => setTimeout(performWork, 0)
+  return () => setTimeout(flushWork, 0)
 })()
 
 export function shouldYeild() {
