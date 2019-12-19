@@ -1,6 +1,6 @@
 {
   "name": "fre",
-  "version": "1.11.8",
+  "version": "1.11.10",
   "description": "",
   "main": "dist/fre.js",
   "unpkg": "dist/fre.js",
