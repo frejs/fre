@@ -2,7 +2,7 @@ import { push, pop, peek } from './heapify'
 
 let taskQueue = []
 let currentCallback = null
-const frameDeadline = 0
+let frameDeadline = 0
 const frameLength = 1000 / 60
 
 export function scheduleCallback(callback) {
