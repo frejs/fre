@@ -1,16 +1,15 @@
 import { push, pop, peek } from './heapify'
 
 let taskQueue = []
-let currentTask = null
 let currentCallback = null
-let frameDeadline = 0
-let frameLength = 1000 / 60
+const frameDeadline = 0
+const frameLength = 1000 / 60
 
 export function scheduleCallback(callback) {
   const currentTime = getTime()
-  let startTime = currentTime
-  let timeout = 3000
-  let dueTime = startTime + timeout
+  const startTime = currentTime
+  const timeout = 3000
+  const dueTime = startTime + timeout
 
   let newTask = {
     callback,
@@ -25,7 +24,7 @@ export function scheduleCallback(callback) {
 
 function flush(iniTime) {
   let currentTime = iniTime
-  currentTask = peek(taskQueue)
+  let currentTask = peek(taskQueue)
 
   while (currentTask) {
     if (currentTask.dueTime > currentTime && shouldYeild()) {
