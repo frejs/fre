@@ -1,6 +1,6 @@
 <p align="center"><img src="http://wx2.sinaimg.cn/mw690/0060lm7Tly1ftpm5b3ihfj3096097aaj.jpg" alt="fre logo" width="150"></p>
 <h1 align="center">Fre</h1>
-<p align="center">:ghost: Tiny React16 like library with Concurrent and Suspense.</p>
+<p align="center">:ghost: Tiny React16 like framework with Concurrent.</p>
 <p align="center">
 <a href="https://circleci.com/gh/yisar/fre"><img src="https://img.shields.io/circleci/project/github/yisar/fre.svg?style=flat-square" alt="Build Status"></a>
 <a href="https://codecov.io/gh/yisar/fre"><img src="https://img.shields.io/codecov/c/github/yisar/fre.svg?style=flat-square" alt="Code Coverage"></a>
