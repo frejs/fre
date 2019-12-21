@@ -3,16 +3,17 @@ import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild } from './scheduler'
 import { createText } from './h'
 
+const HOST = 0
+const HOOK = 1
+
+const NOWOEK = 0
+const PLACE = 1
+const UPDATE = 2
+const DELETE = 3
+
+export const SVG = 4
 export const options = {}
-export const [HOST, SVG, HOOK, PLACE, UPDATE, DELETE, NOWOEK] = [
-  0,
-  1,
-  2,
-  3,
-  4,
-  5,
-  6
-]
+
 export const isFn = fn => typeof fn === 'function'
 const defer =
   typeof requestAnimationFrame === 'undefined'
