@@ -14,12 +14,6 @@ const DELETE = 3
 export const SVG = 4
 export const options = {}
 
-export const isFn = fn => typeof fn === 'function'
-const defer =
-  typeof requestAnimationFrame === 'undefined'
-    ? setTimeout
-    : requestAnimationFrame
-
 let preCommit = null
 let currentFiber = null
 let WIP = null
@@ -182,8 +176,8 @@ function cloneChildren(fiber) {
 }
 
 function shouldUpdate(a, b) {
-  for (let i in a) if (!(i in b)) return true
   for (let i in b) if (a[i] !== b[i]) return true
+  for (let i in a) if (!(i in b)) return true
   return false
 }
 
@@ -241,8 +235,6 @@ function createFiber(vnode, op) {
   return { ...vnode, op, tag: isFn(vnode.type) ? HOOK : HOST }
 }
 
-const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr])
-
 function hashfy(arr) {
   let out = {}
   let i = 0
@@ -262,12 +254,6 @@ function hashfy(arr) {
   return out
 }
 
-const cleanup = e => e[2] && e[2]()
-const effect = e => {
-  const res = e[0]()
-  if (isFn(res)) e[2] = res
-}
-
 function refer(ref, dom) {
   if (ref) isFn(ref) ? ref(dom) : (ref.current = dom)
 }
@@ -280,6 +266,16 @@ function cleanupRef(kids) {
   }
 }
 
-export function getCurrentFiber() {
-  return currentFiber || null
+const cleanup = e => e[2] && e[2]()
+const effect = e => {
+  const res = e[0]()
+  if (isFn(res)) e[2] = res
 }
+
+const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr])
+export const isFn = fn => typeof fn === 'function'
+export const getCurrentFiber = () => currentFiber || null
+const defer =
+  typeof requestAnimationFrame === 'undefined'
+    ? setTimeout
+    : requestAnimationFrame
