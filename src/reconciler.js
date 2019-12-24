@@ -198,18 +198,13 @@ function commitWork(fiber) {
 }
 
 function commit(fiber) {
-  const op = fiber.op
-  const parent = fiber.parentNode
-  const dom = fiber.node
-  const ref = fiber.ref
-  const hooks = fiber.hooks
-
+  const { op, parentNode, node, ref, hooks } = fiber
   if (op === NOWORK) {
   } else if (op === DELETE) {
     hooks && hooks.list.forEach(e => e[2] && e[2]())
     cleanupRef(fiber.kids)
     while (fiber.tag === HOOK) fiber = fiber.child
-    parent.removeChild(fiber.node)
+    parentNode.removeChild(fiber.node)
   } else if (fiber.tag === HOOK) {
     if (hooks) {
       hooks.layout.forEach(cleanup)
@@ -222,15 +217,15 @@ function commit(fiber) {
       })
     }
   } else if (op === UPDATE) {
-    updateElement(dom, fiber.lastProps, fiber.props)
+    updateElement(node, fiber.lastProps, fiber.props)
   } else {
     let point = fiber.insertPoint ? fiber.insertPoint.node : null
-    let after = point ? point.nextSibling : parent.firstChild
-    if (after === dom) return
-    if (after === null && dom === parent.lastChild) return
-    parent.insertBefore(dom, after)
+    let after = point ? point.nextSibling : parentNode.firstChild
+    if (after === node) return
+    if (after === null && node === parentNode.lastChild) return
+    parentNode.insertBefore(node, after)
   }
-  refer(ref, dom)
+  refer(ref, node)
 }
 
 function createFiber(vnode, op) {
