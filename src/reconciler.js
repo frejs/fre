@@ -6,7 +6,7 @@ import { createText } from './h'
 const HOST = 0
 const HOOK = 1
 
-const NOWOEK = 0
+const NOWORK = 0
 const PLACE = 1
 const UPDATE = 2
 const DELETE = 3
@@ -169,7 +169,7 @@ function cloneChildren(fiber) {
 
   let child = fiber.child
   let newChild = child
-  newChild.op = NOWOEK
+  newChild.op = NOWORK
   fiber.child = newChild
   newChild.parent = fiber
   newChild.sibling = null
@@ -202,7 +202,7 @@ function commit(fiber) {
   let parent = fiber.parentNode
   let dom = fiber.node
   let ref = fiber.ref
-  if (op === NOWOEK) {
+  if (op === NOWORK) {
   } else if (op === DELETE) {
     fiber.hooks && fiber.hooks.list.forEach(e => e[2] && e[2]())
     cleanupRef(fiber.kids)
