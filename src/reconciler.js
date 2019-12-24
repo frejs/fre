@@ -202,22 +202,22 @@ function commit(fiber) {
   let parent = fiber.parentNode
   let dom = fiber.node
   let ref = fiber.ref
-  const fiberHooks = fiber.hooks;
+  const hooks = fiber.hooks;
   if (op === NOWORK) {
   } else if (op === DELETE) {
-    fiberHooks && fiberHooks.list.forEach(e => e[2] && e[2]())
+    hooks && hooks.list.forEach(e => e[2] && e[2]())
     cleanupRef(fiber.kids)
     while (fiber.tag === HOOK) fiber = fiber.child
     parent.removeChild(fiber.node)
   } else if (fiber.tag === HOOK) {
-    if (fiberHooks) {
-      fiberHooks.layout.forEach(cleanup)
-      fiberHooks.layout.forEach(effect)
-      fiberHooks.layout = []
+    if (hooks) {
+      hooks.layout.forEach(cleanup)
+      hooks.layout.forEach(effect)
+      hooks.layout = []
       defer(() => {
-        fiberHooks.effect.forEach(cleanup)
-        fiberHooks.effect.forEach(effect)
-        fiberHooks.effect = []
+        hooks.effect.forEach(cleanup)
+        hooks.effect.forEach(effect)
+        hooks.effect = []
       })
     }
   } else if (op === UPDATE) {
