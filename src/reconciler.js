@@ -198,11 +198,12 @@ function commitWork(fiber) {
 }
 
 function commit(fiber) {
-  let op = fiber.op
-  let parent = fiber.parentNode
-  let dom = fiber.node
-  let ref = fiber.ref
-  const hooks = fiber.hooks;
+  const op = fiber.op
+  const parent = fiber.parentNode
+  const dom = fiber.node
+  const ref = fiber.ref
+  const hooks = fiber.hooks
+
   if (op === NOWORK) {
   } else if (op === DELETE) {
     hooks && hooks.list.forEach(e => e[2] && e[2]())
