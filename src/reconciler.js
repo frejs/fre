@@ -232,21 +232,12 @@ function createFiber(vnode, op) {
   return { ...vnode, op, tag: isFn(vnode.type) ? HOOK : HOST }
 }
 
-function hashfy(arr) {
-  let out = {}
-  let i = 0
-  let j = 0
-  arrayfy(arr).forEach(item => {
-    if (item.pop) {
-      item.forEach(item => {
-        item.key
-          ? (out['.' + i + '.' + item.key] = item)
-          : (out['.' + i + '.' + j] = item) && j++
-      })
-      i++
-    } else {
-      item.key ? (out['.' + item.key] = item) : (out['.' + i] = item) && i++
-    }
+const hashfy = children => {
+  const out = {}
+  arrayfy(children).forEach((v, i) => {
+    v.pop
+      ? v.forEach((vi, j) => (out[hash(i, j, vi.key)] = vi))
+      : (out[hash(i, null, v.key)] = v)
   })
   return out
 }
@@ -264,15 +255,28 @@ function cleanupRef(kids) {
 }
 
 const cleanup = e => e[2] && e[2]()
+
 const effect = e => {
   const res = e[0]()
   if (isFn(res)) e[2] = res
 }
 
-const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr])
-export const isFn = fn => typeof fn === 'function'
 export const getCurrentFiber = () => currentFiber || null
+
+const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr])
+
+export const isFn = fn => typeof fn === 'function'
+
 const defer =
   typeof requestAnimationFrame === 'undefined'
     ? setTimeout
     : requestAnimationFrame
+
+const hash = (i, j, k) =>
+  k != null && j != null
+    ? '.' + i + '.' + k
+    : j != null
+    ? '.' + i + '.' + j
+    : k != null
+    ? '.' + k
+    : '.' + i
