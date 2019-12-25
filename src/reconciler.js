@@ -201,7 +201,7 @@ function commit(fiber) {
   const { op, parentNode, node, ref, hooks } = fiber
   if (op === NOWORK) {
   } else if (op === DELETE) {
-    hooks && hooks.list.forEach(e => e[2] && e[2]())
+    hooks && hooks.list.forEach(cleanup)
     cleanupRef(fiber.kids)
     while (fiber.tag === HOOK) fiber = fiber.child
     parentNode.removeChild(fiber.node)
