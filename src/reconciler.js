@@ -232,13 +232,15 @@ function createFiber(vnode, op) {
   return { ...vnode, op, tag: isFn(vnode.type) ? HOOK : HOST }
 }
 
-const hashfy = children =>
-  arrayfy(children).reduce((out, v, i) => {
+const hashfy = children => {
+  const out = {}
+  arrayfy(children).forEach((v, i) => {
     v.pop
-      ? v.reduce((_, n, j) => (out[hash(i, j, n.key)] = n), {})
+      ? v.forEach((vi, j) => (out[hash(i, j, vi.key)] = vi))
       : (out[hash(i, null, v.key)] = v)
-    return out
-  }, {})
+  })
+  return out
+}
 
 function refer(ref, dom) {
   if (ref) isFn(ref) ? ref(dom) : (ref.current = dom)
@@ -253,18 +255,23 @@ function cleanupRef(kids) {
 }
 
 const cleanup = e => e[2] && e[2]()
+
 const effect = e => {
   const res = e[0]()
   if (isFn(res)) e[2] = res
 }
 
-const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr])
-export const isFn = fn => typeof fn === 'function'
 export const getCurrentFiber = () => currentFiber || null
+
+const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr])
+
+export const isFn = fn => typeof fn === 'function'
+
 const defer =
   typeof requestAnimationFrame === 'undefined'
     ? setTimeout
     : requestAnimationFrame
+
 const hash = (i, j, k) =>
   k != null && j != null
     ? '.' + i + '.' + k
