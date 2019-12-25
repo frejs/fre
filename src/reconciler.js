@@ -113,7 +113,7 @@ function reconcileChildren(WIP, children) {
   if (!children) return
   delete WIP.child
   const oldFibers = WIP.kids
-  const newFibers = (WIP.kids = hashfy(children))
+  const newFibers = (WIP.kids = hsfy(children))
 
   let reused = {}
 
@@ -232,13 +232,15 @@ function createFiber(vnode, op) {
   return { ...vnode, op, tag: isFn(vnode.type) ? HOOK : HOST }
 }
 
-const hashfy = children => {
+const hsfy = c => {
   const out = {}
-  arrayfy(children).forEach((v, i) => {
-    v.pop
-      ? v.forEach((vi, j) => (out[hash(i, j, vi.key)] = vi))
-      : (out[hash(i, null, v.key)] = v)
-  })
+  c.pop
+    ? c.forEach((v, i) =>
+        v.pop
+          ? v.forEach((vi, j) => (out[hs(i, j, vi.key)] = vi))
+          : (out[hs(i, null, v.key)] = v)
+      )
+    : (out[hs(0, null, c.key)] = c)
   return out
 }
 
@@ -263,8 +265,6 @@ const effect = e => {
 
 export const getCurrentFiber = () => currentFiber || null
 
-const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr])
-
 export const isFn = fn => typeof fn === 'function'
 
 const defer =
@@ -272,7 +272,7 @@ const defer =
     ? setTimeout
     : requestAnimationFrame
 
-const hash = (i, j, k) =>
+const hs = (i, j, k) =>
   k != null && j != null
     ? '.' + i + '.' + k
     : j != null
