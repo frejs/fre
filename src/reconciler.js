@@ -113,7 +113,7 @@ function reconcileChildren(WIP, children) {
   if (!children) return
   delete WIP.child
   const oldFibers = WIP.kids
-  const newFibers = (WIP.kids = hsfy(children))
+  const newFibers = (WIP.kids = hashfy(children))
 
   let reused = {}
 
@@ -232,7 +232,7 @@ function createFiber(vnode, op) {
   return { ...vnode, op, tag: isFn(vnode.type) ? HOOK : HOST }
 }
 
-const hsfy = c => {
+const hashfy = c => {
   const out = {}
   c.pop
     ? c.forEach((v, i) =>
