@@ -53,10 +53,6 @@ function flushWork() {
   }
 }
 
-function afterPaint(event) {
-  console.log(event.data)
-}
-
 export const planWork = (() => {
   if (typeof MessageChannel !== 'undefined') {
     const channel = new MessageChannel()
