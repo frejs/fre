@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
-import { scheduleCallback, shouldYeild } from './scheduler'
+import { scheduleCallback, shouldYeild,planWork } from './scheduler'
 import { createText } from './h'
 
 const HOST = 0
@@ -210,7 +210,7 @@ function commit(fiber) {
       hooks.layout.forEach(cleanup)
       hooks.layout.forEach(effect)
       hooks.layout = []
-      defer(() => {
+      planWork(() => {
         hooks.effect.forEach(cleanup)
         hooks.effect.forEach(effect)
         hooks.effect = []
@@ -266,11 +266,6 @@ const effect = e => {
 export const getCurrentFiber = () => currentFiber || null
 
 export const isFn = fn => typeof fn === 'function'
-
-const defer =
-  typeof requestAnimationFrame === 'undefined'
-    ? setTimeout
-    : requestAnimationFrame
 
 const hs = (i, j, k) =>
   k != null && j != null

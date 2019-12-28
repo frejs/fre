@@ -53,14 +53,24 @@ function flushWork() {
   }
 }
 
+function afterPaint(event) {
+  console.log(event.data)
+}
+
 export const planWork = (() => {
   if (typeof MessageChannel !== 'undefined') {
     const channel = new MessageChannel()
-    const port = channel.port2
-    channel.port1.onmessage = flushWork
-    return () => port.postMessage(null)
+    return cb => {
+      if (cb) {
+        channel.port2.onmessage = cb
+        channel.port1.postMessage(null)
+      } else {
+        channel.port1.onmessage = flushWork
+        channel.port2.postMessage(null)
+      }
+    }
   }
-  return () => setTimeout(flushWork, 0)
+  return cb => (cb ? setTimeout(cb) : setTimeout(flushWork))
 })()
 
 export function shouldYeild() {
