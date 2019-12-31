@@ -55,18 +55,11 @@ function flushWork() {
 
 export const planWork = (() => {
   if (typeof MessageChannel !== 'undefined') {
-    const channel = new MessageChannel()
-    return cb => {
-      if (cb) {
-        channel.port2.onmessage = cb
-        channel.port1.postMessage(null)
-      } else {
-        channel.port1.onmessage = flushWork
-        channel.port2.postMessage(null)
-      }
-    }
+    const { port1, port2 } = new MessageChannel()
+    port1.onmessage = flushWork
+    return cb => (cb ? requestAnimationFrame(cb) : port2.postMessage(null))
   }
-  return cb => (cb ? setTimeout(cb) : setTimeout(flushWork))
+  return cb => setTimeout(cb || flushWork)
 })()
 
 export function shouldYeild() {
