@@ -10,8 +10,7 @@ export function useState(initState) {
 }
 
 export function useReducer(reducer, initState) {
-  const hook = getHook(cursor++)
-  const current = getCurrentFiber()
+  const [hook, current] = getHook(cursor++)
 
   const setter = value => {
     let newValue = reducer
@@ -42,16 +41,16 @@ export function useLayout(cb, deps) {
 }
 
 function effectImpl(cb, deps, key) {
-  let hook = getHook(cursor++)
+  let [hook, current] = getHook(cursor++)
   if (isChanged(hook[1], deps)) {
     hook[0] = useCallback(cb, deps)
     hook[1] = deps
-    getCurrentFiber().hooks[key].push(hook)
+    current.hooks[key].push(hook)
   }
 }
 
 export function useMemo(cb, deps) {
-  let hook = getHook(cursor++)
+  let hook = getHook(cursor++)[0]
   if (isChanged(hook[1], deps)) {
     hook[1] = deps
     return (hook[0] = cb())
@@ -68,14 +67,13 @@ export function useRef(current) {
 }
 
 export function getHook(cursor) {
-  const currentHook = getCurrentFiber()
+  const current = getCurrentFiber()
   let hooks =
-    currentHook.hooks ||
-    (currentHook.hooks = { list: [], effect: [], layout: [] })
+    current.hooks || (current.hooks = { list: [], effect: [], layout: [] })
   if (cursor >= hooks.list.length) {
     hooks.list.push([])
   }
-  return hooks.list[cursor]
+  return [hooks.list[cursor], current]
 }
 
 export function isChanged(a, b) {

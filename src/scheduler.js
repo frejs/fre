@@ -55,9 +55,16 @@ function flushWork() {
 
 export const planWork = (() => {
   if (typeof MessageChannel !== 'undefined') {
-    const { port1, port2 } = new MessageChannel()
-    port1.onmessage = flushWork
-    return cb => (cb ? requestAnimationFrame(cb) : port2.postMessage(null))
+    const channel = new MessageChannel()
+    return cb => {
+      if (cb) {
+        channel.port2.onmessage = cb
+        channel.port1.postMessage(null)
+      } else {
+        channel.port1.onmessage = flushWork
+        channel.port2.postMessage(null)
+      }
+    }
   }
   return cb => setTimeout(cb || flushWork)
 })()
