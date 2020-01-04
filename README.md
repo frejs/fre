@@ -21,13 +21,8 @@
 
 Fre has wonderful code, we need more to join us and improve together.
 
-<table><tbody><tr>
-<td><a target="_blank" href="https://github.com/yisar"><img width="70px" src="https://avatars0.githubusercontent.com/u/12951461?s=70&v=4"></a></td>
-<td><a target="_blank" href="https://github.com/mindplay-dk"><img width="70px" src="https://avatars3.githubusercontent.com/u/103348?s=70&v=4"></a></td>
-<td><a target="_blank" href="https://github.com/hkc452"><img width="70px" src="https://avatars2.githubusercontent.com/u/3286658?s=70&v=4"></a></td>
-<td><a target="_blank" href="https://github.com/wu-yu-xuan"><img width="70px" src="https://avatars3.githubusercontent.com/u/35450080?s=70&v=4"></a></td>
-<td><a target="_blank" href="https://github.com/yiliang114"><img width="70px" src="https://avatars1.githubusercontent.com/u/11473889?s=70&v=4"></a></td>
-</tr></table></tbody>
+<a href="https://github.com/yisar/fre/graphs/contributors"><img src="https://opencollective.com/fre/contributors.svg?width=890&button=false" /></a>
+
 
 #### Backers
 
