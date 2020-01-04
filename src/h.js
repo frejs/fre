@@ -1,17 +1,22 @@
-export function h(type, attrs) {
+export function h(type, attrs, ...args) {
   let props = attrs || {}
   let key = props.key || null
   let ref = props.ref || null
   let children = []
 
-  for (let i = 2; i < arguments.length; i++) {
-    let vnode = arguments[i]
-    if (vnode == null || vnode === true || vnode === false) {
-    } else if (typeof vnode === 'string' || typeof vnode === 'number') {
-      children.push(createText(vnode))
-    } else {
-      children.push(vnode)
+  for (let i = 0; i < args.length; ++i) {
+    let child = args[i]
+    const type = typeof child
+
+    if (type === 'boolean' || child == null) {
+      break
     }
+
+    if (type === 'string' || type === 'number') {
+      child = createText(child)
+    }
+
+    children.push(child)
   }
 
   if (children.length) {
