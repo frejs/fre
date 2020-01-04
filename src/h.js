@@ -1,26 +1,22 @@
-const hasOwnProperty = Object.prototype.hasOwnProperty
-
 export function h(type, attrs, ...args) {
   let props = attrs || {}
   let key = props.key || null
   let ref = props.ref || null
   let children = []
 
-  for (const key in args) {
-    if (hasOwnProperty.call(args, key)) {
-      let child = args[key]
-      const type = typeof child
+  for (let i = 0; i < args.length; ++i) {
+    let child = args[i]
+    const type = typeof child
 
-      if (type === 'boolean' || child == null) {
-        break
-      }
-
-      if (type === 'string' || type === 'number') {
-        child = createText(child)
-      }
-
-      children.push(child)
+    if (type === 'boolean' || child == null) {
+      break
     }
+
+    if (type === 'string' || type === 'number') {
+      child = createText(child)
+    }
+
+    children.push(child)
   }
 
   if (children.length) {
