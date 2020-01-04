@@ -19,12 +19,12 @@ function A(props) {
   //     console.log(222)
   //   }
   // }, [props.count])
-    useEffect(() => {
-      console.log(333)
-      return () => {
-        console.log(444)
-      }
-    })
+  useEffect(() => {
+    console.log(333)
+    return () => {
+      console.log(444)
+    }
+  })
   return 'hello'
 }
 

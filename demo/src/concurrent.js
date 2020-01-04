@@ -33,7 +33,7 @@ const App = () => {
 
 const SlowComponent = ({ value }) => {
   const start = performance.now()
-  while (performance.now() - start < BLOCK_FOR){};
+  while (performance.now() - start < BLOCK_FOR) {}
 
   return <li className="slow">{value}</li>
 }
