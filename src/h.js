@@ -8,7 +8,7 @@ export function h(type, attrs, ...args) {
 
   for (const key in args) {
     if (hasOwnProperty.call(args, key)) {
-      const child = args[key]
+      let child = args[key]
       const type = typeof child
 
       if (type === 'boolean' || child == null) {
@@ -16,10 +16,10 @@ export function h(type, attrs, ...args) {
       }
 
       if (type === 'string' || type === 'number') {
-        args[key] = createText(args[key])
+        child = createText(child)
       }
 
-      children.push(args[key])
+      children.push(child)
     }
   }
 
