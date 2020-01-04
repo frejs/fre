@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
-import { scheduleCallback, shouldYeild,planWork } from './scheduler'
+import { scheduleCallback, shouldYeild, planWork } from './scheduler'
 import { createText } from './h'
 
 const HOST = 0
@@ -188,9 +188,7 @@ function shouldPlace(fiber) {
 }
 
 function commitWork(fiber) {
-  commitQueue.forEach(c => {
-    if (c.parent) commit(c)
-  })
+  commitQueue.forEach(c => c.parent && commit(c))
   fiber.done && fiber.done()
   commitQueue = []
   preCommit = null

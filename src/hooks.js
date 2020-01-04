@@ -11,7 +11,6 @@ export function useState(initState) {
 
 export function useReducer(reducer, initState) {
   const [hook, current] = getHook(cursor++)
-
   const setter = value => {
     let newValue = reducer
       ? reducer(hook[0], value)
