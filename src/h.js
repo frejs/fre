@@ -4,19 +4,14 @@ export function h(type, attrs, ...args) {
   let ref = props.ref || null
   let children = []
 
-  for (let i = 0; i < args.length; ++i) {
-    let child = args[i]
-    const type = typeof child
-
-    if (type === 'boolean' || child == null) {
-      break
+  for (let i = 0; i < args.length; i++) {
+    let vnode = args[i]
+    if (vnode == null || vnode === true || vnode === false) {
+    } else if (typeof vnode === 'string' || typeof vnode === 'number') {
+      children.push(createText(vnode))
+    } else {
+      children.push(vnode)
     }
-
-    if (type === 'string' || type === 'number') {
-      child = createText(child)
-    }
-
-    children.push(child)
   }
 
   if (children.length) {

@@ -1,4 +1,8 @@
-import { useEffect, useLayout, render, h } from '../../src'
+// import { useEffect, useLayout, render, h } from '../../src'
+// import { render } from "react-dom"
+// import { createElement as h, useLayoutEffect as useLayout, useEffect } from "react"
+import { h, render } from 'preact'
+import {useLayoutEffect as useLayout, useEffect } from 'preact/hooks'
 
 var Root, root, stack
 
