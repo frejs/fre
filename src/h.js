@@ -7,10 +7,10 @@ export function h(type, attrs, ...args) {
   for (let i = 0; i < args.length; i++) {
     let vnode = args[i]
     if (vnode == null || vnode === true || vnode === false) {
-    } else if (typeof vnode === 'string' || typeof vnode === 'number') {
-      children.push(createText(vnode))
     } else {
-      children.push(vnode)
+      const vnodeType = typeof vnode
+      const toPush = ['string', 'number'].includes(vnodeType) ? createText(vnode) : vnode
+      children.push(toPush)
     }
   }
 
