@@ -86,7 +86,7 @@ function updateHOOK(WIP) {
   resetCursor()
   let children = WIP.type(newProps)
   if (!children.type) {
-    children = createText(children)
+    children = createText(children || '')
   }
   reconcileChildren(WIP, children)
 }
