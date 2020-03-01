@@ -230,17 +230,23 @@ function createFiber(vnode, op) {
 }
 
 const hashfy = c => {
-  const out = {}
-  c.pop
-    ? c.forEach((v, i) =>
-        v.pop
-          ? v.forEach((vi, j) => (out[hs(i, j, vi.key)] = vi))
-          : (out[hs(i, null, v.key)] = v)
-      )
-    : (out[hs(0, null, c.key)] = c)
+  const isArray = Array.isArray
+  if (!c) return {}
+  if (!isArray(c)) return { [c.key || '.0']: c }
+  let out = {}
+  function walk(value, key = '') {
+    if (!isArray(value)) {
+      out[key] = value
+      return
+    }
+    value.forEach((elem, index) => {
+      let k = elem.key || index
+      !isArray(value) ? (out[path + '.' + k] = elem) : walk(elem, key + '.' + k)
+    })
+  }
+  walk(c)
   return out
 }
-
 function refer(ref, dom) {
   if (ref) isFn(ref) ? ref(dom) : (ref.current = dom)
 }
@@ -263,12 +269,3 @@ const effect = e => {
 export const getCurrentFiber = () => currentFiber || null
 
 export const isFn = fn => typeof fn === 'function'
-
-const hs = (i, j, k) =>
-  k != null && j != null
-    ? '.' + i + '.' + k
-    : j != null
-    ? '.' + i + '.' + j
-    : k != null
-    ? '.' + k
-    : '.' + i
