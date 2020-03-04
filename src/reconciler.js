@@ -229,25 +229,6 @@ function createFiber(vnode, op) {
   return { ...vnode, op, tag: isFn(vnode.type) ? HOOK : HOST }
 }
 
-const hashfy3 = c => {
-  const isArray = Array.isArray
-  if (!c) return {}
-  if (!isArray(c)) return { [c.key || '.0']: c }
-  let out = {}
-  function walk(value, key = '') {
-    if (!isArray(value)) {
-      out[key] = value
-      return
-    }
-    value.forEach((elem, index) => {
-      let k = elem.key || index
-      !isArray(value) ? (out[path + '.' + k] = elem) : walk(elem, key + '.' + k)
-    })
-  }
-  walk(c)
-  return out
-}
-
 const hashfy = c => {
   const isArray = Array.isArray
   if (!c) return {}
