@@ -40,11 +40,7 @@ export function scheduleWork(fiber) {
 function reconcileWork(didout) {
   if (!WIP) WIP = updateQueue.shift()
   while (WIP && (!shouldYeild() || didout)) {
-    try {
-      WIP = reconcile(WIP)
-    } catch (e) {
-      throw e
-    }
+    WIP = reconcile(WIP)
   }
   if (!didout && WIP) {
     return reconcileWork.bind(null)

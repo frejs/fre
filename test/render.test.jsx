@@ -1,5 +1,6 @@
 /** @jsx h */
-import { h } from '../src/index'
+/** @jsxFrag Fragment */
+import { h, Fragment } from '../src/index'
 import { testRender } from './test-util'
 
 const toString = elements => elements.map(child => child.outerHTML).join('')
@@ -56,4 +57,15 @@ test('render 3D array', async () => {
   expect(toString(elements)).toBe(
     '<ul><li>0,0,0</li><li>0,0,1</li><li>0,1,0</li><li>0,1,1</li><li>1,0,0</li><li>1,0,1</li><li>1,1,0</li><li>1,1,1</li></ul>'
   )
+})
+
+test('render fragment', async () => {
+  const elements = await testRender(
+    <>
+      <li>1</li>
+      <li>2</li>
+    </>
+  )
+
+  expect(toString(elements)).toBe('<li>1</li><li>2</li>')
 })
