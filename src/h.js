@@ -1,3 +1,5 @@
+export const isArr = Array.isArray
+
 export function h(type, attrs, ...args) {
   let props = attrs || {}
   let key = props.key || null
@@ -31,4 +33,6 @@ export function createText(vnode) {
   return { type: 'text', props: { nodeValue: vnode } }
 }
 
-export const isArr = Array.isArray
+export function Fragment(props) {
+  return props.children
+}

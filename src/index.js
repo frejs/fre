@@ -1,4 +1,4 @@
-import { h } from './h'
+import { h,Fragment } from './h'
 import { render, scheduleWork, options } from './reconciler'
 import {
   useState,
@@ -13,6 +13,7 @@ import {
 export {
   h,
   h as createElement,
+  Fragment,
   render,
   scheduleWork,
   options,
@@ -28,6 +29,7 @@ export {
 
 const Fre = {
   h,
+  Fragment,
   render,
   scheduleWork,
   options,
