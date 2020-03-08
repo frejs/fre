@@ -1,7 +1,7 @@
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild, planWork } from './scheduler'
-import { createText } from './h'
+import { createText,isArr } from './h'
 
 const HOST = 0
 const HOOK = 1
@@ -230,39 +230,14 @@ function createFiber(vnode, op) {
 }
 
 const hashfy = c => {
-  const isArray = Array.isArray
-  if (!c || (isArray(c) && !c.length)) return {}
-  if (!isArray(c)) return { [c.key || '.0']: c }
-  let out = {}
-  const keyList = [0]
-  const getCurInfo = () => {
-    let key = ''
-    let list = c
-    let elem = c
-    for (let i = 0; i < keyList.length; i++) {
-      elem = elem[keyList[i]]
-      key += '.' + (elem.key || keyList[i])
-      if (i < keyList.length - 1) list = list[keyList[i]]
-    }
-    return { elem, list, key }
-  }
-  while (keyList.length) {
-    let { elem, list, key } = getCurInfo()
-    if (!isArray(elem)) {
-      out[key] = elem
-      keyList[keyList.length - 1]++
-      while (list.length === keyList[keyList.length - 1]) {
-        keyList.pop()
-        list = getCurInfo().list
-        keyList.length && keyList[keyList.length - 1]++
-      }
-      continue
-    }
-    if (list.length > 0) keyList.push(0)
-    else {
-      keyList[keyList.length - 1]++
-    }
-  }
+  const out = {}
+  isArr(c)
+    ? c.forEach((v, i) =>
+        v.pop
+          ? v.forEach((vi, j) => (out[hs(i, j, vi.key)] = vi))
+          : (out[hs(i, null, v.key)] = v)
+      )
+    : (out[hs(0, null, c.key)] = c)
   return out
 }
 
@@ -288,3 +263,12 @@ const effect = e => {
 export const getCurrentFiber = () => currentFiber || null
 
 export const isFn = fn => typeof fn === 'function'
+
+const hs = (i, j, k) =>
+  k != null && j != null
+    ? '.' + i + '.' + k
+    : j != null
+    ? '.' + i + '.' + j
+    : k != null
+    ? '.' + k
+    : '.' + i

@@ -10,6 +10,9 @@ export function h(type, attrs, ...args) {
     } else if (typeof vnode === 'string' || typeof vnode === 'number') {
       children.push(createText(vnode))
     } else {
+      while (vnode.some(v => isArr(v))) {
+        vnode = [].concat(...vnode)
+      }
       children.push(vnode)
     }
   }
@@ -27,3 +30,5 @@ export function h(type, attrs, ...args) {
 export function createText(vnode) {
   return { type: 'text', props: { nodeValue: vnode } }
 }
+
+export const isArr = Array.isArray
