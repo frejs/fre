@@ -8,19 +8,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: setup
-        uses: actions/setup-node@v1
-        with:
-          node-version: 10.x
       - name: test
         run: |
           npm install
           npm test
       - name: report
         uses: codecov/codecov-action@v1.0.6
-      - name: size  
-        uses: preactjs/compressed-size-action@v1
-        with:
-          repo-token: '${{ secrets.GITHUB_TOKEN }}'
         env:
           CI: true
