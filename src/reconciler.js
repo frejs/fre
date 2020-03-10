@@ -1,7 +1,7 @@
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild, planWork } from './scheduler'
-import { createText, isArr } from './h'
+import { createText, isArr,isStr } from './h'
 
 const HOST = 0
 const HOOK = 1
@@ -81,7 +81,7 @@ function updateHOOK(WIP) {
   currentFiber = WIP
   resetCursor()
   let children = WIP.type(newProps)
-  if (typeof children === 'string') {
+  if (isStr(children)) {
     children = createText(children || '')
   }
   reconcileChildren(WIP, children)

@@ -1,4 +1,5 @@
 export const isArr = Array.isArray
+export const isStr = s => typeof s === 'string' || typeof s === 'number'
 
 export function h(type, attrs, ...args) {
   let props = attrs || {}
@@ -9,7 +10,7 @@ export function h(type, attrs, ...args) {
   for (let i = 0; i < args.length; i++) {
     let vnode = args[i]
     if (vnode == null || vnode === true || vnode === false) {
-    } else if (typeof vnode === 'string' || typeof vnode === 'number') {
+    } else if (isStr(vnode)) {
       children.push(createText(vnode))
     } else {
       while (isArr(vnode) && vnode.some(v => isArr(v))) {
@@ -36,3 +37,4 @@ export function createText(vnode) {
 export function Fragment(props) {
   return props.children
 }
+
