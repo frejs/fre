@@ -1,0 +1,22 @@
+name: main
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: setup
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10.x
+      - name: test
+        run: |
+          npm install
+          npm test
+      - name: codecov
+        uses: codecov/codecov-action@v1.0.6    
+        env:
+          CI: true
