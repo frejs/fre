@@ -2,7 +2,7 @@
 <h1 align="center">Fre</h1>
 <p align="center">:ghost: Tiny React16 like framework with Concurrent.</p>
 <p align="center">
-<a href="https://circleci.com/gh/yisar/fre"><img src="https://img.shields.io/github/workflow/status/yisar/fre/main.svg?style=flat-square" alt="Build Status"></a>
+<a href="https://github.com/yisar/fre/actions"><img src="https://img.shields.io/github/workflow/status/yisar/fre/main.svg?style=flat-square" alt="Build Status"></a>
 <a href="https://codecov.io/gh/yisar/fre"><img src="https://img.shields.io/codecov/c/github/yisar/fre.svg?style=flat-square" alt="Code Coverage"></a>
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/v/fre.svg?style=flat-square" alt="npm-v"></a>
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/dt/fre.svg?style=flat-square" alt="npm-d"></a>
