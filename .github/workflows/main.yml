@@ -8,7 +8,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      - name: Use Node.js 10.x
+      - name: setup
         uses: actions/setup-node@v1
         with:
           node-version: 10.x
@@ -16,5 +16,7 @@ jobs:
         run: |
           npm install
           npm test
+      - name: codecov
+        uses: codecov/codecov-action@v1.0.6    
         env:
           CI: true
