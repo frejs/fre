@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: setup
         uses: actions/setup-node@v1
         with:
@@ -16,7 +16,11 @@ jobs:
         run: |
           npm install
           npm test
-      - name: codecov
-        uses: codecov/codecov-action@v1.0.6    
+      - name: report
+        uses: codecov/codecov-action@v1.0.6
+      - name: size  
+        uses: preactjs/compressed-size-action@v1
+        with:
+          repo-token: '${{ secrets.GITHUB_TOKEN }}'
         env:
           CI: true
