@@ -1,7 +1,7 @@
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild, planWork } from './scheduler'
-import { createText, isArr,isStr } from './h'
+import { createText, isArr, isStr, MEMO } from './h'
 
 const HOST = 0
 const HOOK = 1
@@ -73,7 +73,8 @@ function updateHOOK(WIP) {
   const newProps = WIP.props
   if (
     (WIP.dirty === false || WIP.dirty === null) &&
-    !shouldUpdate(oldProps, newProps)
+    !shouldUpdate(oldProps, newProps) &&
+    WIP.type.type === MEMO
   ) {
     cloneChildren(WIP)
     return
