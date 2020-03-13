@@ -1,17 +1,17 @@
 /** @jsx h */
-import { h, useState, useRef } from '../src/index'
+import { h, useState, memo } from '../src/index'
 import { testUpdates } from './test-util'
 
 test('async state update', async () => {
   let updates = 0
 
-  const Component = () => {
+  const Component = memo(() => {
     const [count, setState] = useState(0)
 
     updates += 1
 
     return <button onClick={() => setState(count => count + 1)}>{count}</button>
-  }
+  })
 
   await testUpdates([
     {

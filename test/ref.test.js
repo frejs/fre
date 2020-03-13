@@ -21,7 +21,7 @@ test('persist reference to any value', async () => {
     {
       content: <Component />,
       test: ([p]) => {
-        expect(p.textContent).toBe('x')
+        expect(p.textContent).toBe('xx')
       }
     }
   ])
