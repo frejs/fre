@@ -1,21 +1,21 @@
-import { h, render, useState } from '../../src'
+import { h, render, useState, memo } from '../../src'
 
 function App() {
   const [state, setState] = useState(0)
+  console.log('all')
   return (
     <div>
       {state}
-      <B />
       <A />
       <button onClick={() => setState(state + 1)}>+</button>
     </div>
   )
 }
 
-function A(props) {
+const A = memo(function A(props) {
   console.log('a')
-  return <C count={[]} />
-}
+  return 111
+})
 function B(props) {
   console.log('b')
   const [state, setState] = useState(0)
