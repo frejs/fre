@@ -40,6 +40,6 @@ export function Fragment(props) {
 }
 
 export function memo(fn) {
-  fn.type = MEMO
+  fn.tag = MEMO
   return fn
 }
