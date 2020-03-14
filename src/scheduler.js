@@ -66,4 +66,4 @@ export function shouldYeild() {
   return getTime() >= frameDeadline
 }
 
-const getTime = () => performance.now()
+export const getTime = () => performance.now()

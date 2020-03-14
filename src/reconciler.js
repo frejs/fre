@@ -3,9 +3,6 @@ import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild, planWork } from './scheduler'
 import { createText, isArr, isStr, MEMO } from './h'
 
-const HOST = 0
-const HOOK = 1
-
 const NOWORK = 0
 const PLACE = 1
 const UPDATE = 2
@@ -22,7 +19,6 @@ let commitQueue = []
 
 export function render(vnode, node, done) {
   let rootFiber = {
-    tag: HOST,
     node,
     props: { children: vnode },
     done
@@ -51,8 +47,8 @@ function reconcileWork(didout) {
 
 function reconcile(WIP) {
   WIP.parentNode = getParentNode(WIP)
-  WIP.tag == HOOK ? updateHOOK(WIP) : updateHost(WIP)
-  WIP.pendingProps = WIP.props
+  isFn(WIP.type) ? updateHOOK(WIP) : updateHost(WIP)
+  WIP.oldProps = WIP.props
   commitQueue.push(WIP)
 
   if (WIP.child) return WIP.child
@@ -69,21 +65,19 @@ function reconcile(WIP) {
 }
 
 function updateHOOK(WIP) {
-  const oldProps = WIP.pendingProps
-  const newProps = WIP.props
   if (
+    WIP.type.tag === MEMO &&
     (WIP.dirty === false || WIP.dirty === null) &&
-    !shouldUpdate(oldProps, newProps) &&
-    WIP.type.type === MEMO
+    !shouldUpdate(WIP.oldProps, WIP.props)
   ) {
     cloneChildren(WIP)
     return
   }
   currentFiber = WIP
   resetCursor()
-  let children = WIP.type(newProps)
+  let children = WIP.type(WIP.props)
   if (isStr(children)) {
-    children = createText(children || '')
+    children = createText(children)
   }
   reconcileChildren(WIP, children)
 }
@@ -102,7 +96,7 @@ function updateHost(WIP) {
 
 function getParentNode(fiber) {
   while ((fiber = fiber.parent)) {
-    if (fiber.tag < HOOK) return fiber.node
+    if (!isFn(fiber.type)) return fiber.node
   }
 }
 
@@ -179,7 +173,7 @@ function shouldUpdate(a, b) {
 
 function shouldPlace(fiber) {
   let p = fiber.parent
-  if (p.tag === HOOK) return p.key && !p.dirty
+  if (isFn(p.type)) return p.key && !p.dirty
   return fiber.key
 }
 
@@ -197,9 +191,9 @@ function commit(fiber) {
   } else if (op === DELETE) {
     hooks && hooks.list.forEach(cleanup)
     cleanupRef(fiber.kids)
-    while (fiber.tag === HOOK) fiber = fiber.child
+    while (isFn(fiber.type)) fiber = fiber.child
     parentNode.removeChild(fiber.node)
-  } else if (fiber.tag === HOOK) {
+  } else if (isFn(fiber.type)) {
     if (hooks) {
       hooks.layout.forEach(cleanup)
       hooks.layout.forEach(effect)
@@ -223,7 +217,7 @@ function commit(fiber) {
 }
 
 function createFiber(vnode, op) {
-  return { ...vnode, op, tag: isFn(vnode.type) ? HOOK : HOST }
+  return { ...vnode, op }
 }
 
 const hashfy = c => {
