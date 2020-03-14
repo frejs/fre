@@ -15,7 +15,6 @@
 - :tada: Functional Component and hooks API
 - :confetti_ball: Concurrent and Suspense
 - :telescope: keyed reconcilation algorithm
-- :shaved_ice: exact updating(UI = f(state))
 
 #### Contributors
 
@@ -236,28 +235,33 @@ function App() {
 }
 ```
 
-### Exact updating
+### memo
 
-This optimization mainly includes two aspects:
-
-1. Shallow compare props
+The component can use `Fre.memo`, it will compare props shallowly and tell optimization explicitly.
 
 ```js
-<Compoent />
-<Compoent /> // ×
-<Compoent value={111}/>
-<Compoent value={111}/> // ×
-<Compoent value={222}/> // √
-<Compoent value={[]}/>
-<Compoent value={[]}/> // √
+import { memo } from 'fre'
+const MemoComponent = memo(() => 'hello world')
 ```
 
-2. `===` compare state
+### Fragments
 
-```js
-const [state, setState] = useState('hello')
-setState('hello') // × because state have not changed
-setState('world') // √
+Fragments will not create dom element.
+
+```jsx
+<>someThing</>
+```
+
+The above code needs babel plugin `@babel/plugin-transform-react-jsx`
+
+```json
+[
+  "@babel/plugin-transform-react-jsx",
+  {
+    "pragma": "h",
+    "pragmaFrag": "Fragment"
+  }
+]
 ```
 
 ### render props / children
