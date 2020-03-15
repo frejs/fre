@@ -48,6 +48,7 @@ function reconcileWork(didout) {
 function reconcile(WIP) {
   WIP.parentNode = getParentNode(WIP)
   isFn(WIP.type) ? updateHOOK(WIP) : updateHost(WIP)
+  WIP.dirty = WIP.dirty ? false : null
   WIP.oldProps = WIP.props
   commitQueue.push(WIP)
 
@@ -152,7 +153,6 @@ function reconcileChildren(WIP, children) {
   }
 
   if (prevFiber) prevFiber.sibling = null
-  WIP.dirty = WIP.dirty ? false : null
 }
 
 function cloneChildren(fiber) {
