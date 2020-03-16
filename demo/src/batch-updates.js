@@ -1,13 +1,17 @@
-import { h, render, useState } from '../../src'
+// import { h, render, useState } from '../../src'
+// import { h, render } from 'preact'
+// import {useState } from 'preact/hooks'
+import { render } from "react-dom"
+import { createElement as h, useState, useEffect } from "react"
 
-let i = 0
 function App() {
+  console.log(123)
   const [count, setCount] = useState(0)
   const up = () => {
-    while (i < 10) {
-      i++
-      setCount(count + 1)
-    }
+    setCount(count + 1)
+    console.log(count)
+    setCount(count + 1)
+    console.log(count)
   }
   return (
     <div>

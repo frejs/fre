@@ -3947,7 +3947,7 @@ log-symbols@^2.2.0:
   dependencies:
     chalk "^2.0.1"
 
-loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.4.0:
+loose-envify@^1.0.0, loose-envify@^1.1.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/loose-envify/-/loose-envify-1.4.0.tgz#71ee51fa7be4caec1a63839f7e682d8132d30caf"
   integrity sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==
@@ -5510,15 +5510,6 @@ promise.series@^0.2.0:
   resolved "https://registry.npm.taobao.org/promise.series/download/promise.series-0.2.0.tgz#2cc7ebe959fc3a6619c04ab4dbdc9e452d864bbd"
   integrity sha1-LMfr6Vn8OmYZwEq029yeRS2GS70=
 
-prop-types@^15.6.2:
-  version "15.7.2"
-  resolved "https://registry.npm.taobao.org/prop-types/download/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
-  integrity sha1-UsQedbjIfnK52TYOAga5ncv/psU=
-  dependencies:
-    loose-envify "^1.4.0"
-    object-assign "^4.1.1"
-    react-is "^16.8.1"
-
 proto-list@~1.2.1:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/proto-list/-/proto-list-1.2.4.tgz#212d5bfe1318306a420f6402b8e26ff39647a849"
@@ -5650,29 +5641,22 @@ re@^0.1.4:
   resolved "https://registry.npm.taobao.org/re/download/re-0.1.4.tgz#d821067ee10b52011491ba1ad9342150f9ce7031"
   integrity sha1-2CEGfuELUgEUkboa2TQhUPnOcDE=
 
-react-dom@^16.10.1:
-  version "16.10.1"
-  resolved "https://registry.npm.taobao.org/react-dom/download/react-dom-16.10.1.tgz#479a6511ba34a429273c213cbc2a9ac4d296dac1"
-  integrity sha1-R5plEbo0pCknPCE8vCqaxNKW2sE=
+react-dom@^0.0.0-experimental-8b155d261:
+  version "0.0.0-experimental-8b155d261"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-0.0.0-experimental-8b155d261.tgz#d84a21129883b579b6f0b7402e7bf923f3fa2fba"
+  integrity sha512-l/AcYQt+FZ/STH8DBBcgCs1nLflSewaVu5laf7s2HCZ2BHM/fuSFUerhqvbg3Jgi4ZJGX65C4YpzzxU1pmSKrg==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
-    prop-types "^15.6.2"
-    scheduler "^0.16.1"
+    scheduler "0.0.0-experimental-8b155d261"
 
-react-is@^16.8.1:
-  version "16.10.1"
-  resolved "https://registry.npm.taobao.org/react-is/download/react-is-16.10.1.tgz#0612786bf19df406502d935494f0450b40b8294f"
-  integrity sha1-BhJ4a/Gd9AZQLZNUlPBFC0C4KU8=
-
-react@^16.10.1:
-  version "16.10.1"
-  resolved "https://registry.npm.taobao.org/react/download/react-16.10.1.tgz#967c1e71a2767dfa699e6ba702a00483e3b0573f"
-  integrity sha1-lnwecaJ2ffppnmunAqAEg+OwVz8=
+react@^0.0.0-experimental-8b155d261:
+  version "0.0.0-experimental-8b155d261"
+  resolved "https://registry.yarnpkg.com/react/-/react-0.0.0-experimental-8b155d261.tgz#af4b06223e085c666676f66ff9f1f99498f8f891"
+  integrity sha512-Y4wXdV1UCu/hfjfpZcEbwxD/KU1aSx7rrbA2NBqFSeiHi/r0LlWwJsm+ORxCAS0Ybt2HI4qI1JYXy3MI9fwPpQ==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
-    prop-types "^15.6.2"
 
 readable-stream@^2.0.1, readable-stream@^2.0.2, readable-stream@^2.0.6, readable-stream@^2.2.2, readable-stream@^2.3.3, readable-stream@^2.3.6, readable-stream@~2.3.3, readable-stream@~2.3.6:
   version "2.3.6"
@@ -6166,10 +6150,10 @@ sax@^1.2.4, sax@~1.2.1, sax@~1.2.4:
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
   integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
 
-scheduler@^0.16.1:
-  version "0.16.1"
-  resolved "https://registry.npm.taobao.org/scheduler/download/scheduler-0.16.1.tgz?cache=0&sync_timestamp=1569695279882&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fscheduler%2Fdownload%2Fscheduler-0.16.1.tgz#a6fb6ddec12dc2119176e6eb54ecfe69a9eba8df"
-  integrity sha1-pvtt3sEtwhGRdubrVOz+aanrqN8=
+scheduler@0.0.0-experimental-8b155d261:
+  version "0.0.0-experimental-8b155d261"
+  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.0.0-experimental-8b155d261.tgz#2f06a76f979ed5a3575a41c5acb8a525b77445b8"
+  integrity sha512-FevboYeVL8BkYeiZZrFOfUNorPh89DoLOZSkLdFH9eQQorDpWmSColNPHaxXP+vB+LvszLm9mhwh+deUQJIAug==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"

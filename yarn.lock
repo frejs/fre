@@ -3028,7 +3028,7 @@ lodash@^4.17.11, lodash@^4.17.13:
   resolved "https://registry.npm.taobao.org/lodash/download/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha1-tEf2ZwoEVbv+7dETku/zMOoJdUg=
 
-loose-envify@^1.0.0:
+loose-envify@^1.0.0, loose-envify@^1.1.0:
   version "1.4.0"
   resolved "https://registry.npm.taobao.org/loose-envify/download/loose-envify-1.4.0.tgz#71ee51fa7be4caec1a63839f7e682d8132d30caf"
   integrity sha1-ce5R+nvkyuwaY4OffmgtgTLTDK8=
@@ -3393,7 +3393,7 @@ oauth-sign@~0.9.0:
   resolved "https://registry.npm.taobao.org/oauth-sign/download/oauth-sign-0.9.0.tgz#47a7b016baa68b5fa0ecf3dee08a85c679ac6455"
   integrity sha1-R6ewFrqmi1+g7PPe4IqFxnmsZFU=
 
-object-assign@^4.1.0:
+object-assign@^4.1.0, object-assign@^4.1.1:
   version "4.1.1"
   resolved "https://registry.npm.taobao.org/object-assign/download/object-assign-4.1.1.tgz#2109adc7965887cfc05cbbd442cac8bfbb360863"
   integrity sha1-IQmtx5ZYh8/AXLvUQsrIv7s2CGM=
@@ -3729,10 +3729,27 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-dom@^0.0.0-experimental-8b155d261:
+  version "0.0.0-experimental-8b155d261"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-0.0.0-experimental-8b155d261.tgz#d84a21129883b579b6f0b7402e7bf923f3fa2fba"
+  integrity sha512-l/AcYQt+FZ/STH8DBBcgCs1nLflSewaVu5laf7s2HCZ2BHM/fuSFUerhqvbg3Jgi4ZJGX65C4YpzzxU1pmSKrg==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    scheduler "0.0.0-experimental-8b155d261"
+
 react-is@^16.8.4:
   version "16.10.2"
   resolved "https://registry.npm.taobao.org/react-is/download/react-is-16.10.2.tgz?cache=0&sync_timestamp=1570140382805&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-is%2Fdownload%2Freact-is-16.10.2.tgz#984120fd4d16800e9a738208ab1fba422d23b5ab"
   integrity sha1-mEEg/U0WgA6ac4IIqx+6Qi0jtas=
+
+react@^0.0.0-experimental-8b155d261:
+  version "0.0.0-experimental-8b155d261"
+  resolved "https://registry.yarnpkg.com/react/-/react-0.0.0-experimental-8b155d261.tgz#af4b06223e085c666676f66ff9f1f99498f8f891"
+  integrity sha512-Y4wXdV1UCu/hfjfpZcEbwxD/KU1aSx7rrbA2NBqFSeiHi/r0LlWwJsm+ORxCAS0Ybt2HI4qI1JYXy3MI9fwPpQ==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
 
 read-pkg-up@^3.0.0:
   version "3.0.0"
@@ -4046,6 +4063,14 @@ sax@^1.2.4:
   version "1.2.4"
   resolved "https://registry.npm.taobao.org/sax/download/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
   integrity sha1-KBYjTiN4vdxOU1T6tcqold9xANk=
+
+scheduler@0.0.0-experimental-8b155d261:
+  version "0.0.0-experimental-8b155d261"
+  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.0.0-experimental-8b155d261.tgz#2f06a76f979ed5a3575a41c5acb8a525b77445b8"
+  integrity sha512-FevboYeVL8BkYeiZZrFOfUNorPh89DoLOZSkLdFH9eQQorDpWmSColNPHaxXP+vB+LvszLm9mhwh+deUQJIAug==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
 
 "semver@2 || 3 || 4 || 5", semver@^5.3.0, semver@^5.4.1, semver@^5.5.0, semver@^5.5.1, semver@^5.6.0:
   version "5.7.1"
