@@ -5,11 +5,27 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        node-version: [8.x, 10.x, 12.x]
     steps:
       - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: node dependencies cache
+        uses: actions/cache@v1.1.0
+        with:
+          path: ~/.npm
+          key: ${{ runner.OS }}-node-modules-cache-${{ hashFiles('yarn.lock') }}
+      - name: install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          npm install -g yarn
+          yarn
       - name: test
-        run: yarn && yarn test
+        run: yarn test
       - name: report
         uses: codecov/codecov-action@v1.0.6
         env:
