@@ -1,5 +1,4 @@
 import { scheduleWork, isFn, getCurrentFiber } from './reconciler'
-import { MEMO } from './h'
 let cursor = 0
 export function useState(initState) {
   return useReducer(null, initState)
@@ -37,6 +36,7 @@ export function useLayout(cb, deps) {
 
 function effectImpl(cb, deps, key) {
   let [hook, current] = getHook(cursor++)
+  console.log(hook[1], deps)
   if (isChanged(hook[1], deps)) {
     hook[0] = useCallback(cb, deps)
     hook[1] = deps
@@ -83,12 +83,10 @@ export function useContext(context, selector) {
   let [hook, current] = getHook(cursor++)
   const value = current.context[context.id]
   const selected = selector ? selector(value) : value
-  console.log(selected,hook[0])
   if (hook[0] !== selected) {
     hook[0] = selected
     return selected
   } else {
-    current.type.tag = MEMO
     return hook[0]
   }
 }
@@ -102,7 +100,7 @@ export function createContext(defaultValue) {
       return props.children(context)
     },
     Provider(props) {
-      let [, current] = getHook(cursor)
+      let current = getCurrentFiber()
       if (!current.context) current.context = {}
       current.context[context.id] = props.value
       return props.children
