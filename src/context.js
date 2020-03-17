@@ -7,6 +7,7 @@ let cursor = getCursor()
 export function useContext(context) {
   let [hook, current] = getHook(cursor++)
   const provider = current.context[context.id]
+  console.log(current.context,context)
   if (!provider) return context.defaultValue
   if (!hook[0]) {
     hook[0] = true
@@ -17,7 +18,7 @@ export function useContext(context) {
 
 export function createContext(defaultValue) {
   const context = {
-    id: id++,
+    id,
     defaultValue,
     Consumer(props, context) {
       return props.children(context)
@@ -31,7 +32,7 @@ export function createContext(defaultValue) {
       }
       if (!current.context) {
         current.context = {}
-        current.context[id] = current
+        current.context[id++] = current
         current.sub = c => hook[1].push(c)
       }
       return props.children

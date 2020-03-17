@@ -1,9 +1,9 @@
 import { h, render, createContext, useContext } from '../../src'
 
-const Context = createContext(0)
+const Context = createContext(null)
 
 function App() {
-  return <Context.Provider value={0}>
+  return <Context.Provider value={'hello world'}>
     <A/>
   </Context.Provider>
 }
