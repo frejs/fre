@@ -15,14 +15,14 @@ function App() {
 
 render(<App />, document.body)
 
-function createMutableSource(source, version) {
+export function createMutableSource(source, version) {
   return {
     version,
     source
   }
 }
 
-function useMutableSource(mutation, snapshot, subscribe) {
+export function useMutableSource(mutation, snapshot, subscribe) {
   const { source, version } = mutation
   const [snap, setSnap] = useState(snapshot(source))
   useEffect(() => {

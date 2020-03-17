@@ -9,7 +9,6 @@ const UPDATE = 2
 const DELETE = 3
 
 export const SVG = 4
-export const options = {}
 
 let preCommit = null
 let currentFiber = null
@@ -147,6 +146,7 @@ function reconcileChildren(WIP, children) {
       prevFiber.sibling = newFiber
     } else {
       if (WIP.tag === SVG) newFiber.tag = SVG
+      if (WIP.context) newFiber.context = WIP.context
       WIP.child = newFiber
     }
     prevFiber = newFiber

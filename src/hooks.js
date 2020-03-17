@@ -1,9 +1,5 @@
 import { scheduleWork, isFn, getCurrentFiber } from './reconciler'
-let cursor = 0
-
-export function resetCursor() {
-  cursor = 0
-}
+export var cursor = 0
 
 export function useState(initState) {
   return useReducer(null, initState)
@@ -77,4 +73,12 @@ export function getHook(cursor) {
 
 export function isChanged(a, b) {
   return !a || b.some((arg, index) => arg !== a[index])
+}
+
+export function resetCursor() {
+  cursor = 0
+}
+
+export function getCursor(){
+  return cursor
 }
