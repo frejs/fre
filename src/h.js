@@ -1,6 +1,6 @@
 export const isArr = Array.isArray
 export const isStr = s => typeof s === 'string' || typeof s === 'number'
-export const MEMO = 0
+export const MEMO = 3
 
 export function h(type, attrs, ...args) {
   let props = attrs || {}

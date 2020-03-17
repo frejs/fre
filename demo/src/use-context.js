@@ -17,11 +17,13 @@ function App() {
 
 function A() {
   const count1 = useContext(Context, v => v.count1)
+  console.log('a')
   return <div>{count1}</div>
 }
 
 function B() {
   const count2 = useContext(Context, v => v.count2)
+  console.log('b')
   return <div>{count2}</div>
 }
 

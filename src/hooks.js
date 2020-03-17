@@ -1,4 +1,5 @@
 import { scheduleWork, isFn, getCurrentFiber } from './reconciler'
+import { MEMO } from './h'
 let cursor = 0
 export function useState(initState) {
   return useReducer(null, initState)
@@ -79,10 +80,17 @@ export function resetCursor() {
 }
 
 export function useContext(context, selector) {
-  let [, current] = getHook(cursor++)
+  let [hook, current] = getHook(cursor++)
   const value = current.context[context.id]
   const selected = selector ? selector(value) : value
-  return selected || context.defaultValue
+  console.log(selected,hook[0])
+  if (hook[0] !== selected) {
+    hook[0] = selected
+    return selected
+  } else {
+    current.type.tag = MEMO
+    return hook[0]
+  }
 }
 
 let id = 0
