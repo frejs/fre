@@ -95,7 +95,7 @@ export function useContext(context, selector) {
 let id = 0
 export function createContext(defaultValue) {
   const context = {
-    id: id,
+    id: '@' + id++,
     defaultValue,
     Consumer(props, context) {
       return props.children(context)
