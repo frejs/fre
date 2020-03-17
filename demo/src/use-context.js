@@ -1,11 +1,17 @@
-import { h, render, createContext, useContext, useState } from '../../src'
+import {
+  h,
+  render,
+  createContext,
+  useContext,
+  useState,
+  useCallback
+} from '../../src'
 
-
-const context = createContext(null)
+const Context = createContext(null)
 
 const Counter1 = () => {
-  const count1 = useContext(context, v => v[0].count1)
-  const setState = useContext(context, v => v[1])
+  const count1 = useContext(Context, v => v[0].count1)
+  const setState = useContext(Context, v => v[1])
   const increment = () =>
     setState(s => ({
       ...s,
@@ -23,8 +29,8 @@ const Counter1 = () => {
 }
 
 const Counter2 = () => {
-  const count2 = useContext(context, v => v[0].count2)
-  const setState = useContext(context, v => v[1])
+  const count2 = useContext(Context, v => v[0].count2)
+  const setState = useContext(Context, v => v[1])
   const increment = () =>
     setState(s => ({
       ...s,
@@ -44,7 +50,9 @@ const Counter2 = () => {
 const StateProvider = ({ children }) => {
   const [state, setState] = useState({ count1: 0, count2: 0 })
   return (
-    <context.Provider value={[state, setState]}>{children}</context.Provider>
+    <Context.Provider value={[state, useCallback(setState, [])]}>
+      {children}
+    </Context.Provider>
   )
 }
 
