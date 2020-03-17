@@ -73,6 +73,9 @@ function updateHOOK(WIP) {
     cloneChildren(WIP)
     return
   }
+  if (WIP.parent && WIP.parent.context) {
+    WIP.context = WIP.parent.context
+  }
   currentFiber = WIP
   resetCursor()
   let children = WIP.type(WIP.props)
@@ -146,7 +149,6 @@ function reconcileChildren(WIP, children) {
       prevFiber.sibling = newFiber
     } else {
       if (WIP.tag === SVG) newFiber.tag = SVG
-      if (WIP.context) newFiber.context = WIP.context
       WIP.child = newFiber
     }
     prevFiber = newFiber

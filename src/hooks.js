@@ -1,6 +1,5 @@
 import { scheduleWork, isFn, getCurrentFiber } from './reconciler'
-export var cursor = 0
-
+let cursor = 0
 export function useState(initState) {
   return useReducer(null, initState)
 }
@@ -79,6 +78,27 @@ export function resetCursor() {
   cursor = 0
 }
 
-export function getCursor(){
-  return cursor
+export function useContext(context, selector) {
+  let [, current] = getHook(cursor++)
+  const value = current.context[context.id]
+  const selected = selector ? selector(value) : value
+  return selected || context.defaultValue
+}
+
+let id = 0
+export function createContext(defaultValue) {
+  const context = {
+    id: id,
+    defaultValue,
+    Consumer(props, context) {
+      return props.children(context)
+    },
+    Provider(props) {
+      let [, current] = getHook(cursor)
+      if (!current.context) current.context = {}
+      current.context[context.id] = props.value
+      return props.children
+    }
+  }
+  return context
 }

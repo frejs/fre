@@ -1,6 +1,5 @@
 import { h, Fragment, memo } from './h'
 import { render, scheduleWork } from './reconciler'
-import { createContext, useContext } from './context'
 import {
   useState,
   useReducer,
@@ -8,7 +7,9 @@ import {
   useMemo,
   useCallback,
   useRef,
-  useLayout
+  useLayout,
+  createContext,
+  useContext
 } from './hooks'
 
 export {
