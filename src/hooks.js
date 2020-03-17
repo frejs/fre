@@ -18,7 +18,7 @@ export function useReducer(reducer, initState) {
     }
   }
 
-  if (hook.length) {
+  if (hook[0]) {
     return [hook[0], setter]
   } else {
     hook[0] = initState
@@ -83,6 +83,7 @@ export function useContext(context, selector) {
   let [hook, current] = getHook(cursor++)
   const value = current.context[context.id]
   const selected = selector ? selector(value) : value
+  if (selected == null) return defaultValue
   if (hook[0] !== selected) {
     hook[0] = selected
     return selected
