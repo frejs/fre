@@ -47,7 +47,7 @@ function reconcileWork(didout) {
 function reconcile(WIP) {
   WIP.parentNode = getParentNode(WIP)
   isFn(WIP.type) ? updateHOOK(WIP) : updateHost(WIP)
-  WIP.dirty = WIP.dirty ? false : null
+  WIP.dirty && (WIP.dirty = false)
   WIP.oldProps = WIP.props
   commitQueue.push(WIP)
 
@@ -67,7 +67,7 @@ function reconcile(WIP) {
 function updateHOOK(WIP) {
   if (
     WIP.type.tag === MEMO &&
-    (WIP.dirty === false || WIP.dirty === null) &&
+    WIP.dirty === false &&
     !shouldUpdate(WIP.oldProps, WIP.props)
   ) {
     cloneChildren(WIP)
