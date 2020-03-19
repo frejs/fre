@@ -13,6 +13,7 @@ export const SVG = 4
 let preCommit = null
 let currentFiber = null
 let commitQueue = []
+let WIP = null
 
 export function render(vnode, node, done) {
   let rootFiber = {
@@ -20,17 +21,18 @@ export function render(vnode, node, done) {
     props: { children: vnode },
     done
   }
+  // debugger
   scheduleWork(rootFiber)
 }
 
 export function scheduleWork(fiber) {
   if (!fiber.dirty && (fiber.dirty = true)) {
-    scheduleCallback(reconcileWork, fiber)
+    scheduleCallback(fiber, reconcileWork)
   }
 }
 
-function reconcileWork(didout, WIP) {
-  if (!WIP.dirty) return null
+function reconcileWork(didout) {
+  // if (!WIP.dirty) return null
   while (WIP && (!shouldYeild() || didout)) {
     WIP = reconcile(WIP)
   }
@@ -64,17 +66,15 @@ function reconcile(WIP) {
 }
 
 function updateHOOK(WIP) {
-  if (
-    WIP.type.tag === MEMO &&
-    (WIP.dirty === false || WIP.dirty === null) &&
-    !shouldUpdate(WIP.oldProps, WIP.props)
-  ) {
-    cloneChildren(WIP)
-    return
-  }
-  if (WIP.parent && WIP.parent.context) {
-    WIP.context = WIP.parent.context
-  }
+  // if (
+  //   WIP.type.tag === MEMO &&
+  //   (WIP.dirty === false || WIP.dirty === null) &&
+  //   !shouldUpdate(WIP.oldProps, WIP.props)
+  // ) {
+  //   cloneChildren(WIP)
+  //   return
+  // }
+
   currentFiber = WIP
   resetCursor()
   let children = WIP.type(WIP.props)

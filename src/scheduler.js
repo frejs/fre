@@ -5,7 +5,7 @@ let currentCallback = null
 let frameDeadline = 0
 const frameLength = 1000 / 60
 
-export function scheduleCallback(callback, fiber) {
+export function scheduleCallback(fiber, callback) {
   const currentTime = getTime()
   const startTime = currentTime
   const timeout = 3000
@@ -35,14 +35,20 @@ function flush(iniTime) {
     currentTask.callback = null
     const didout = currentTask.dueTime <= currentTime
 
-    let next = callback(didout, currentTask.fiber)
+    let next = callback(currentTask.fiber, didout)
     next ? (currentTask.callback = next) : pop(taskQueue)
 
     currentTask = peek(taskQueue)
     currentTime = getTime()
   }
 
-  return !!currentTask
+  if(currentTask){
+    console.log(111)
+    return true
+  }else{
+    console.log(222)
+    return false
+  }
 }
 
 function flushWork() {
