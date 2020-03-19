@@ -12,7 +12,7 @@ const App = () => {
   const [count, setCount] = useState(0)
 
   useEffect(() => {
-    setTimeout(() => setCount(count + 1), UPDATE_EVERY)
+    // setTimeout(() => setCount(count + 1), UPDATE_EVERY)
   })
 
   const values = []
@@ -298,7 +298,7 @@ ul.solarsystem li.jupiter {
 </ul>
 </div>`
 
-document.body.insertBefore(div, root)
+// document.body.insertBefore(div, root)
 render(<App />, root)
 // const root = createRoot(document.getElementById('root'))
 // root.render(<App />)
