@@ -1,16 +1,21 @@
-import { h, render, useState, useEffect } from '../../src'
+// import { h, render, useState, useEffect } from '../../src'
+import { h, render } from 'preact'
+import { useState, useEffect } from 'preact/hooks'
+
+let timer = null
 
 function App() {
   const [count, setCount] = useState(0)
 
   useEffect(() => {
     if (count === 0) {
-      const val = 10 + Math.random() * 200
-      setCount(val)
+      setCount(Math.random())
     }
   }, [count])
 
-  setTimeout(() => {
+  timer = setTimeout(() => {
+    console.log(timer)
+    // clearTimeout(timer)
     setCount(0)
   }, 1000)
 

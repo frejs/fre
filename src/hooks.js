@@ -1,4 +1,5 @@
 import { scheduleWork, isFn, getCurrentFiber } from './reconciler'
+import { getTime } from './scheduler'
 let cursor = 0
 export function useState(initState) {
   return useReducer(null, initState)
@@ -35,7 +36,6 @@ export function useLayout(cb, deps) {
 
 function effectImpl(cb, deps, key) {
   let [hook, current] = getHook(cursor++)
-  console.log(hook[1], deps)
   if (isChanged(hook[1], deps)) {
     hook[0] = useCallback(cb, deps)
     hook[1] = deps
