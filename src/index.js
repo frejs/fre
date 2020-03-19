@@ -1,5 +1,5 @@
 import { h, Fragment, memo } from './h'
-import { render, scheduleWork, options } from './reconciler'
+import { render, scheduleWork } from './reconciler'
 import {
   useState,
   useReducer,
@@ -16,7 +16,6 @@ export {
   Fragment,
   render,
   scheduleWork,
-  options,
   useState,
   useReducer,
   useEffect,
@@ -33,7 +32,6 @@ const Fre = {
   Fragment,
   render,
   scheduleWork,
-  options,
   useState,
   useReducer,
   useEffect,

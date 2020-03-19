@@ -9,12 +9,9 @@ const UPDATE = 2
 const DELETE = 3
 
 export const SVG = 4
-export const options = {}
 
 let preCommit = null
 let currentFiber = null
-let WIP = null
-let updateQueue = []
 let commitQueue = []
 
 export function render(vnode, node, done) {
@@ -28,13 +25,11 @@ export function render(vnode, node, done) {
 
 export function scheduleWork(fiber) {
   if (!fiber.dirty && (fiber.dirty = true)) {
-    updateQueue.push(fiber)
+    scheduleCallback(reconcileWork, fiber)
   }
-  scheduleCallback(reconcileWork)
 }
 
-function reconcileWork(didout) {
-  if (!WIP) WIP = updateQueue.shift()
+function reconcileWork(didout, WIP) {
   while (WIP && (!shouldYeild() || didout)) {
     WIP = reconcile(WIP)
   }
@@ -73,6 +68,9 @@ function updateHOOK(WIP) {
   ) {
     cloneChildren(WIP)
     return
+  }
+  if (WIP.parent && WIP.parent.context) {
+    WIP.context = WIP.parent.context
   }
   currentFiber = WIP
   resetCursor()
@@ -182,7 +180,6 @@ function commitWork(fiber) {
   fiber.done && fiber.done()
   commitQueue = []
   preCommit = null
-  WIP = null
 }
 
 function commit(fiber) {

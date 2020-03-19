@@ -1,6 +1,6 @@
 {
   "name": "fre",
-  "version": "1.12.6",
+  "version": "1.13.1",
   "description": "",
   "main": "dist/fre.js",
   "unpkg": "dist/fre.js",
@@ -12,7 +12,6 @@
   ],
   "scripts": {
     "test": "jest --coverage",
-    "test-heap": "jest ./test/heapify.test.js",
     "build": "rollup -c && gzip-size dist/fre.js",
     "format": "prettier --write \"{src,test,demo}/**/*.js\"",
     "prepublishOnly": "node prepublish.js"
