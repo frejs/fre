@@ -30,13 +30,16 @@ export function scheduleWork(fiber) {
 }
 
 function reconcileWork(didout, WIP) {
+  if (!WIP.dirty) return null
   while (WIP && (!shouldYeild() || didout)) {
     WIP = reconcile(WIP)
   }
-  if (WIP && WIP.dirty && !didout) {
+  if (WIP && !didout) {
     return reconcileWork.bind(null)
   }
-  if (!WIP) commitWork(preCommit)
+  if (preCommit) {
+    commitWork(preCommit)
+  }
   return null
 }
 
