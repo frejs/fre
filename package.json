@@ -5,6 +5,7 @@
   "main": "dist/fre.js",
   "unpkg": "dist/fre.js",
   "module": "dist/fre.esm.js",
+  "typings": "./index.d.ts",
   "files": [
     "src/**/*",
     "dist/*.js",
