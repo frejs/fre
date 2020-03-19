@@ -1,6 +1,6 @@
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
-import { scheduleCallback, shouldYeild, planWork, getTime } from './scheduler'
+import { scheduleCallback, shouldYeild, planWork } from './scheduler'
 import { createText, isArr, isStr, MEMO } from './h'
 
 const NOWORK = 0

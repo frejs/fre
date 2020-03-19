@@ -1,5 +1,4 @@
 import { scheduleWork, isFn, getCurrentFiber } from './reconciler'
-import { getTime } from './scheduler'
 let cursor = 0
 export function useState(initState) {
   return useReducer(null, initState)
