@@ -33,10 +33,10 @@ function reconcileWork(didout, WIP) {
   while (WIP && (!shouldYeild() || didout)) {
     WIP = reconcile(WIP)
   }
-  if (!didout && WIP) {
+  if (WIP && WIP.dirty && !didout) {
     return reconcileWork.bind(null)
   }
-  if (preCommit) commitWork(preCommit)
+  if (!WIP) commitWork(preCommit)
   return null
 }
 

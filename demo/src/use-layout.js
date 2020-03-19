@@ -1,7 +1,7 @@
 import { h, render, useState, useLayout, useEffect } from '../../src'
 
 function App() {
-  console.log(888)
+  // console.log(888)
   const [count, setCount] = useState(0)
   return (
     <div>
@@ -13,6 +13,7 @@ function App() {
 }
 
 function A(props) {
+  console.log('a')
   // useLayout(() => {
   //   console.log(111)
   //   return () => {
