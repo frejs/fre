@@ -76,6 +76,8 @@ render(<App />, document.getElementById('root'))
 
 - [useRef](https://github.com/yisar/fre#useref)
 
+- [useContext](https://github.com/yisar/fre#usecontext)
+
 #### useState
 
 `useState` is a base API, It will receive initial state and return a Array
@@ -233,6 +235,36 @@ function App() {
   })
   return flag && <span ref={t}>I will removed</span>
 }
+```
+
+### useContext
+
+Context is no need to build in fre core. It can be implemented in user land and has slector and better performance
+
+```js
+import { createContext, useContext } from 'fre/compat'
+
+function App() {
+  const [count, setCount] = useReducer(c => c + 1, 0)
+  return (
+    <Context.Provider value={count}>
+      <A />
+      <B />
+      <button onClick={() => setCount(count + 1)}>+</button>
+    </Context.Provider>
+  )
+}
+
+function A() {
+  const context = useContext(Context, ctx => ctx) // with selector
+  return <div>{context}</div>
+}
+
+function B() {
+  const context = useContext(Context, ctx => ctx)
+  return <div>{context}</div>
+}
+
 ```
 
 ### memo
