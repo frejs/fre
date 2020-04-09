@@ -1,4 +1,4 @@
-import { h, render, useReducer, useLayout, useRef, useState } from '../../src'
+import { h, render, useReducer, useLayout, useRef } from '../../src'
 
 const CONTEXT_LISTENERS = Symbol('CONTEXT_LISTENERS')
 
@@ -44,7 +44,7 @@ export const useContext = (context, selector) => {
 const Context = createContext(0)
 
 function App() {
-  const [count, setCount] = useState(0)
+    const [count, setCount] = useReducer(c => c + 1, 0)
   return (
     <Context.Provider value={count}>
       <A />
