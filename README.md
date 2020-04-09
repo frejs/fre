@@ -239,7 +239,9 @@ function App() {
 
 ### useContext
 
-Context is no need to build in fre core. It can be implemented in user land and has slector and better performance
+Context is no need to build in fre core. It can be implemented in user land and has slector and better performance.
+
+Here is an example: [use-context-selector](https://github.com/yisar/fre/blob/master/demo/src/use-context.js)
 
 ```js
 import { createContext, useContext } from 'fre/compat'
