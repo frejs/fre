@@ -18,7 +18,7 @@ export const createContext = defaultValue => {
 export const useContext = (context, selector) => {
   const subs = context.subs
   const [, forceUpdate] = useReducer(c => c + 1, 0)
-  const selected = selector(context.value)
+  const selected = selector ? selector(context.value) : context.value
   const ref = useRef(null)
   useLayout(() => {
     ref.current = context.value
