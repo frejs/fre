@@ -1,14 +1,12 @@
 import { h, render, useReducer, useLayout, useRef } from '../../src'
 
-const CONTEXT_LISTENERS = Symbol('CONTEXT_LISTENERS')
-
 export const createContext = defaultValue => {
   let context = {}
   context.value = defaultValue
-  context[CONTEXT_LISTENERS] = new Set()
+  context.subs = new Set()
   context.Provider = function Provider({ value, children }) {
     useLayout(() => {
-      context[CONTEXT_LISTENERS].forEach(fn => fn(value))
+      context.subs.forEach(fn => fn(value))
       context.value = value
     })
     return children
@@ -17,7 +15,7 @@ export const createContext = defaultValue => {
 }
 
 export const useContext = (context, selector) => {
-  const listeners = context[CONTEXT_LISTENERS]
+  const subs = context.subs
   const [, forceUpdate] = useReducer(c => c + 1, 0)
   const selected = selector(context.value)
   const ref = useRef(null)
@@ -33,11 +31,11 @@ export const useContext = (context, selector) => {
       if (ref.current.v === nextValue) return
       forceUpdate()
     }
-    listeners.add(fn)
+    subs.add(fn)
     return () => {
-      listeners.delete(fn)
+      subs.delete(fn)
     }
-  }, [listeners])
+  }, [subs])
   return selected
 }
 
