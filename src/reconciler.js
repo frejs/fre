@@ -226,7 +226,7 @@ const hashfy = c => {
   const out = {}
   isArr(c)
     ? c.forEach((v, i) =>
-        v.pop
+        isArr(v)
           ? v.forEach((vi, j) => (out[hs(i, j, vi.key)] = vi))
           : (out[hs(i, null, v.key)] = v)
       )
