@@ -44,7 +44,7 @@ export const useContext = (context, selector) => {
 const Context = createContext(0)
 
 function App() {
-    const [count, setCount] = useReducer(c => c + 1, 0)
+  const [count, setCount] = useReducer(c => c + 1, 0)
   return (
     <Context.Provider value={count}>
       <A />
@@ -60,9 +60,8 @@ function A() {
 }
 
 function B() {
-    const context = useContext(Context, ctx => ctx)
-    return <div>{context}</div>
-  }
-  
+  const context = useContext(Context, ctx => ctx)
+  return <div>{context}</div>
+}
 
 render(<App />, document.getElementById('root'))
