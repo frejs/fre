@@ -1,15 +1,16 @@
 import { h, render, useReducer, useLayout, useRef } from '../../src'
 
 export const createContext = defaultValue => {
-  let context = {}
-  context.value = defaultValue
-  context.subs = new Set()
-  context.Provider = function Provider({ value, children }) {
-    useLayout(() => {
-      context.subs.forEach(fn => fn(value))
-      context.value = value
-    })
-    return children
+  const context = {
+    value: defaultValue,
+    subs: new Set(),
+    Provider: function Provider({ value, children }) {
+      useLayout(() => {
+        context.subs.forEach(fn => fn(value))
+        context.value = value
+      })
+      return children
+    }
   }
   return context
 }
@@ -20,21 +21,15 @@ export const useContext = (context, selector) => {
   const selected = selector(context.value)
   const ref = useRef(null)
   useLayout(() => {
-    ref.current = {
-      f: selector,
-      v: context.value,
-      s: selected
-    }
+    ref.current = context.value
   })
   useLayout(() => {
     const fn = nextValue => {
-      if (ref.current.v === nextValue) return
+      if (ref.current === nextValue) return
       forceUpdate()
     }
     subs.add(fn)
-    return () => {
-      subs.delete(fn)
-    }
+    return () => subs.delete(fn)
   }, [subs])
   return selected
 }
