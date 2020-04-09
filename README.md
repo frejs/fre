@@ -244,6 +244,8 @@ Context is no need to build in fre core. It can be implemented in user land and 
 ```js
 import { createContext, useContext } from 'fre/compat'
 
+const Context = createContext(0)
+
 function App() {
   const [count, setCount] = useReducer(c => c + 1, 0)
   return (
@@ -264,7 +266,6 @@ function B() {
   const context = useContext(Context, ctx => ctx)
   return <div>{context}</div>
 }
-
 ```
 
 ### memo
