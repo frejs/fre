@@ -67,7 +67,7 @@ function reconcile(WIP) {
 function updateHOOK(WIP) {
   if (
     WIP.type.tag === MEMO &&
-    WIP.dirty === false &&
+    !WIP.dirty &&
     !shouldUpdate(WIP.oldProps, WIP.props)
   ) {
     cloneChildren(WIP)

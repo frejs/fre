@@ -22,16 +22,6 @@ Fre has wonderful code, we need more to join us and improve together.
 
 <a href="https://github.com/yisar/fre/graphs/contributors"><img src="https://opencollective.com/fre/contributors.svg?width=890&button=false" /></a>
 
-#### Sponsors
-
-Use fre and donate us, no matter how much, please let us know
-
-<table><tbody><tr>
-<td><a target="_blank" href="https://ke.qq.com/course/368629?flowToken=1015240"><img height="60px" src="https://ws1.sinaimg.cn/large/0065Zy9ely1g983zobxqzj30ka03y0v6.jpg"></a></td>
-<td><a target="_blank" href="https://www.clicli.me"><img height="60px" src="https://ws1.sinaimg.cn/large/0065Zy9ely1g983rcrcyuj30a305sgm2.jpg"></a></td>
-</tr></table></tbody>
-<a target="_blank" href="https://opencollective.com/fre"><img height="60px" src="https://opencollective.com/fre/sponsor.svg?avatarHeight=60"></a>
-
 ### Real world
 
 [clicli.me](https://www.clicli.me)
