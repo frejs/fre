@@ -1,4 +1,13 @@
-import { h, render, useReducer, useLayout, useRef } from '../../src'
+import {
+  h,
+  render,
+  useReducer,
+  useLayout,
+  useRef,
+  useState,
+  useMemo,
+  memo
+} from '../../src'
 
 export const createContext = defaultValue => {
   const context = {
@@ -21,11 +30,11 @@ export const useContext = (context, selector) => {
   const selected = selector ? selector(context.value) : context.value
   const ref = useRef(null)
   useLayout(() => {
-    ref.current = context.value
+    ref.current = selected
   })
   useLayout(() => {
     const fn = nextValue => {
-      if (ref.current === nextValue) return
+      if (ref.current === selector(nextValue)) return
       forceUpdate()
     }
     subs.add(fn)
@@ -34,27 +43,41 @@ export const useContext = (context, selector) => {
   return selected
 }
 
-const Context = createContext(0)
+const Context = createContext({
+  count1: 0,
+  count2: 0
+})
 
 function App() {
-  const [count, setCount] = useReducer(c => c + 1, 0)
+  const [count, setCount] = useState(Context.value)
   return (
     <Context.Provider value={count}>
       <A />
       <B />
-      <button onClick={() => setCount(count + 1)}>+</button>
+      <C />
+      <button onClick={() => setCount({ ...count, count1: count.count1 + 1 })}>
+        +
+      </button>
     </Context.Provider>
   )
 }
 
 function A() {
-  const context = useContext(Context, ctx => ctx)
+  const context = useContext(Context, ctx => ctx.count1)
+  console.log('A')
   return <div>{context}</div>
 }
 
 function B() {
-  const context = useContext(Context, ctx => ctx)
+  const context = useContext(Context, ctx => ctx.count2)
+  console.log('B')
   return <div>{context}</div>
 }
+
+const C = memo(function C() {
+  const context = useContext(Context, ctx => ctx.count2)
+  console.log('C')
+  return <div>{context}</div>
+})
 
 render(<App />, document.getElementById('root'))
