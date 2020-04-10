@@ -47,7 +47,7 @@ function reconcileWork(didout) {
 function reconcile(WIP) {
   WIP.parentNode = getParentNode(WIP)
   isFn(WIP.type) ? updateHOOK(WIP) : updateHost(WIP)
-  WIP.dirty && (WIP.dirty = false)
+  WIP.dirty = WIP.dirty ? false : 0
   WIP.oldProps = WIP.props
   commitQueue.push(WIP)
 
@@ -67,14 +67,11 @@ function reconcile(WIP) {
 function updateHOOK(WIP) {
   if (
     WIP.type.tag === MEMO &&
-    !WIP.dirty &&
+    WIP.dirty == 0 &&
     !shouldUpdate(WIP.oldProps, WIP.props)
   ) {
     cloneChildren(WIP)
     return
-  }
-  if (WIP.parent && WIP.parent.context) {
-    WIP.context = WIP.parent.context
   }
   currentFiber = WIP
   resetCursor()
