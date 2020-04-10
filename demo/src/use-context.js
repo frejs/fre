@@ -5,7 +5,6 @@ import {
   useLayout,
   useRef,
   useState,
-  useMemo,
   memo
 } from '../../src'
 
