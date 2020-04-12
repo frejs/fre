@@ -234,28 +234,33 @@ Context is no need to build in fre core. It can be implemented in user land and 
 Here is an example: [use-context-selector](https://github.com/yisar/fre/blob/master/demo/src/use-context.js)
 
 ```js
-import { createContext, useContext } from 'fre/compat'
-
-const Context = createContext(0)
+const Context = createContext({
+  count1: 0,
+  count2: 0
+})
 
 function App() {
-  const [count, setCount] = useReducer(c => c + 1, 0)
+  const [count, setCount] = useState(Context.value)
   return (
     <Context.Provider value={count}>
       <A />
       <B />
-      <button onClick={() => setCount(count + 1)}>+</button>
+      <button onClick={() => setCount({ ...count, count1: count.count1 + 1 })}>
+        +
+      </button>
     </Context.Provider>
   )
 }
 
 function A() {
-  const context = useContext(Context, ctx => ctx) // with selector
+  const context = useContext(Context, ctx => ctx.count1)
+  console.log('A')
   return <div>{context}</div>
 }
 
 function B() {
-  const context = useContext(Context, ctx => ctx)
+  const context = useContext(Context, ctx => ctx.count2)
+  console.log('B')
   return <div>{context}</div>
 }
 ```
