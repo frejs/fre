@@ -253,7 +253,7 @@ function App() {
 }
 
 function A() {
-  const context = useContext(Context, ctx => ctx.count1)
+  const context = useContext(Context, ctx => ctx.count1) // with selector, only execute when count1 changed
   console.log('A')
   return <div>{context}</div>
 }
