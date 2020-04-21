@@ -199,7 +199,6 @@ ul.solarsystem li.asteroids_meteorids {
   top: 155px;
   left: 315px;
   z-index: 1;
-  background: url(http://neography.com/experiment/circles/solarsystem/asteroids_meteorids.png) no-repeat 0 0;
   width: 330px;
   height: 330px;
   border-radius: 165px;

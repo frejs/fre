@@ -27,12 +27,11 @@ function flush(iniTime) {
   let currentTask = peek(taskQueue)
 
   while (currentTask) {
-    if (currentTask.dueTime > currentTime && shouldYeild()) {
-      break
-    }
+    const didout = currentTask.dueTime <= currentTime
+    if (!didout && shouldYeild()) break
+
     let callback = currentTask.callback
     currentTask.callback = null
-    const didout = currentTask.dueTime <= currentTime
 
     let next = callback(didout)
     next ? (currentTask.callback = next) : pop(taskQueue)
