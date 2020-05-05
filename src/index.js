@@ -1,5 +1,5 @@
 import { h, Fragment, memo } from './h'
-import { render, scheduleWork } from './reconciler'
+import { render, scheduleWork, options } from './reconciler'
 import {
   useState,
   useReducer,
@@ -7,7 +7,7 @@ import {
   useMemo,
   useCallback,
   useRef,
-  useLayout
+  useLayout,
 } from './hooks'
 
 export {
@@ -24,7 +24,8 @@ export {
   useRef,
   useLayout,
   useLayout as useLayoutEffect,
-  memo
+  memo,
+  options
 }
 
 const Fre = {
@@ -38,7 +39,8 @@ const Fre = {
   useMemo,
   useCallback,
   useRef,
-  memo
+  memo,
+  options
 }
 
 export default Fre
