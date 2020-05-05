@@ -2,7 +2,6 @@ import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild, planWork } from './scheduler'
 import { createText, isArr, isStr, MEMO } from './h'
-export const options = {}
 
 const NOWORK = 0
 const PLACE = 1
@@ -75,7 +74,7 @@ function updateHOOK(WIP) {
     return
   }
   currentFiber = WIP
-  options.updateHOOK && options.updateHOOK(WIP)
+  WIP.type.fiber = WIP
   resetCursor()
   let children = WIP.type(WIP.props)
   if (isStr(children)) {
