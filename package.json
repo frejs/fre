@@ -16,7 +16,7 @@
     "test": "jest --coverage",
     "build": "rollup -c && gzip-size dist/fre.js",
     "format": "prettier --write \"{src,test,demo}/**/*.js\"",
-    "prepublishOnly": "node prepublish.js"
+    "prepublishOnly": "yarn build"
   },
   "keywords": [],
   "author": "132yse",
