@@ -1,4 +1,4 @@
-import { h, render, useState, useLayout, useEffect } from '../../src'
+import { h, render, useState, useLayout, useEffect } from '../../dist/fre.esm'
 
 function App() {
   const [count, setCount] = useState(0)

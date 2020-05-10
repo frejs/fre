@@ -1,7 +1,7 @@
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild, planWork } from './scheduler'
-import { isArr  } from './jsx'
+import { isArr } from './jsx'
 
 const NOWORK = 0
 const PLACE = 1
@@ -47,7 +47,7 @@ function reconcileWork(didout) {
 
 function reconcile(WIP) {
   WIP.parentNode = getParentNode(WIP)
-  isFn(WIP.type) ? updateHOOK(WIP) : updateHost(WIP)
+  isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
   WIP.dirty = WIP.dirty ? false : 0
   WIP.oldProps = WIP.props
   commitQueue.push(WIP)
@@ -65,7 +65,7 @@ function reconcile(WIP) {
   }
 }
 
-function updateHOOK(WIP) {
+function updateHook(WIP) {
   if (
     WIP.type.tag === MEMO &&
     WIP.dirty == 0 &&
@@ -78,9 +78,6 @@ function updateHOOK(WIP) {
   WIP.type.fiber = WIP
   resetCursor()
   let children = WIP.type(WIP.props)
-  // if (isStr(children)) {
-  //   children = createText(children)
-  // }
   reconcileChildren(WIP, children)
 }
 
@@ -103,7 +100,7 @@ function getParentNode(fiber) {
 }
 
 function reconcileChildren(WIP, children) {
-  if (!children) return
+  if (children == null) return
   delete WIP.child
   const oldFibers = WIP.kids
   const newFibers = (WIP.kids = hashfy(children))
@@ -218,7 +215,13 @@ function commit(fiber) {
 }
 
 function createFiber(vnode, op) {
+  if (isStr(vnode))
+    vnode = createText(vnode)
   return { ...vnode, op }
+}
+
+function createText(s) {
+  return { type: 'text', props: { nodeValue: s } }
 }
 
 const hashfy = c => {
@@ -255,6 +258,7 @@ const effect = e => {
 export const getCurrentFiber = () => currentFiber || null
 
 export const isFn = fn => typeof fn === 'function'
+export const isStr = s => typeof s === 'number' || typeof s === 'string'
 
 const hs = (i, j, k) =>
   k != null && j != null

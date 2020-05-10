@@ -27,6 +27,7 @@ export function updateElement(dom, oldProps, newProps) {
 }
 
 export function createElement(fiber) {
+  console.log(fiber)
   const dom =
     fiber.type === 'text'
       ? document.createTextNode('')
