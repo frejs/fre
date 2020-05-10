@@ -1,6 +1,6 @@
 /** @jsx h */
 /** @jsxFrag Fragment */
-import { h} from '../dist/fre-esm'
+import { h} from '../dist/fre.esm'
 import { testRender } from './test-util'
 
 const toString = elements => elements.map(child => child.outerHTML).join('')
