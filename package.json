@@ -40,6 +40,7 @@
     "rollup-plugin-cleanup": "^3.1.1",
     "rollup-plugin-license": "^0.8.1",
     "rollup-plugin-terser": "^5.1.2",
+    "rollup-plugin-typescript2": "^0.27.0",
     "terser": "^4.1.2",
     "typescript": "^3.5.2",
     "yarpm": "^0.2.1"

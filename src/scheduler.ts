@@ -19,7 +19,7 @@ export function scheduleCallback(callback) {
 
   push(taskQueue, newTask)
   currentCallback = flush
-  planWork()
+  planWork(null)
 }
 
 function flush(iniTime) {
@@ -48,7 +48,7 @@ function flushWork() {
     let currentTime = getTime()
     frameDeadline = currentTime + frameLength
     let more = currentCallback(currentTime)
-    more ? planWork() : (currentCallback = null)
+    more ? planWork(null) : (currentCallback = null)
   }
 }
 
