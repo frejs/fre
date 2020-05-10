@@ -3,14 +3,6 @@ import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild, planWork } from './scheduler'
 import { isArr } from './jsx'
 
-const NOWORK = 0
-const PLACE = 1
-const UPDATE = 2
-const DELETE = 3
-const MEMO = 0
-
-export const SVG = 4
-
 let preCommit = null
 let currentFiber = null
 let WIP = null
@@ -67,7 +59,7 @@ function reconcile(WIP) {
 
 function updateHook(WIP) {
   if (
-    WIP.type.tag === MEMO &&
+    WIP.type.tag === Flag.MEMO &&
     WIP.dirty == 0 &&
     !shouldUpdate(WIP.oldProps, WIP.props)
   ) {
@@ -83,7 +75,7 @@ function updateHook(WIP) {
 
 function updateHost(WIP) {
   if (!WIP.node) {
-    if (WIP.type === 'svg') WIP.tag = SVG
+    if (WIP.type === 'svg') WIP.tag = Flag.SVG
     WIP.node = createElement(WIP)
   }
   let p = WIP.parentNode || {}
@@ -114,7 +106,7 @@ function reconcileChildren(WIP, children) {
     if (newFiber && newFiber.type === oldFiber.type) {
       reused[k] = oldFiber
     } else {
-      oldFiber.op = DELETE
+      oldFiber.op = Flag.DELETE
       commitQueue.push(oldFiber)
     }
   }
@@ -127,15 +119,15 @@ function reconcileChildren(WIP, children) {
     let oldFiber = reused[k]
 
     if (oldFiber) {
-      alternate = createFiber(oldFiber, UPDATE)
-      newFiber.op = UPDATE
+      alternate = createFiber(oldFiber, Flag.UPDATE)
+      newFiber.op = Flag.UPDATE
       newFiber = { ...alternate, ...newFiber }
       newFiber.lastProps = alternate.props
       if (shouldPlace(newFiber)) {
-        newFiber.op = PLACE
+        newFiber.op = Flag.PLACE
       }
     } else {
-      newFiber = createFiber(newFiber, PLACE)
+      newFiber = createFiber(newFiber, Flag.PLACE)
     }
 
     newFibers[k] = newFiber
@@ -144,7 +136,7 @@ function reconcileChildren(WIP, children) {
     if (prevFiber) {
       prevFiber.sibling = newFiber
     } else {
-      if (WIP.tag === SVG) newFiber.tag = SVG
+      if (WIP.tag === Flag.SVG) newFiber.tag = Flag.SVG
       WIP.child = newFiber
     }
     prevFiber = newFiber
@@ -157,7 +149,7 @@ function cloneChildren(fiber) {
   if (!fiber.child) return
   let child = fiber.child
   let newChild = child
-  newChild.op = NOWORK
+  newChild.op = Flag.NOWORK
   fiber.child = newChild
   newChild.parent = fiber
   newChild.sibling = null
@@ -185,8 +177,8 @@ function commitWork(fiber) {
 
 function commit(fiber) {
   const { op, parentNode, node, ref, hooks } = fiber
-  if (op === NOWORK) {
-  } else if (op === DELETE) {
+  if (op === Flag.NOWORK) {
+  } else if (op === Flag.DELETE) {
     hooks && hooks.list.forEach(cleanup)
     cleanupRef(fiber.kids)
     while (isFn(fiber.type)) fiber = fiber.child
@@ -202,7 +194,7 @@ function commit(fiber) {
         hooks.effect = []
       })
     }
-  } else if (op === UPDATE) {
+  } else if (op === Flag.UPDATE) {
     updateElement(node, fiber.lastProps, fiber.props)
   } else {
     let point = fiber.insertPoint ? fiber.insertPoint.node : null
@@ -215,8 +207,7 @@ function commit(fiber) {
 }
 
 function createFiber(vnode, op) {
-  if (isStr(vnode))
-    vnode = createText(vnode)
+  if (isStr(vnode)) vnode = createText(vnode)
   return { ...vnode, op }
 }
 
@@ -268,3 +259,12 @@ const hs = (i, j, k) =>
     : k != null
     ? '.' + k
     : '.' + i
+
+export const enum Flag {
+  NOWORK = 0,
+  PLACE = 1,
+  UPDATE = 2,
+  DELETE = 3,
+  SVG = 4,
+  MEMO = 5
+}

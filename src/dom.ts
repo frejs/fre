@@ -1,4 +1,4 @@
-import { SVG } from './reconciler'
+import { Flag } from './reconciler'
 
 export function updateElement(dom, oldProps, newProps) {
   for (let name in { ...oldProps, ...newProps }) {
@@ -31,7 +31,7 @@ export function createElement(fiber) {
   const dom =
     fiber.type === 'text'
       ? document.createTextNode('')
-      : fiber.tag === SVG
+      : fiber.tag === Flag.SVG
       ? document.createElementNS('http://www.w3.org/2000/svg', fiber.type)
       : document.createElement(fiber.type)
   updateElement(dom, {}, fiber.props)

@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import { h } from "../src/h"
+import { h } from "../dist/fre-esm"
 
 test('create JSX node', () => {
   const div = <div/>

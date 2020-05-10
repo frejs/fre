@@ -1,5 +1,5 @@
 /** @jsx h */
-import { h, useState, memo } from '../src/index'
+import { h, useState, memo } from '../dist/fre-esm'
 import { testUpdates } from './test-util'
 
 test('async state update', async () => {

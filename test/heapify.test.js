@@ -1,4 +1,4 @@
-import { push, pop, peek } from '../src/heapify'
+import { push, pop, peek } from '../dist/fre-esm'
 
 test('test push', () => {
   const heap = [{ dueTime: 1 }, { dueTime: 3 }]

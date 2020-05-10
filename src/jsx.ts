@@ -1,4 +1,5 @@
 import { Vnode, Ref, Props } from './type'
+import {Flag} from './reconciler'
 
 // Supported and simplify jsx2
 // * https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md
@@ -28,6 +29,15 @@ export function jsx(type, attrs) {
   delete props.ref
 
   return { type, props, key, ref }
+}
+
+export function Fragment(props) {
+  return props.children
+}
+
+export function memo(fn) {
+  fn.tag = Flag.MEMO
+  return fn
 }
 
 export const isArr = Array.isArray

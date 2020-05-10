@@ -1,4 +1,4 @@
-import { jsx } from './jsx'
+import { jsx, Fragment, memo } from './jsx'
 import { render, scheduleWork } from './reconciler'
 import {
   useState,
@@ -23,7 +23,9 @@ export {
   useCallback,
   useRef,
   useLayout,
-  useLayout as useLayoutEffect
+  useLayout as useLayoutEffect,
+  Fragment,
+  memo
 }
 
 const Fre = {
@@ -37,7 +39,9 @@ const Fre = {
   useEffect,
   useMemo,
   useCallback,
-  useRef
+  useRef,
+  Fragment,
+  memo
 }
 
 export default Fre
