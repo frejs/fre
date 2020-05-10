@@ -1,4 +1,4 @@
-import { h, Fragment, memo } from './h'
+import { jsx } from './jsx'
 import { render, scheduleWork } from './reconciler'
 import {
   useState,
@@ -7,13 +7,13 @@ import {
   useMemo,
   useCallback,
   useRef,
-  useLayout,
+  useLayout
 } from './hooks'
 
 export {
-  h,
-  h as createElement,
-  Fragment,
+  jsx,
+  jsx as createElement,
+  jsx as h,
   render,
   scheduleWork,
   useState,
@@ -23,13 +23,13 @@ export {
   useCallback,
   useRef,
   useLayout,
-  useLayout as useLayoutEffect,
-  memo
+  useLayout as useLayoutEffect
 }
 
 const Fre = {
-  h,
-  Fragment,
+  jsx,
+  h: jsx,
+  createElement: jsx,
   render,
   scheduleWork,
   useState,
@@ -37,8 +37,7 @@ const Fre = {
   useEffect,
   useMemo,
   useCallback,
-  useRef,
-  memo
+  useRef
 }
 
 export default Fre

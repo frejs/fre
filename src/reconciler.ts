@@ -1,12 +1,13 @@
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild, planWork } from './scheduler'
-import { createText, isArr, isStr, MEMO } from './h'
+import { isArr  } from './jsx'
 
 const NOWORK = 0
 const PLACE = 1
 const UPDATE = 2
 const DELETE = 3
+const MEMO = 0
 
 export const SVG = 4
 
@@ -77,9 +78,9 @@ function updateHOOK(WIP) {
   WIP.type.fiber = WIP
   resetCursor()
   let children = WIP.type(WIP.props)
-  if (isStr(children)) {
-    children = createText(children)
-  }
+  // if (isStr(children)) {
+  //   children = createText(children)
+  // }
   reconcileChildren(WIP, children)
 }
 
