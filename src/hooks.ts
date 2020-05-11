@@ -12,7 +12,7 @@ export function useState<T>(initState: T): [T, Function] {
 
 export function useReducer<T>(reducer: Function, initState: T): [T, Function] {
   const [hook, current] = getHook(cursor++)
-  const setter = value => {
+  const setter = (value: T) => {
     let newValue = reducer
       ? reducer(hook[0], value)
       : isFn(value)
