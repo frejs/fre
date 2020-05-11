@@ -1,16 +1,17 @@
+import { Fiber, Vnode, Ref } from './type'
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild, planWork } from './scheduler'
 import { isArr } from './jsx'
 
-let preCommit = null
-let currentFiber = null
-let WIP = null
-let updateQueue = []
-let commitQueue = []
+let preCommit: Fiber
+let currentFiber: Fiber
+let WIP: Fiber
+let updateQueue: Array<Fiber>
+let commitQueue: Array<Fiber>
 
-export function render(vnode, node, done) {
-  let rootFiber = {
+export function render(vnode: Vnode, node: Node, done: Function) {
+  let rootFiber: Fiber = {
     node,
     props: { children: vnode },
     done
@@ -18,27 +19,27 @@ export function render(vnode, node, done) {
   scheduleWork(rootFiber)
 }
 
-export function scheduleWork(fiber) {
+export function scheduleWork(fiber: Fiber) {
   if (!fiber.dirty && (fiber.dirty = true)) {
     updateQueue.push(fiber)
   }
   scheduleCallback(reconcileWork)
 }
 
-function reconcileWork(didout) {
+function reconcileWork(timeout: boolean) {
   if (!WIP) WIP = updateQueue.shift()
-  while (WIP && (!shouldYeild() || didout)) {
+  while (WIP && (!shouldYeild() || timeout)) {
     WIP = reconcile(WIP)
   }
-  if (!didout && WIP) {
+  if (!timeout && WIP) {
     return reconcileWork.bind(null)
   }
   if (preCommit) commitWork(preCommit)
   return null
 }
 
-function reconcile(WIP) {
-  WIP.parentNode = getParentNode(WIP)
+function reconcile(WIP: Fiber) {
+  WIP.pnode = getParentNode(WIP)
   isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
   WIP.dirty = WIP.dirty ? false : 0
   commitQueue.push(WIP)
@@ -57,7 +58,7 @@ function reconcile(WIP) {
   }
 }
 
-function updateHook(WIP) {
+function updateHook(WIP: Fiber) {
   if (
     WIP.type.tag === Flag.MEMO &&
     WIP.dirty == 0 &&
@@ -67,31 +68,30 @@ function updateHook(WIP) {
     return
   }
   currentFiber = WIP
-  WIP.type.fiber = WIP
   resetCursor()
   let children = WIP.type(WIP.props)
   reconcileChildren(WIP, children)
 }
 
-function updateHost(WIP) {
+function updateHost(WIP: Fiber) {
   if (!WIP.node) {
-    if (WIP.type === 'svg') WIP.tag = Flag.SVG
+    // if (WIP.type === 'svg') WIP.tag = Flag.SVG
     WIP.node = createElement(WIP)
   }
-  let p = WIP.parentNode || {}
-  WIP.insertPoint = p.last || null
-  p.last = WIP
-  WIP.node.last = null
+  let p = WIP.pnode || ({} as Fiber)
+  WIP.insertPoint = p.lastFiber || null
+  p.lastFiber = WIP
+  WIP.node.lastFiber = null
   reconcileChildren(WIP, WIP.props.children)
 }
 
-function getParentNode(fiber) {
-  while ((fiber = fiber.parent)) {
-    if (!isFn(fiber.type)) return fiber.node
+function getParentNode(WIP: Fiber) {
+  while ((WIP = WIP.parent)) {
+    if (!isFn(WIP.type)) return WIP.node
   }
 }
 
-function reconcileChildren(WIP, children) {
+function reconcileChildren(WIP: Fiber, children: Vnode['children']) {
   if (!children) return
   delete WIP.child
   const oldFibers = WIP.kids
@@ -133,7 +133,7 @@ function reconcileChildren(WIP, children) {
     if (prevFiber) {
       prevFiber.sibling = newFiber
     } else {
-      if (WIP.tag === Flag.SVG) newFiber.tag = Flag.SVG
+      // if (WIP.tag === Flag.SVG) newFiber.tag = Flag.SVG
       WIP.child = newFiber
     }
     prevFiber = newFiber
@@ -142,29 +142,29 @@ function reconcileChildren(WIP, children) {
   if (prevFiber) prevFiber.sibling = null
 }
 
-function cloneChildren(fiber) {
-  if (!fiber.child) return
-  let child = fiber.child
+function cloneChildren(WIP: Fiber) {
+  if (!WIP.child) return
+  let child = WIP.child
   let newChild = child
   newChild.op = Flag.NOWORK
-  fiber.child = newChild
-  newChild.parent = fiber
+  WIP.child = newChild
+  newChild.parent = WIP
   newChild.sibling = null
 }
 
-function shouldUpdate(a, b) {
+function shouldUpdate(a: Object, b: Object) {
   for (let i in a) if (!(i in b)) return true
   for (let i in b) if (a[i] !== b[i]) return true
   return false
 }
 
-function shouldPlace(fiber) {
+function shouldPlace(fiber: Fiber) {
   let p = fiber.parent
   if (isFn(p.type)) return p.key && !p.dirty
   return fiber.key
 }
 
-function commitWork(fiber) {
+function commitWork(fiber: Fiber) {
   commitQueue.forEach(c => c.parent && commit(c))
   fiber.done && fiber.done()
   commitQueue = []
@@ -172,14 +172,14 @@ function commitWork(fiber) {
   WIP = null
 }
 
-function commit(fiber) {
-  const { op, parentNode, node, ref, hooks } = fiber
+function commit(fiber: Fiber) {
+  const { op, pnode, node, ref, hooks } = fiber
   if (op === Flag.NOWORK) {
   } else if (op === Flag.DELETE) {
     hooks && hooks.list.forEach(cleanup)
     cleanupRef(fiber.kids)
     while (isFn(fiber.type)) fiber = fiber.child
-    parentNode.removeChild(fiber.node)
+    pnode.removeChild(fiber.node)
   } else if (isFn(fiber.type)) {
     if (hooks) {
       hooks.layout.forEach(cleanup)
@@ -195,24 +195,24 @@ function commit(fiber) {
     updateElement(node, fiber.lastProps, fiber.props)
   } else {
     let point = fiber.insertPoint ? fiber.insertPoint.node : null
-    let after = point ? point.nextSibling : parentNode.firstChild
+    let after = point ? point.nextSibling : pnode.firstChild
     if (after === node) return
-    if (after === null && node === parentNode.lastChild) return
-    parentNode.insertBefore(node, after)
+    if (after === null && node === pnode.lastChild) return
+    pnode.insertBefore(node, after)
   }
   refer(ref, node)
 }
 
-function createFiber(vnode, op) {
-  if (isStr(vnode)) vnode = createText(vnode)
-  return { ...vnode, op }
+function createFiber(vnode: unknown, op: number) {
+  if (isStr(vnode)) vnode = createText(vnode as string)
+  return { ...(vnode as Vnode), op }
 }
 
-function createText(s) {
+function createText(s: string) {
   return { type: 'text', props: { s } }
 }
 
-const hashfy = c => {
+const hashfy = (c: Vnode['children']) => {
   const out = {}
   isArr(c)
     ? c.forEach((v, i) =>
@@ -220,15 +220,15 @@ const hashfy = c => {
           ? v.forEach((vi, j) => (out[hs(i, j, vi.key)] = vi))
           : (out[hs(i, null, v.key)] = v)
       )
-    : (out[hs(0, null, c.key)] = c)
+    : (out[hs(0, null, (c as any).key)] = c)
   return out
 }
 
-function refer(ref, dom) {
-  if (ref) isFn(ref) ? ref(dom) : (ref.current = dom)
+function refer(ref: Ref, dom: Node) {
+  if (ref) isFn(ref) ? ref(dom) : (ref!.current = dom)
 }
 
-function cleanupRef(kids) {
+function cleanupRef(kids: Record<string, Fiber>) {
   for (const k in kids) {
     const kid = kids[k]
     refer(kid.ref, null)
@@ -236,19 +236,20 @@ function cleanupRef(kids) {
   }
 }
 
-const cleanup = e => e[2] && e[2]()
+const cleanup = (e: Function) => e[2] && e[2]()
 
-const effect = e => {
+const effect = (e: Function) => {
   const res = e[0]()
   if (isFn(res)) e[2] = res
 }
 
 export const getCurrentFiber = () => currentFiber || null
 
-export const isFn = fn => typeof fn === 'function'
-export const isStr = s => typeof s === 'number' || typeof s === 'string'
+export const isFn = (x: any): x is Function => typeof x === 'function'
+export const isStr = (s: any): s is number | string =>
+  typeof s === 'number' || typeof s === 'string'
 
-const hs = (i, j, k) =>
+const hs = (i:number, j:number, k:unknown) =>
   k != null && j != null
     ? '.' + i + '.' + k
     : j != null
