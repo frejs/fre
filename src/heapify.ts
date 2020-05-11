@@ -1,10 +1,16 @@
-export function push(heap, node) {
+import { Heap, Task } from './type'
+
+/* Largely inspired by follows:
+  https://github.com/facebook/react/blob/master/packages/scheduler/src/SchedulerMinHeap.js
+  https://github.com/jviide/sorted-queue
+*/
+export function push(heap: Heap, node: Task) {
   const i = heap.length
   heap.push(node)
   siftUp(heap, node, i)
 }
 
-export function pop(heap) {
+export function pop(heap: Heap) {
   const first = heap[0]
   if (!first) return null
   const last = heap.pop()
@@ -15,7 +21,7 @@ export function pop(heap) {
   return first
 }
 
-function siftUp(heap, node, i) {
+function siftUp(heap: Heap, node: Task, i: number) {
   while (i > 0) {
     const pi = (i - 1) >>> 1
     const parent = heap[pi]
@@ -26,7 +32,7 @@ function siftUp(heap, node, i) {
   }
 }
 
-function siftDown(heap, node, i) {
+function siftDown(heap: Heap, node: Task, i: number) {
   for (;;) {
     const li = i * 2 + 1
     const left = heap[li]
@@ -42,10 +48,10 @@ function siftDown(heap, node, i) {
   }
 }
 
-function cmp(a, b) {
+function cmp(a: Task, b: Task) {
   return a.dueTime - b.dueTime
 }
 
-export function peek(heap) {
+export function peek(heap: Heap) {
   return heap[0] || null
 }

@@ -29,7 +29,9 @@ export type Fiber = {
 } & Vnode
 
 export type Task = {
-  work: Function
-  startTime: number
+  callback?: Function
+  startTime?: number
   dueTime: number
 }
+
+export type Heap = Array<Task>
