@@ -1,5 +1,5 @@
-import { Vnode, Ref, Props } from './type'
-import {Flag} from './reconciler'
+import { Vnode, Ref, Props, Component } from './type'
+import { Flag } from './reconciler'
 
 // Supported and simplify jsx2
 // * https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md
@@ -31,11 +31,11 @@ export function jsx(type, attrs) {
   return { type, props, key, ref }
 }
 
-export function Fragment(props) {
+export function Fragment(props: Props) {
   return props.children
 }
 
-export function memo(fn) {
+export function memo(fn: Component) {
   fn.tag = Flag.MEMO
   return fn
 }

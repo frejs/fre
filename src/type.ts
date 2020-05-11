@@ -7,6 +7,10 @@ export type Vnode =
     }
   | string
 
+export type Component = Function & {
+  tag: number
+}
+
 export type Props = Record<string, unknown> & {
   key?: string
   ref?: Ref
