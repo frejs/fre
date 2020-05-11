@@ -9,14 +9,14 @@ export type Component = Function & {
   tag: number
 }
 
-export type Props = Record<string, unknown> & {
+export type Props = Record<string, any> & {
   key?: string
   ref?: Ref
 }
 
 export type Fiber = {
-  node: Node & Point
-  pnode?: Node & Point
+  node: Dom & Point
+  pnode?: Dom & Point
   done: Function
   dirty?: boolean | number
   props?: Props
@@ -51,4 +51,6 @@ export type Task = {
 
 export type Heap = Array<Task>
 
-export type Deps = (number|string|boolean)[] | null
+export type Dom = HTMLElement | SVGAElement
+
+export type Deps = (number | string | boolean)[] | null

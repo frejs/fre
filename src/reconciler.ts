@@ -1,4 +1,4 @@
-import { Fiber, Vnode, Ref } from './type'
+import { Fiber, Vnode, Ref, Dom } from './type'
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild, planWork } from './scheduler'
@@ -10,7 +10,7 @@ let WIP: Fiber
 let updateQueue: Array<Fiber> = []
 let commitQueue: Array<Fiber> = []
 
-export function render(vnode: Vnode, node: Node, done: Function) {
+export function render(vnode: Vnode, node: Dom, done: Function) {
   let rootFiber: Fiber = {
     node,
     props: { children: vnode },
@@ -196,7 +196,7 @@ function commit(fiber: Fiber) {
       })
     }
   } else if (op === Flag.UPDATE) {
-    updateElement(node, fiber.lastProps, fiber.props)
+    updateElement(node as Dom, fiber.lastProps, fiber.props)
   } else {
     let point = fiber.insertPoint ? fiber.insertPoint.node : null
     let after = point ? point.nextSibling : pnode.firstChild
