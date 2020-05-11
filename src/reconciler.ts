@@ -41,8 +41,8 @@ function reconcile(WIP) {
   WIP.parentNode = getParentNode(WIP)
   isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
   WIP.dirty = WIP.dirty ? false : 0
-  WIP.oldProps = WIP.props
   commitQueue.push(WIP)
+  WIP.oldProps = WIP.props
 
   if (WIP.child) return WIP.child
   while (WIP) {
@@ -92,7 +92,7 @@ function getParentNode(fiber) {
 }
 
 function reconcileChildren(WIP, children) {
-  if (children == null) return
+  if (!children) return
   delete WIP.child
   const oldFibers = WIP.kids
   const newFibers = (WIP.kids = hashfy(children))
@@ -120,12 +120,9 @@ function reconcileChildren(WIP, children) {
 
     if (oldFiber) {
       alternate = createFiber(oldFiber, Flag.UPDATE)
-      newFiber.op = Flag.UPDATE
       newFiber = { ...alternate, ...newFiber }
       newFiber.lastProps = alternate.props
-      if (shouldPlace(newFiber)) {
-        newFiber.op = Flag.PLACE
-      }
+      if (shouldPlace(newFiber)) newFiber.op = Flag.PLACE
     } else {
       newFiber = createFiber(newFiber, Flag.PLACE)
     }
