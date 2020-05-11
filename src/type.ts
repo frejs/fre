@@ -50,3 +50,5 @@ export type Task = {
 }
 
 export type Heap = Array<Task>
+
+export type Deps = (number|string|boolean)[] | null

@@ -1,11 +1,12 @@
 import { push, pop, peek } from './heapify'
+import { Task } from './type'
 
-let taskQueue = []
-let currentCallback = null
-let frameDeadline = 0
-const frameLength = 1000 / 60
+let taskQueue: Task[] = []
+let currentCallback: Function
+let frameDeadline: number = 0
+const frameLength: number = 5
 
-export function scheduleCallback(callback) {
+export function scheduleCallback(callback: Function) {
   const currentTime = getTime()
   const startTime = currentTime
   const timeout = 3000
@@ -22,7 +23,7 @@ export function scheduleCallback(callback) {
   planWork(null)
 }
 
-function flush(iniTime) {
+function flush(iniTime: number) {
   let currentTime = iniTime
   let currentTask = peek(taskQueue)
 
@@ -56,9 +57,10 @@ export const planWork = (() => {
   if (typeof MessageChannel !== 'undefined') {
     const { port1, port2 } = new MessageChannel()
     port1.onmessage = flushWork
-    return cb => (cb ? requestAnimationFrame(cb) : port2.postMessage(null))
+    return (cb: FrameRequestCallback) =>
+      cb ? requestAnimationFrame(cb) : port2.postMessage(null)
   }
-  return cb => setTimeout(cb || flushWork)
+  return (cb: TimerHandler) => setTimeout(cb || flushWork)
 })()
 
 export function shouldYeild() {

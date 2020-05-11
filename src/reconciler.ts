@@ -7,8 +7,8 @@ import { isArr } from './jsx'
 let preCommit: Fiber
 let currentFiber: Fiber
 let WIP: Fiber
-let updateQueue: Array<Fiber>
-let commitQueue: Array<Fiber>
+let updateQueue: Array<Fiber> = []
+let commitQueue: Array<Fiber> = []
 
 export function render(vnode: Vnode, node: Node, done: Function) {
   let rootFiber: Fiber = {
