@@ -30,7 +30,7 @@ export function createElement(fiber) {
   const dom =
     fiber.type === 'text'
       ? document.createTextNode(fiber.props.s)
-      : fiber.tag === Flag.SVG
+      : fiber.type.tag === Flag.SVG
       ? document.createElementNS('http://www.w3.org/2000/svg', fiber.type)
       : document.createElement(fiber.type)
   updateElement(dom, {}, fiber.props)

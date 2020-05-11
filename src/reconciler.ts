@@ -75,7 +75,9 @@ function updateHook(WIP: Fiber) {
 
 function updateHost(WIP: Fiber) {
   if (!WIP.node) {
-    // if (WIP.type === 'svg') WIP.tag = Flag.SVG
+    if (WIP.type === 'svg') {
+      WIP.type.tag = Flag.SVG
+    }
     WIP.node = createElement(WIP)
   }
   let p = WIP.pnode || ({} as Fiber)
@@ -133,7 +135,9 @@ function reconcileChildren(WIP: Fiber, children: Vnode['children']) {
     if (prevFiber) {
       prevFiber.sibling = newFiber
     } else {
-      // if (WIP.tag === Flag.SVG) newFiber.tag = Flag.SVG
+      if (WIP.type.tag === Flag.SVG) {
+        newFiber.type.tag = Flag.SVG
+      }
       WIP.child = newFiber
     }
     prevFiber = newFiber
@@ -249,7 +253,7 @@ export const isFn = (x: any): x is Function => typeof x === 'function'
 export const isStr = (s: any): s is number | string =>
   typeof s === 'number' || typeof s === 'string'
 
-const hs = (i:number, j:number, k:unknown) =>
+const hs = (i: number, j: number, k: unknown) =>
   k != null && j != null
     ? '.' + i + '.' + k
     : j != null
