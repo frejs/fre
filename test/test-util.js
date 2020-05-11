@@ -1,5 +1,5 @@
 /** @jsx h */
-import { h, render, useEffect, useState } from '../src'
+import { h, render, useEffect, useState } from '../dist/fre.esm'
 
 export const testRender = jsx =>
   new Promise(resolve => {
