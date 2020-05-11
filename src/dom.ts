@@ -5,7 +5,7 @@ export function updateElement(dom, oldProps, newProps) {
     let oldValue = oldProps[name]
     let newValue = newProps[name]
 
-    if (oldValue == newValue || name === 'children') {
+    if (oldValue == newValue || name === 'children' || name === 's') {
     } else if (name === 'style') {
       for (const k in { ...oldValue, ...newValue }) {
         if (!(oldValue && newValue && oldValue[k] === newValue[k])) {
@@ -27,10 +27,9 @@ export function updateElement(dom, oldProps, newProps) {
 }
 
 export function createElement(fiber) {
-  console.log(fiber)
   const dom =
     fiber.type === 'text'
-      ? document.createTextNode('')
+      ? document.createTextNode(fiber.props.s)
       : fiber.tag === Flag.SVG
       ? document.createElementNS('http://www.w3.org/2000/svg', fiber.type)
       : document.createElement(fiber.type)

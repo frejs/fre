@@ -212,7 +212,7 @@ function createFiber(vnode, op) {
 }
 
 function createText(s) {
-  return { type: 'text', props: { nodeValue: s } }
+  return { type: 'text', props: { s } }
 }
 
 const hashfy = c => {
