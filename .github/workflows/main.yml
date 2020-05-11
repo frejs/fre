@@ -19,13 +19,13 @@ jobs:
         with:
           path: ~/.npm
           key: ${{ runner.OS }}-node-modules-cache-${{ hashFiles('yarn.lock') }}
-      - name: install dependencies
+      - name: install
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          npm install -g yarn
-          yarn
+          npm install
+          npm run build
       - name: test
-        run: yarn test
+        run: npm run test
       - name: report
         uses: codecov/codecov-action@v1.0.6
         env:
