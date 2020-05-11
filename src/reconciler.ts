@@ -268,5 +268,7 @@ export const enum Flag {
   UPDATE = 2,
   DELETE = 3,
   SVG = 4,
-  MEMO = 5
+  MEMO = 5,
+  LAZY = 6,
+  SUSPENSE = 7
 }
