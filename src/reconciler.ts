@@ -76,7 +76,7 @@ function updateHook(WIP: Fiber) {
 function updateHost(WIP: Fiber) {
   if (!WIP.node) {
     if (WIP.type === 'svg') {
-      WIP.type.tag = Flag.SVG
+      WIP.tag = Flag.SVG
     }
     WIP.node = createElement(WIP)
   }
@@ -135,8 +135,8 @@ function reconcileChildren(WIP: Fiber, children: Vnode['children']) {
     if (prevFiber) {
       prevFiber.sibling = newFiber
     } else {
-      if (WIP.type.tag === Flag.SVG) {
-        newFiber.type.tag = Flag.SVG
+      if (WIP.tag === Flag.SVG) {
+        newFiber.tag = Flag.SVG
       }
       WIP.child = newFiber
     }
