@@ -121,7 +121,7 @@ function reconcileChildren(WIP: Fiber, children: Vnode['children']) {
     }
   }
 
-  let prevFiber = null
+  let prevFiber: Fiber | null = null
   let alternate = null
 
   for (const k in newFibers) {
@@ -164,7 +164,7 @@ function cloneChildren(WIP: Fiber) {
   newChild.sibling = null
 }
 
-function shouldUpdate(a: Object, b: Object) {
+function shouldUpdate<T extends Object>(a: T, b: T) {
   for (let i in a) if (!(i in b)) return true
   for (let i in b) if (a[i] !== b[i]) return true
   return false
