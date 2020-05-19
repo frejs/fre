@@ -64,3 +64,7 @@ export type EffectCallback = () => (void | (() => void | undefined));
 export type Dispatch<A> = (value: A) => void;
 
 export type SetStateAction<S> = S | ((prevState: S) => S);
+
+export type Options = {
+  catchError?: (error: Error, fiber: Fiber) => void
+}
