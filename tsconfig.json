@@ -11,5 +11,5 @@
       "sourceMap": false
     },
     "exclude": ["node_modules", "dist"],
-    "include": ["src", "compat/Suspense.ts"]
+    "include": ["src", "compat/suspense.ts"]
   }
