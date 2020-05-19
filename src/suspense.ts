@@ -1,24 +1,24 @@
-import { Component, Props } from './type'
+import { Component, Props, Loader } from './type'
 import { jsx } from './jsx'
 
 export function lazy(loader: Component) {
-  let p
-  let component
-  let error
+  let p:Promise<Loader>
+  let comp:Component
+  let err:Error
 
   function Lazy(props: Props) {
     if (!p) {
       p = loader()
       p.then(
-        exports => (component = exports.default || exports),
-        e => (error = e)
+        exports => (comp = exports.default || exports),
+        e => (err = e)
       )
     }
 
-    if (error) throw error
-    if (!component) throw p
+    if (err) throw err
+    if (!comp) throw p
 
-    return jsx(component, props)
+    return jsx(comp, props)
   }
   return Lazy
 }

@@ -1,4 +1,5 @@
 import { jsx, Fragment, memo } from './jsx'
+import {lazy} from './suspense'
 import { render, scheduleWork } from './reconciler'
 import {
   useState,
