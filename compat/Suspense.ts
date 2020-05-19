@@ -1,7 +1,13 @@
-import { Flag, getCurrentFiber } from './reconciler'
-import { Component, Props, Loader } from './type'
-import { jsx } from './jsx'
-import { useEffect, useState } from './hooks'
+import { Flag, getCurrentFiber, jsx, useEffect, useState,options } from 'fre'
+import { Component, Props, Loader } from '../src/type'
+
+options.catchError = (error,fiber){
+  if (!!error && typeof error.then === 'function') {
+    // this is lazy Component, its parent is a Suspense Component
+    fiber.parent.suspenders = fiber.parent.suspenders || []
+    fiber.parent.suspenders.push(error)
+  }
+}
 
 export function lazy(loader: Component) {
   let p: Promise<Loader>

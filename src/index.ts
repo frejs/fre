@@ -1,6 +1,5 @@
 import { jsx, Fragment, memo } from './jsx'
-import { lazy, Suspense } from './Suspense'
-import { render, scheduleWork } from './reconciler'
+import { render, scheduleWork, getCurrentFiber, options } from './reconciler'
 import {
   useState,
   useReducer,
@@ -27,8 +26,8 @@ export {
   useLayout as useLayoutEffect,
   Fragment,
   memo,
-  lazy,
-  Suspense
+  getCurrentFiber,
+  options
 }
 
 const Fre = {
@@ -45,8 +44,8 @@ const Fre = {
   useRef,
   Fragment,
   memo,
-  lazy,
-  Suspense
+  getCurrentFiber,
+  options
 }
 
 export default Fre

@@ -58,3 +58,7 @@ export type Deps = (number | string | boolean)[] | null
 export type Loader = {
   default: Function
 } & Function
+
+export type Options = {
+  catchError?: (error: Error, fiber: Fiber) => void
+}

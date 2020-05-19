@@ -1,4 +1,4 @@
-import { Fiber, Vnode, Ref, Dom } from './type'
+import { Fiber, Vnode, Ref, Dom, Options } from './type'
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild, planWork } from './scheduler'
@@ -44,11 +44,7 @@ function reconcile(WIP: Fiber) {
     try {
       updateHook(WIP)
     } catch (e) {
-      if (!!e && typeof e.then === 'function') {
-        // this is lazy Component, its parent is a Suspense Component
-        WIP.parent.suspenders = WIP.parent.suspenders || []
-        WIP.parent.suspenders.push(e)
-      }
+      options.catchError && options.catchError(e, WIP)
     }
   } else {
     updateHost(WIP)
@@ -284,3 +280,5 @@ export const enum Flag {
   LAZY = 6,
   SUSPENSE = 7
 }
+
+export const options: Options = {}
