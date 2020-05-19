@@ -14,8 +14,10 @@ export function jsx(type, attrs) {
     if (vnode == null || vnode === true || vnode === false) {
     } else {
       // if vnode is a nest array, flat them first
-      while (isArr(vnode) && vnode.some(v => isArr(v)))
+      while (isArr(vnode) && vnode.some(v => isArr(v))) {
+        console.log(111)
         vnode = [].concat(...vnode)
+      }
       children.push(vnode)
     }
   }

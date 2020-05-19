@@ -1,5 +1,5 @@
 import { jsx, Fragment, memo } from './jsx'
-import {lazy} from './suspense'
+import { lazy, Suspense } from './Suspense'
 import { render, scheduleWork } from './reconciler'
 import {
   useState,
@@ -26,7 +26,9 @@ export {
   useLayout,
   useLayout as useLayoutEffect,
   Fragment,
-  memo
+  memo,
+  lazy,
+  Suspense
 }
 
 const Fre = {
@@ -42,7 +44,9 @@ const Fre = {
   useCallback,
   useRef,
   Fragment,
-  memo
+  memo,
+  lazy,
+  Suspense
 }
 
 export default Fre
