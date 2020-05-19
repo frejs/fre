@@ -10,14 +10,14 @@ export function useState<T>(initState: T): [T, Dispatch<SetStateAction<T>>] {
   return useReducer(null, initState)
 }
 
-export function useReducer<T>(reducer: Function, initState: T): [T, Dispatch<SetStateAction<T>>] {
+export function useReducer<T>(reducer: Function | null, initState: T): [T, Dispatch<SetStateAction<T>>] {
   const [hook, current] = getHook(cursor++)
   const setter = (value: T) => {
     let newValue = reducer
       ? reducer(hook[0], value)
       : isFn(value)
-      ? value(hook[0])
-      : value
+        ? value(hook[0])
+        : value
     if (newValue !== hook[0]) {
       hook[0] = newValue
       scheduleWork(current)
@@ -77,5 +77,5 @@ export function getHook(cursor: number) {
 }
 
 export function isChanged(a: Deps, b: Deps) {
-  return !a || b.some((arg, index: number) => arg !== a[index])
+  return !a || b?.some((arg, index: number) => arg !== a[index]) || false
 }
