@@ -6,7 +6,7 @@ export type Vnode = {
 } & Props
 
 export type Component = Function & {
-  tag: number
+  tag?: number
 }
 
 export type Props = Record<string, any> & {
@@ -54,3 +54,7 @@ export type Heap = Array<Task>
 export type Dom = HTMLElement | SVGAElement
 
 export type Deps = (number | string | boolean)[] | null
+
+export type Loader = {
+  default: Function
+} & Function

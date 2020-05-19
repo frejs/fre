@@ -40,7 +40,19 @@ function reconcileWork(timeout: boolean) {
 
 function reconcile(WIP: Fiber) {
   WIP.pnode = getParentNode(WIP)
-  isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
+  if (isFn(WIP.type)) {
+    try {
+      updateHook(WIP)
+    } catch (e) {
+      if (!!e && typeof e.then === 'function') {
+        // this is lazy Component, its parent is a Suspense Component
+        WIP.parent.suspenders = WIP.parent.suspenders || []
+        WIP.parent.suspenders.push(e)
+      }
+    }
+  } else {
+    updateHost(WIP)
+  }
   WIP.dirty = WIP.dirty ? false : 0
   commitQueue.push(WIP)
   WIP.oldProps = WIP.props
@@ -218,13 +230,13 @@ function createText(s: string) {
 
 const hashfy = (c: Vnode['children']) => {
   const out = {}
-  isArr(c)
+  c && isArr(c)
     ? c.forEach((v, i) =>
-        isArr(v)
+        v && isArr(v)
           ? v.forEach((vi, j) => (out[hs(i, j, vi.key)] = vi))
-          : (out[hs(i, null, v.key)] = v)
+          : v && (out[hs(i, null, v.key)] = v)
       )
-    : (out[hs(0, null, (c as any).key)] = c)
+    : c && (out[hs(0, null, (c as any).key)] = c)
   return out
 }
 
