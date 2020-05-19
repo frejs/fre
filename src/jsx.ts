@@ -1,5 +1,5 @@
 import { Vnode, Ref, Props, Component } from './type'
-import { Flag } from './reconciler'
+import { Flag, some } from './reconciler'
 
 // Supported and simplify jsx2
 // * https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md
@@ -11,8 +11,7 @@ export function jsx(type, attrs) {
 
   for (let i = 2; i < arguments.length; i++) {
     let vnode = arguments[i]
-    if (vnode == null || vnode === true || vnode === false) {
-    } else {
+    if (some(vnode)) {
       // if vnode is a nest array, flat them first
       while (isArr(vnode) && vnode.some(v => isArr(v))) {
         console.log(111)
