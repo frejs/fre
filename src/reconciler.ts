@@ -226,13 +226,13 @@ function createText(s: string) {
 
 const hashfy = (c: Vnode['children']) => {
   const out = {}
-  c && isArr(c)
+  isArr(c)
     ? c.forEach((v, i) =>
-        v && isArr(v)
+        isArr(v)
           ? v.forEach((vi, j) => (out[hs(i, j, vi.key)] = vi))
-          : v && (out[hs(i, null, v.key)] = v)
+          : some(v) && (out[hs(i, null, v.key)] = v)
       )
-    : c && (out[hs(0, null, (c as any).key)] = c)
+    : some(c) && (out[hs(0, null, (c as any).key)] = c)
   return out
 }
 
@@ -260,6 +260,7 @@ export const getCurrentFiber = () => currentFiber || null
 export const isFn = (x: any): x is Function => typeof x === 'function'
 export const isStr = (s: any): s is number | string =>
   typeof s === 'number' || typeof s === 'string'
+export const some = (v: any) => v != null && v !== false && v !== true
 
 const hs = (i: number, j: number, k: unknown) =>
   k != null && j != null

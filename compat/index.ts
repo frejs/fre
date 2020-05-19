@@ -1,3 +1,4 @@
-import { lazy, Suspense } from './Suspense'
+import { lazy, Suspense } from './suspense'
+import { createContext, useContext } from './context'
 
-export { lazy, Suspense }
+export { lazy, Suspense, createContext, useContext }
