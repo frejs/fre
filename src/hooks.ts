@@ -1,16 +1,16 @@
 import { scheduleWork, isFn, getCurrentFiber } from './reconciler'
-import { Deps } from './type'
+import { Deps, EffectCallback, Dispatch, SetStateAction } from './type'
 let cursor = 0
 
 export function resetCursor() {
   cursor = 0
 }
 
-export function useState<T>(initState: T): [T, Function] {
+export function useState<T>(initState: T): [T, Dispatch<SetStateAction<T>>] {
   return useReducer(null, initState)
 }
 
-export function useReducer<T>(reducer: Function, initState: T): [T, Function] {
+export function useReducer<T>(reducer: Function, initState: T): [T, Dispatch<SetStateAction<T>>] {
   const [hook, current] = getHook(cursor++)
   const setter = (value: T) => {
     let newValue = reducer
@@ -32,15 +32,15 @@ export function useReducer<T>(reducer: Function, initState: T): [T, Function] {
   }
 }
 
-export function useEffect(cb: Function, deps: Deps) {
+export function useEffect(cb: EffectCallback, deps: Deps) {
   return effectImpl(cb, deps, 'effect')
 }
 
-export function useLayout(cb: Function, deps: Deps) {
+export function useLayout(cb: EffectCallback, deps: Deps) {
   return effectImpl(cb, deps, 'layout')
 }
 
-function effectImpl(cb: Function, deps: Deps, key: string) {
+function effectImpl(cb: EffectCallback, deps: Deps, key: string): void {
   let [hook, current] = getHook(cursor++)
   if (isChanged(hook[1], deps)) {
     hook[0] = useCallback(cb, deps)
@@ -49,7 +49,7 @@ function effectImpl(cb: Function, deps: Deps, key: string) {
   }
 }
 
-export function useMemo(cb: Function, deps: Deps) {
+export function useMemo<T>(cb: () => T, deps: Deps): T {
   let hook = getHook(cursor++)[0]
   if (isChanged(hook[1], deps)) {
     hook[1] = deps
@@ -58,11 +58,11 @@ export function useMemo(cb: Function, deps: Deps) {
   return hook[0]
 }
 
-export function useCallback(cb: Function, deps: Deps) {
+export function useCallback<T extends (...args: any[]) => any>(cb: T, deps: Deps) {
   return useMemo(() => cb, deps)
 }
 
-export function useRef(current: any) {
+export function useRef<T>(current: T) {
   return useMemo(() => ({ current }), [])
 }
 

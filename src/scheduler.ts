@@ -2,7 +2,7 @@ import { push, pop, peek } from './heapify'
 import { Task } from './type'
 
 let taskQueue: Task[] = []
-let currentCallback: Function
+let currentCallback: ((iniTime: number) => boolean) | null | undefined
 let frameDeadline: number = 0
 const frameLength: number = 5
 

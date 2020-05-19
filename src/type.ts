@@ -58,3 +58,9 @@ export type Deps = (number | string | boolean)[] | null
 export type Loader = {
   default: Function
 } & Function
+
+export type EffectCallback = () => (void | (() => void | undefined));
+
+export type Dispatch<A> = (value: A) => void;
+
+export type SetStateAction<S> = S | ((prevState: S) => S);
