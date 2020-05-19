@@ -1,7 +1,7 @@
 import { Flag, getCurrentFiber, jsx, useEffect, useState,options } from 'fre'
-import { Component, Props, Loader } from '../src/type'
+import { Component, Props, Loader,Fiber } from '../src/type'
 
-options.catchError = (error,fiber){
+options.catchError = (error:any,fiber:Fiber){
   if (!!error && typeof error.then === 'function') {
     // this is lazy Component, its parent is a Suspense Component
     fiber.parent.suspenders = fiber.parent.suspenders || []
