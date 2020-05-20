@@ -1,4 +1,4 @@
-import { jsx, Fragment, memo } from './jsx'
+import { jsx, Fragment } from './jsx'
 import { render, scheduleWork, getCurrentFiber, options } from './reconciler'
 import {
   useState,
@@ -25,7 +25,6 @@ export {
   useLayout,
   useLayout as useLayoutEffect,
   Fragment,
-  memo,
   getCurrentFiber,
   options
 }
@@ -43,7 +42,6 @@ const Fre = {
   useCallback,
   useRef,
   Fragment,
-  memo,
   getCurrentFiber,
   options
 }

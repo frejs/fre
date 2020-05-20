@@ -36,9 +36,4 @@ export function Fragment(props: Props) {
   return props.children
 }
 
-export function memo(fn: Component) {
-  fn.tag = Flag.MEMO
-  return fn
-}
-
 export const isArr = Array.isArray

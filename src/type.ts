@@ -59,12 +59,13 @@ export type Loader = {
   default: Function
 } & Function
 
-export type EffectCallback = () => (void | (() => void | undefined));
+export type EffectCallback = () => void | (() => void | undefined)
 
-export type Dispatch<A> = (value: A) => void;
+export type Dispatch<A> = (value: A) => void
 
-export type SetStateAction<S> = S;
+export type SetStateAction<S> = S
 
 export type Options = {
   catchError?: (error: Error, fiber: Fiber) => void
+  updateHook?: (fiber: Fiber) => void
 }
