@@ -4,9 +4,9 @@ import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild, planWork } from './scheduler'
 import { isArr } from './jsx'
 
-let preCommit: Fiber | undefined | null
-let currentFiber: Fiber | undefined
-let WIP: Fiber | undefined | null
+let preCommit: Fiber | null
+let currentFiber: Fiber | null
+let WIP: Fiber | null
 let updateQueue: Array<Fiber> = []
 let commitQueue: Array<Fiber> = []
 

@@ -77,5 +77,5 @@ export function getHook(cursor: number) {
 }
 
 export function isChanged(a: Deps, b: Deps) {
-  return !a || b?.some((arg, index: number) => arg !== a[index]) || false
+  return !a || b?.some((arg, index: number) => arg !== a[index])
 }
