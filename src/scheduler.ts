@@ -34,7 +34,7 @@ function flush(iniTime: number) {
     let callback = currentTask.callback
     currentTask.callback = null
 
-    let next = callback(didout)
+    let next = callback && callback(didout)
     next ? (currentTask.callback = next) : pop(taskQueue)
 
     currentTask = peek(taskQueue)
@@ -57,10 +57,10 @@ export const planWork = (() => {
   if (typeof MessageChannel !== 'undefined') {
     const { port1, port2 } = new MessageChannel()
     port1.onmessage = flushWork
-    return (cb: FrameRequestCallback) =>
+    return (cb: FrameRequestCallback | null) =>
       cb ? requestAnimationFrame(cb) : port2.postMessage(null)
   }
-  return (cb: TimerHandler) => setTimeout(cb || flushWork)
+  return (cb: TimerHandler | null) => setTimeout(cb || flushWork)
 })()
 
 export function shouldYeild() {

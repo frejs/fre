@@ -1,4 +1,4 @@
-export type Ref = Function & { current: Node }
+export type Ref = Function & { current: Node | null }
 
 export type Vnode = {
   type?: Component & string
@@ -24,7 +24,7 @@ export type Fiber = {
   lastProps?: Props
   parent?: Fiber
   child?: Fiber
-  sibling?: Fiber
+  sibling?: Fiber | null
   kids?: Record<string, Fiber>
   op?: number
   hooks?: Hooks
@@ -32,8 +32,8 @@ export type Fiber = {
   Point
 
 export type Point = {
-  insertPoint?: Fiber
-  lastFiber?: Fiber
+  insertPoint?: Fiber | null
+  lastFiber?: Fiber | null
 }
 
 export type Hooks = {
@@ -44,7 +44,7 @@ export type Hooks = {
 
 export type Hook = Array<any>
 export type Task = {
-  callback?: Function
+  callback?: Function | null
   startTime?: number
   dueTime: number
 }
@@ -63,7 +63,7 @@ export type EffectCallback = () => (void | (() => void | undefined));
 
 export type Dispatch<A> = (value: A) => void;
 
-export type SetStateAction<S> = S | ((prevState: S) => S);
+export type SetStateAction<S> = S;
 
 export type Options = {
   catchError?: (error: Error, fiber: Fiber) => void

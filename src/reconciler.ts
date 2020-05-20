@@ -4,9 +4,9 @@ import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild, planWork } from './scheduler'
 import { isArr } from './jsx'
 
-let preCommit: Fiber
-let currentFiber: Fiber
-let WIP: Fiber
+let preCommit: Fiber | undefined | null
+let currentFiber: Fiber | undefined
+let WIP: Fiber | undefined | null
 let updateQueue: Array<Fiber> = []
 let commitQueue: Array<Fiber> = []
 
@@ -26,7 +26,7 @@ export function scheduleWork(fiber: Fiber) {
   scheduleCallback(reconcileWork)
 }
 
-function reconcileWork(timeout: boolean) {
+function reconcileWork(timeout: boolean): ((timeout: boolean) => void) | null {
   if (!WIP) WIP = updateQueue.shift()
   while (WIP && (!shouldYeild() || timeout)) {
     WIP = reconcile(WIP)
@@ -68,7 +68,7 @@ function reconcile(WIP: Fiber) {
 
 function updateHook(WIP: Fiber) {
   if (
-    WIP.type.tag === Flag.MEMO &&
+    WIP.type?.tag === Flag.MEMO &&
     WIP.dirty == 0 &&
     !shouldUpdate(WIP.oldProps, WIP.props)
   ) {
@@ -236,7 +236,7 @@ const hashfy = (c: Vnode['children']) => {
   return out
 }
 
-function refer(ref: Ref, dom: Node) {
+function refer(ref: Ref | undefined, dom: Node | null) {
   if (ref) isFn(ref) ? ref(dom) : (ref!.current = dom)
 }
 
