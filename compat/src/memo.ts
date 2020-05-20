@@ -1,5 +1,5 @@
 import { options } from 'fre'
-import { Fiber, Component } from '../src/type'
+import { Fiber, Component } from '../../src/type'
 
 options.updateHook = fiber => {
   if (
