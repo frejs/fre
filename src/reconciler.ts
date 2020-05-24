@@ -171,8 +171,8 @@ function commit(fiber: Fiber) {
     pnode.removeChild(fiber.node)
   } else if (isFn(fiber.type)) {
     if (hooks) {
-      applyEffect(hooks.layout)
-      planWork(() => applyEffect(hooks.effect))
+      side(hooks.layout)
+      planWork(() => side(hooks.effect))
     }
   } else if (op === Flag.UPDATE) {
     updateElement(node as Dom, fiber.lastProps, fiber.props)
@@ -219,7 +219,7 @@ function cleanupRef(kids: Record<string, Fiber>) {
   }
 }
 
-function applyEffect(effects: Function[]) {
+function side(effects: Function[]) {
   effects.forEach(cleanup)
   effects.forEach(effect)
   effects.length = 0
