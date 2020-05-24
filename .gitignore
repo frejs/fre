@@ -9,5 +9,5 @@ demo/**/node_modules/
 server/**/node_modules/
 demo/**/.cache/
 demo/**/dist/
-demo/**/preact/
 /dist/
+/**/node_modules/
