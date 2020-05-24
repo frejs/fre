@@ -163,8 +163,8 @@ function commitWork(fiber: Fiber) {
 
 function commit(fiber: Fiber) {
   const { op, pnode, node, ref, hooks } = fiber
-  if (op === Flag.NOWORK) {
-  } else if (op === Flag.DELETE) {
+  if (op === Flag.NOWORK) return
+  if (op === Flag.DELETE) {
     hooks && hooks.list.forEach(cleanup)
     cleanupRef(fiber.kids)
     while (isFn(fiber.type)) fiber = fiber.child
