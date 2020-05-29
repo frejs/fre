@@ -1,5 +1,15 @@
 import { scheduleWork, isFn, getCurrentFiber } from './reconciler'
-import { Deps, EffectCallback, Dispatch, SetStateAction } from './type'
+import {
+  DependencyList,
+  Reducer,
+  IFiber,
+  Dispatch,
+  SetStateAction,
+  EffectCallback,
+  HookTpes,
+  RefObject,
+  IEffect
+} from './type'
 let cursor = 0
 
 export function resetCursor() {
@@ -7,40 +17,47 @@ export function resetCursor() {
 }
 
 export function useState<T>(initState: T): [T, Dispatch<SetStateAction<T>>] {
-  return useReducer(null, initState)
+  return useReducer(undefined, initState)
 }
 
-export function useReducer<T>(reducer: Function | null, initState: T): [T, Dispatch<SetStateAction<T>>] {
-  const [hook, current] = getHook(cursor++)
-  const setter = (value: T) => {
+export function useReducer<S, A, Dependency = any>(
+  reducer?: Reducer<S, A>,
+  initState?: S
+): [S, Dispatch<A>] {
+  const [hook, current]: [[S | A, Dependency], IFiber] = getHook<S>(cursor++)
+  const setter = (value: A | Dispatch<A>) => {
     let newValue = reducer
-      ? reducer(hook[0], value)
-      : isFn(value)
-        ? value(hook[0])
-        : value
+      ? reducer((hook as [S, Dependency])[0], value as A)
+      : isFn(value as Dispatch<A>)
+      ? (value as Dispatch<A>)((hook as [A, Dependency])[0])
+      : value
     if (newValue !== hook[0]) {
-      hook[0] = newValue
+      ;(hook as [S | A | Dispatch<A> | void, Dependency])[0] = newValue
       scheduleWork(current)
     }
   }
 
   if (hook.length) {
-    return [hook[0], setter]
+    return [hook[0] as S, setter]
   } else {
-    hook[0] = initState
-    return [initState, setter]
+    hook[0] = initState as S
+    return [initState!, setter]
   }
 }
 
-export function useEffect(cb: EffectCallback, deps: Deps) {
-  return effectImpl(cb, deps, 'effect')
+export function useEffect(cb: EffectCallback, deps?: DependencyList): void {
+  return effectImpl(cb, deps!, 'effect')
 }
 
-export function useLayout(cb: EffectCallback, deps: Deps) {
-  return effectImpl(cb, deps, 'layout')
+export function useLayout(cb: EffectCallback, deps?: DependencyList): void {
+  return effectImpl(cb, deps!, 'layout')
 }
 
-function effectImpl(cb: EffectCallback, deps: Deps, key: string): void {
+function effectImpl(
+  cb: EffectCallback,
+  deps: DependencyList,
+  key: HookTpes
+): void {
   let [hook, current] = getHook(cursor++)
   if (isChanged(hook[1], deps)) {
     hook[0] = useCallback(cb, deps)
@@ -49,33 +66,38 @@ function effectImpl(cb: EffectCallback, deps: Deps, key: string): void {
   }
 }
 
-export function useMemo<T>(cb: () => T, deps: Deps): T {
-  let hook = getHook(cursor++)[0]
-  if (isChanged(hook[1], deps)) {
+export function useMemo<S = Function>(cb: () => S, deps?: DependencyList): S {
+  let hook = getHook<S>(cursor++)[0]
+  if (isChanged(hook[1], deps!)) {
     hook[1] = deps
     return (hook[0] = cb())
   }
   return hook[0]
 }
 
-export function useCallback<T extends (...args: any[]) => any>(cb: T, deps: Deps) {
+export function useCallback<T extends (...args: any[]) => void>(
+  cb: T,
+  deps?: DependencyList
+): T {
   return useMemo(() => cb, deps)
 }
 
-export function useRef<T>(current: T) {
+export function useRef<T>(current: T): RefObject<T> {
   return useMemo(() => ({ current }), [])
 }
 
-export function getHook(cursor: number) {
-  const current = getCurrentFiber()
+export function getHook<S = Function | undefined, Dependency = any>(
+  cursor: number
+): [[S, Dependency], IFiber] {
+  const current: IFiber<any> = getCurrentFiber()
   let hooks =
     current.hooks || (current.hooks = { list: [], effect: [], layout: [] })
   if (cursor >= hooks.list.length) {
-    hooks.list.push([])
+    hooks.list.push([] as IEffect)
   }
-  return [hooks.list[cursor], current]
+  return [(hooks.list[cursor] as unknown) as [S, Dependency], current]
 }
 
-export function isChanged(a: Deps, b: Deps) {
-  return !a || b?.some((arg, index: number) => arg !== a[index])
+export function isChanged(a: DependencyList, b: DependencyList) {
+  return !a || b.some((arg, index) => arg !== a[index])
 }

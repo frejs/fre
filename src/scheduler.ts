@@ -1,12 +1,13 @@
 import { push, pop, peek } from './heapify'
-import { Task } from './type'
+import { ITask, ITaskCallback, IVoidCb } from './type'
+import { isFn } from './reconciler'
 
-let taskQueue: Task[] = []
-let currentCallback: ((iniTime: number) => boolean) | null | undefined
+let taskQueue: ITask[] = []
+let currentCallback: ITaskCallback | undefined
 let frameDeadline: number = 0
 const frameLength: number = 5
 
-export function scheduleCallback(callback: Function) {
+export function scheduleCallback(callback: ITaskCallback): void {
   const currentTime = getTime()
   const startTime = currentTime
   const timeout = 3000
@@ -19,11 +20,11 @@ export function scheduleCallback(callback: Function) {
   }
 
   push(taskQueue, newTask)
-  currentCallback = flush
+  currentCallback = flush as ITaskCallback
   planWork(null)
 }
 
-function flush(iniTime: number) {
+function flush(iniTime: number): boolean {
   let currentTime = iniTime
   let currentTask = peek(taskQueue)
 
@@ -34,7 +35,7 @@ function flush(iniTime: number) {
     let callback = currentTask.callback
     currentTask.callback = null
 
-    let next = callback && callback(didout)
+    let next = isFn(callback) && callback(didout)
     next ? (currentTask.callback = next) : pop(taskQueue)
 
     currentTask = peek(taskQueue)
@@ -44,8 +45,8 @@ function flush(iniTime: number) {
   return !!currentTask
 }
 
-function flushWork() {
-  if (currentCallback) {
+function flushWork(): void {
+  if (isFn(currentCallback)) {
     let currentTime = getTime()
     frameDeadline = currentTime + frameLength
     let more = currentCallback(currentTime)
@@ -53,18 +54,18 @@ function flushWork() {
   }
 }
 
-export const planWork = (() => {
+export const planWork: (cb?: IVoidCb | undefined) => number | void = (() => {
   if (typeof MessageChannel !== 'undefined') {
     const { port1, port2 } = new MessageChannel()
     port1.onmessage = flushWork
-    return (cb: FrameRequestCallback | null) =>
+    return (cb?: IVoidCb) =>
       cb ? requestAnimationFrame(cb) : port2.postMessage(null)
   }
-  return (cb: TimerHandler | null) => setTimeout(cb || flushWork)
+  return (cb?: IVoidCb) => setTimeout(cb || flushWork)
 })()
 
-export function shouldYeild() {
+export function shouldYeild(): boolean {
   return getTime() >= frameDeadline
 }
 
-export const getTime = () => performance.now()
+const getTime = () => performance.now()

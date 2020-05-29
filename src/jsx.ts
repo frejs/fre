@@ -1,20 +1,22 @@
-import { Vnode, Ref, Props, Component } from './type'
+import { Attributes, FC, FreNode, IFiber, PropsWithChildren } from './type'
 import { Flag, some } from './reconciler'
 
 // Supported and simplify jsx2
 // * https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md
-export function jsx(type, attrs) {
-  let props: Props = attrs || {}
-  let key: string = props.key || null
-  let ref: Ref = props.ref || null
-  let children: (Vnode | string)[] = []
+export function h<P extends Attributes = {}>(
+  type: FC<P>,
+  attrs: P
+): Partial<IFiber> {
+  let props = attrs || ({} as Attributes)
+  let key = props.key || null
+  let ref = props.ref || null
+  let children: FreNode[] = []
 
   for (let i = 2; i < arguments.length; i++) {
     let vnode = arguments[i]
     if (some(vnode)) {
       // if vnode is a nest array, flat them first
       while (isArr(vnode) && vnode.some(v => isArr(v))) {
-        console.log(111)
         vnode = [].concat(...vnode)
       }
       children.push(vnode)
@@ -29,11 +31,10 @@ export function jsx(type, attrs) {
   delete props.key
   delete props.ref
 
-  return { type, props, key, ref }
+  return { type, props, key, ref } as Partial<IFiber>
 }
 
-export function Fragment(props: Props) {
+export function Fragment(props: PropsWithChildren): FreNode {
   return props.children
 }
-
 export const isArr = Array.isArray
