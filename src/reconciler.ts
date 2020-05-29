@@ -110,7 +110,6 @@ function getParentNode(fiber: IFiber): HTMLElement | undefined {
 }
 
 function reconcileChildren(WIP: IFiber, children: FreNode): void {
-  if (!children) return
   delete WIP.child
   const oldFibers = WIP.kids
   const newFibers = (WIP.kids = hashfy(children as IFiber))

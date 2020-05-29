@@ -3,7 +3,7 @@ import { Flag, some } from './reconciler'
 
 // Supported and simplify jsx2
 // * https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md
-export function h<P extends Attributes = {}>(
+export function jsx<P extends Attributes = {}>(
   type: FC<P>,
   attrs: P
 ): Partial<IFiber> {
