@@ -9,11 +9,14 @@ import {
   useRef,
   useLayout
 } from './hooks'
+import {lazy,Suspense} from './suspense'
 
 export {
   jsx,
   jsx as createElement,
   jsx as h,
+  lazy,
+  Suspense,
   render,
   scheduleWork,
   useState,

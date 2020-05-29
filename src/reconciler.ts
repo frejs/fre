@@ -14,6 +14,7 @@ import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild, planWork } from './scheduler'
 import { isArr } from './jsx'
+import { catchPromise } from './suspense'
 
 let preCommit: IFiber | undefined
 let currentFiber: IFiber
@@ -59,7 +60,10 @@ function reconcile(WIP: IFiber): IFiber | undefined {
     try {
       updateHook(WIP)
     } catch (e) {
-      // options.catchError && options.catchError(e, WIP)
+      if (!!e && typeof e.then === 'function') {
+        // this is lazy Component, its parent is a Suspense Component
+        catchPromise(WIP, e)
+      }
     }
   } else {
     updateHost(WIP)
