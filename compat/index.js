@@ -1,8 +1,9 @@
 import { jsx, useState, useEffect, options } from 'fre'
 
-let oldCatchError = options.catchError
+let oldCatchError = options.catchError || {}
 options.catchError = (fiber, error) => {
   if (!!error && typeof error.then === 'function') {
+    fiber.dueTime = performance.now() + 5000
     fiber.promises = fiber.promises || []
     fiber.promises.push(error)
     oldCatchError(fiber, error)

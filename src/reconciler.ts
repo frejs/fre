@@ -62,7 +62,7 @@ function reconcile(WIP: IFiber): IFiber | undefined {
     try {
       updateHook(WIP)
     } catch (e) {
-      options!.catchError(WIP, e)
+      options.catchError && options.catchError(WIP, e)
     }
   } else {
     updateHost(WIP)

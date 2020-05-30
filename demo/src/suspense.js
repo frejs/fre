@@ -1,4 +1,5 @@
-import { render, h, lazy, Suspense } from '../../compat/index'
+import { lazy, Suspense } from '../../compat/index'
+import {render, h, } from '../../dist/fre.esm'
 
 const A = lazy(() => {
   return new Promise(resolve =>

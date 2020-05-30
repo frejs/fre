@@ -15,7 +15,7 @@
   "scripts": {
     "test": "jest --coverage",
     "build": "rollup -c && gzip-size dist/fre.js",
-    "build:compat":"rollup --config compat/rollup.config.js",
+    "build:compat": "rollup --config compat/rollup.config.js",
     "dev": "rollup -c --watch",
     "format": "prettier --write \"{src,test,demo}/**/*.js\"",
     "prepublishOnly": "yarn build"
@@ -26,12 +26,6 @@
   "devDependencies": {
     "@babel/core": "^7.0.0-0",
     "@babel/plugin-transform-react-jsx": "^7.9.4",
-    "@babel/plugin-transform-runtime": "^7.6.2",
-    "@babel/preset-env": "^7.9.5",
-    "@babel/preset-react": "^7.9.4",
-    "@babel/preset-typescript": "^7.9.0",
-    "@rollup/plugin-multi-entry": "^3.0.1",
-    "@rollup/plugin-typescript": "^4.1.1",
     "@types/jest": "^24.0.15",
     "babel-jest": "^24.8.0",
     "codecov": "^3.6.1",
@@ -47,7 +41,8 @@
     "rollup-plugin-typescript2": "^0.27.0",
     "terser": "^4.1.2",
     "typescript": "3.9.1-rc",
-    "yarpm": "^0.2.1"
+    "yarpm": "^0.2.1",
+    "parcel": "^2.0.0-alpha.3.2"
   },
   "dependencies": {},
   "jest": {
