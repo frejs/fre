@@ -13,9 +13,13 @@ import {
 } from './type'
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
-import { scheduleCallback, shouldYeild, planWork } from './scheduler'
+import { scheduleCallback, shouldYeild, planWork,getTime } from './scheduler'
 import { isArr } from './jsx'
-export const options: Option = {}
+export const options: Option = {
+  catchError(_, e) {
+    throw e
+  }
+}
 
 let preCommit: IFiber | undefined
 let currentFiber: IFiber
@@ -49,7 +53,7 @@ function reconcileWork(timeout: boolean): boolean | null | ITaskCallback {
   while (WIP && (!shouldYeild() || timeout)) {
     WIP = reconcile(WIP)
   }
-  if (!timeout && WIP) {
+  if (WIP && !timeout) {
     return reconcileWork.bind(null)
   }
   if (preCommit) commitWork(preCommit)
@@ -62,7 +66,7 @@ function reconcile(WIP: IFiber): IFiber | undefined {
     try {
       updateHook(WIP)
     } catch (e) {
-      options.catchError && options.catchError(WIP, e)
+      options.catchError(WIP, e)
     }
   } else {
     updateHost(WIP)
@@ -105,7 +109,7 @@ function updateHost(WIP: IFiber): void {
   reconcileChildren(WIP, WIP.props.children)
 }
 
-function getParentNode(fiber: IFiber): HTMLElement | undefined {
+function getParentNode(WIP: IFiber): HTMLElement | undefined {
   while ((WIP = WIP.parent)) {
     if (!isFn(WIP.type)) return WIP.node
   }

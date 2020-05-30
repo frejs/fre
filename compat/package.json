@@ -1,0 +1,16 @@
+{
+  "name": "fre-compat",
+  "version": "1.0.0",
+  "description": "> Something that can be implemanted in userland.",
+  "main": "../dist/fre-compat.js",
+  "peerDependencies": {
+    "fre": "^2.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

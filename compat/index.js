@@ -1,12 +1,10 @@
-import { jsx, useState, useEffect, options } from 'fre'
+import { h, useState, useEffect, options } from '../dist/fre.esm'
 
-let oldCatchError = options.catchError || {}
 options.catchError = (fiber, error) => {
   if (!!error && typeof error.then === 'function') {
     fiber.dueTime = performance.now() + 5000
     fiber.promises = fiber.promises || []
     fiber.promises.push(error)
-    oldCatchError(fiber, error)
   }
 }
 
@@ -22,9 +20,10 @@ export function lazy(loader) {
         e => (err = e)
       )
     }
+
     if (err) throw err
     if (!comp) throw p
-    return jsx(comp, props)
+    return h(comp, props)
   }
 }
 
