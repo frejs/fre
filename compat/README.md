@@ -7,6 +7,8 @@
 Suspsnese is a API for promises, it throws a promise and catch it sync.
 
 ```js
+import { Suspense, lazy } from 'fre/compat'
+
 const A = lazy(() => {
   return new Promise(resolve =>
     setTimeout(
