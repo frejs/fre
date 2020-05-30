@@ -1,18 +1,25 @@
-import { getCurrentFiber, jsx, useEffect, useState,options } from 'fre'
+import {
+  jsx,
+  useState,
+  useEffect,
+  EffectCallback,
+  options
+} from '../../src'
 
-options.catchError = (error:any,fiber:Fiber){
+let oldCatchError = options.catchError
+options.catchError = (fiber, error) => {
   if (!!error && typeof error.then === 'function') {
-    // this is lazy Component, its parent is a Suspense Component
-    fiber.parent.suspenders = fiber.parent.suspenders || []
-    fiber.parent.suspenders.push(error)
+    fiber.promises = fiber.promises || []
+    fiber.promises.push(error as any)
+    oldCatchError()
   }
 }
 
-export function lazy(loader: Component) {
-  let p: Promise<Loader>
-  let comp: Component
-  let err: Error
-  return function Lazy(props: Props) {
+export function lazy(loader) {
+  let p
+  let comp
+  let err
+  return function Lazy(props) {
     if (!p) {
       p = loader()
       p.then(
@@ -27,10 +34,10 @@ export function lazy(loader: Component) {
 }
 
 export function Suspense(props) {
-  const current = getCurrentFiber()
   const [suspend, setSuspend] = useState(false)
-  useEffect(
-    () => Promise.all(current.suspenders).then(c => setSuspend(true)),[]
-  )
+  const cb = current => {
+    Promise.all(current.promises).then(() => setSuspend(true))
+  }
+  useEffect(cb as EffectCallback, [])
   return [props.children, !suspend && props.fallback]
 }

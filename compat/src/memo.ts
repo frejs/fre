@@ -1,5 +1,4 @@
-import { options } from 'fre'
-import { Fiber, Component } from '../../src/type'
+import { options } from '../../src'
 
 options.updateHook = fiber => {
   if (
@@ -12,12 +11,12 @@ options.updateHook = fiber => {
   }
 }
 
-export function memo(fn: Component) {
+export function memo(fn) {
   fn.tag = 5
   return fn
 }
 
-function cloneChildren(WIP: Fiber) {
+function cloneChildren(WIP) {
   if (!WIP.child) return
   let child = WIP.child
   let newChild = child

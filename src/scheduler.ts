@@ -9,13 +9,11 @@ const frameLength: number = 5
 
 export function scheduleCallback(callback: ITaskCallback): void {
   const currentTime = getTime()
-  const startTime = currentTime
   const timeout = 3000
-  const dueTime = startTime + timeout
+  const dueTime = currentTime + timeout
 
   let newTask = {
     callback,
-    startTime,
     dueTime
   }
 
@@ -29,13 +27,13 @@ function flush(iniTime: number): boolean {
   let currentTask = peek(taskQueue)
 
   while (currentTask) {
-    const didout = currentTask.dueTime <= currentTime
-    if (!didout && shouldYeild()) break
+    const timeout = currentTask.dueTime <= currentTime
+    if (!timeout && shouldYeild()) break
 
     let callback = currentTask.callback
     currentTask.callback = null
 
-    let next = isFn(callback) && callback(didout)
+    let next = isFn(callback) && callback(timeout)
     next ? (currentTask.callback = next) : pop(taskQueue)
 
     currentTask = peek(taskQueue)

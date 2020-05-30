@@ -8,13 +8,14 @@ import {
   FreNode,
   FiberMap,
   IRef,
-  IEffect
+  IEffect,
+  Option
 } from './type'
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild, planWork } from './scheduler'
 import { isArr } from './jsx'
-import { catchPromise } from './suspense'
+export const options: Option = {}
 
 let preCommit: IFiber | undefined
 let currentFiber: IFiber
@@ -36,7 +37,8 @@ export function render(
 }
 
 export function scheduleWork(fiber: IFiber) {
-  if (!fiber.dirty && (fiber.dirty = true)) {
+  if (!fiber.dirty) {
+    fiber.dirty = true
     updateQueue.push(fiber)
   }
   scheduleCallback(reconcileWork as ITaskCallback)
@@ -60,9 +62,7 @@ function reconcile(WIP: IFiber): IFiber | undefined {
     try {
       updateHook(WIP)
     } catch (e) {
-      if (!!e && typeof e.then === 'function') {
-        catchPromise(WIP, e)
-      }
+      options!.catchError()
     }
   } else {
     updateHost(WIP)
@@ -246,7 +246,7 @@ function side(effects: IEffect[]) {
 export const getCurrentFiber = () => currentFiber || null
 
 const effect = (e: IEffect): void => {
-  const res = e[0]()
+  const res = e[0](currentFiber)
   if (isFn(res)) e[2] = res
 }
 
@@ -276,5 +276,3 @@ export const enum Flag {
   LAZY = 6,
   SUSPENSE = 7
 }
-
-export const options = {}

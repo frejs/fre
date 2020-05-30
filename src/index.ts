@@ -9,14 +9,12 @@ import {
   useRef,
   useLayout
 } from './hooks'
-import {lazy,Suspense} from './suspense'
+export * from './type'
 
 export {
   jsx,
   jsx as createElement,
   jsx as h,
-  lazy,
-  Suspense,
   render,
   scheduleWork,
   useState,
@@ -31,7 +29,6 @@ export {
   getCurrentFiber,
   options
 }
-
 const Fre = {
   jsx,
   h: jsx,

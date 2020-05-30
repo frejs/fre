@@ -93,8 +93,9 @@ export type ITaskCallback =
 
 export interface ITask {
   callback?: ITaskCallback
-  startTime: number
   dueTime: number
 }
 
 export type DOM = HTMLElement | SVGElement
+
+export type Option = Record<string,Function>
