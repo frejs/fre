@@ -1,9 +1,8 @@
 import { terser } from 'rollup-plugin-terser'
 import typescript from 'rollup-plugin-typescript2'
-import multi from '@rollup/plugin-multi-entry';
 
 export default {
-  input: ['src/index.ts','compat/index.ts'],
+  input: 'src/index.ts',
   output: [
     {
       file: 'dist/fre.js',
@@ -11,7 +10,7 @@ export default {
       name: 'fre',
       sourcemap: true
     },
-    { file: 'dist/fre.esm.js', format: 'esm', esModule: false, sourcemap: true }
+    { file: 'dist/fre.esm.js', format: 'esm', sourcemap: true }
   ],
   plugins: [
     typescript({
@@ -20,7 +19,6 @@ export default {
     }),
     terser({
       include: ['fre.js']
-    }),
-    multi()
+    })
   ]
 }

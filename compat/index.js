@@ -1,11 +1,11 @@
-import { jsx, useState, useEffect, EffectCallback, options } from 'fre'
+import { jsx, useState, useEffect, options } from 'fre'
 
 let oldCatchError = options.catchError
 options.catchError = (fiber, error) => {
   if (!!error && typeof error.then === 'function') {
     fiber.promises = fiber.promises || []
     fiber.promises.push(error)
-    oldCatchError()
+    oldCatchError(fiber, error)
   }
 }
 
