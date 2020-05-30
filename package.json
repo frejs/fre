@@ -15,6 +15,7 @@
   "scripts": {
     "test": "jest --coverage",
     "build": "rollup -c && gzip-size dist/fre.js",
+    "build:compat":"rollup --config compat/rollup.config.js",
     "dev": "rollup -c --watch",
     "format": "prettier --write \"{src,test,demo}/**/*.js\"",
     "prepublishOnly": "yarn build"
