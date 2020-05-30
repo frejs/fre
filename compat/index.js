@@ -1,16 +1,10 @@
-import {
-  jsx,
-  useState,
-  useEffect,
-  EffectCallback,
-  options
-} from '../../src'
+import { jsx, useState, useEffect, EffectCallback, options } from 'fre'
 
 let oldCatchError = options.catchError
 options.catchError = (fiber, error) => {
   if (!!error && typeof error.then === 'function') {
     fiber.promises = fiber.promises || []
-    fiber.promises.push(error as any)
+    fiber.promises.push(error)
     oldCatchError()
   }
 }
@@ -35,9 +29,8 @@ export function lazy(loader) {
 
 export function Suspense(props) {
   const [suspend, setSuspend] = useState(false)
-  const cb = current => {
+  useEffect(current => {
     Promise.all(current.promises).then(() => setSuspend(true))
-  }
-  useEffect(cb as EffectCallback, [])
+  }, [])
   return [props.children, !suspend && props.fallback]
 }

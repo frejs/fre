@@ -2,14 +2,14 @@
 import { h, useState } from '../dist/fre.esm'
 import { testUpdates } from './test-util'
 
-test('async state update', async () => {
+test('batch updates', async () => {
   let updates = 0
 
   const Component = () => {
     const [count, setState] = useState(0)
     updates++
-    const asyncUp = () =>{
-      for(let i = 0;i<10;i++){
+    const asyncUp = () => {
+      for (let i = 0; i < 10; i++) {
         setState(i)
       }
     }
@@ -18,7 +18,7 @@ test('async state update', async () => {
 
   await testUpdates([
     {
-      content: <Component/>,
+      content: <Component />,
       test: ([button]) => {
         expect(+button.textContent).toBe(0)
         expect(updates).toBe(1)
@@ -27,7 +27,7 @@ test('async state update', async () => {
       }
     },
     {
-      content: <Component/>,
+      content: <Component />,
       test: ([button]) => {
         expect(+button.textContent).toBe(9)
         expect(updates).toBe(2)

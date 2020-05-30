@@ -85,7 +85,6 @@ function reconcile(WIP: IFiber): IFiber | undefined {
 }
 
 function updateHook<P = Attributes>(WIP: IFiber): void {
-  // options.updateHook && options.updateHook(WIP)
   currentFiber = WIP
   resetCursor()
   let children = (WIP.type as FC<P>)(WIP.props)

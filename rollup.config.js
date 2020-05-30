@@ -1,13 +1,13 @@
 import { terser } from 'rollup-plugin-terser'
 import typescript from 'rollup-plugin-typescript2'
+import multi from '@rollup/plugin-multi-entry';
 
 export default {
-  input: 'src/index.ts',
+  input: ['src/index.ts','compat/index.ts'],
   output: [
     {
       file: 'dist/fre.js',
       format: 'umd',
-      esModule: false,
       name: 'fre',
       sourcemap: true
     },
@@ -20,6 +20,7 @@ export default {
     }),
     terser({
       include: ['fre.js']
-    })
+    }),
+    multi()
   ]
 }
