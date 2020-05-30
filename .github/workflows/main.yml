@@ -14,6 +14,11 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+      - name: node dependencies cache
+        uses: actions/cache@v1.1.0
+        with:
+          path: ~/.npm
+          key: ${{ runner.OS }}-node-modules-cache-${{ hashFiles('yarn.lock') }}
       - name: install
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
