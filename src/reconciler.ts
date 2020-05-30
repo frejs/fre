@@ -61,7 +61,6 @@ function reconcile(WIP: IFiber): IFiber | undefined {
       updateHook(WIP)
     } catch (e) {
       if (!!e && typeof e.then === 'function') {
-        // this is lazy Component, its parent is a Suspense Component
         catchPromise(WIP, e)
       }
     }

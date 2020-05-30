@@ -4,7 +4,6 @@ import { useState, useEffect } from './hooks'
 import { getCurrentFiber } from './reconciler'
 
 export function catchPromise(WIP: IFiber, e: Function) {
-  console.log(WIP, e)
   WIP.parent.promises = WIP.parent.promises || []
   WIP.parent.promises.push(e as any)
 }
