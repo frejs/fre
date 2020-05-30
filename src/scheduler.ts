@@ -9,11 +9,13 @@ const frameLength: number = 5
 
 export function scheduleCallback(callback: ITaskCallback): void {
   const currentTime = getTime()
+  const startTime = currentTime
   const timeout = 3000
-  const dueTime = currentTime + timeout
+  const dueTime = startTime + timeout
 
   let newTask = {
     callback,
+    startTime,
     dueTime
   }
 
