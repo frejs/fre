@@ -3,10 +3,10 @@
 import { h } from '../dist/fre.esm'
 
 test('create JSX node', () => {
-  const div = <div />
+  const div = <div/>
 
   expect(div).toStrictEqual({
-    type: 'div',
+    type: "div",
     key: null,
     ref: null,
     props: {}
@@ -14,15 +14,15 @@ test('create JSX node', () => {
 })
 
 test('create JSX node with key and props', () => {
-  const div = <input key="foo" name="foo" value="bar" />
+  const div = <input key="foo" name="foo" value="bar"/>
 
   expect(div).toStrictEqual({
-    type: 'input',
-    key: 'foo',
+    type: "input",
+    key: "foo",
     ref: null,
     props: {
-      name: 'foo',
-      value: 'bar'
+      name: "foo",
+      value: "bar"
     }
   })
 })
@@ -31,24 +31,24 @@ test('create JSX node with children', () => {
   const divs = (
     <div key="a">
       <div key="b">
-        <div key="c" />
+        <div key="c"/>
       </div>
     </div>
   )
 
   expect(divs).toStrictEqual({
-    type: 'div',
-    key: 'a',
+    type: "div",
+    key: "a",
     ref: null,
     props: {
       children: {
-        type: 'div',
-        key: 'b',
+        type: "div",
+        key: "b",
         ref: null,
         props: {
           children: {
-            type: 'div',
-            key: 'c',
+            type: "div",
+            key: "c",
             ref: null,
             props: {}
           }
@@ -59,17 +59,10 @@ test('create JSX node with children', () => {
 })
 
 test('ignore `true`, `false`, `null` and `undefined` JSX literals', () => {
-  const div = (
-    <div>
-      {true}
-      {false}
-      {null}
-      {undefined}
-    </div>
-  )
+  const div = <div>{true}{false}{null}{undefined}</div>
 
   expect(div).toStrictEqual({
-    type: 'div',
+    type: "div",
     key: null,
     ref: null,
     props: {}
@@ -77,40 +70,37 @@ test('ignore `true`, `false`, `null` and `undefined` JSX literals', () => {
 })
 
 test('emit JSX string/number literals', () => {
-  const div = (
-    <div>
-      {'hello'}
-      {''}
-      {123}
-    </div>
-  )
+  const div = <div>{"hello"}{""}{123}</div>
 
   expect(div).toStrictEqual({
-    type: 'div',
+    type: "div",
     key: null,
     ref: null,
     props: {
       children: [
-        'hello',
-        '',
-        123
+        { type: "text", props: { nodeValue: "hello" } },
+        { type: "text", props: { nodeValue: "" } },
+        { type: "text", props: { nodeValue: 123 } },
       ]
     }
   })
 })
 
 test('emit JSX component nodes', () => {
-  const Component = ({ value }) => <input value={value} />
+  const Component = ({ value }) => <input value={value}/>
 
-  const div = <Component value={'foo'}>bar</Component>
+  const div = <Component value={"foo"}>bar</Component>
 
   expect(div).toStrictEqual({
     type: Component,
     key: null,
     ref: null,
     props: {
-      value: 'foo',
-      children: "bar"
+      value: "foo",
+      children: {
+        type: "text",
+        props: { nodeValue: "bar" }
+      }
     }
   })
 })

@@ -73,7 +73,6 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
   }
   WIP.dirty = WIP.dirty ? false : 0
   commitQueue.push(WIP)
-  WIP.oldProps = WIP.props || WIP.type
 
   if (WIP.child) return WIP.child
   while (WIP) {
@@ -135,19 +134,18 @@ const reconcileChildren = (WIP: IFiber, children: FreNode): void => {
   }
 
   let prevFiber: IFiber | null
-  let alternate: IFiber | null
 
   for (const k in newFibers) {
     let newFiber = newFibers[k]
     let oldFiber = reused[k]
 
     if (oldFiber) {
-      alternate = createFiber(oldFiber, Flag.UPDATE)
-      newFiber = { ...alternate, ...newFiber }
-      newFiber.lastProps = alternate.props
+      oldFiber.op = Flag.UPDATE
+      newFiber = { ...oldFiber, ...newFiber }
+      newFiber.lastProps = oldFiber.props
       if (shouldPlace(newFiber)) newFiber.op = Flag.PLACE
     } else {
-      newFiber = createFiber(newFiber, Flag.PLACE)
+      newFiber.op = Flag.PLACE
     }
 
     newFibers[k] = newFiber
@@ -203,10 +201,6 @@ const commit = (fiber: IFiber): void => {
     parentNode.insertBefore(node, after)
   }
   refer(ref, node)
-}
-
-const createFiber = (vnode: Partial<IFiber>, op: number): IFiber => {
-  return { ...vnode, op } as IFiber
 }
 
 const hashfy = <P>(c: IFiber<P>): FiberMap<P> => {
