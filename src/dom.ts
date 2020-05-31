@@ -5,7 +5,7 @@ export const updateElement = <P extends Attributes>(
   dom: DOM,
   oldProps: P,
   newProps: P
-) =>{
+) => {
   for (let name in { ...oldProps, ...newProps }) {
     let oldValue = oldProps[name]
     let newValue = newProps[name]
@@ -33,7 +33,7 @@ export const updateElement = <P extends Attributes>(
   }
 }
 
-export const createElement=<P = Attributes>(fiber: IFiber)=> {
+export const createElement = <P = Attributes>(fiber: IFiber) => {
   const dom =
     fiber.type === 'text'
       ? document.createTextNode(fiber.props.s)

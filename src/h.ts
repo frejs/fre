@@ -3,7 +3,7 @@ import { some } from './reconciler'
 
 // Supported and simplify jsx2
 // * https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md
-export function h<P extends Attributes = {}>(
+export const h = function<P extends Attributes = {}>(
   type: FC<P>,
   attrs: P
 ): Partial<IFiber> {
