@@ -1,4 +1,4 @@
-import { jsx, Fragment } from './jsx'
+import { h, Fragment } from './h'
 import { render, scheduleWork, getCurrentFiber, options } from './reconciler'
 import {
   useState,
@@ -12,9 +12,8 @@ import {
 export * from './type'
 
 export {
-  jsx,
-  jsx as createElement,
-  jsx as h,
+  h,
+  h as createElement,
   render,
   scheduleWork,
   useState,
@@ -30,9 +29,8 @@ export {
   options
 }
 const Fre = {
-  jsx,
-  h: jsx,
-  createElement: jsx,
+  h,
+  createElement: h,
   render,
   scheduleWork,
   useState,

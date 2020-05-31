@@ -12,18 +12,18 @@ import {
 } from './type'
 let cursor = 0
 
-export function resetCursor() {
+export const resetCursor = () => {
   cursor = 0
 }
 
-export function useState<T>(initState: T): [T, Dispatch<SetStateAction<T>>] {
+export const useState = <T>(initState: T): [T, Dispatch<SetStateAction<T>>] => {
   return useReducer(null, initState)
 }
 
-export function useReducer<S, A, Dependency = any>(
+export const useReducer = <S, A, Dependency = any>(
   reducer?: Reducer<S, A>,
   initState?: S
-): [S, Dispatch<A>] {
+): [S, Dispatch<A>] => {
   const [hook, current]: [[S | A, Dependency], IFiber] = getHook<S>(cursor++)
   const setter = (value: A | Dispatch<A>) => {
     let newValue = reducer
@@ -45,19 +45,19 @@ export function useReducer<S, A, Dependency = any>(
   }
 }
 
-export function useEffect(cb: EffectCallback, deps?: DependencyList): void {
+export const useEffect = (cb: EffectCallback, deps?: DependencyList): void => {
   return effectImpl(cb, deps!, 'effect')
 }
 
-export function useLayout(cb: EffectCallback, deps?: DependencyList): void {
+export const useLayout = (cb: EffectCallback, deps?: DependencyList): void => {
   return effectImpl(cb, deps!, 'layout')
 }
 
-function effectImpl(
+const effectImpl = (
   cb: EffectCallback,
   deps: DependencyList,
   key: HookTpes
-): void {
+): void => {
   let [hook, current] = getHook(cursor++)
   if (isChanged(hook[1], deps)) {
     hook[0] = useCallback(cb, deps)
@@ -66,7 +66,7 @@ function effectImpl(
   }
 }
 
-export function useMemo<S = Function>(cb: () => S, deps?: DependencyList): S {
+export const useMemo = <S = Function>(cb: () => S, deps?: DependencyList): S => {
   let hook = getHook<S>(cursor++)[0]
   if (isChanged(hook[1], deps!)) {
     hook[1] = deps
@@ -75,20 +75,20 @@ export function useMemo<S = Function>(cb: () => S, deps?: DependencyList): S {
   return hook[0]
 }
 
-export function useCallback<T extends (...args: any[]) => void>(
+export const useCallback = <T extends (...args: any[]) => void>(
   cb: T,
   deps?: DependencyList
-): T {
+): T => {
   return useMemo(() => cb, deps)
 }
 
-export function useRef<T>(current: T): RefObject<T> {
+export const useRef = <T>(current: T): RefObject<T> => {
   return useMemo(() => ({ current }), [])
 }
 
-export function getHook<S = Function | undefined, Dependency = any>(
+export const getHook = <S = Function | undefined, Dependency = any>(
   cursor: number
-): [[S, Dependency], IFiber] {
+): [[S, Dependency], IFiber] => {
   const current: IFiber<any> = getCurrentFiber()
   let hooks =
     current.hooks || (current.hooks = { list: [], effect: [], layout: [] })
@@ -98,6 +98,6 @@ export function getHook<S = Function | undefined, Dependency = any>(
   return [(hooks.list[cursor] as unknown) as [S, Dependency], current]
 }
 
-export function isChanged(a: DependencyList, b: DependencyList) {
+export const isChanged = (a: DependencyList, b: DependencyList) => {
   return !a || b.some((arg, index) => arg !== a[index])
 }

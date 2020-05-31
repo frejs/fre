@@ -1,9 +1,9 @@
 import { Attributes, FC, FreNode, IFiber, PropsWithChildren } from './type'
-import { Flag, some } from './reconciler'
+import { some } from './reconciler'
 
 // Supported and simplify jsx2
 // * https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md
-export function jsx<P extends Attributes = {}>(
+export function h<P extends Attributes = {}>(
   type: FC<P>,
   attrs: P
 ): Partial<IFiber> {
@@ -11,7 +11,6 @@ export function jsx<P extends Attributes = {}>(
   let key = props.key || null
   let ref = props.ref || null
   let children: FreNode[] = []
-
   for (let i = 2; i < arguments.length; i++) {
     let vnode = arguments[i]
     if (some(vnode)) {
@@ -34,7 +33,7 @@ export function jsx<P extends Attributes = {}>(
   return { type, props, key, ref } as Partial<IFiber>
 }
 
-export function Fragment(props: PropsWithChildren): FreNode {
+export const Fragment = (props: PropsWithChildren): FreNode => {
   return props.children
 }
 export const isArr = Array.isArray

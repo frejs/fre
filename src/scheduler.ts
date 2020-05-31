@@ -6,7 +6,7 @@ let currentCallback: ITaskCallback | undefined
 let frameDeadline: number = 0
 const frameLength: number = 5
 
-export function scheduleCallback(callback: ITaskCallback): void {
+export const scheduleCallback = (callback: ITaskCallback): void => {
   const currentTime = getTime()
   const timeout = 3000
   const dueTime = currentTime + timeout
@@ -21,7 +21,7 @@ export function scheduleCallback(callback: ITaskCallback): void {
   planWork(null)
 }
 
-function flush(iniTime: number): boolean {
+const flush = (iniTime: number): boolean => {
   let currentTime = iniTime
   let currentTask = peek(taskQueue)
 
@@ -42,12 +42,12 @@ function flush(iniTime: number): boolean {
   return !!currentTask
 }
 
-function peek(queue){
+const peek = (queue: ITask[]) => {
   queue.sort((a, b) => a.dueTime - b.dueTime)
   return queue[0]
 }
 
-function flushWork(): void {
+const flushWork = (): void => {
   if (isFn(currentCallback)) {
     let currentTime = getTime()
     frameDeadline = currentTime + frameLength
@@ -66,7 +66,7 @@ export const planWork: (cb?: IVoidCb | undefined) => number | void = (() => {
   return (cb?: IVoidCb) => setTimeout(cb || flushWork)
 })()
 
-export function shouldYeild(): boolean {
+export const shouldYeild = (): boolean => {
   return getTime() >= frameDeadline
 }
 
