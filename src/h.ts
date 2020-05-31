@@ -1,4 +1,4 @@
-import { Attributes, FC, FreNode, IFiber, PropsWithChildren } from './type'
+import { Attributes, FC, FreNode, IFiber, PropsWithChildren, FreElement } from './type'
 import { some, isStr } from './reconciler'
 
 // Supported and simplify jsx2
@@ -37,7 +37,7 @@ export const h = function<P extends Attributes = {}>(
 }
 
 export function createText(vnode: string) {
-  return { type: 'text', props: { nodeValue: vnode } }
+  return { type: 'text', props: { nodeValue: vnode } } as FreElement
 }
 
 export const Fragment = (props: PropsWithChildren): FreNode => {

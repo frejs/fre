@@ -91,6 +91,7 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
   currentFiber = WIP
   resetCursor()
   let children = (WIP.type as FC<P>)(WIP.props)
+  if (isStr(children)) children = createText(children as string)
   reconcileChildren(WIP, children)
 }
 
