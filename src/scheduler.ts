@@ -1,4 +1,3 @@
-import { push, pop, peek } from './heapify'
 import { ITask, ITaskCallback, IVoidCb } from './type'
 import { isFn } from './reconciler'
 
@@ -17,7 +16,7 @@ export function scheduleCallback(callback: ITaskCallback): void {
     dueTime
   }
 
-  push(taskQueue, newTask)
+  taskQueue.push(newTask)
   currentCallback = flush as ITaskCallback
   planWork(null)
 }
@@ -34,13 +33,18 @@ function flush(iniTime: number): boolean {
     currentTask.callback = null
 
     let next = isFn(callback) && callback(timeout)
-    next ? (currentTask.callback = next) : pop(taskQueue)
+    next ? (currentTask.callback = next) : taskQueue.shift()
 
     currentTask = peek(taskQueue)
     currentTime = getTime()
   }
 
   return !!currentTask
+}
+
+function peek(queue){
+  queue.sort((a, b) => a.dueTime - b.dueTime)
+  return queue[0]
 }
 
 function flushWork(): void {

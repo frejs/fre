@@ -17,7 +17,6 @@ export function resetCursor() {
 }
 
 export function useState<T>(initState: T): [T, Dispatch<SetStateAction<T>>] {
-  console.log(getCurrentFiber())
   return useReducer(null, initState)
 }
 
