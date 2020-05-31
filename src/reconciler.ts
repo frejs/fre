@@ -14,7 +14,7 @@ import {
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild, planWork } from './scheduler'
-import { isArr } from './h'
+import { isArr, createText } from './h'
 export const options: Option = {
   catchError(_, e) {
     throw e
@@ -73,7 +73,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
   }
   WIP.dirty = WIP.dirty ? false : 0
   commitQueue.push(WIP)
-  WIP.oldProps = WIP.props
+  WIP.oldProps = WIP.props || WIP.type
 
   if (WIP.child) return WIP.child
   while (WIP) {
@@ -206,12 +206,7 @@ const commit = (fiber: IFiber): void => {
 }
 
 const createFiber = (vnode: Partial<IFiber>, op: number): IFiber => {
-  if (isStr(vnode)) vnode = createText(vnode as string)
   return { ...vnode, op } as IFiber
-}
-
-const createText = (s: string) => {
-  return { type: 'text', props: { s } }
 }
 
 const hashfy = <P>(c: IFiber<P>): FiberMap<P> => {
@@ -273,8 +268,5 @@ export const enum Flag {
   PLACE = 1,
   UPDATE = 2,
   DELETE = 3,
-  SVG = 4,
-  MEMO = 5,
-  LAZY = 6,
-  SUSPENSE = 7
+  SVG = 4
 }

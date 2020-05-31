@@ -10,7 +10,7 @@ export const updateElement = <P extends Attributes>(
     let oldValue = oldProps[name]
     let newValue = newProps[name]
 
-    if (oldValue == newValue || name === 'children' || name === 's') {
+    if (oldValue == newValue || name === 'children') {
     } else if (name === 'style') {
       for (const k in { ...oldValue, ...newValue }) {
         if (!(oldValue && newValue && oldValue[k] === newValue[k])) {
@@ -36,7 +36,7 @@ export const updateElement = <P extends Attributes>(
 export const createElement = <P = Attributes>(fiber: IFiber) => {
   const dom =
     fiber.type === 'text'
-      ? document.createTextNode(fiber.props.s)
+      ? document.createTextNode('')
       : fiber.tag === Flag.SVG
       ? document.createElementNS(
           'http://www.w3.org/2000/svg',
