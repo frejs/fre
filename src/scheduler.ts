@@ -71,3 +71,5 @@ export const shouldYeild = (): boolean => {
 }
 
 export const getTime = () => performance.now()
+
+// export const ceiling = () => ((((getTime() + 500) / 25) | 0) + 1) * 25

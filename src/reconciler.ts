@@ -13,7 +13,7 @@ import {
 } from './type'
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
-import { scheduleCallback, shouldYeild, planWork, getTime } from './scheduler'
+import { scheduleCallback, shouldYeild, planWork } from './scheduler'
 import { isArr } from './h'
 export const options: Option = {
   catchError(_, e) {
@@ -183,7 +183,6 @@ const commitWork = (fiber: IFiber): void => {
 
 const commit = (fiber: IFiber): void => {
   const { op, parentNode, node, ref, hooks } = fiber
-  if (op === Flag.NOWORK) return
   if (op === Flag.DELETE) {
     hooks && hooks.list.forEach(cleanup)
     cleanupRef(fiber.kids)

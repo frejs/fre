@@ -1,13 +1,13 @@
 import { h, useState, useEffect, options } from '../dist/fre.esm'
-
+const SUSPENSE = 9
 let oldCatchError = options.catchError
 options.catchError = (fiber, error) => {
   if (!!error && typeof error.then === 'function') {
-    fiber.dueTime = performance.now() + 5000
+    fiber.tag = SUSPENSE
     fiber.promises = fiber.promises || []
     fiber.promises.push(error)
-    oldCatchError(fiber, error)
-  }
+    //
+  } else oldCatchError(fiber, error)
 }
 
 export function lazy(loader) {

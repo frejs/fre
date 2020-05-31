@@ -2,11 +2,25 @@
 // import { createElement as h, useState, useEffect } from "react"
 // import { h, render } from 'preact'
 // import {useState, useEffect } from 'preact/hooks'
-import { h, render, useState, useEffect } from '../../src'
+// import { lazy, Suspense } from 'preact/compat'
+import { lazy, Suspense } from '../../compat/index'
+import { render, h, useState, useEffect } from '../../dist/fre.esm'
+
+const A = lazy(() => {
+  return new Promise(resolve =>
+    setTimeout(
+      () =>
+        resolve({
+          default: function Hello() {
+            return <div>A</div>
+          }
+        }),
+      2000
+    )
+  )
+})
 
 const UPDATE_EVERY = 500
-const BLOCK_FOR = 10
-const NUM_COMPONENTS = 100
 
 const App = () => {
   const [count, setCount] = useState(0)
@@ -15,34 +29,22 @@ const App = () => {
     setTimeout(() => setCount(count + 1), UPDATE_EVERY)
   })
 
-  const values = []
-
-  for (let i = count; i < count + NUM_COMPONENTS; i++) {
-    values.push(i)
-  }
-
   return (
     <div className="wraper">
       <h1>Count: {count}</h1>
-      {values.map((value, index) => (
-        <SlowComponent key={value} value={value} />
-      ))}
+      <Suspense fallback={<div>Loading...</div>}>
+        {Array(2).fill().map(() => {
+          return <A />
+        })}
+      </Suspense>
     </div>
   )
-}
-
-const SlowComponent = ({ value }) => {
-  const start = performance.now()
-  while (performance.now() - start < BLOCK_FOR) {}
-
-  return <li className="slow">{value}</li>
 }
 
 const root = document.getElementById('root')
 let div = document.createElement('div')
 div.innerHTML = `<style>
 body {
-  background: #010911;
   font-family: sans-serif;
 }
 

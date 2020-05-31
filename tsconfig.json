@@ -7,7 +7,6 @@
       "removeComments": true,
       "moduleResolution": "node",
       "sourceMap": false,
-      "strict": false
     },
     "exclude": ["node_modules", "dist"],
     "include": ["src", "src/expiration.ts"]
