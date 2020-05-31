@@ -1,6 +1,11 @@
-import { SVG } from './reconciler'
+import { Attributes, DOM, IFiber } from './type'
+import { Flag } from './reconciler'
 
-export function updateElement(dom, oldProps, newProps) {
+export const updateElement = <P extends Attributes>(
+  dom: DOM,
+  oldProps: P,
+  newProps: P
+) => {
   for (let name in { ...oldProps, ...newProps }) {
     let oldValue = oldProps[name]
     let newValue = newProps[name]
@@ -9,30 +14,35 @@ export function updateElement(dom, oldProps, newProps) {
     } else if (name === 'style') {
       for (const k in { ...oldValue, ...newValue }) {
         if (!(oldValue && newValue && oldValue[k] === newValue[k])) {
-          dom[name][k] = (newValue && newValue[k]) || ''
+          ;(dom as any)[name][k] = (newValue && newValue[k]) || ''
         }
       }
     } else if (name[0] === 'o' && name[1] === 'n') {
-      name = name.slice(2).toLowerCase()
+      name = name.slice(2).toLowerCase() as Extract<keyof P, string>
       if (oldValue) dom.removeEventListener(name, oldValue)
       dom.addEventListener(name, newValue)
     } else if (name in dom && !(dom instanceof SVGElement)) {
-      dom[name] = newValue == null ? '' : newValue
+      // for property, such as className
+      ;(dom as any)[name] = newValue == null ? '' : newValue
     } else if (newValue == null || newValue === false) {
       dom.removeAttribute(name)
     } else {
+      // for attributes
       dom.setAttribute(name, newValue)
     }
   }
 }
 
-export function createElement(fiber) {
+export const createElement = <P = Attributes>(fiber: IFiber) => {
   const dom =
     fiber.type === 'text'
       ? document.createTextNode('')
-      : fiber.tag === SVG
-      ? document.createElementNS('http://www.w3.org/2000/svg', fiber.type)
-      : document.createElement(fiber.type)
-  updateElement(dom, {}, fiber.props)
+      : fiber.tag === Flag.SVG
+      ? document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          fiber.type as string
+        )
+      : document.createElement(fiber.type as string)
+  updateElement(dom as DOM, {} as P, fiber.props as P)
   return dom
 }

@@ -1,35 +1,35 @@
 /** @jsx h */
-import { h, useState, memo } from '../src/index'
+import { h, useState } from '../dist/fre.esm'
 import { testUpdates } from './test-util'
 
-test('async state update', async () => {
+test('batch updates', async () => {
   let updates = 0
 
-  const Component = memo(() => {
+  const Component = () => {
     const [count, setState] = useState(0)
-
-    updates += 1
-
-    return <button onClick={() => setState(count => count + 1)}>{count}</button>
-  })
+    updates++
+    const asyncUp = () => {
+      for (let i = 0; i < 10; i++) {
+        setState(i)
+      }
+    }
+    return <button onClick={asyncUp}>{count}</button>
+  }
 
   await testUpdates([
     {
-      content: <Component/>,
+      content: <Component />,
       test: ([button]) => {
         expect(+button.textContent).toBe(0)
         expect(updates).toBe(1)
-
-        // trigger several functional state updates:
         button.click()
-        button.click()
-        button.click()
+        updates = 0
       }
     },
     {
-      content: <Component/>,
+      content: <Component />,
       test: ([button]) => {
-        expect(+button.textContent).toBe(3) // all 3 state updates applied
+        expect(+button.textContent).toBe(9)
         expect(updates).toBe(2)
       }
     }

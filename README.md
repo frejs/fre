@@ -192,12 +192,6 @@ const cb = useCallback(() => {
 }, [])
 ```
 
-The implement amount to
-
-```js
-useMemo(() => cb, deps)
-```
-
 #### useRef
 
 `useRef` will return a function or an object.
@@ -227,53 +221,6 @@ function App() {
 }
 ```
 
-### useContext
-
-Context is no need to build in fre core. It can be implemented in user land and has slector and better performance.
-
-Here is an example: [use-context-selector](https://github.com/yisar/fre/blob/master/demo/src/use-context.js)
-
-```js
-const Context = createContext({
-  count1: 0,
-  count2: 0
-})
-
-function App() {
-  const [count, setCount] = useState(Context.value)
-  return (
-    <Context.Provider value={count}>
-      <A />
-      <B />
-      <button onClick={() => setCount({ ...count, count1: count.count1 + 1 })}>
-        +
-      </button>
-    </Context.Provider>
-  )
-}
-
-function A() {
-  const context = useContext(Context, ctx => ctx.count1) // with selector, only execute when count1 changed
-  console.log('A')
-  return <div>{context}</div>
-}
-
-function B() {
-  const context = useContext(Context, ctx => ctx.count2)
-  console.log('B')
-  return <div>{context}</div>
-}
-```
-
-### memo
-
-The component can use `Fre.memo`, it will compare props shallowly and tell optimization explicitly.
-
-```js
-import { memo } from 'fre'
-const MemoComponent = memo(() => 'hello world')
-```
-
 ### Fragments
 
 Fragments will not create dom element.
@@ -293,36 +240,6 @@ The above code needs babel plugin `@babel/plugin-transform-react-jsx`
   }
 ]
 ```
-
-### render props / children
-
-```js
-const HelloBox = () => <Box render={value => <h1>{value}</h1>} />
-
-const Box = props => <div>{props.render('hello world!')}</div>
-```
-
-```js
-const HelloBox = () => (
-  <Box>
-    {value => {
-      return <h1>{value}</h1>
-    }}
-  </Box>
-)
-
-const Box = props => <div>{props.children('hello world!')}</div>
-```
-
-### Concurrent
-
-Fre implements a tiny priority scheduler, which called [Concurrent Mode](https://reactjs.org/docs/concurrent-mode-intro.html).
-
-It uses the `linked list` data struct to iterate a tree, which can better break, continue, and fallback.
-
-At the same time, it uses double buffering to separate reading and writing.
-
-Of course, the new data struct brings different algorithms and many possibilities.
 
 #### time slicing
 

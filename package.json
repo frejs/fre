@@ -5,6 +5,16 @@
   "main": "dist/fre.js",
   "unpkg": "dist/fre.js",
   "module": "dist/fre.esm.js",
+  "exports": {
+    ".": {
+      "browser": "./dist/fre.esm.js",
+      "umd": "./dist/fre.js"
+    },
+    "./compat": {
+      "browser": "./dist/fre-compat.js",
+      "umd": "./dist/fre-compat.js"
+    }
+  },
   "typings": "./index.d.ts",
   "files": [
     "src/**/*",
@@ -15,7 +25,8 @@
   "scripts": {
     "test": "jest --coverage",
     "build": "rollup -c && gzip-size dist/fre.js",
-    "format": "prettier --write \"{src,test,demo}/**/*.js\"",
+    "build:compat": "rollup --config compat/rollup.config.js",
+    "dev": "rollup -c --watch",
     "prepublishOnly": "yarn build"
   },
   "keywords": [],
@@ -24,34 +35,25 @@
   "devDependencies": {
     "@babel/core": "^7.0.0-0",
     "@babel/plugin-transform-react-jsx": "^7.9.4",
-    "@babel/plugin-transform-runtime": "^7.6.2",
-    "@babel/preset-env": "^7.9.5",
-    "@babel/preset-react": "^7.9.4",
-    "@babel/preset-typescript": "^7.9.0",
     "@types/jest": "^24.0.15",
     "babel-jest": "^24.8.0",
     "codecov": "^3.6.1",
     "cross-env": "^5.2.0",
     "gzip-size-cli": "^3.0.0",
     "jest": "^24.8.0",
-    "prettier": "^1.19.1",
-    "rollup": "^1.10.1",
+    "rollup": "^2.11.2",
     "rollup-plugin-babel": "^4.3.3",
-    "rollup-plugin-cleanup": "^3.1.1",
-    "rollup-plugin-license": "^0.8.1",
     "rollup-plugin-terser": "^5.1.2",
+    "rollup-plugin-typescript2": "^0.27.0",
     "terser": "^4.1.2",
-    "typescript": "^3.5.2",
-    "yarpm": "^0.2.1"
+    "typescript": "3.9.1-rc",
+    "yarpm": "^0.2.1",
+    "parcel": "^2.0.0-alpha.3.2"
   },
   "dependencies": {},
   "jest": {
     "coveragePathIgnorePatterns": [
       "<rootDir>/test/test-util.js"
     ]
-  },
-  "prettier": {
-    "singleQuote": true,
-    "semi": false
   }
 }
