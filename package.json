@@ -5,6 +5,16 @@
   "main": "dist/fre.js",
   "unpkg": "dist/fre.js",
   "module": "dist/fre.esm.js",
+  "exports": {
+    ".": {
+      "browser": "./dist/fre.esm.js",
+      "umd": "./dist/fre.js"
+    },
+    "./compat": {
+      "browser": "./dist/fre-compat.js",
+      "umd": "./dist/fre-compat.js"
+    }
+  },
   "typings": "./index.d.ts",
   "files": [
     "src/**/*",
@@ -31,11 +41,8 @@
     "cross-env": "^5.2.0",
     "gzip-size-cli": "^3.0.0",
     "jest": "^24.8.0",
-    "prettier": "^1.19.1",
     "rollup": "^2.11.2",
     "rollup-plugin-babel": "^4.3.3",
-    "rollup-plugin-cleanup": "^3.1.1",
-    "rollup-plugin-license": "^0.8.1",
     "rollup-plugin-terser": "^5.1.2",
     "rollup-plugin-typescript2": "^0.27.0",
     "terser": "^4.1.2",
@@ -48,9 +55,5 @@
     "coveragePathIgnorePatterns": [
       "<rootDir>/test/test-util.js"
     ]
-  },
-  "prettier": {
-    "singleQuote": true,
-    "semi": false
   }
 }
