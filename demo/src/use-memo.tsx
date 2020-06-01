@@ -1,5 +1,3 @@
-// import {h, render} from 'preact'
-// import {useEffect,useMemo,useState,useCallback} from './preact/dist/hooks'
 import { h, render, useState, useMemo, useEffect } from '../../src'
 
 function Counter() {

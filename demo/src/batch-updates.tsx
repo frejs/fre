@@ -1,8 +1,4 @@
 import { h, render, useState } from '../../src'
-// import { h, render } from 'preact'
-// import {useState } from 'preact/hooks'
-// import { render } from "react-dom"
-// import { createElement as h, useState, useEffect } from "react"
 
 function App() {
   console.log(123)

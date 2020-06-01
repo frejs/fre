@@ -1,7 +1,3 @@
-// import { unstable_createRoot } from "react-dom"
-// import { createElement as h, useState, useEffect } from "react"
-// import { h, render } from 'preact'
-// import {useState, useEffect } from 'preact/hooks'
 import { h, render, useState, useEffect } from '../../src'
 
 const UPDATE_EVERY = 500
