@@ -237,12 +237,8 @@ const side = (effects: IEffect[]): void => {
 
 export const getCurrentFiber = () => currentFiber || null
 
-const effect = (e: IEffect): void => {
-  const res = e[0](currentFiber)
-  if (isFn(res)) e[2] = res
-}
-
-const cleanup = (e: IEffect): void => e[2] && e[2]()
+const effect = (e: IEffect): void => e[2] = e[0](currentFiber)
+const cleanup = (e: IEffect): void => e[2] && e[2](currentFiber)
 
 export const isFn = (x: any): x is Function => typeof x === 'function'
 export const isStr = (s: any): s is number | string =>
