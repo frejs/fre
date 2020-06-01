@@ -13,7 +13,7 @@ export const scheduleCallback = (callback: ITaskCallback): void => {
 
   let newTask = {
     callback,
-    dueTime,
+    dueTime
   }
 
   taskQueue.push(newTask)
@@ -57,10 +57,11 @@ const flushWork = (): void => {
 }
 
 export const planWork: (cb?: IVoidCb | undefined) => number | void = (() => {
-  if (typeof postMessage !== 'undefined') {
-    // https://stackoverflow.com/questions/18826570/settimeout0-vs-window-postmessage-vs-messageport-postmessage
-    onmessage = flushWork
-    return (cb?: IVoidCb) => (cb ? requestAnimationFrame(cb) : postMessage(null, '*'))
+  if (typeof MessageChannel !== 'undefined') {
+    const { port1, port2 } = new MessageChannel()
+    port1.onmessage = flushWork
+    return (cb?: IVoidCb) =>
+      cb ? requestAnimationFrame(cb) : port2.postMessage(null)
   }
   return (cb?: IVoidCb) => setTimeout(cb || flushWork)
 })()
