@@ -1,11 +1,11 @@
 import { terser } from 'rollup-plugin-terser'
 import typescript from 'rollup-plugin-typescript2'
-import dts from 'rollup-plugin-dts'
 
-export const plugins = [
+const plugins = [
   typescript({
     tsconfig: 'tsconfig.json',
     removeComments: true,
+    useTsconfigDeclarationDir: true,
   }),
   terser({
     include: ['fre.js'],

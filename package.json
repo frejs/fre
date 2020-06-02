@@ -11,7 +11,7 @@
       "umd": "./dist/fre-compat.js"
     }
   },
-  "typings": "dist/index.d.ts",
+  "typings": "dist/types/index.d.ts",
   "files": [
     "src/**/*",
     "dist/*.js",
