@@ -6,16 +6,12 @@
   "unpkg": "dist/fre.js",
   "module": "dist/fre.esm.js",
   "exports": {
-    ".": {
-      "browser": "./dist/fre.esm.js",
-      "umd": "./dist/fre.js"
-    },
     "./compat": {
       "browser": "./dist/fre-compat.js",
       "umd": "./dist/fre-compat.js"
     }
   },
-  "typings": "./index.d.ts",
+  "typings": "dist/index.d.ts",
   "files": [
     "src/**/*",
     "dist/*.js",
@@ -44,6 +40,7 @@
     "parcel": "^2.0.0-alpha.3.2",
     "rollup": "^2.11.2",
     "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-dts": "^1.4.7",
     "rollup-plugin-terser": "^5.1.2",
     "rollup-plugin-typescript2": "^0.27.0",
     "terser": "^4.1.2",

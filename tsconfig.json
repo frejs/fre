@@ -1,13 +1,14 @@
 {
-    "compilerOptions": {
-      "module": "ES6",
-      "lib": ["es6", "dom"],
-      "target": "ES2015",
-      "allowSyntheticDefaultImports": true,
-      "removeComments": true,
-      "moduleResolution": "node",
-      "sourceMap": false,
-    },
-    "exclude": ["node_modules", "dist"],
-    "include": ["src", "src/expiration.ts"]
-  }
+  "compilerOptions": {
+    "module": "ES6",
+    "lib": ["es6", "dom"],
+    "target": "ES2015",
+    "allowSyntheticDefaultImports": true,
+    "removeComments": true,
+    "moduleResolution": "node",
+    "sourceMap": false,
+    "declaration": true
+  },
+  "exclude": ["node_modules", "dist"],
+  "include": ["src"]
+}
