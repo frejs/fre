@@ -15,12 +15,6 @@
 - :confetti_ball: Concurrent and Suspense
 - :telescope: keyed reconcilation algorithm
 
-#### Contributors
-
-Fre has wonderful code, we need more to join us and improve together.
-
-<a href="https://github.com/yisar/fre/graphs/contributors"><img src="https://opencollective.com/fre/contributors.svg?width=890&button=false" /></a>
-
 ### Real world
 
 [clicli.me](https://www.clicli.me)
