@@ -3,14 +3,16 @@ import { some, isStr } from './reconciler'
 
 // Supported and simplify jsx2
 // * https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md
-export const h = function<P extends Attributes = {}>(
+export const h = function <P extends Attributes = {}>(
   type: FC<P>,
   attrs: P
 ): Partial<IFiber> {
   let props = attrs || ({} as P)
   let key = props.key || null
   let ref = props.ref || null
+
   let children: FreNode[] = []
+  let simpleNode = '';
   for (let i = 2; i < arguments.length; i++) {
     let vnode = arguments[i]
     if (some(vnode)) {
@@ -19,7 +21,15 @@ export const h = function<P extends Attributes = {}>(
         vnode = [].concat(...vnode)
       }
       if (isStr(vnode)) {
-        vnode = createText(vnode as string)
+        // merge simple nodes
+        simpleNode += vnode;
+        const nextNode = arguments[i+1];
+        if (nextNode && isStr(nextNode)) {
+          continue; 
+        } else {
+          vnode = createText(simpleNode as string)
+          simpleNode = '';
+        }
       }
       children.push(vnode)
     }
