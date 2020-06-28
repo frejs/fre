@@ -76,9 +76,7 @@ test('merge simple nodes', () => {
     key: null,
     ref: null,
     props: {
-      children: [
-        { type: "text", props: { nodeValue: "hello123" } },
-      ]
+      children: { type: "text", props: { nodeValue: "hello123" } },
     }
   })
 })
