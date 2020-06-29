@@ -24,7 +24,7 @@ export const h = function <P extends Attributes = {}>(
         // merge simple nodes
         simpleNode += vnode;
         const nextNode = arguments[i+1];
-        if (nextNode && isStr(nextNode)) {
+        if (isDefine(nextNode) && isStr(nextNode)) {
           continue; 
         } else {
           vnode = createText(simpleNode as string)
@@ -54,3 +54,5 @@ export const Fragment = (props: PropsWithChildren): FreNode => {
   return props.children
 }
 export const isArr = Array.isArray
+
+export const isDefine = (val) => val !== undefined;
