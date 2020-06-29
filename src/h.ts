@@ -5,8 +5,7 @@ import { some, isStr } from './reconciler'
 // * https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md
 export const h = function <P extends Attributes = {}>(
   type: FC<P>,
-  attrs: P,
-  ...childrenEle
+  attrs: P
 ): Partial<IFiber> {
   let props = attrs || ({} as P)
   let key = props.key || null
@@ -14,25 +13,27 @@ export const h = function <P extends Attributes = {}>(
 
   let children: FreNode[] = [];
   let simpleNode = '';
-  const childrenEleLen = childrenEle.length;
-  childrenEle.forEach((child, i) => {
-    const isEnd = i === (childrenEleLen - 1);
+  const childrenArgLen = arguments.length;
+  for (let i = 2; i < childrenArgLen; i++) {
+    let child = arguments[i];
+    const isEnd = i === childrenArgLen - 1;
     // if vnode is a nest array, flat them first
     while (isArr(child) && child.some(v => isArr(v))) {
       child = [].concat(...child)
     }
     let vnode = some(child) ? child : '';
+    const isStrNode = isStr(vnode);
     // merge simple nodes
-    if (isStr(vnode)) {
+    if (isStrNode) {
       simpleNode += String(vnode);
     }
-    if (simpleNode && (typeof vnode === 'object' || isEnd)) {
+    if (simpleNode && (!isStrNode || isEnd)) {
       children.push(createText(simpleNode));
     }
-    if (typeof vnode === 'object') {
+    if (!isStrNode) {
       children.push(vnode);
     }
-  })
+  }
 
   if (children.length) {
     // if there is only on child, it not need an array, such as child use as a function
