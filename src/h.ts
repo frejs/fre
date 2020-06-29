@@ -29,6 +29,7 @@ export const h = function <P extends Attributes = {}>(
     }
     if (simpleNode && (!isStrNode || isEnd)) {
       children.push(createText(simpleNode));
+      simpleNode = '';
     }
     if (!isStrNode) {
       children.push(vnode);
