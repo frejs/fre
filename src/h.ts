@@ -11,27 +11,27 @@ export const h = function <P extends Attributes = {}>(
   let key = props.key || null
   let ref = props.ref || null
 
-  let children: FreNode[] = []
+  let children: FreNode[] = [];
   let simpleNode = '';
-  for (let i = 2; i < arguments.length; i++) {
-    let vnode = arguments[i]
-    if (some(vnode)) {
-      // if vnode is a nest array, flat them first
-      while (isArr(vnode) && vnode.some(v => isArr(v))) {
-        vnode = [].concat(...vnode)
-      }
-      if (isStr(vnode)) {
-        // merge simple nodes
-        simpleNode += vnode;
-        const nextNode = arguments[i+1];
-        if (isDefine(nextNode) && isStr(nextNode)) {
-          continue; 
-        } else {
-          vnode = createText(simpleNode as string)
-          simpleNode = '';
-        }
-      }
-      children.push(vnode)
+  const childrenArgLen = arguments.length;
+  for (let i = 2; i < childrenArgLen; i++) {
+    let child = arguments[i];
+    const isEnd = i === childrenArgLen - 1;
+    // if vnode is a nest array, flat them first
+    while (isArr(child) && child.some(v => isArr(v))) {
+      child = [].concat(...child)
+    }
+    let vnode = some(child) ? child : '';
+    const isStrNode = isStr(vnode);
+    // merge simple nodes
+    if (isStrNode) {
+      simpleNode += String(vnode);
+    }
+    if (simpleNode && (!isStrNode || isEnd)) {
+      children.push(createText(simpleNode));
+    }
+    if (!isStrNode) {
+      children.push(vnode);
     }
   }
 
@@ -55,4 +55,3 @@ export const Fragment = (props: PropsWithChildren): FreNode => {
 }
 export const isArr = Array.isArray
 
-export const isDefine = (val) => val !== undefined;
