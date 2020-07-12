@@ -3,37 +3,30 @@ import { some, isStr } from './reconciler'
 
 // Supported and simplify jsx2
 // * https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md
-export const h = function <P extends Attributes = {}>(
-  type: FC<P>,
-  attrs: P
-): Partial<IFiber> {
+export const h = function <P extends Attributes = {}>(type: FC<P>, attrs: P): Partial<IFiber> {
   let props = attrs || ({} as P)
   let key = props.key || null
   let ref = props.ref || null
 
-  let children: FreNode[] = [];
-  let simpleNode = '';
-  const childrenArgLen = arguments.length;
-  for (let i = 2; i < childrenArgLen; i++) {
-    let child = arguments[i];
-    const isEnd = i === childrenArgLen - 1;
+  let children: FreNode[] = []
+  let simple = ''
+  const len = arguments.length
+  for (let i = 2; i < len; i++) {
+    let child = arguments[i]
+    const end = i === len - 1
     // if vnode is a nest array, flat them first
-    while (isArr(child) && child.some(v => isArr(v))) {
+    while (isArr(child) && child.some((v) => isArr(v))) {
       child = [].concat(...child)
     }
-    let vnode = some(child) ? child : '';
-    const isStrNode = isStr(vnode);
+    let vnode = some(child) ? child : ''
+    const str = isStr(vnode)
     // merge simple nodes
-    if (isStrNode) {
-      simpleNode += String(vnode);
+    if (str) simple += String(vnode)
+    if (simple && (!str || end)) {
+      children.push(createText(simple))
+      simple = ''
     }
-    if (simpleNode && (!isStrNode || isEnd)) {
-      children.push(createText(simpleNode));
-      simpleNode = '';
-    }
-    if (!isStrNode) {
-      children.push(vnode);
-    }
+    if (!str) children.push(vnode)
   }
 
   if (children.length) {
@@ -55,4 +48,3 @@ export const Fragment = (props: PropsWithChildren): FreNode => {
   return props.children
 }
 export const isArr = Array.isArray
-
