@@ -10,7 +10,7 @@ export const updateElement = <P extends Attributes>(
     let oldValue = oldProps[name]
     let newValue = newProps[name]
 
-    if (oldValue == newValue || name === 'children') {
+    if (oldValue === newValue || name === 'children') {
     } else if (name === 'style') {
       for (const k in { ...oldValue, ...newValue }) {
         if (!(oldValue && newValue && oldValue[k] === newValue[k])) {
