@@ -48,7 +48,7 @@ const peek = (queue: ITask[]) => {
 }
 
 const flushWork = (e): void => {
-  if (e.data) {
+  if (e && e.data) {
     currentEffect()
   } else if (isFn(currentCallback)) {
     let currentTime = getTime()
@@ -69,7 +69,7 @@ export const planWork: any = (() => {
       port2.postMessage(cb ? true : false)
     }
   }
-  return (cb: any) => setTimeout(flushWork || cb)
+  return (cb: any) => setTimeout(cb || flushWork)
 })()
 
 export const shouldYeild = (): boolean => {
