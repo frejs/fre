@@ -80,7 +80,7 @@ export type Dispatch<A> = (value: A) => void
 export type Reducer<S, A> = (prevState: S, action: A) => S
 export type IVoidCb = () => void
 export type EffectCallback = () => void | (IVoidCb | undefined)
-export type DependencyList = ReadonlyArray<any>
+export type DependencyList = Array<any>
 
 export interface PropsWithChildren {
   children?: FreNode
