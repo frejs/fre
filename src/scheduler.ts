@@ -13,12 +13,12 @@ export const scheduleCallback = (callback: ITaskCallback): void => {
 
   let newTask = {
     callback,
-    dueTime
+    dueTime,
   }
 
   taskQueue.push(newTask)
   currentCallback = flush as ITaskCallback
-  planWork(null)
+  planWork()
 }
 
 const flush = (iniTime: number): boolean => {
@@ -47,23 +47,29 @@ const peek = (queue: ITask[]) => {
   return queue[0]
 }
 
-const flushWork = (): void => {
-  if (isFn(currentCallback)) {
+const flushWork = (e): void => {
+  if (e.data) {
+    currentEffect()
+  } else if (isFn(currentCallback)) {
     let currentTime = getTime()
     frameDeadline = currentTime + frameLength
     let more = currentCallback(currentTime)
-    more ? planWork(null) : (currentCallback = null)
+    more ? planWork() : (currentCallback = null)
   }
 }
 
-export const planWork: (cb?: IVoidCb | undefined) => number | void = (() => {
+let currentEffect = null
+
+export const planWork: any = (() => {
   if (typeof MessageChannel !== 'undefined') {
     const { port1, port2 } = new MessageChannel()
     port1.onmessage = flushWork
-    return (cb?: IVoidCb) =>
-      cb ? requestAnimationFrame(cb) : port2.postMessage(null)
+    return (cb) => {
+      cb && (currentEffect = cb)
+      port2.postMessage(cb ? true : false)
+    }
   }
-  return (cb?: IVoidCb) => setTimeout(cb || flushWork)
+  return (cb: any) => setTimeout(flushWork || cb)
 })()
 
 export const shouldYeild = (): boolean => {
