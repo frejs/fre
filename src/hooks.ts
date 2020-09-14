@@ -12,17 +12,14 @@ export const useState = <T>(initState: T): [T, Dispatch<SetStateAction<T>>] => {
 
 export const useReducer = <S, A>(reducer?: Reducer<S, A>, initState?: S): [S, Dispatch<A>] => {
   const [hook, current]: [any, IFiber] = getHook<S>(cursor++)
-  const setter = (value: A | Dispatch<A>) => {
-    hook[1] = reducer || value
-    scheduleWork(current)
-  }
-  if (hook.length) {
-    hook[0] = isFn(hook[1]) ? hook[1](hook[0]) : hook[1]
-  } else {
-    hook[0] = initState as S
-    hook[1] = []
-  }
-  return [hook[0] as S, setter]
+  hook[0] = isFn(hook[1]) ? hook[1](hook[0]) : hook[1] || initState
+  return [
+    hook[0] as S,
+    (value: A | Dispatch<A>) => {
+      hook[1] = reducer || value
+      scheduleWork(current)
+    },
+  ]
 }
 
 export const useEffect = (cb: EffectCallback, deps?: DependencyList): void => {
