@@ -46,6 +46,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
     isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
   } catch (e) {
     if (!!e && typeof e.then === 'function') {
+      console.log('111')
       return
     }
   } finally {
