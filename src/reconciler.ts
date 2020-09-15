@@ -1,13 +1,9 @@
 import { IFiber, FreElement, ITaskCallback, FC, Attributes, HTMLElementEx, FreNode, FiberMap, IRef, IEffect, Option } from './type'
 import { createElement, updateElement } from './dom'
-import { resetCursor, currentHook } from './hooks'
+import { resetCursor } from './hooks'
 import { scheduleCallback, shouldYeild, planWork } from './scheduler'
 import { isArr, createText } from './h'
-export const options: Option = {
-  catchError(_, e) {
-    throw e
-  },
-}
+export const options: Option = {}
 
 let preCommit: IFiber | undefined
 let currentFiber: IFiber
@@ -50,7 +46,6 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
     isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
   } catch (e) {
     if (!!e && typeof e.then === 'function') {
-      console.log(currentHook)
       return
     }
   } finally {
@@ -63,9 +58,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
         preCommit = WIP
         return null
       }
-      if (WIP.sibling) {
-        return WIP.sibling
-      }
+      if (WIP.sibling) return WIP.sibling
       WIP = WIP.parent
     }
   }
