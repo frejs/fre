@@ -10,6 +10,7 @@ let currentFiber: IFiber
 let WIP: IFiber | undefined
 let updateQueue: IFiber[] = []
 let commitQueue: IFiber[] = []
+const lanes: Array<number> = [2, 3]
 
 export const render = (vnode: FreElement, node: Element | Document | DocumentFragment | Comment, done?: () => void): void => {
   let rootFiber = {
@@ -21,8 +22,8 @@ export const render = (vnode: FreElement, node: Element | Document | DocumentFra
 }
 
 export const scheduleWork = (fiber: IFiber) => {
-  if (!fiber.dirty) {
-    fiber.dirty = true
+  if (fiber.lane < 2) {
+    fiber.lane = 2
     updateQueue.push(fiber)
   }
   scheduleCallback(reconcileWork as ITaskCallback)
@@ -50,18 +51,25 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
       return
     }
   } finally {
-    WIP.dirty = WIP.dirty ? false : 0
+    WIP.lane = divide(WIP.lane)
     commitQueue.push(WIP)
 
     if (WIP.child) return WIP.child
     while (WIP) {
-      if (!preCommit && WIP.dirty === false) {
+      if (!preCommit && WIP.lane === 1) {
         preCommit = WIP
         return null
       }
       if (WIP.sibling) return WIP.sibling
       WIP = WIP.parent
     }
+  }
+}
+
+const divide = (lane: number) => {
+  if (!lane) return 0
+  for (let i = lanes.length - 1; i >= 0; i--) {
+    if (lane % lanes[i] === 0) return lane
   }
 }
 
@@ -146,7 +154,7 @@ const reconcileChildren = (WIP: IFiber, children: FreNode): void => {
 
 const shouldPlace = (fiber: IFiber): string | boolean | undefined => {
   let p = fiber.parent
-  if (isFn(p.type)) return p.key && !p.dirty
+  if (isFn(p.type)) return p.key && p.lane < 2
   return fiber.key
 }
 
