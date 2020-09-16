@@ -10,6 +10,7 @@ let currentFiber: IFiber
 let WIP: IFiber | undefined
 let updateQueue: IFiber[] = []
 let commitQueue: IFiber[] = []
+const lanes: Array<number> = [2, 3]
 
 export const render = (vnode: FreElement, node: Element | Document | DocumentFragment | Comment, done?: () => void): void => {
   let rootFiber = {
