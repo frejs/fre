@@ -8,7 +8,7 @@ function App() {
       setTwo(two + 1)
     }, 1000)
   })
-  // console.log(count,two)
+  console.log(count,two)
   return (
     <div>
       <button onClick={() => setCount(count + 1, 6)}>{two}</button>

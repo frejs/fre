@@ -8,10 +8,10 @@ const App = () => {
       return () => clearInterval(id)
     }, [])
   const update = () => {
-    setResource(wrapPromise(new Promise((r) => setTimeout(r, 3000)).then(() => 'FETCHED RESULT')))
+    setResource(wrapPromise(new Promise((r) => setTimeout(r, 3000)).then(() => 'FETCHED RESULT')),6)
   }
 
-  // console.log(resource,count)
+  console.log(resource,count)
   return (
     <div>
       <button onClick={update}>CLICK ME</button>
