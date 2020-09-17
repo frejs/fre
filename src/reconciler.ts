@@ -46,10 +46,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
     isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
   } catch (e) {
     if (!!e && typeof e.then === 'function') {
-      e.then(res=>{
-        WIP.hooks.list.forEach((s:any)=>s[3]&&(s[3] = undefined))
-      })
-      return
+      e.then(WIP.hooks.list.forEach((s: any) => s[3] && (s[3] = undefined)))
     }
   } finally {
     WIP.lane = WIP.lane ? false : 0
