@@ -14,7 +14,6 @@ export const useReducer = <S, A>(reducer?: Reducer<S, A>, initState?: S): [S, Di
   const [hook, current]: [any, IFiber] = getHook<S>(cursor++)
   hook[2] = divide(hook[2])
   if (hook[2] > 1) {
-    // current.lane = 0
     hook[3] = false
     scheduleWork(current)
   } else {
