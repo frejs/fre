@@ -10,7 +10,6 @@ let currentFiber: IFiber
 let WIP: IFiber | undefined
 let microTask: IFiber[] = []
 let commitQueue: IFiber[] = []
-const lanes: Array<number> = [2, 3]
 
 export const render = (vnode: FreElement, node: Element | Document | DocumentFragment | Comment, done?: () => void): void => {
   let rootFiber = {
@@ -47,8 +46,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
     isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
   } catch (e) {
     if (!!e && typeof e.then === 'function') {
-      console.log('111')
-      return
+      e.then(WIP.hooks.list.forEach((s: any) => s[3] && (s[3] = undefined)))
     }
   } finally {
     WIP.lane = WIP.lane ? false : 0

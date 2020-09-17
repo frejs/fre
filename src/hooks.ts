@@ -14,11 +14,15 @@ export const useReducer = <S, A>(reducer?: Reducer<S, A>, initState?: S): [S, Di
   const [hook, current]: [any, IFiber] = getHook<S>(cursor++)
   hook[2] = divide(hook[2])
   if (hook[2] > 1) {
-    current.lane = 0
+    hook[3] = false
     scheduleWork(current)
-    hook[0] = initState
   } else {
-    hook[0] = isFn(hook[1]) ? hook[1](hook[0]) : hook[1] || initState
+    if (hook[3]) {
+      hook[0] = initState
+    } else {
+      hook[0] = isFn(hook[1]) ? hook[1](hook[0]) : hook[1] || initState
+    }
+    if (typeof hook[3] === 'boolean') hook[3] = !hook[3]
   }
   return [
     hook[0] as S,
