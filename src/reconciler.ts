@@ -8,7 +8,7 @@ export const options: Option = {}
 let preCommit: IFiber | undefined
 let currentFiber: IFiber
 let WIP: IFiber | undefined
-let updateQueue: IFiber[] = []
+let microTask: IFiber[] = []
 let commitQueue: IFiber[] = []
 const lanes: Array<number> = [2, 3]
 
@@ -24,13 +24,13 @@ export const render = (vnode: FreElement, node: Element | Document | DocumentFra
 export const scheduleWork = (fiber: IFiber) => {
   if (!fiber.lane) {
     fiber.lane = true
-    updateQueue.push(fiber)
+    microTask.push(fiber)
   }
   scheduleCallback(reconcileWork as ITaskCallback)
 }
 
 const reconcileWork = (timeout: boolean): boolean | null | ITaskCallback => {
-  if (!WIP) WIP = updateQueue.shift()
+  if (!WIP) WIP = microTask.shift()
   while (WIP && (!shouldYeild() || timeout)) {
     WIP = reconcile(WIP)
   }
