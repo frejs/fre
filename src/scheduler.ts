@@ -1,7 +1,7 @@
 import { ITask, ITaskCallback, IVoidCb } from './type'
 import { isFn } from './reconciler'
 
-let asyncQueue: ITask[] = []
+let macroTask: ITask[] = []
 let currentCallback: ITaskCallback | undefined
 let frameDeadline: number = 0
 const frameLength: number = 5
@@ -16,14 +16,14 @@ export const scheduleCallback = (callback: ITaskCallback): void => {
     dueTime,
   }
 
-  asyncQueue.push(newTask)
+  macroTask.push(newTask)
   currentCallback = flush as ITaskCallback
   planWork()
 }
 
 const flush = (iniTime: number): boolean => {
   let currentTime = iniTime
-  let currentTask = peek(asyncQueue)
+  let currentTask = peek(macroTask)
 
   while (currentTask) {
     const timeout = currentTask.dueTime <= currentTime
@@ -33,9 +33,9 @@ const flush = (iniTime: number): boolean => {
     currentTask.callback = null
 
     let next = isFn(callback) && callback(timeout)
-    next ? (currentTask.callback = next) : asyncQueue.shift()
+    next ? (currentTask.callback = next) : macroTask.shift()
 
-    currentTask = peek(asyncQueue)
+    currentTask = peek(macroTask)
     currentTime = getTime()
   }
 
