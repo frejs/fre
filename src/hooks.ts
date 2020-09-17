@@ -12,11 +12,19 @@ export const useState = <T>(initState: T): [T, Dispatch<SetStateAction<T>>] => {
 
 export const useReducer = <S, A>(reducer?: Reducer<S, A>, initState?: S): [S, Dispatch<A>] => {
   const [hook, current]: [any, IFiber] = getHook<S>(cursor++)
-  hook[0] = isFn(hook[1]) ? hook[1](hook[0]) : hook[1] || initState
+  hook[2] = divide(hook[2])
+  if (hook[2] > 1) {
+    current.lane = 0
+    scheduleWork(current)
+    hook[0] = initState
+  } else {
+    hook[0] = isFn(hook[1]) ? hook[1](hook[0]) : hook[1] || initState
+  }
   return [
     hook[0] as S,
-    (value: A | Dispatch<A>) => {
+    (value: A | Dispatch<A>, priority: number = 2) => {
       hook[1] = reducer || value
+      hook[2] = priority
       scheduleWork(current)
     },
   ]
@@ -67,4 +75,13 @@ export const getHook = <S = Function | undefined, Dependency = any>(cursor: numb
 
 export const isChanged = (a: DependencyList, b: DependencyList) => {
   return !a || b.some((arg, index) => arg !== a[index])
+}
+
+function divide(num) {
+  let prime = [3, 2]
+  for (let i = 0; i < prime.length; i++) {
+    if (num % prime[i] === 0) {
+      return num / prime[i]
+    }
+  }
 }
