@@ -23,7 +23,7 @@ export const updateElement = <P extends Attributes>(
       dom.addEventListener(name, newValue)
     } else if (name in dom && !(dom instanceof SVGElement)) {
       // for property, such as className
-      ;(dom as any)[name] = newValue == null ? '' : newValue
+      ;(dom as any)[name] = newValue || ''
     } else if (newValue == null || newValue === false) {
       dom.removeAttribute(name)
     } else {
