@@ -199,7 +199,7 @@ function App() {
 }
 ```
 
-If it use a function, It can return a cleanup and exectes when removed.
+If it use a function, It can return a cleanup and executes when removed.
 
 ```js
 function App() {
