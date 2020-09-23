@@ -4,11 +4,11 @@ import { some, isStr } from './reconciler'
 // Supported and simplify jsx2
 // * https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md
 export const h = function <P extends Attributes = {}>(type: FC<P>, attrs: P): Partial<IFiber> {
-  let props = attrs || ({} as P)
-  let key = props.key || null
-  let ref = props.ref || null
+  const props = attrs || ({} as P)
+  const key = props.key || null
+  const ref = props.ref || null
 
-  let children: FreNode[] = []
+  const children: FreNode[] = []
   let simple = ''
   const len = arguments.length
   for (let i = 2; i < len; i++) {
@@ -18,7 +18,7 @@ export const h = function <P extends Attributes = {}>(type: FC<P>, attrs: P): Pa
     while (isArr(child) && child.some((v) => isArr(v))) {
       child = [].concat(...child)
     }
-    let vnode = some(child) ? child : ''
+    const vnode = some(child) ? child : ''
     const str = isStr(vnode)
     // merge simple nodes
     if (str) simple += String(vnode)

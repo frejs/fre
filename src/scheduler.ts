@@ -1,7 +1,7 @@
-import { ITask, ITaskCallback, IVoidCb } from './type'
+import { ITask, ITaskCallback } from './type'
 import { isFn } from './reconciler'
 
-let macroTask: ITask[] = []
+const macroTask: ITask[] = []
 let currentCallback: ITaskCallback | undefined
 let frameDeadline: number = 0
 const frameLength: number = 5
@@ -11,7 +11,7 @@ export const scheduleCallback = (callback: ITaskCallback): void => {
   const timeout = 3000
   const dueTime = currentTime + timeout
 
-  let newTask = {
+  const newTask = {
     callback,
     dueTime,
   }
@@ -21,18 +21,18 @@ export const scheduleCallback = (callback: ITaskCallback): void => {
   planWork()
 }
 
-const flush = (iniTime: number): boolean => {
-  let currentTime = iniTime
+const flush = (initTime: number): boolean => {
+  let currentTime = initTime
   let currentTask = peek(macroTask)
 
   while (currentTask) {
     const timeout = currentTask.dueTime <= currentTime
     if (!timeout && shouldYeild()) break
 
-    let callback = currentTask.callback
+    const callback = currentTask.callback
     currentTask.callback = null
 
-    let next = isFn(callback) && callback(timeout)
+    const next = isFn(callback) && callback(timeout)
     next ? (currentTask.callback = next) : macroTask.shift()
 
     currentTask = peek(macroTask)
@@ -47,13 +47,13 @@ const peek = (queue: ITask[]) => {
   return queue[0]
 }
 
-const flushWork = (e): void => {
-  if (e && e.data) {
+const flushWork = (e: { data: any }): void => {
+  if (e?.data) {
     currentEffect()
   } else if (isFn(currentCallback)) {
-    let currentTime = getTime()
+    const currentTime = getTime()
     frameDeadline = currentTime + frameLength
-    let more = currentCallback(currentTime)
+    const more = currentCallback(currentTime)
     more ? planWork() : (currentCallback = null)
   }
 }
@@ -64,7 +64,7 @@ export const planWork: any = (() => {
   if (typeof MessageChannel !== 'undefined') {
     const { port1, port2 } = new MessageChannel()
     port1.onmessage = flushWork
-    return (cb) => {
+    return (cb: any) => {
       cb && (currentEffect = cb)
       port2.postMessage(cb ? true : false)
     }

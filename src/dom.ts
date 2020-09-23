@@ -14,7 +14,7 @@ export const updateElement = <P extends Attributes>(
     } else if (name === 'style') {
       for (const k in { ...oldValue, ...newValue }) {
         if (!(oldValue && newValue && oldValue[k] === newValue[k])) {
-          ;(dom as any)[name][k] = (newValue && newValue[k]) || ''
+          ;(dom as any)[name][k] = newValue?.[k] || ''
         }
       }
     } else if (name[0] === 'o' && name[1] === 'n') {

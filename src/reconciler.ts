@@ -8,11 +8,11 @@ export const options: Option = {}
 let preCommit: IFiber | undefined
 let currentFiber: IFiber
 let WIP: IFiber | undefined
-let microTask: IFiber[] = []
-let commitQueue: IFiber[] = []
+const microTask: IFiber[] = []
+const commitQueue: IFiber[] = []
 
 export const render = (vnode: FreElement, node: Element | Document | DocumentFragment | Comment, done?: () => void): void => {
-  let rootFiber = {
+  const rootFiber = {
     node,
     props: { children: vnode },
     done,
@@ -45,7 +45,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
   try {
     isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
   } catch (e) {
-    if (!!e && typeof e.then === 'function') {
+    if (typeof e?.then === 'function') {
       e.then(WIP.hooks.list.forEach((s: any) => s[3] && (s[3] = undefined)))
     }
   } finally {
@@ -79,7 +79,7 @@ const updateHost = (WIP: IFiber): void => {
     }
     WIP.node = createElement(WIP) as HTMLElementEx
   }
-  let p = WIP.parentNode || {}
+  const p = WIP.parentNode || {}
   WIP.insertPoint = (p as HTMLElementEx).last || null
   ;(p as HTMLElementEx).last = WIP
   ;(WIP.node as HTMLElementEx).last = null
@@ -97,11 +97,11 @@ const reconcileChildren = (WIP: IFiber, children: FreNode): void => {
   const oldFibers = WIP.kids
   const newFibers = (WIP.kids = hashfy(children as IFiber))
 
-  let reused = {}
+  const reused = {}
 
   for (const k in oldFibers) {
-    let newFiber = newFibers[k]
-    let oldFiber = oldFibers[k]
+    const newFiber = newFibers[k]
+    const oldFiber = oldFibers[k]
 
     if (newFiber && newFiber.type === oldFiber.type) {
       reused[k] = oldFiber
@@ -115,7 +115,7 @@ const reconcileChildren = (WIP: IFiber, children: FreNode): void => {
 
   for (const k in newFibers) {
     let newFiber = newFibers[k]
-    let oldFiber = reused[k]
+    const oldFiber = reused[k]
 
     if (oldFiber) {
       oldFiber.op = Flag.UPDATE
@@ -144,14 +144,14 @@ const reconcileChildren = (WIP: IFiber, children: FreNode): void => {
 }
 
 const shouldPlace = (fiber: IFiber): string | boolean | undefined => {
-  let p = fiber.parent
+  const p = fiber.parent
   if (isFn(p.type)) return p.key && !p.lane
   return fiber.key
 }
 
 const commitWork = (fiber: IFiber): void => {
   commitQueue.forEach(commit)
-  fiber.done && fiber.done()
+  fiber.done?.()
   commitQueue.length = 0
   preCommit = null
   WIP = null
@@ -160,7 +160,7 @@ const commitWork = (fiber: IFiber): void => {
 const commit = (fiber: IFiber): void => {
   const { op, parentNode, node, ref, hooks } = fiber
   if (op === Flag.DELETE) {
-    hooks && hooks.list.forEach(cleanup)
+    hooks?.list.forEach(cleanup)
     cleanupRef(fiber.kids)
     while (isFn(fiber.type)) fiber = fiber.child
     parentNode.removeChild(fiber.node)
@@ -172,8 +172,8 @@ const commit = (fiber: IFiber): void => {
   } else if (op === Flag.UPDATE) {
     updateElement(node, fiber.lastProps, fiber.props)
   } else {
-    let point = fiber.insertPoint ? fiber.insertPoint.node : null
-    let after = point ? point.nextSibling : parentNode.firstChild
+    const point = fiber.insertPoint ? fiber.insertPoint.node : null
+    const after = point ? point.nextSibling : parentNode.firstChild
     if (after === node) return
     if (after === null && node === parentNode.lastChild) return
     parentNode.insertBefore(node, after)
@@ -209,8 +209,8 @@ const side = (effects: IEffect[]): void => {
 
 export const getCurrentFiber = () => currentFiber || null
 
-const effect = (e: IEffect): void => (e[2] = e[0](currentFiber))
-const cleanup = (e: IEffect): void => e[2] && e[2](currentFiber)
+const effect = (e: IEffect): void => e[2] = e[0](currentFiber)
+const cleanup = (e: IEffect): void => e[2]?.(currentFiber)
 
 export const isFn = (x: any): x is Function => typeof x === 'function'
 export const isStr = (s: any): s is number | string => typeof s === 'number' || typeof s === 'string'
