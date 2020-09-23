@@ -43,7 +43,7 @@ export const useLayout = (cb: EffectCallback, deps?: DependencyList): void => {
 }
 
 const effectImpl = (cb: EffectCallback, deps: DependencyList, key: HookTpes): void => {
-  let [hook, current] = getHook(cursor++)
+  const [hook, current] = getHook(cursor++)
   if (isChanged(hook[1], deps)) {
     hook[0] = useCallback(cb, deps)
     hook[1] = deps
@@ -52,7 +52,7 @@ const effectImpl = (cb: EffectCallback, deps: DependencyList, key: HookTpes): vo
 }
 
 export const useMemo = <S = Function>(cb: () => S, deps?: DependencyList): S => {
-  let hook = getHook<S>(cursor++)[0]
+  const hook = getHook<S>(cursor++)[0]
   if (isChanged(hook[1], deps!)) {
     hook[1] = deps
     return (hook[0] = cb())
@@ -70,7 +70,7 @@ export const useRef = <T>(current: T): RefObject<T> => {
 
 export const getHook = <S = Function | undefined, Dependency = any>(cursor: number): [[S, Dependency], IFiber] => {
   const current: IFiber<any> = getCurrentFiber()
-  let hooks = current.hooks || (current.hooks = { list: [], effect: [], layout: [] })
+  const hooks = current.hooks || (current.hooks = { list: [], effect: [], layout: [] })
   if (cursor >= hooks.list.length) {
     hooks.list.push([] as IEffect)
   }
@@ -81,8 +81,8 @@ export const isChanged = (a: DependencyList, b: DependencyList) => {
   return !a || b.some((arg, index) => arg !== a[index])
 }
 
-function divide(num) {
-  let prime = [3, 2]
+function divide(num: number) {
+  const prime = [3, 2]
   for (let i = 0; i < prime.length; i++) {
     if (num % prime[i] === 0) {
       return num / prime[i]
