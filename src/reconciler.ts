@@ -50,7 +50,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
     }
   } finally {
     WIP.lane = WIP.lane ? false : 0
-    commitQueue.push(WIP)
+    WIP.parent && commitQueue.push(WIP)
 
     if (WIP.child) return WIP.child
     while (WIP) {
@@ -150,7 +150,7 @@ const shouldPlace = (fiber: IFiber): string | boolean | undefined => {
 }
 
 const commitWork = (fiber: IFiber): void => {
-  commitQueue.forEach((c) => c.parent && commit(c))
+  commitQueue.forEach(commit)
   fiber.done && fiber.done()
   commitQueue.length = 0
   preCommit = null
