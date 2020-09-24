@@ -1,17 +1,17 @@
-import { h, render, useState, useEffect } from '../../src/index'
+import { h, render, useState, useEffect, useResource } from '../../src/index'
 
 const App = () => {
-  const [resource, setResource] = useState(undefined)
+  const [resource, setResource] = useResource(undefined)
   const [count, setCount] = useState(0)
     useEffect(() => {
       const id = setInterval(() => setCount((c) => c + 1), 1000)
       return () => clearInterval(id)
     }, [])
   const update = () => {
-    setResource(wrapPromise(new Promise((r) => setTimeout(r, 3000)).then(() => 'FETCHED RESULT')),6)
+    setResource(wrapPromise(new Promise((r) => setTimeout(r, 3000)).then(() => 'FETCHED RESULT')))
   }
 
-  console.log(resource,count)
+  // console.log(resource,count)
   return (
     <div>
       <button onClick={update}>CLICK ME</button>

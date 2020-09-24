@@ -47,8 +47,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
   } catch (e) {
     if (typeof e?.then === 'function') {
       WIP.lane = false
-      WIP.hooks.list[0][0] = null
-      WIP.hooks.list[0][2] = true as any
+      WIP.hooks.list.forEach((h: any) => (h[3] ? (h[2] = 1) : h.length > 3 ? (h[2] = 2) : null))
       scheduleWork(WIP)
     }
   } finally {

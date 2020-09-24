@@ -7,7 +7,8 @@ import {
   useMemo,
   useCallback,
   useRef,
-  useLayout
+  useLayout,
+  useResource
 } from './hooks'
 export * from './type'
 
@@ -23,6 +24,7 @@ export {
   useCallback,
   useRef,
   useLayout,
+  useResource,
   useLayout as useLayoutEffect,
   Fragment,
   getCurrentFiber,
@@ -38,6 +40,7 @@ const Fre = {
   useEffect,
   useMemo,
   useCallback,
+  useResource,
   useRef,
   Fragment,
   getCurrentFiber,
