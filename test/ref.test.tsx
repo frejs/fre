@@ -1,5 +1,5 @@
 /** @jsx h */
-import { h, useRef } from '../dist/fre.esm'
+import { h, useRef } from '../src/index'
 import { testUpdates } from './test-util'
 
 test('persist reference to any value', async () => {

@@ -1,5 +1,5 @@
 /** @jsx h */
-import { h, useState } from '../dist/fre.esm'
+import { h, useState } from '../src/index'
 import { testUpdates } from './test-util'
 
 test('batch updates', async () => {

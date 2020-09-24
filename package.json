@@ -29,15 +29,11 @@
   "author": "132yse",
   "license": "MIT",
   "devDependencies": {
-    "@babel/core": "^7.0.0-0",
-    "@babel/plugin-transform-react-jsx": "^7.9.4",
-    "@babel/preset-env": "^7.11.5",
     "@types/jest": "^24.0.15",
-    "babel-jest": "^24.8.0",
     "codecov": "^3.6.1",
     "cross-env": "^5.2.0",
     "gzip-size-cli": "^3.0.0",
-    "jest": "^24.8.0",
+    "jest": "^26.4.2",
     "rollup": "^2.11.2",
     "rollup-plugin-terser": "^5.1.2",
     "rollup-plugin-typescript2": "^0.27.0",
@@ -48,7 +44,15 @@
   },
   "jest": {
     "coveragePathIgnorePatterns": [
-      "<rootDir>/test/test-util.js"
+      "<rootDir>/test/test-util.tsx"
+    ],
+    "transform": {
+      ".(ts|tsx)": "ts-jest"
+    },
+    "moduleFileExtensions": [
+      "js",
+      "ts",
+      "tsx"
     ]
   }
 }
