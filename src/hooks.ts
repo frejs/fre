@@ -12,11 +12,19 @@ export const useState = <T>(initState: T): [T, Dispatch<SetStateAction<T>>] => {
 
 export const useReducer = <S, A>(reducer?: Reducer<S, A>, initState?: S): [S, Dispatch<A>] => {
   const [hook, current]: [any, IFiber] = getHook<S>(cursor++)
-  hook[0] = isFn(hook[1]) ? hook[1](hook[0]) : hook[1] || initState
+  if (hook[2] === 1) {
+    hook[0] = initState
+    hook[2] = 0
+  } else if (hook[2] === 2) {
+    hook[2] = 0
+  } else {
+    hook[0] = isFn(hook[1]) ? hook[1](hook[0]) : hook[1] || initState
+  }
   return [
     hook[0] as S,
-    (value: A | Dispatch<A>) => {
+    (value: A | Dispatch<A>, resume?: boolean) => {
       hook[1] = reducer || value
+      hook[3] = resume
       scheduleWork(current)
     },
   ]

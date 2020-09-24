@@ -20,8 +20,8 @@ export const render = (vnode: FreElement, node: Element | Document | DocumentFra
   scheduleWork(rootFiber)
 }
 
-export const scheduleWork = (fiber: IFiber) => {
-  if (!fiber.lane) {
+export const scheduleWork = (fiber?: IFiber) => {
+  if (fiber && !fiber.lane) {
     fiber.lane = true
     microTask.push(fiber)
   }
@@ -46,7 +46,9 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
     isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
   } catch (e) {
     if (typeof e?.then === 'function') {
-      e.then(WIP.hooks.list.forEach((s: any) => s[3] && (s[3] = undefined)))
+      WIP.lane = false
+      WIP.hooks.list.forEach((h: any) => (h[3] ? (h[2] = 1) : h.length > 3 ? (h[2] = 2) : null))
+      scheduleWork(WIP)
     }
   } finally {
     WIP.lane = WIP.lane ? false : 0
@@ -151,8 +153,8 @@ const shouldPlace = (fiber: IFiber): string | boolean | undefined => {
 
 const commitWork = (fiber: IFiber): void => {
   commitQueue.forEach(commit)
-  fiber.done?.()
   commitQueue.length = 0
+  fiber.done?.()
   preCommit = null
   WIP = null
 }
@@ -209,7 +211,7 @@ const side = (effects: IEffect[]): void => {
 
 export const getCurrentFiber = () => currentFiber || null
 
-const effect = (e: IEffect): void => e[2] = e[0](currentFiber)
+const effect = (e: IEffect): void => (e[2] = e[0](currentFiber))
 const cleanup = (e: IEffect): void => e[2]?.(currentFiber)
 
 export const isFn = (x: any): x is Function => typeof x === 'function'

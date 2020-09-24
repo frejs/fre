@@ -7,7 +7,7 @@ import {
   useMemo,
   useCallback,
   useRef,
-  useLayout
+  useLayout,
 } from './hooks'
 export * from './type'
 
