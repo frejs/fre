@@ -249,6 +249,4 @@ Fre implements a compact reconcilation algorithm support keyed, which also calle
 It uses hash to mark locations to reduce much size.
 
 #### License
-
-
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2yisar%2Fyisar.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fyisar%2Ffre?ref=badge_small)
+_MIT @yisar
