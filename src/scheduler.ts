@@ -3,22 +3,20 @@ import { isFn } from './reconciler'
 
 const macroTask: ITask[] = []
 let currentCallback: ITaskCallback | undefined
+let currentEffect = null
 let frameDeadline: number = 0
 const frameLength: number = 5
 
 export const scheduleCallback = (callback: ITaskCallback): void => {
   const currentTime = getTime()
-  const timeout = 3000
-  const dueTime = currentTime + timeout
-
   const newTask = {
     callback,
-    dueTime,
+    time: currentTime + 3000,
   }
 
   macroTask.push(newTask)
   currentCallback = flush as ITaskCallback
-  planWork()
+  postMessage()
 }
 
 const flush = (initTime: number): boolean => {
@@ -26,7 +24,7 @@ const flush = (initTime: number): boolean => {
   let currentTask = peek(macroTask)
 
   while (currentTask) {
-    const timeout = currentTask.dueTime <= currentTime
+    const timeout = currentTask.time <= currentTime
     if (!timeout && shouldYeild()) break
 
     const callback = currentTask.callback
@@ -43,7 +41,7 @@ const flush = (initTime: number): boolean => {
 }
 
 const peek = (queue: ITask[]) => {
-  queue.sort((a, b) => a.dueTime - b.dueTime)
+  queue.sort((a, b) => a.time - b.time)
   return queue[0]
 }
 
@@ -54,13 +52,11 @@ const flushWork = (e: { data: any }): void => {
     const currentTime = getTime()
     frameDeadline = currentTime + frameLength
     const more = currentCallback(currentTime)
-    more ? planWork() : (currentCallback = null)
+    more ? postMessage() : (currentCallback = null)
   }
 }
 
-let currentEffect = null
-
-export const planWork: any = (() => {
+export const postMessage: any = (() => {
   if (typeof MessageChannel !== 'undefined') {
     const { port1, port2 } = new MessageChannel()
     port1.onmessage = flushWork

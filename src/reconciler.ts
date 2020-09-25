@@ -1,7 +1,7 @@
 import { IFiber, FreElement, ITaskCallback, FC, Attributes, HTMLElementEx, FreNode, FiberMap, IRef, IEffect, Option } from './type'
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
-import { scheduleCallback, shouldYeild, planWork } from './scheduler'
+import { scheduleCallback, shouldYeild, postMessage } from './scheduler'
 import { isArr, createText } from './h'
 export const options: Option = {}
 
@@ -169,7 +169,7 @@ const commit = (fiber: IFiber): void => {
   } else if (isFn(fiber.type)) {
     if (hooks) {
       side(hooks.layout)
-      planWork(() => side(hooks.effect))
+      postMessage(() => side(hooks.effect))
     }
   } else if (op === Flag.UPDATE) {
     updateElement(node, fiber.lastProps, fiber.props)

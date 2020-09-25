@@ -60,7 +60,7 @@ export interface IFiber<P extends Attributes = any> {
   insertPoint: IFiber | null
   props: P
   oldProps?: P
-  dueTime?: number
+  time?: number
   promises?: Promise<Function>[]
 }
 
@@ -93,7 +93,7 @@ export type ITaskCallback =
 
 export interface ITask {
   callback?: ITaskCallback
-  dueTime: number
+  time: number
 }
 
 export type DOM = HTMLElement | SVGElement
