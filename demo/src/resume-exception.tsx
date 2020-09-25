@@ -1,24 +1,26 @@
 import { h, render, useState, useEffect, useReducer } from '../../src/index'
 
-const reducer = (state,action)=>{
-  switch(action.type){
+const reducer = (state, action) => {
+  switch (action.type) {
     case '*throw':
       return lazy(new Promise((r) => setTimeout(r, 3000)).then(() => 'Done'))
+    default:
+      return state
   }
 }
 
 const App = () => {
-  const [state, dispatch] = useReducer(reducer,null)
+  const [state, dispatch] = useReducer(reducer, null)
   const [count, setCount] = useState(0)
-    useEffect(() => {
-      const id = setInterval(() => setCount((c) => c + 1), 1000)
-      return () => clearInterval(id)
-    }, [])
+  useEffect(() => {
+    const id = setInterval(() => setCount((c) => c + 1), 1000)
+    return () => clearInterval(id)
+  }, [])
 
-  console.log(state,count)
+  console.log(state, count)
   return (
     <div>
-      <button onClick={()=>dispatch({type:'*throw'})}>CLICK ME</button>
+      <button onClick={() => dispatch({ type: '*throw' })}>CLICK ME</button>
       <pre>{JSON.stringify({ count }, null, 2)}</pre>
       {state ? state.read() : 'Init'}
     </div>
