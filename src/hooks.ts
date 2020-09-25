@@ -22,9 +22,9 @@ export const useReducer = <S, A>(reducer?: Reducer<S, A>, initState?: S): [S, Di
   }
   return [
     hook[0] as S,
-    (value: A | Dispatch<A>, resume?: boolean) => {
-      hook[1] = reducer || value
-      hook[3] = resume
+    (action: A | Dispatch<A>, resume?: boolean) => {
+      hook[1] = reducer ? reducer(hook[0], action as A) : action
+      hook[3] = reducer && (action as any).type[0] === '*'
       scheduleWork(current)
     },
   ]
