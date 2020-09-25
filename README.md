@@ -12,7 +12,7 @@
 ### Feature
 
 - :tada: Functional Component and hooks API
-- :confetti_ball: Time slicing and Resumable exception
+- :confetti_ball: Time slicing and Algebraic effect
 - :telescope: keyed reconcilation algorithm
 
 ### Real world
