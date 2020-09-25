@@ -11,7 +11,7 @@ let WIP: IFiber | undefined
 const microTask: IFiber[] = []
 const commitQueue: IFiber[] = []
 
-export const render = (vnode: FreElement, node: Element | Document | DocumentFragment | Comment, done?: () => void): void => {
+export const render = (vnode: FreElement, node: Node, done?: () => void): void => {
   const rootFiber = {
     node,
     props: { children: vnode },
