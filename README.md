@@ -1,6 +1,6 @@
 <p align="center"><img src="http://wx2.sinaimg.cn/mw690/0060lm7Tly1ftpm5b3ihfj3096097aaj.jpg" alt="fre logo" width="150"></p>
 <h1 align="center">Fre</h1>
-<p align="center">:ghost: Tiny React16 like framework with Concurrent.</p>
+<p align="center">:ghost: Tiny React like framework with Concurrent.</p>
 <p align="center">
 <a href="https://github.com/yisar/fre/actions"><img src="https://img.shields.io/github/workflow/status/yisar/fre/main.svg" alt="Build Status"></a>
 <a href="https://codecov.io/gh/yisar/fre"><img src="https://img.shields.io/codecov/c/github/yisar/fre.svg" alt="Code Coverage"></a>
@@ -12,7 +12,7 @@
 ### Feature
 
 - :tada: Functional Component and hooks API
-- :confetti_ball: Concurrent and Suspense
+- :confetti_ball: Time slicing and Algebraic effects
 - :telescope: keyed reconcilation algorithm
 
 ### Real world
@@ -238,9 +238,9 @@ The above code needs babel plugin `@babel/plugin-transform-react-jsx`
 
 Time slicing is the scheduling of reconcilation, synchronous tasks, sacrifice CPU and reduce blocking time
 
-#### Suspense
+#### resumable exception
 
-Suspense is the scheduling of promise, asynchronous tasks, break current tasks, and continue tasks after promise resolve
+resumable exception is a concept of algebraic effects. It can synchronously throw effects and then resume the execution of other logic of components.
 
 #### key-based reconcilation
 
@@ -249,5 +249,4 @@ Fre implements a compact reconcilation algorithm support keyed, which also calle
 It uses hash to mark locations to reduce much size.
 
 #### License
-
-_MIT_ ©yisar inspired by [react](https://github.com/facebook/react) [preact](https://github.com/preactjs/preact) [anu](https://github.com/RubyLouvre/anu)
+_MIT @yisar
