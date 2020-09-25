@@ -6,9 +6,11 @@
   "unpkg": "dist/fre.js",
   "module": "dist/fre.esm.js",
   "exports": {
-    "./compat": {
-      "browser": "./dist/fre-compat.js",
-      "umd": "./dist/fre-compat.js"
+    "./jsx-runtime": {
+      "main": "./dist/fre.esm.js"
+    },
+    "./jsx-dev-runtime": {
+      "main": "./dist/fre.esm.js"
     }
   },
   "typings": "dist/types/index.d.ts",
