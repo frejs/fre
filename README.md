@@ -12,7 +12,7 @@
 ### Feature
 
 - :tada: Functional Component and hooks API
-- :confetti_ball: Time slicing and resumable exception
+- :confetti_ball: Time slicing and Resumable exception
 - :telescope: keyed reconcilation algorithm
 
 ### Real world
@@ -250,4 +250,5 @@ It uses hash to mark locations to reduce much size.
 
 #### License
 
-_MIT_ ©yisar inspired by [react](https://github.com/facebook/react) [preact](https://github.com/preactjs/preact) [anu](https://github.com/RubyLouvre/anu)
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2yisar%2Fyisar.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fyisar%2Ffre?ref=badge_small)
