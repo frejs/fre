@@ -19,7 +19,7 @@ export const scheduleWork = (callback: ITaskCallback): void => {
   schedule(flushWork)
 }
 
-const requestMC = () => {
+const postMessage = (() => {
   const cb = () => callbacks.splice(0, callbacks.length).forEach((c) => c())
   if (typeof MessageChannel !== 'undefined') {
     const channel = new MessageChannel()
@@ -27,9 +27,7 @@ const requestMC = () => {
     return () => channel.port2.postMessage(null)
   }
   return () => setTimeout(cb)
-}
-
-const postMessage = requestMC()
+})()
 
 const flush = (initTime: number): boolean => {
   let currentTime = initTime
