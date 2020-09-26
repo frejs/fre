@@ -9,7 +9,7 @@ let preCommit: IFiber | undefined
 let currentFiber: IFiber
 let WIP: IFiber | undefined
 const microTask: IFiber[] = []
-const commitQueue: IFiber[] = []
+const commits: IFiber[] = []
 
 export const render = (vnode: FreElement, node: Node, done?: () => void): void => {
   const rootFiber = {
@@ -52,7 +52,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
     }
   } finally {
     WIP.lane = WIP.lane ? false : 0
-    WIP.parent && commitQueue.push(WIP)
+    WIP.parent && commits.push(WIP)
 
     if (WIP.child) return WIP.child
     while (WIP) {
@@ -109,7 +109,7 @@ const reconcileChildren = (WIP: IFiber, children: FreNode): void => {
       reused[k] = oldFiber
     } else {
       oldFiber.op = Flag.DELETE
-      commitQueue.push(oldFiber)
+      commits.push(oldFiber)
     }
   }
 
@@ -152,8 +152,8 @@ const shouldPlace = (fiber: IFiber): string | boolean | undefined => {
 }
 
 const commitWork = (fiber: IFiber): void => {
-  commitQueue.forEach(commit)
-  commitQueue.length = 0
+  commits.forEach(commit)
+  commits.length = 0
   fiber.done?.()
   preCommit = null
   WIP = null

@@ -2,11 +2,11 @@ import { ITask, ITaskCallback } from './type'
 import { isFn } from './reconciler'
 
 const macroTask: ITask[] = []
-let frameDeadline: number = 0
-const frameLength: number = 5
-const cbs = []
+let deadline: number = 0
+const sliceLen: number = 5
+const callbacks = []
 
-export const schedule = (cb) => cbs.push(cb) === 1 && requestMC()()
+export const schedule = (cb) => callbacks.push(cb) === 1 && requestMC()()
 
 export const scheduleWork = (callback: ITaskCallback): void => {
   const currentTime = getTime()
@@ -19,7 +19,7 @@ export const scheduleWork = (callback: ITaskCallback): void => {
 }
 
 const requestMC = () => {
-  const cb = () => cbs.splice(0, cbs.length).forEach((c) => c())
+  const cb = () => callbacks.splice(0, callbacks.length).forEach((c) => c())
   if (typeof MessageChannel !== 'undefined') {
     const channel = new MessageChannel()
     channel.port1.onmessage = cb
@@ -55,12 +55,12 @@ const peek = (queue: ITask[]) => {
 
 const flushWork = (): void => {
   const currentTime = getTime()
-  frameDeadline = currentTime + frameLength
+  deadline = currentTime + sliceLen
   flush(currentTime) && schedule(flushWork)
 }
 
 export const shouldYeild = (): boolean => {
-  return getTime() >= frameDeadline
+  return getTime() >= deadline
 }
 
 const getTime = () => performance.now()
