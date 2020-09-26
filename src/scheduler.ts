@@ -6,7 +6,8 @@ let deadline: number = 0
 const sliceLen: number = 5
 const callbacks = []
 
-export const schedule = (cb) => callbacks.push(cb) === 1 && requestMC()()
+
+export const schedule = (cb) => callbacks.push(cb) === 1 && postMessage()
 
 export const scheduleWork = (callback: ITaskCallback): void => {
   const currentTime = getTime()
@@ -27,6 +28,8 @@ const requestMC = () => {
   }
   return () => setTimeout(cb)
 }
+
+const postMessage = requestMC()
 
 const flush = (initTime: number): boolean => {
   let currentTime = initTime
