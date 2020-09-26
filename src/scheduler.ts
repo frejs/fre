@@ -2,21 +2,30 @@ import { ITask, ITaskCallback } from './type'
 import { isFn } from './reconciler'
 
 const macroTask: ITask[] = []
-let currentCallback: ITaskCallback | undefined
-let currentEffect = null
 let frameDeadline: number = 0
 const frameLength: number = 5
+const cbs = []
 
-export const scheduleCallback = (callback: ITaskCallback): void => {
+export const schedule = (cb) => cbs.push(cb) === 1 && requestMC()()
+
+export const scheduleWork = (callback: ITaskCallback): void => {
   const currentTime = getTime()
   const newTask = {
     callback,
     time: currentTime + 3000,
   }
-
   macroTask.push(newTask)
-  currentCallback = flush as ITaskCallback
-  postMessage()
+  schedule(flushWork)
+}
+
+const requestMC = () => {
+  const cb = () => cbs.splice(0, cbs.length).forEach((c) => c())
+  if (typeof MessageChannel !== 'undefined') {
+    const channel = new MessageChannel()
+    channel.port1.onmessage = cb
+    return () => channel.port2.postMessage(null)
+  }
+  return () => setTimeout(cb)
 }
 
 const flush = (initTime: number): boolean => {
@@ -36,7 +45,6 @@ const flush = (initTime: number): boolean => {
     currentTask = peek(macroTask)
     currentTime = getTime()
   }
-
   return !!currentTask
 }
 
@@ -45,31 +53,14 @@ const peek = (queue: ITask[]) => {
   return queue[0]
 }
 
-const flushWork = (e: { data: any }): void => {
-  if (e?.data) {
-    currentEffect()
-  } else if (isFn(currentCallback)) {
-    const currentTime = getTime()
-    frameDeadline = currentTime + frameLength
-    const more = currentCallback(currentTime)
-    more ? postMessage() : (currentCallback = null)
-  }
+const flushWork = (): void => {
+  const currentTime = getTime()
+  frameDeadline = currentTime + frameLength
+  flush(currentTime) && schedule(flushWork)
 }
-
-export const postMessage: any = (() => {
-  if (typeof MessageChannel !== 'undefined') {
-    const { port1, port2 } = new MessageChannel()
-    port1.onmessage = flushWork
-    return (cb: any) => {
-      cb && (currentEffect = cb)
-      port2.postMessage(cb ? true : false)
-    }
-  }
-  return (cb: any) => setTimeout(cb || flushWork)
-})()
 
 export const shouldYeild = (): boolean => {
   return getTime() >= frameDeadline
 }
 
-export const getTime = () => performance.now()
+const getTime = () => performance.now()

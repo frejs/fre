@@ -1,7 +1,7 @@
 import { IFiber, FreElement, ITaskCallback, FC, Attributes, HTMLElementEx, FreNode, FiberMap, IRef, IEffect, Option } from './type'
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
-import { scheduleCallback, shouldYeild, postMessage } from './scheduler'
+import { scheduleWork, shouldYeild, schedule } from './scheduler'
 import { isArr, createText } from './h'
 export const options: Option = {}
 
@@ -17,15 +17,15 @@ export const render = (vnode: FreElement, node: Node, done?: () => void): void =
     props: { children: vnode },
     done,
   } as IFiber
-  scheduleWork(rootFiber)
+  scheduleUpdate(rootFiber)
 }
 
-export const scheduleWork = (fiber?: IFiber) => {
+export const scheduleUpdate = (fiber?: IFiber) => {
   if (fiber && !fiber.lane) {
     fiber.lane = true
     microTask.push(fiber)
   }
-  scheduleCallback(reconcileWork as ITaskCallback)
+  scheduleWork(reconcileWork as ITaskCallback)
 }
 
 const reconcileWork = (timeout: boolean): boolean | null | ITaskCallback => {
@@ -48,7 +48,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
     if (typeof e?.then === 'function') {
       WIP.lane = false
       WIP.hooks.list.forEach((h: any) => (h[3] ? (h[2] = 1) : h.length > 3 ? (h[2] = 2) : null))
-      scheduleWork(WIP)
+      scheduleUpdate(WIP)
     }
   } finally {
     WIP.lane = WIP.lane ? false : 0
@@ -169,7 +169,7 @@ const commit = (fiber: IFiber): void => {
   } else if (isFn(fiber.type)) {
     if (hooks) {
       side(hooks.layout)
-      postMessage(() => side(hooks.effect))
+      schedule(() => side(hooks.effect))
     }
   } else if (op === Flag.UPDATE) {
     updateElement(node, fiber.lastProps, fiber.props)

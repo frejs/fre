@@ -1,5 +1,5 @@
 import { h, Fragment } from './h'
-import { render, scheduleWork, getCurrentFiber, options } from './reconciler'
+import { render, options } from './reconciler'
 import { useState, useReducer, useEffect, useMemo, useCallback, useRef, useLayout } from './hooks'
 export * from './type'
 
@@ -9,7 +9,6 @@ export {
   h as jsxs,
   h as jsxDEV,
   render,
-  scheduleWork,
   useState,
   useReducer,
   useEffect,
@@ -19,6 +18,5 @@ export {
   useLayout,
   useLayout as useLayoutEffect,
   Fragment,
-  getCurrentFiber,
   options,
 }
