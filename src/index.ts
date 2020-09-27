@@ -1,7 +1,10 @@
 import { h, Fragment } from './h'
-import { render, options } from './reconciler'
+import { render } from './reconciler'
 import { useState, useReducer, useEffect, useMemo, useCallback, useRef, useLayout } from './hooks'
 export * from './type'
+
+const mixins: Record<string,Function> = {}
+
 
 export {
   h,
@@ -18,5 +21,5 @@ export {
   useLayout,
   useLayout as useLayoutEffect,
   Fragment,
-  options,
+  mixins,
 }

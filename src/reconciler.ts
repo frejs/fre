@@ -1,9 +1,8 @@
-import { IFiber, FreElement, ITaskCallback, FC, Attributes, HTMLElementEx, FreNode, FiberMap, IRef, IEffect, Option } from './type'
+import { IFiber, FreElement, ITaskCallback, FC, Attributes, HTMLElementEx, FreNode, FiberMap, IRef, IEffect } from './type'
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { scheduleWork, shouldYeild, schedule } from './scheduler'
 import { isArr, createText } from './h'
-export const options: Option = {}
 
 let preCommit: IFiber | undefined
 let currentFiber: IFiber

@@ -97,5 +97,3 @@ export interface ITask {
 }
 
 export type DOM = HTMLElement | SVGElement
-
-export type Option = Record<string,Function>
