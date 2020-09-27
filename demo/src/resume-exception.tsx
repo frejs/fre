@@ -1,4 +1,4 @@
-import { h, render, useState, useEffect, useReducer } from '../../src/index'
+import { h, render, useState, useReducer, useLayout } from '../../src/index'
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -12,7 +12,7 @@ const reducer = (state, action) => {
 const App = () => {
   const [state, dispatch] = useReducer(reducer, null)
   const [count, setCount] = useState(0)
-  useEffect(() => {
+  useLayout(() => {
     const id = setInterval(() => setCount((c) => c + 1), 1000)
     return () => clearInterval(id)
   }, [])
