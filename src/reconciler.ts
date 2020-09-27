@@ -8,8 +8,9 @@ export const options: Option = {}
 let preCommit: IFiber | undefined
 let currentFiber: IFiber
 let WIP: IFiber | undefined
+let commits: IFiber[] = []
+
 const microTask: IFiber[] = []
-const commits: IFiber[] = []
 
 export const render = (vnode: FreElement, node: Node, done?: () => void): void => {
   const rootFiber = {
@@ -17,10 +18,10 @@ export const render = (vnode: FreElement, node: Node, done?: () => void): void =
     props: { children: vnode },
     done,
   } as IFiber
-  scheduleUpdate(rootFiber)
+  update(rootFiber)
 }
 
-export const scheduleUpdate = (fiber?: IFiber) => {
+export const update = (fiber?: IFiber) => {
   if (fiber && !fiber.lane) {
     fiber.lane = true
     microTask.push(fiber)
@@ -48,7 +49,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
     if (typeof e?.then === 'function') {
       WIP.lane = false
       WIP.hooks.list.forEach((h: any) => (h[3] ? (h[2] = 1) : h.length > 3 ? (h[2] = 2) : null))
-      scheduleUpdate(WIP)
+      update(WIP)
     }
   } finally {
     WIP.lane = WIP.lane ? false : 0
@@ -153,8 +154,8 @@ const shouldPlace = (fiber: IFiber): string | boolean | undefined => {
 
 const commitWork = (fiber: IFiber): void => {
   commits.forEach(commit)
-  commits.length = 0
   fiber.done?.()
+  commits = []
   preCommit = null
   WIP = null
 }

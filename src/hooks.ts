@@ -1,4 +1,4 @@
-import { scheduleUpdate, isFn, getCurrentFiber } from './reconciler'
+import { update, isFn, getCurrentFiber } from './reconciler'
 import { DependencyList, Reducer, IFiber, Dispatch, SetStateAction, EffectCallback, HookTpes, RefObject, IEffect } from './type'
 let cursor = 0
 
@@ -25,7 +25,7 @@ export const useReducer = <S, A>(reducer?: Reducer<S, A>, initState?: S): [S, Di
     (action: A | Dispatch<A>) => {
       hook[1] = reducer ? reducer(hook[0], action as A) : action
       hook[3] = reducer && (action as any).type[0] === '*'
-      scheduleUpdate(current)
+      update(current)
     },
   ]
 }
