@@ -3,12 +3,12 @@ import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { scheduleWork, shouldYield, schedule } from './scheduler'
 import { isArr, createText } from './h'
-import { invokeGuardedCallback, getCaughtError, clearCaughtError, registerErrorListener } from './errorUtil'
 
 let preCommit: IFiber | undefined
 let currentFiber: IFiber
 let WIP: IFiber | undefined
 let commits: IFiber[] = []
+let rootNode: Node = null
 
 const microTask: IFiber[] = []
 
@@ -19,7 +19,9 @@ export const render = (vnode: FreElement, node: Node, done?: () => void): void =
     done,
   } as IFiber
   update(rootFiber)
-  registerErrorListener();
+  rootNode = node
+  window.addEventListener('error', handleError)
+  rootNode.addEventListener('fre-error', (e: CustomEvent) => isFn(e.detail) && e.detail())
 }
 
 export const update = (fiber?: IFiber) => {
@@ -44,23 +46,7 @@ const reconcileWork = (timeout: boolean): boolean | null | ITaskCallback => {
 
 const reconcile = (WIP: IFiber): IFiber | undefined => {
   WIP.parentNode = getParentNode(WIP) as HTMLElementEx
-  invokeGuardedCallback(() => {
-    isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
-  });
-
-  const error = getCaughtError();
-
-  if (error) {
-    // suspend 支持
-    if (typeof error.error?.then === 'function') {
-      WIP.lane = false
-      WIP.hooks.list.forEach((h: any) => (h[3] ? (h[2] = 1) : h.length > 3 ? (h[2] = 2) : null))
-      update(WIP)
-    }
-    // 后续如果有 ErrorBoundary 类似的接口支持，则可以将错误传进去处理
-    clearCaughtError();
-  }
-
+  isFn(WIP.type) ? dispatchEvent(() => updateHook(WIP)) : updateHost(WIP)
   WIP.lane = WIP.lane ? false : 0
   WIP.parent && commits.push(WIP)
 
@@ -190,6 +176,22 @@ const commit = (fiber: IFiber): void => {
     parentNode.insertBefore(node, after)
   }
   refer(ref, node)
+}
+
+export function dispatchEvent(cb) {
+  const ev = document.createEvent('customEvent')
+  //@ts-ignore
+  ev.initCustomEvent('fre-error', false, true, cb)
+  rootNode?.dispatchEvent(ev)
+}
+
+const handleError = (e) => {
+  if (isFn(e.error?.then)) {
+    e.preventDefault()
+    currentFiber.lane = false
+    currentFiber.hooks.list.forEach((h: any) => (h[3] ? (h[2] = 1) : h.length > 3 ? (h[2] = 2) : null))
+    update(currentFiber)
+  }
 }
 
 const hashfy = <P>(c: IFiber<P>): FiberMap<P> => {

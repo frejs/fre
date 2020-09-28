@@ -1,46 +1,36 @@
-interface ICaughtError extends Error {
-  error?: Promise<any>;
-}
-let caughtError: ICaughtError = null;
-let freErrorNode: Node = document.createElement("fre");
-let hasRegisterListener = false;
+import { getCurrentFiber, update } from './reconciler'
 
-const eventType = "fre-error";
 
-function dispatchEvent(cb) {
-  const evt = document.createEvent("customEvent");
+let freErrorNode: Node = document.createElement('fre')
+let hasRegisterListener = false
+
+export function dispatchEvent(cb) {
+  const evt = document.createEvent('customEvent')
   //@ts-ignore
-  evt.initCustomEvent(eventType, false, true, cb);
-  freErrorNode.dispatchEvent(evt);
+  evt.initCustomEvent('fre-error', false, true, cb)
+  freErrorNode.dispatchEvent(evt)
 }
 
 export function registerErrorListener() {
   if (hasRegisterListener) {
-    return;
+    return
   }
 
-  hasRegisterListener = true;
+  hasRegisterListener = true
 
-  const handleError = (error) => {
-    caughtError = error;
-  };
-  window.addEventListener("error", handleError);
-
-  freErrorNode.addEventListener(eventType, (event: CustomEvent) => {
-    if (typeof event.detail === "function") {
-      event.detail();
+  const handleError = (e) => {
+    const current = getCurrentFiber()
+    if (typeof e.error?.then === 'function') {
+      current.lane = false
+      current.hooks.list.forEach((h: any) => (h[3] ? (h[2] = 1) : h.length > 3 ? (h[2] = 2) : null))
+      update(current)
     }
-  });
-}
+  }
+  window.addEventListener('error', handleError)
 
-export function invokeGuardedCallback(fn: () => any, context?, ...args) {
-  dispatchEvent(fn.bind(context, ...args));
-}
-
-export function getCaughtError() {
-  return caughtError;
-}
-
-export function clearCaughtError() {
-  caughtError = null;
+  freErrorNode.addEventListener('fre-error', (event: CustomEvent) => {
+    if (typeof event.detail === 'function') {
+      event.detail()
+    }
+  })
 }
