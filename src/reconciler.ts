@@ -3,6 +3,7 @@ import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { scheduleWork, shouldYield, schedule } from './scheduler'
 import { isArr, createText } from './h'
+import { invokeGuardedCallback, getCaughtError, clearCaughtError, registerErrorListener } from './errorUtil'
 
 let preCommit: IFiber | undefined
 let currentFiber: IFiber
@@ -18,6 +19,7 @@ export const render = (vnode: FreElement, node: Node, done?: () => void): void =
     done,
   } as IFiber
   update(rootFiber)
+  registerErrorListener();
 }
 
 export const update = (fiber?: IFiber) => {
@@ -42,27 +44,34 @@ const reconcileWork = (timeout: boolean): boolean | null | ITaskCallback => {
 
 const reconcile = (WIP: IFiber): IFiber | undefined => {
   WIP.parentNode = getParentNode(WIP) as HTMLElementEx
-  try {
+  invokeGuardedCallback(() => {
     isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
-  } catch (e) {
-    if (typeof e?.then === 'function') {
+  });
+
+  const error = getCaughtError();
+
+  if (error) {
+    // suspend 支持
+    if (typeof error.error?.then === 'function') {
       WIP.lane = false
       WIP.hooks.list.forEach((h: any) => (h[3] ? (h[2] = 1) : h.length > 3 ? (h[2] = 2) : null))
       update(WIP)
     }
-  } finally {
-    WIP.lane = WIP.lane ? false : 0
-    WIP.parent && commits.push(WIP)
+    // 后续如果有 ErrorBoundary 类似的接口支持，则可以将错误传进去处理
+    clearCaughtError();
+  }
 
-    if (WIP.child) return WIP.child
-    while (WIP) {
-      if (!preCommit && WIP.lane === false) {
-        preCommit = WIP
-        return null
-      }
-      if (WIP.sibling) return WIP.sibling
-      WIP = WIP.parent
+  WIP.lane = WIP.lane ? false : 0
+  WIP.parent && commits.push(WIP)
+
+  if (WIP.child) return WIP.child
+  while (WIP) {
+    if (!preCommit && WIP.lane === false) {
+      preCommit = WIP
+      return null
     }
+    if (WIP.sibling) return WIP.sibling
+    WIP = WIP.parent
   }
 }
 
