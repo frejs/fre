@@ -1,7 +1,7 @@
 import { IFiber, FreElement, ITaskCallback, FC, Attributes, HTMLElementEx, FreNode, FiberMap, IRef, IEffect } from './type'
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
-import { scheduleWork, shouldYeild, schedule } from './scheduler'
+import { scheduleWork, shouldYield, schedule } from './scheduler'
 import { isArr, createText } from './h'
 
 let preCommit: IFiber | undefined
@@ -30,7 +30,7 @@ export const update = (fiber?: IFiber) => {
 
 const reconcileWork = (timeout: boolean): boolean | null | ITaskCallback => {
   if (!WIP) WIP = microTask.shift()
-  while (WIP && (!shouldYeild() || timeout)) {
+  while (WIP && (!shouldYield() || timeout)) {
     WIP = reconcile(WIP)
   }
   if (WIP && !timeout) {
