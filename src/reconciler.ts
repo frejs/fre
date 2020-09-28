@@ -18,10 +18,23 @@ export const render = (vnode: FreElement, node: Node, done?: () => void): void =
     props: { children: vnode },
     done,
   } as IFiber
-  update(rootFiber)
-  rootNode = node
+  
+  node.addEventListener('fre-error', (e: CustomEvent) => {
+    console.log(e.detail.name)
+    isFn(e.detail) && e.detail()
+  })
   window.addEventListener('error', handleError)
-  rootNode.addEventListener('fre-error', (e: CustomEvent) => isFn(e.detail) && e.detail())
+  rootNode = node
+  update(rootFiber)
+}
+
+const handleError = (e) => {
+  if (isFn(e.error?.then)) {
+    e.preventDefault()
+    currentFiber.lane = false
+    currentFiber.hooks.list.forEach((h: any) => (h[3] ? (h[2] = 1) : h.length > 3 ? (h[2] = 2) : null))
+    update(currentFiber)
+  } else throw e
 }
 
 export const update = (fiber?: IFiber) => {
@@ -180,18 +193,9 @@ const commit = (fiber: IFiber): void => {
 
 export function dispatchEvent(cb) {
   const ev = document.createEvent('customEvent')
-  //@ts-ignore
+    //@ts-ignore
   ev.initCustomEvent('fre-error', false, true, cb)
   rootNode?.dispatchEvent(ev)
-}
-
-const handleError = (e) => {
-  if (isFn(e.error?.then)) {
-    e.preventDefault()
-    currentFiber.lane = false
-    currentFiber.hooks.list.forEach((h: any) => (h[3] ? (h[2] = 1) : h.length > 3 ? (h[2] = 2) : null))
-    update(currentFiber)
-  }
 }
 
 const hashfy = <P>(c: IFiber<P>): FiberMap<P> => {
