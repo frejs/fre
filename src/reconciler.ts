@@ -8,7 +8,9 @@ let preCommit: IFiber | undefined
 let currentFiber: IFiber
 let WIP: IFiber | undefined
 let commits: IFiber[] = []
-let rootNode: Node = null
+let freErrorNode = document.createElement('fre')
+
+let hasRegisterErrorEvent = false;
 
 const microTask: IFiber[] = []
 
@@ -19,9 +21,14 @@ export const render = (vnode: FreElement, node: Node, done?: () => void): void =
     done,
   } as IFiber
   update(rootFiber)
-  rootNode = node
+  registerErrorEvent()
+}
+
+function registerErrorEvent() {
+  if (hasRegisterErrorEvent) return;
+  hasRegisterErrorEvent = true;
   window.addEventListener('error', handleError)
-  rootNode.addEventListener('fre-error', (e: CustomEvent) => isFn(e.detail) && e.detail())
+  freErrorNode.addEventListener('fre-error', (e: CustomEvent) => isFn(e.detail) && e.detail())
 }
 
 export const update = (fiber?: IFiber) => {
@@ -182,7 +189,7 @@ export function dispatchEvent(cb) {
   const ev = document.createEvent('customEvent')
   //@ts-ignore
   ev.initCustomEvent('fre-error', false, true, cb)
-  rootNode?.dispatchEvent(ev)
+  freErrorNode?.dispatchEvent(ev)
 }
 
 const handleError = (e) => {
