@@ -20,7 +20,7 @@ export const render = (vnode: FreElement, node: Node, done?: () => void): void =
   } as IFiber
   
   node.addEventListener('fre-error', (e: CustomEvent) => {
-    console.log(e.detail.name)
+    console.log(111)
     isFn(e.detail) && e.detail()
   })
   window.addEventListener('error', handleError)
