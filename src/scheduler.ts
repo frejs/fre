@@ -35,7 +35,7 @@ const flush = (initTime: number): boolean => {
 
   while (currentTask) {
     const timeout = currentTask.time <= currentTime
-    if (!timeout && shouldYeild()) break
+    if (!timeout && shouldYield()) break
 
     const callback = currentTask.callback
     currentTask.callback = null
@@ -60,7 +60,7 @@ const flushWork = (): void => {
   flush(currentTime) && schedule(flushWork)
 }
 
-export const shouldYeild = (): boolean => {
+export const shouldYield = (): boolean => {
   return getTime() >= deadline
 }
 
