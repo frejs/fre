@@ -180,7 +180,7 @@ const onError = (e: any) => {
     currentFiber.lane = false
     currentFiber.hooks.list.forEach((h: any) => (h[3] ? (h[2] = 1) : h.length > 3 ? (h[2] = 2) : null))
     dispatchUpdate(currentFiber)
-  } else throw e.error
+  }
 }
 
 const hashfy = <P>(c: IFiber<P>): FiberMap<P> => {
