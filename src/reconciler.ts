@@ -14,7 +14,7 @@ const microTask: IFiber[] = []
 export const render = (vnode: FreElement, node: Node, done?: () => void): void => {
   const rootFiber = {
     node,
-    props: { children: vnode, onError},
+    props: { children: vnode, onError },
     done,
   } as IFiber
   dispatchUpdate(rootFiber)
@@ -180,7 +180,7 @@ const onError = (e: any) => {
     currentFiber.lane = false
     currentFiber.hooks.list.forEach((h: any) => (h[3] ? (h[2] = 1) : h.length > 3 ? (h[2] = 2) : null))
     dispatchUpdate(currentFiber)
-  }
+  } else throw e.error
 }
 
 const hashfy = <P>(c: IFiber<P>): FiberMap<P> => {
