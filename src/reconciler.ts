@@ -14,10 +14,11 @@ const microTask: IFiber[] = []
 export const render = (vnode: FreElement, node: Node, done?: () => void): void => {
   const rootFiber = {
     node,
-    props: { children: vnode, onError },
+    props: { children: vnode },
     done,
   } as IFiber
   dispatchUpdate(rootFiber)
+  window.addEventListener('error', onError)
 }
 
 export const dispatchUpdate = (fiber?: IFiber) => {
@@ -68,7 +69,7 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
 const updateHost = (WIP: IFiber): void => {
   if (!WIP.node) {
     if (WIP.type === 'svg') {
-      WIP.op |= (1 << 6)
+      WIP.op |= (1 << 4)
     }
     WIP.node = createElement(WIP) as HTMLElementEx
   }
@@ -127,8 +128,8 @@ const reconcileChildren = (WIP: IFiber, children: FreNode): void => {
     if (prevFiber) {
       prevFiber.sibling = newFiber
     } else {
-      if (WIP.op & (1 << 6)) {
-        newFiber.op |= (1 << 6)
+      if (WIP.op & (1 << 4)) {
+        newFiber.op |= (1 << 4)
       }
       WIP.child = newFiber
     }

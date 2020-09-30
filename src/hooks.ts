@@ -24,7 +24,7 @@ export const useReducer = <S, A>(reducer?: Reducer<S, A>, initState?: S): [S, Di
     hook[0] as S,
     (action: A | Dispatch<A>) => {
       hook[1] = reducer ? reducer(hook[0], action as A) : action
-      hook[3] = reducer && (action as any).type[0] === '*'
+      hook[2] = reducer && (action as any).type[0] === '*' ? 0b01 : 0b00
       dispatchUpdate(current)
     },
   ]
