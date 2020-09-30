@@ -60,8 +60,6 @@ export interface IFiber<P extends Attributes = any> {
   insertPoint: IFiber | null
   props: P
   oldProps?: P
-  time?: number
-  promises?: Promise<Function>[]
 }
 
 export type HTMLElementEx = HTMLElement & { last: IFiber | null }
