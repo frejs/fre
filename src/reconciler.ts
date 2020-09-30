@@ -99,7 +99,7 @@ const reconcileChildren = (WIP: IFiber, children: FreNode): void => {
     if (newFiber && newFiber.type === oldFiber.type) {
       reused[k] = oldFiber
     } else {
-      oldFiber.op = Flag.DELETE
+      oldFiber.op |= (1 << 3)
       commits.push(oldFiber)
     }
   }
@@ -111,12 +111,14 @@ const reconcileChildren = (WIP: IFiber, children: FreNode): void => {
     const oldFiber = reused[k]
 
     if (oldFiber) {
-      oldFiber.op = Flag.UPDATE
+      oldFiber.op |= (1 << 2)
       newFiber = { ...oldFiber, ...newFiber }
       newFiber.lastProps = oldFiber.props
-      if (shouldPlace(newFiber)) newFiber.op = Flag.PLACE
+      if (shouldPlace(newFiber)) {
+        newFiber.op &= (1 << 1)
+      }
     } else {
-      newFiber.op = Flag.PLACE
+      newFiber.op |= (1 << 1)
     }
 
     newFibers[k] = newFiber
@@ -125,8 +127,8 @@ const reconcileChildren = (WIP: IFiber, children: FreNode): void => {
     if (prevFiber) {
       prevFiber.sibling = newFiber
     } else {
-      if (WIP.tag === Flag.SVG) {
-        newFiber.tag = Flag.SVG
+      if (WIP.op & (1 << 4)) {
+        newFiber.op |= (1 << 4)
       }
       WIP.child = newFiber
     }
@@ -152,7 +154,7 @@ const commitWork = (fiber: IFiber): void => {
 
 const commit = (fiber: IFiber): void => {
   const { op, parentNode, node, ref, hooks } = fiber
-  if (op === Flag.DELETE) {
+  if (op & (1 << 3)) {
     hooks?.list.forEach(cleanup)
     cleanupRef(fiber.kids)
     while (isFn(fiber.type)) fiber = fiber.child
@@ -162,7 +164,7 @@ const commit = (fiber: IFiber): void => {
       side(hooks.layout)
       schedule(() => side(hooks.effect))
     }
-  } else if (op === Flag.UPDATE) {
+  } else if (op & (1 << 2)) {
     updateElement(node, fiber.lastProps, fiber.props)
   } else {
     const point = fiber.insertPoint ? fiber.insertPoint.node : null
