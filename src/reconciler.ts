@@ -68,7 +68,7 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
 const updateHost = (WIP: IFiber): void => {
   if (!WIP.node) {
     if (WIP.type === 'svg') {
-      WIP.tag = Flag.SVG
+      WIP.op |= (1 << 6)
     }
     WIP.node = createElement(WIP) as HTMLElementEx
   }
@@ -127,8 +127,8 @@ const reconcileChildren = (WIP: IFiber, children: FreNode): void => {
     if (prevFiber) {
       prevFiber.sibling = newFiber
     } else {
-      if (WIP.op & (1 << 4)) {
-        newFiber.op |= (1 << 4)
+      if (WIP.op & (1 << 6)) {
+        newFiber.op |= (1 << 6)
       }
       WIP.child = newFiber
     }
@@ -222,11 +222,3 @@ export const some = (v: any) => v != null && v !== false && v !== true
 
 const hs = (i: number, j: string | number | null, k?: string): string =>
   k != null && j != null ? '.' + i + '.' + k : j != null ? '.' + i + '.' + j : k != null ? '.' + k : '.' + i
-
-export const enum Flag {
-  NOWORK = 0,
-  PLACE = 1,
-  UPDATE = 2,
-  DELETE = 3,
-  SVG = 4,
-}
