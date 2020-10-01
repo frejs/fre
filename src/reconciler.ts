@@ -186,7 +186,7 @@ const onError = (e: any) => {
   }
 }
 
-const reset = (h: any) => (h[3] ? (h[2] = 1) : h.length > 3 ? (h[2] = 2) : null)
+const reset = (h: any) => (h[3] ? (h[2] |= (1<<2)) : h.length > 3 ? (h[2] |= (1<<1)) : null)
 
 const hashfy = <P>(c: IFiber<P>): FiberMap<P> => {
   const out: FiberMap<P> = {}
