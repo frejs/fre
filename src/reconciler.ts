@@ -29,16 +29,16 @@ export const dispatchUpdate = (fiber?: IFiber) => {
   scheduleWork(reconcileWork as ITaskCallback)
 }
 
-const reconcileWork = (timeout: boolean): boolean | null | ITaskCallback => {
+const reconcileWork = (timeout: boolean): boolean => {
   if (!WIP) WIP = microTask.shift()
   while (WIP && (!shouldYield() || timeout)) {
     WIP = reconcile(WIP)
   }
   if (WIP && !timeout) {
-    return reconcileWork.bind(null)
+    return true
   }
   if (preCommit) commitWork(preCommit)
-  return null
+  return false
 }
 
 const reconcile = (WIP: IFiber): IFiber | undefined => {
