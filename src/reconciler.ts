@@ -17,7 +17,7 @@ export const render = (vnode: FreElement, node: Node, done?: () => void): void =
     props: { children: vnode },
     done,
   } as IFiber
-  window.addEventListener('error',onError)
+  window.addEventListener('error', onError)
   dispatchUpdate(rootFiber)
 }
 
@@ -69,7 +69,7 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
 const updateHost = (WIP: IFiber): void => {
   if (!WIP.node) {
     if (WIP.type === 'svg') {
-      WIP.op |= (1<<4)
+      WIP.op |= (1 << 4)
     }
     WIP.node = createElement(WIP) as HTMLElementEx
   }
@@ -186,7 +186,8 @@ const onError = (e: any) => {
   }
 }
 
-const reset = (h: any) => (h[3] ? (h[2] |= (1<<2)) : h.length > 3 ? (h[2] |= (1<<1)) : null)
+const reset = (h: any) => (h[2] & (1 << 2) ? h[2] = 0b1101 : h[2] & (1 << 3) ? h[2] = 0b1010 : null)
+
 
 const hashfy = <P>(c: IFiber<P>): FiberMap<P> => {
   const out: FiberMap<P> = {}

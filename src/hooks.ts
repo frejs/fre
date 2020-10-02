@@ -12,11 +12,14 @@ export const useState = <T>(initState: T): [T, Dispatch<SetStateAction<T>>] => {
 
 export const useReducer = <S, A>(reducer?: Reducer<S, A>, initState?: S): [S, Dispatch<A>] => {
   const [hook, current]: [any, IFiber] = getHook<S>(cursor++)
-  if (hook[2] & (1 << 2)) {
+  console.log(hook[2] && hook[2].toString(2))
+
+  if (hook[2] & (1 << 3 >> 3)) {
     hook[0] = initState
-    hook[2] = 0
-  } else if (hook[2] & (1 << 1)) {
-    hook[2] = 0
+    hook[2] = 0b1100
+  } else if (hook[2] & (1 << 3 >> 2)) {
+    console.log(hook[2].toString(2))
+    hook[2] = 0b1000
   } else {
     hook[0] = isFn(hook[1]) ? hook[1](hook[0]) : hook[1] || initState
   }
@@ -24,7 +27,7 @@ export const useReducer = <S, A>(reducer?: Reducer<S, A>, initState?: S): [S, Di
     hook[0] as S,
     (action: A | Dispatch<A>) => {
       hook[1] = reducer ? reducer(hook[0], action as A) : action
-      hook[3] = reducer && (action as any).type[0] === '*'
+      hook[2] = reducer && (action as any).type[0] === '*' ? 0b1100 : 0b1000
       dispatchUpdate(current)
     },
   ]
