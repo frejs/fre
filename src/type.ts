@@ -26,7 +26,7 @@ export interface FreElement<P extends Attributes = any, T = string> {
   props: P
 }
 
-export type HookTpes = 'list' | 'effect' | 'layout'
+export type HookTypes = 'list' | 'effect' | 'layout'
 
 export interface IHook {
   list: IEffect[]

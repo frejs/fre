@@ -1,5 +1,5 @@
 import { dispatchUpdate, isFn, getCurrentFiber } from './reconciler'
-import { DependencyList, Reducer, IFiber, Dispatch, SetStateAction, EffectCallback, HookTpes, RefObject, IEffect } from './type'
+import { DependencyList, Reducer, IFiber, Dispatch, SetStateAction, EffectCallback, HookTypes, RefObject, IEffect } from './type'
 let cursor = 0
 
 export const resetCursor = () => {
@@ -41,7 +41,7 @@ export const useLayout = (cb: EffectCallback, deps?: DependencyList): void => {
   return effectImpl(cb, deps!, 'layout')
 }
 
-const effectImpl = (cb: EffectCallback, deps: DependencyList, key: HookTpes): void => {
+const effectImpl = (cb: EffectCallback, deps: DependencyList, key: HookTypes): void => {
   const [hook, current] = getHook(cursor++)
   if (isChanged(hook[1], deps)) {
     hook[0] = useCallback(cb, deps)
