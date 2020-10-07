@@ -1,5 +1,4 @@
 import { ITask, ITaskCallback } from './type'
-import { isFn } from './reconciler'
 
 const macroTask: ITask[] = []
 let deadline: number = 0
@@ -37,11 +36,15 @@ const flush = (initTime: number): boolean => {
     const timeout = currentTask.time <= currentTime
     if (!timeout && shouldYield()) break
 
-    const callback = currentTask.callback
+    // currentTask.callback can only be reconciler.ts:reconcileWork() or null
+    const reconcileWork = currentTask.callback
     currentTask.callback = null
 
-    const next = isFn(callback) && callback(timeout)
-    next ? (currentTask.callback = next) : macroTask.shift()
+    if (reconcileWork?.(timeout)) {
+      currentTask.callback = reconcileWork
+    } else {
+      macroTask.shift()
+    }
 
     currentTask = peek(macroTask)
     currentTime = getTime()
