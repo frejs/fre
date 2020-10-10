@@ -8,7 +8,6 @@ let preCommit: IFiber | undefined
 let currentFiber: IFiber
 let WIP: IFiber | undefined
 let commits: IFiber[] = []
-
 const microTask: IFiber[] = []
 
 export const render = (vnode: FreElement, node: Node, done?: () => void): void => {
@@ -17,7 +16,6 @@ export const render = (vnode: FreElement, node: Node, done?: () => void): void =
     props: { children: vnode },
     done,
   } as IFiber
-  window.addEventListener('error', onError)
   dispatchUpdate(rootFiber)
 }
 
@@ -184,7 +182,6 @@ const onError = (e: any) => {
 
 const reset = (h: any) => (h[2] & (1 << 2) ? h[2] = 0b1101 : h[2] & (1 << 3) ? h[2] = 0b1010 : null)
 
-
 const hashfy = <P>(c: IFiber<P>): FiberMap<P> => {
   const out: FiberMap<P> = {}
   isArr(c)
@@ -222,3 +219,5 @@ export const some = (v: any) => v != null && v !== false && v !== true
 
 const hs = (i: number, j: string | number | null, k?: string): string =>
   k != null && j != null ? '.' + i + '.' + k : j != null ? '.' + i + '.' + j : k != null ? '.' + k : '.' + i
+
+window.addEventListener('error', onError)
