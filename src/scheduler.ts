@@ -5,7 +5,6 @@ let deadline: number = 0
 const sliceLen: number = 5
 const callbacks = []
 
-
 export const schedule = (cb) => callbacks.push(cb) === 1 && postMessage()
 
 export const scheduleWork = (callback: ITaskCallback): void => {
@@ -21,9 +20,9 @@ export const scheduleWork = (callback: ITaskCallback): void => {
 const postMessage = (() => {
   const cb = () => callbacks.splice(0, callbacks.length).forEach((c) => c())
   if (typeof MessageChannel !== 'undefined') {
-    const channel = new MessageChannel()
-    channel.port1.onmessage = cb
-    return () => channel.port2.postMessage(null)
+    const { port1, port2 } = new MessageChannel()
+    port1.onmessage = cb
+    return () => port2.postMessage(null)
   }
   return () => setTimeout(cb)
 })()
