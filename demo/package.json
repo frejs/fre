@@ -14,10 +14,10 @@
     "@babel/core": "^7.0.0-0",
     "@babel/plugin-transform-react-jsx": "^7.3.0",
     "@babel/preset-react": "^7.0.0",
+    "fre": "1.13.5",
     "parcel-bundler": "^1.12.3",
+    "preact": "^10.0.0",
     "react": "^0.14.0",
-    "react-dom": "^0.0.0-experimental-8b155d261",
-    "fre": "^1.3.13",
-    "preact": "^10.0.0"
+    "react-dom": "^0.0.0-experimental-8b155d261"
   }
 }

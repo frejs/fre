@@ -2422,10 +2422,10 @@ fragment-cache@^0.2.1:
   dependencies:
     map-cache "^0.2.2"
 
-fre@^1.3.13:
-  version "1.13.8"
-  resolved "https://registry.yarnpkg.com/fre/-/fre-1.13.8.tgz#bcb6c34f200d783618c3b93daa83bcf0ade202d2"
-  integrity sha512-+OOYtRJmAWJyup+1deXZhJ1yPz7DL+oLjim/7hA4shgpG+MkXbJ/xosAW2LK81/zjO9tWe+DuR3WG/hFVIzy4g==
+fre@1.13.5:
+  version "1.13.5"
+  resolved "https://registry.npm.taobao.org/fre/download/fre-1.13.5.tgz#5105de806c9130396d2cfcf220d2a6142ef53f84"
+  integrity sha1-UQXegGyRMDltLPzyINKmFC71P4Q=
 
 fresh@0.5.2:
   version "0.5.2"

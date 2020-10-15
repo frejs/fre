@@ -32,9 +32,9 @@ export const dispatchUpdate = (fiber?: IFiber) => {
 const reconcileWork = (timeout: boolean): boolean => {
   if (!WIP) WIP = microTask.shift()
   while (WIP && (!shouldYield() || timeout)) WIP = reconcile(WIP)
-  if (WIP && !timeout) return true
+  if (WIP && !timeout) return reconcileWork.bind(null)
   if (preCommit) commitWork(preCommit)
-  return false
+  return null
 }
 
 const reconcile = (WIP: IFiber): IFiber | undefined => {

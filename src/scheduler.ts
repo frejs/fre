@@ -2,7 +2,7 @@ import { ITask, ITaskCallback } from './type'
 
 const macroTask: ITask[] = []
 let deadline: number = 0
-const sliceLen: number = 5
+const threshold: number = 1000 / 60
 const callbacks = []
 
 
@@ -36,15 +36,11 @@ const flush = (initTime: number): boolean => {
     const timeout = currentTask.time <= currentTime
     if (!timeout && shouldYield()) break
 
-    // currentTask.callback can only be reconciler.ts:reconcileWork() or null
-    const reconcileWork = currentTask.callback
+    const callback = currentTask.callback
     currentTask.callback = null
 
-    if (reconcileWork?.(timeout)) {
-      currentTask.callback = reconcileWork
-    } else {
-      macroTask.shift()
-    }
+    const next = callback(timeout)
+    next ? (currentTask.callback = next as any) : macroTask.shift()
 
     currentTask = peek(macroTask)
     currentTime = getTime()
@@ -59,7 +55,7 @@ const peek = (queue: ITask[]) => {
 
 const flushWork = (): void => {
   const currentTime = getTime()
-  deadline = currentTime + sliceLen
+  deadline = currentTime + threshold
   flush(currentTime) && schedule(flushWork)
 }
 
