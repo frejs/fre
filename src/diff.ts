@@ -4,7 +4,8 @@ const enum Flag {
   Remove = 1 << 3,
   Replace = 1 << 4,
 }
-function diff(newArray, oldArray, newStart = 0, newEnd = newArray.length - 1, oldStart = 0, oldEnd = oldArray.length - 1) {
+export function diff(newArray, oldArray, newStart = 0, newEnd = newArray.length - 1, oldStart = 0, oldEnd = oldArray.length - 1) {
+    console.log(newArray,oldArray)
   let keyMap = {},
     unkeyed = [],
     idxUnkeyed = 0,

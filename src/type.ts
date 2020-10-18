@@ -59,6 +59,7 @@ export interface IFiber<P extends Attributes = any> {
   insertPoint: IFiber | null
   props: P
   oldProps?: P
+  children:any
 }
 
 export type HTMLElementEx = HTMLElement & { last: IFiber | null }

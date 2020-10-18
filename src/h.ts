@@ -1,37 +1,28 @@
 import { Attributes, FC, FreNode, IFiber, PropsWithChildren, FreElement } from './type'
-import { some, isStr } from './reconciler'
+import { some, isFn,isStr } from './reconciler'
 
 // Supported and simplify jsx2
 // * https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md
 export const h = function <P extends Attributes = {}>(type: FC<P>, attrs: P): Partial<IFiber> {
+  for (var vnode, rest = [], children = [], i = arguments.length; i-- > 2; ) {
+    rest.push(arguments[i])
+  }
   const props = attrs || ({} as P)
   const key = props.key || null
   const ref = props.ref || null
 
-  const children: FreNode[] = []
-  let simple = ''
-  const len = arguments.length
-  for (let i = 2; i < len; i++) {
-    let child = arguments[i]
-    const end = i === len - 1
-    // if vnode is a nest array, flat them first
-    while (isArr(child) && child.some((v) => isArr(v))) {
-      child = [].concat(...child)
+  while (rest.length > 0) {
+    if (isArr((vnode = rest.pop()))) {
+      for (var i = vnode.length; i-- > 0; ) {
+        rest.push(vnode[i])
+      }
+    } else if (some(vnode)) {
+      children.push( isStr(vnode)? createText(vnode as string):vnode )
     }
-    const vnode = some(child) ? child : ''
-    const str = isStr(vnode)
-    // merge simple nodes
-    if (str) simple += String(vnode)
-    if (simple && (!str || end)) {
-      children.push(createText(simple))
-      simple = ''
-    }
-    if (!str) children.push(vnode)
   }
-
   if (children.length) {
-    // if there is only on child, it not need an array, such as child use as a function
-    props.children = children.length === 1 ? children[0] : children
+    // for render children function
+    props.children = isFn(children[0]) ? children[0] : children
   }
   // delete them to reduce loop performance
   delete props.key

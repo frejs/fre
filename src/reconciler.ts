@@ -3,6 +3,7 @@ import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { scheduleWork, shouldYield, schedule } from './scheduler'
 import { isArr, createText } from './h'
+import {diff} from './diff'
 
 let preCommit: IFiber | undefined
 let currentFiber: IFiber
@@ -11,6 +12,7 @@ let commits: IFiber[] = []
 const microTask: IFiber[] = []
 
 export const render = (vnode: FreElement, node: Node, done?: () => void): void => {
+  console.log(vnode)
   const rootFiber = {
     node,
     props: { children: vnode },
@@ -62,9 +64,7 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
 
 const updateHost = (WIP: IFiber): void => {
   if (!WIP.node) {
-    if (WIP.type === 'svg') {
-      WIP.op |= (1 << 4)
-    }
+    if (WIP.type === 'svg') WIP.op |= (1 << 4)
     WIP.node = createElement(WIP) as HTMLElementEx
   }
   const p = WIP.parentNode || {}
@@ -81,9 +81,16 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
 }
 
 const reconcileChildren = (WIP: IFiber, children: FreNode): void => {
+  // console.log(children)
   delete WIP.child
   const oldFibers = WIP.kids
   const newFibers = (WIP.kids = hashfy(children as IFiber))
+  WIP.children = children
+
+  if(isArr(children)){
+    // console.log(children,WIP.children)
+    const res = diff(WIP.children,children)
+  }
 
   const reused = {}
 
