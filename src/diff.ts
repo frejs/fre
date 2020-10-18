@@ -58,7 +58,7 @@ export function diff(oldArray, newArray, oldStart = 0, oldEnd = oldArray.length 
   while (ptr) {
     const { newi, oldi } = ptr
     while (curNewi > newi) {
-      diff[d--] = Flag.Replace
+      diff[d--] = Flag.Place
       curNewi--
     }
     while (curOldi > oldi) {
@@ -71,7 +71,7 @@ export function diff(oldArray, newArray, oldStart = 0, oldEnd = oldArray.length 
     ptr = ptr.prev
   }
   while (curNewi >= newStart) {
-    diff[d--] = Flag.Replace
+    diff[d--] = Flag.Place
     curNewi--
   }
   while (curOldi >= oldStart) {

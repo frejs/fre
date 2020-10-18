@@ -8,8 +8,7 @@ import { diff, Flag } from './diff'
 let preCommit: IFiber | undefined
 let currentFiber: IFiber
 let WIP: IFiber | undefined
-let commits: IFiber[] = []
-const commitList = []
+let commits = []
 const microTask: IFiber[] = []
 
 export const render = (vnode: FreElement, node: Node, done?: () => void): void => {
@@ -41,7 +40,6 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
   WIP.parentNode = getParentNode(WIP) as HTMLElementEx
   isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
   WIP.lane = WIP.lane ? false : 0
-  WIP.parent && commits.push(WIP)
 
   if (WIP.child) return WIP.child
   while (WIP) {
@@ -55,6 +53,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
 }
 
 const updateHook = <P = Attributes>(WIP: IFiber): void => {
+  if (!WIP.node) WIP.node = WIP.parent.node
   currentFiber = WIP
   resetCursor()
   let children = (WIP.type as FC<P>)(WIP.props)
@@ -77,16 +76,11 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
 }
 
 const reconcileChildren = (parent: IFiber, children: any): void => {
-  const oldFibers = parent.children
+  const oldFibers = arrayfy(parent.children)
   const newFbiers = (parent.children = arrayfy(children))
-
-  const patch = diff(oldFibers || [], newFbiers)
-
-  console.log(patch)
-
-  commitList.push(commit2.bind(null, patch, parent.parentNode, oldFibers, newFbiers))
-
-  // console.log(commitList)
+  const patch = diff(oldFibers, newFbiers)
+  const p = parent.node
+  parent.parent && commits.push(commit.bind(null, patch, p, oldFibers, newFbiers))
 
   // generate the linked list
   for (var i = 0, prev; i < newFbiers.length; i++) {
@@ -102,42 +96,37 @@ const reconcileChildren = (parent: IFiber, children: any): void => {
   }
 }
 
-const commit2 = (patch, parentNode, oldChildren, newChildren) => {
-  //todo
+const commit = ({ diff, keymap }, parent, o, n, childs = [...parent.childNodes]) => {
+  var newFiber, oldVNode, domNode, oldMatchIndex
+
+  for (var i = 0, newIndex = 0, oldIndex = 0; i < diff.length; i++) {
+    const op = diff[i]
+    if (op === Flag.Update) {
+      //update
+      newIndex++
+      oldIndex++
+    } else if (op === Flag.Place) {
+      newFiber = n[newIndex]
+      if (isFn(newFiber.type)) {
+      } else {
+        const node = newFiber.node
+        console.log(parent, node)
+        parent.insertBefore(node, childs[oldIndex])
+      }
+      newIndex++
+    } else if (op === Flag.Remove) {
+      oldIndex++
+    }
+  }
 }
 
 const commitWork = (fiber: IFiber): void => {
-  commits.forEach(commit)
+  commits.forEach((c) => c())
   fiber.done?.()
   commits = []
   preCommit = null
   WIP = null
 }
-
-const commit = (fiber: IFiber): void => {
-  const { flag, parentNode, node, ref, hooks } = fiber
-  if (flag & (1 << 3)) {
-    hooks?.list.forEach(cleanup)
-    cleanupRef(fiber.children)
-    while (isFn(fiber.type)) fiber = fiber.child
-    parentNode.removeChild(fiber.node)
-  } else if (isFn(fiber.type)) {
-    if (hooks) {
-      side(hooks.layout)
-      schedule(() => side(hooks.effect))
-    }
-  } else if (flag & (1 << 2)) {
-    updateElement(node, fiber.lastProps, fiber.props)
-  } else {
-    const point =  null
-    const after = point ? point.nextSibling : parentNode.firstChild
-    if (after === node) return
-    if (after === null && node === parentNode.lastChild) return
-    parentNode.insertBefore(node, after)
-  }
-  refer(ref, node)
-}
-
 const onError = (e: any) => {
   if (isFn(e.error?.then)) {
     e.preventDefault()
