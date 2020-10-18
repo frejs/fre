@@ -79,18 +79,23 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
   }
 }
 
-const reconcileChildren = (WIP: IFiber, children: any): void => {
+const reconcileChildren = (parent: IFiber, children: any): void => {
+  const oldFibers = parent.children
+  const newFbiers = (parent.children = arrayfy(children))
+
+  console.log(parent)
+
   // generate the linked list
-  for (var i = 0, prevFiber, children = arrayfy(children); i < children.length; i++) {
-    let newFiber = children[i]
-    newFiber.parent = WIP
-    if (i > 1) {
-      prevFiber.sibling = newFiber
+  for (var i = 0, prev; i < newFbiers.length; i++) {
+    const fiber = newFbiers[i]
+    fiber.parent = parent
+    if (i > 0) {
+      prev.sibling = fiber
     } else {
-      if (WIP.op & Flag.Svg) newFiber.op |= Flag.Svg
-      WIP.child = newFiber
+      if (parent.op & Flag.Svg) fiber.op |= Flag.Svg
+      parent.child = fiber
     }
-    prevFiber = newFiber
+    prev = fiber
   }
 }
 
