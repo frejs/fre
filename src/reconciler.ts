@@ -1,4 +1,4 @@
-import { IFiber, FreElement, ITaskCallback, FC, Attributes, HTMLElementEx, FreNode, FiberMap, IRef, IEffect } from './type'
+import { IFiber, FreElement, ITaskCallback, FC, Attributes, HTMLElementEx, FreNode, IRef, IEffect } from './type'
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
 import { scheduleWork, shouldYield, schedule } from './scheduler'
@@ -9,6 +9,7 @@ let preCommit: IFiber | undefined
 let currentFiber: IFiber
 let WIP: IFiber | undefined
 let commits: IFiber[] = []
+const commitList = []
 const microTask: IFiber[] = []
 
 export const render = (vnode: FreElement, node: Node, done?: () => void): void => {
@@ -63,13 +64,9 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
 
 const updateHost = (WIP: IFiber): void => {
   if (!WIP.node) {
-    if (WIP.type === 'svg') WIP.op |= 1 << 4
+    if (WIP.type === 'svg') WIP.flag |= Flag.Svg
     WIP.node = createElement(WIP) as HTMLElementEx
   }
-  const p = WIP.parentNode || {}
-  WIP.insertPoint = (p as HTMLElementEx).last || null
-  ;(p as HTMLElementEx).last = WIP
-  ;(WIP.node as HTMLElementEx).last = null
   reconcileChildren(WIP, WIP.props.children)
 }
 
@@ -83,7 +80,13 @@ const reconcileChildren = (parent: IFiber, children: any): void => {
   const oldFibers = parent.children
   const newFbiers = (parent.children = arrayfy(children))
 
-  console.log(parent)
+  const patch = diff(oldFibers || [], newFbiers)
+
+  console.log(patch)
+
+  commitList.push(commit2.bind(null, patch, parent.parentNode, oldFibers, newFbiers))
+
+  // console.log(commitList)
 
   // generate the linked list
   for (var i = 0, prev; i < newFbiers.length; i++) {
@@ -92,11 +95,15 @@ const reconcileChildren = (parent: IFiber, children: any): void => {
     if (i > 0) {
       prev.sibling = fiber
     } else {
-      if (parent.op & Flag.Svg) fiber.op |= Flag.Svg
+      if (parent.flag & Flag.Svg) fiber.flag |= Flag.Svg
       parent.child = fiber
     }
     prev = fiber
   }
+}
+
+const commit2 = (patch, parentNode, oldChildren, newChildren) => {
+  //todo
 }
 
 const commitWork = (fiber: IFiber): void => {
@@ -108,10 +115,10 @@ const commitWork = (fiber: IFiber): void => {
 }
 
 const commit = (fiber: IFiber): void => {
-  const { op, parentNode, node, ref, hooks } = fiber
-  if (op & (1 << 3)) {
+  const { flag, parentNode, node, ref, hooks } = fiber
+  if (flag & (1 << 3)) {
     hooks?.list.forEach(cleanup)
-    cleanupRef(fiber.kids)
+    cleanupRef(fiber.children)
     while (isFn(fiber.type)) fiber = fiber.child
     parentNode.removeChild(fiber.node)
   } else if (isFn(fiber.type)) {
@@ -119,10 +126,10 @@ const commit = (fiber: IFiber): void => {
       side(hooks.layout)
       schedule(() => side(hooks.effect))
     }
-  } else if (op & (1 << 2)) {
+  } else if (flag & (1 << 2)) {
     updateElement(node, fiber.lastProps, fiber.props)
   } else {
-    const point = fiber.insertPoint ? fiber.insertPoint.node : null
+    const point =  null
     const after = point ? point.nextSibling : parentNode.firstChild
     if (after === node) return
     if (after === null && node === parentNode.lastChild) return
@@ -148,12 +155,11 @@ const refer = (ref: IRef, dom?: HTMLElement): void => {
   if (ref) isFn(ref) ? ref(dom) : ((ref as { current?: HTMLElement })!.current = dom)
 }
 
-const cleanupRef = <P = Attributes>(kids: FiberMap<P>): void => {
-  for (const k in kids) {
-    const kid = kids[k]
-    refer(kid.ref, null)
-    if (kid.kids) cleanupRef(kid.kids)
-  }
+const cleanupRef = (children: any): void => {
+  children.forEach((c) => {
+    refer(c)
+    c.children && cleanupRef(c.chidlren)
+  })
 }
 
 const side = (effects: IEffect[]): void => {

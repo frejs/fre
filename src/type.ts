@@ -38,16 +38,14 @@ export type IRef = (
   e: HTMLElement | undefined
 ) => void | { current?: HTMLElement }
 
-export type FiberMap<P> = Record<string, IFiber<P>>
 
 export interface IFiber<P extends Attributes = any> {
   key?: string
   lane?: any
   type: string | FC<P>
-  op: number
+  flag: number
   parentNode: HTMLElementEx
   node: HTMLElementEx
-  kids?: FiberMap<P>
   parent?: IFiber<P>
   sibling?: IFiber<P>
   last?: IFiber<P>
@@ -56,7 +54,6 @@ export interface IFiber<P extends Attributes = any> {
   ref: IRef
   hooks: IHook
   lastProps: P
-  insertPoint: IFiber | null
   props: P
   oldProps?: P
   children:any

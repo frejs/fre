@@ -1,4 +1,5 @@
 import { Attributes, DOM, IFiber } from './type'
+import {Flag} from './diff'
 
 export const updateElement = <P extends Attributes>(
   dom: DOM,
@@ -36,7 +37,7 @@ export const createElement = <P = Attributes>(fiber: IFiber) => {
   const dom =
     fiber.type === 'text'
       ? document.createTextNode('')
-      : fiber.op & (1 << 4)
+      : fiber.flag & Flag.Svg
       ? document.createElementNS(
           'http://www.w3.org/2000/svg',
           fiber.type as string

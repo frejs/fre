@@ -5,8 +5,7 @@ export const enum Flag {
   Replace = 1 << 4,
   Svg = 1 << 5
 }
-export function diff(newArray, oldArray, newStart = 0, newEnd = newArray.length - 1, oldStart = 0, oldEnd = oldArray.length - 1) {
-    console.log(newArray,oldArray)
+export function diff(oldArray, newArray, oldStart = 0, oldEnd = oldArray.length - 1, newStart = 0, newEnd = newArray.length - 1) {
   let keyMap = {},
     unkeyed = [],
     idxUnkeyed = 0,
