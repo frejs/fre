@@ -1,8 +1,9 @@
-const enum Flag {
+export const enum Flag {
   Place = 1 << 1,
   Update = 1 << 2,
   Remove = 1 << 3,
   Replace = 1 << 4,
+  Svg = 1 << 5
 }
 export function diff(newArray, oldArray, newStart = 0, newEnd = newArray.length - 1, oldStart = 0, oldEnd = oldArray.length - 1) {
     console.log(newArray,oldArray)
