@@ -130,7 +130,7 @@ const reconcileChildren = (WIP: IFiber, children: FreNode): void => {
     prevFiber = newFiber
   }
 
-  delete prevFiber.sibling
+  delete prevFiber?.sibling
 }
 
 const shouldPlace = (fiber: IFiber): string | boolean | undefined => {
