@@ -39,7 +39,7 @@ export type IRef = (e: HTMLElement | undefined) => void | { current?: HTMLElemen
 export interface IFiber<P extends Attributes = any> {
   key?: string
   lane?: any
-  type: string | FC<P>
+  type: string | number | FC<P>
   flag: number
   parentNode: HTMLElementEx
   node: HTMLElementEx

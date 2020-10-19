@@ -1,5 +1,6 @@
 import { Attributes, FC, FreNode, IFiber, PropsWithChildren, FreElement } from './type'
 import { some, isFn,isStr } from './reconciler'
+import {Flag} from './diff'
 
 // Supported and simplify jsx2
 // * https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md
@@ -31,7 +32,7 @@ export const h = function <P extends Attributes = {}>(type: FC<P>, attrs: P): Pa
 }
 
 export function createText(vnode: string) {
-  return { type: 'text', props: { nodeValue: vnode } } as FreElement
+  return { type: Flag.Text as any, props: { nodeValue: vnode } } as FreElement
 }
 
 export const Fragment = (props: PropsWithChildren): FreNode => {

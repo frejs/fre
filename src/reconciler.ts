@@ -84,11 +84,13 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
 const reconcileChildren = (WIP: IFiber, children: any): void => {
   children = arrayfy(children)
   const oldFiber = WIP.alternate
-  console.log(oldFiber,WIP)
   if (WIP.flag & Flag.Host) {
     if (!oldFiber) {
       // mount
       WIP.flag |= Flag.Place
+      commits.push(() => commit(WIP))
+    } else if (WIP.type === Flag.Text) {
+      WIP.flag |= Flag.Update
       commits.push(() => commit(WIP))
     }
   }
@@ -119,10 +121,12 @@ const reconcileChildren = (WIP: IFiber, children: any): void => {
 }
 
 const commit = (fiber) => {
-  const { flag, parentNode, node, type } = fiber
-  if (isFn(type)) {
-  } else if (flag & Flag.Place) {
+  const { flag, parentNode, node, type, alternate, props } = fiber
+  if (flag & Flag.Place) {
     parentNode.insertBefore(node, null)
+  } else if (flag & Flag.Update) {
+    console.log(node,props.nodeValue)
+    alternate.node.nodeValue = props.nodeValue
   }
 }
 
