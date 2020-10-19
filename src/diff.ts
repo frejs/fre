@@ -3,7 +3,10 @@ export const enum Flag {
   Update = 1 << 2,
   Remove = 1 << 3,
   Replace = 1 << 4,
-  Svg = 1 << 5
+  Root = 1 << 5,
+  Hook = 1 << 6,
+  Host = 1 << 7,
+  Svg = 1 << 8,
 }
 export function diff(oldArray, newArray, oldStart = 0, oldEnd = oldArray.length - 1, newStart = 0, newEnd = newArray.length - 1) {
   let keyMap = {},

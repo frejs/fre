@@ -7,6 +7,7 @@ import { diff, Flag } from './diff'
 
 let preCommit: IFiber | undefined
 let currentFiber: IFiber
+let current: IFiber = null
 let WIP: IFiber | undefined
 let commits = []
 const microTask: IFiber[] = []
@@ -15,6 +16,7 @@ export const render = (vnode: FreElement, node: Node, done?: () => void): void =
   const rootFiber = {
     node,
     props: { children: vnode },
+    flag: Flag.Root,
     done,
   } as IFiber
   dispatchUpdate(rootFiber)
@@ -40,10 +42,11 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
   WIP.parentNode = getParentNode(WIP) as HTMLElementEx
   isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
   WIP.lane = WIP.lane ? false : 0
+  // WIP.alternate = WIP
 
   if (WIP.child) return WIP.child
   while (WIP) {
-    if (!preCommit && WIP.lane === false) {
+    if (!preCommit && !WIP.parent) {
       preCommit = WIP
       return null
     }
@@ -53,12 +56,14 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
 }
 
 const updateHook = <P = Attributes>(WIP: IFiber): void => {
+  WIP.flag |= Flag.Hook
   if (!WIP.node) WIP.node = WIP.parent.node
   currentFiber = WIP
   resetCursor()
   let children = (WIP.type as FC<P>)(WIP.props)
   if (isStr(children)) children = createText(children as string)
   reconcileChildren(WIP, children)
+  currentFiber.alternate = WIP
 }
 
 const updateHost = (WIP: IFiber): void => {
@@ -66,6 +71,7 @@ const updateHost = (WIP: IFiber): void => {
     if (WIP.type === 'svg') WIP.flag |= Flag.Svg
     WIP.node = createElement(WIP) as HTMLElementEx
   }
+  if (!WIP.flag) WIP.flag |= Flag.Host
   reconcileChildren(WIP, WIP.props.children)
 }
 
@@ -75,57 +81,55 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
   }
 }
 
-const reconcileChildren = (parent: IFiber, children: any): void => {
-  const oldFibers = arrayfy(parent.children)
-  const newFbiers = (parent.children = arrayfy(children))
-  const patch = diff(oldFibers, newFbiers)
-  const p = parent.node
-  parent.parent && commits.push(commit.bind(null, patch, p, oldFibers, newFbiers))
+const reconcileChildren = (WIP: IFiber, children: any): void => {
+  children = arrayfy(children)
+  const oldFiber = WIP.alternate
+  console.log(oldFiber,WIP)
+  if (WIP.flag & Flag.Host) {
+    if (!oldFiber) {
+      // mount
+      WIP.flag |= Flag.Place
+      commits.push(() => commit(WIP))
+    }
+  }
 
   // generate the linked list
-  for (var i = 0, prev; i < newFbiers.length; i++) {
-    const fiber = newFbiers[i]
-    fiber.parent = parent
+  for (var i = 0, prev, old = oldFiber?.child; i < children.length; i++) {
+    const child = children[i]
+
+    child.parent = WIP
+    child.alternate = old
+
     if (i > 0) {
-      prev.sibling = fiber
+      prev.sibling = child
     } else {
-      if (parent.flag & Flag.Svg) fiber.flag |= Flag.Svg
-      parent.child = fiber
+      WIP.child = child
     }
-    prev = fiber
+
+    prev = child
+
+    if (old) {
+      if (old.type !== child.type) {
+        continue
+      } else {
+        old = old.sibling
+      }
+    }
   }
 }
 
-const commit = ({ diff, keymap }, parent, o, n, childs = [...parent.childNodes]) => {
-  var newFiber, oldVNode, domNode, oldMatchIndex
-
-  for (var i = 0, newIndex = 0, oldIndex = 0; i < diff.length; i++) {
-    const op = diff[i]
-    if (op === Flag.Update) {
-      //update
-      newIndex++
-      oldIndex++
-    } else if (op === Flag.Place) {
-      newFiber = n[newIndex]
-      if (isFn(newFiber.type)) {
-      } else {
-        const node = newFiber.node
-        console.log(parent, node)
-        parent.insertBefore(node, childs[oldIndex])
-      }
-      newIndex++
-    } else if (op === Flag.Remove) {
-      oldIndex++
-    }
+const commit = (fiber) => {
+  const { flag, parentNode, node, type } = fiber
+  if (isFn(type)) {
+  } else if (flag & Flag.Place) {
+    parentNode.insertBefore(node, null)
   }
 }
 
 const commitWork = (fiber: IFiber): void => {
-  commits.forEach((c) => c())
+  commits.splice(0, commits.length).forEach((c) => c())
   fiber.done?.()
-  commits = []
   preCommit = null
-  WIP = null
 }
 const onError = (e: any) => {
   if (isFn(e.error?.then)) {
