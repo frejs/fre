@@ -1,14 +1,16 @@
 {
   "name": "fre",
-  "version": "1.13.8",
+  "version": "2.0.0-rc.1",
   "description": "",
   "main": "dist/fre.js",
   "unpkg": "dist/fre.js",
   "module": "dist/fre.esm.js",
   "exports": {
-    "./compat": {
-      "browser": "./dist/fre-compat.js",
-      "umd": "./dist/fre-compat.js"
+    "./jsx-runtime": {
+      "main": "./dist/fre.esm.js"
+    },
+    "./jsx-dev-runtime": {
+      "main": "./dist/fre.esm.js"
     }
   },
   "typings": "dist/types/index.d.ts",
@@ -29,29 +31,30 @@
   "author": "132yse",
   "license": "MIT",
   "devDependencies": {
-    "@babel/core": "^7.0.0-0",
-    "@babel/plugin-transform-react-jsx": "^7.9.4",
     "@types/jest": "^24.0.15",
-    "babel-jest": "^24.8.0",
     "codecov": "^3.6.1",
     "cross-env": "^5.2.0",
     "gzip-size-cli": "^3.0.0",
-    "jest": "^24.8.0",
-    "parcel": "^2.0.0-alpha.3.2",
+    "jest": "^26.4.2",
     "rollup": "^2.11.2",
-    "rollup-plugin-babel": "^4.3.3",
-    "rollup-plugin-dts": "^1.4.7",
     "rollup-plugin-terser": "^5.1.2",
     "rollup-plugin-typescript2": "^0.27.0",
     "terser": "^4.1.2",
     "ts-jest": "^26.1.0",
-    "typescript": "3.9.1-rc",
+    "typescript": "^4.0.2",
     "yarpm": "^0.2.1"
   },
-  "dependencies": {},
   "jest": {
     "coveragePathIgnorePatterns": [
-      "<rootDir>/test/test-util.js"
+      "<rootDir>/test/test-util.tsx"
+    ],
+    "transform": {
+      ".(ts|tsx)": "ts-jest"
+    },
+    "moduleFileExtensions": [
+      "js",
+      "ts",
+      "tsx"
     ]
   }
 }

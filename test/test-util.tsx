@@ -1,11 +1,10 @@
-/** @jsx h */
-import { h, render, useEffect, useState } from '../dist/fre.esm'
+import { h, render, useEffect, useState } from '../src/index'
 
 export const testRender = jsx =>
   new Promise(resolve => {
     document.body.innerHTML = ''
 
-    render(jsx, document.body, () => resolve([...document.body.childNodes]))
+    render(jsx, document.body, () => resolve([...document.body.childNodes as any]))
   })
 
 export const testUpdates = async updates => {
@@ -20,8 +19,7 @@ export const testUpdates = async updates => {
     useEffect(effect)
     return content
   }
-
-  const run = index => updates[index].test([...document.body.childNodes])
+  const run = index => updates[index].test([...document.body.childNodes as any])
 
   await testRender(<Component />)
 

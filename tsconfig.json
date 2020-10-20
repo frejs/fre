@@ -8,7 +8,10 @@
     "moduleResolution": "node",
     "sourceMap": false,
     "declaration": true,
-    "declarationDir": "dist/types/"
+    "declarationDir": "dist/types/",
+    "jsx": "react",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment"
   },
   "exclude": ["node_modules", "dist"],
   "include": ["src"]

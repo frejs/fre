@@ -26,7 +26,7 @@ export interface FreElement<P extends Attributes = any, T = string> {
   props: P
 }
 
-export type HookTpes = 'list' | 'effect' | 'layout'
+export type HookTypes = 'list' | 'effect' | 'layout'
 
 export interface IHook {
   list: IEffect[]
@@ -42,8 +42,7 @@ export type FiberMap<P> = Record<string, IFiber<P>>
 
 export interface IFiber<P extends Attributes = any> {
   key?: string
-  dirty?: boolean | number
-  tag: number
+  lane?: any
   type: string | FC<P>
   op: number
   parentNode: HTMLElementEx
@@ -60,8 +59,6 @@ export interface IFiber<P extends Attributes = any> {
   insertPoint: IFiber | null
   props: P
   oldProps?: P
-  dueTime?: number
-  promises?: Promise<Function>[]
 }
 
 export type HTMLElementEx = HTMLElement & { last: IFiber | null }
@@ -76,26 +73,23 @@ export type FreNode =
   | null
   | undefined
 export type SetStateAction<S> = S | ((prevState: S) => S)
-export type Dispatch<A> = (value: A) => void
+export type Dispatch<A> = (value: A, resume?:boolean) => void
 export type Reducer<S, A> = (prevState: S, action: A) => S
 export type IVoidCb = () => void
 export type EffectCallback = () => void | (IVoidCb | undefined)
-export type DependencyList = ReadonlyArray<any>
+export type DependencyList = Array<any>
 
 export interface PropsWithChildren {
   children?: FreNode
 }
 
 export type ITaskCallback =
-  | ((time: number | boolean) => boolean)
-  | boolean
-  | null
+| ((time: boolean) => boolean)
+| null
 
 export interface ITask {
   callback?: ITaskCallback
-  dueTime: number
+  time: number
 }
 
 export type DOM = HTMLElement | SVGElement
-
-export type Option = Record<string,Function>

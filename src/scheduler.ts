@@ -1,73 +1,65 @@
-import { ITask, ITaskCallback, IVoidCb } from './type'
-import { isFn } from './reconciler'
+import { ITask, ITaskCallback } from './type'
 
-let taskQueue: ITask[] = []
-let currentCallback: ITaskCallback | undefined
-let frameDeadline: number = 0
-const frameLength: number = 5
+const macroTask: ITask[] = []
+let deadline: number = 0
+const threshold: number = 1000 / 60
+const callbacks = []
 
-export const scheduleCallback = (callback: ITaskCallback): void => {
+export const schedule = (cb) => callbacks.push(cb) === 1 && postMessage()
+
+export const scheduleWork = (callback: ITaskCallback): void => {
   const currentTime = getTime()
-  const timeout = 3000
-  const dueTime = currentTime + timeout
-
-  let newTask = {
+  const newTask = {
     callback,
-    dueTime
+    time: currentTime + 3000,
   }
-
-  taskQueue.push(newTask)
-  currentCallback = flush as ITaskCallback
-  planWork(null)
+  macroTask.push(newTask)
+  schedule(flushWork)
 }
 
-const flush = (iniTime: number): boolean => {
-  let currentTime = iniTime
-  let currentTask = peek(taskQueue)
+const postMessage = (() => {
+  const cb = () => callbacks.splice(0, callbacks.length).forEach((c) => c())
+  if (typeof MessageChannel !== 'undefined') {
+    const { port1, port2 } = new MessageChannel()
+    port1.onmessage = cb
+    return () => port2.postMessage(null)
+  }
+  return () => setTimeout(cb)
+})()
+
+const flush = (initTime: number): boolean => {
+  let currentTime = initTime
+  let currentTask = peek(macroTask)
 
   while (currentTask) {
-    const timeout = currentTask.dueTime <= currentTime
-    if (!timeout && shouldYeild()) break
+    const timeout = currentTask.time <= currentTime
+    if (!timeout && shouldYield()) break
 
-    let callback = currentTask.callback
+    const callback = currentTask.callback
     currentTask.callback = null
 
-    let next = isFn(callback) && callback(timeout)
-    next ? (currentTask.callback = next) : taskQueue.shift()
+    const next = callback(timeout)
+    next ? (currentTask.callback = next as any) : macroTask.shift()
 
-    currentTask = peek(taskQueue)
+    currentTask = peek(macroTask)
     currentTime = getTime()
   }
-
   return !!currentTask
 }
 
 const peek = (queue: ITask[]) => {
-  queue.sort((a, b) => a.dueTime - b.dueTime)
+  queue.sort((a, b) => a.time - b.time)
   return queue[0]
 }
 
 const flushWork = (): void => {
-  if (isFn(currentCallback)) {
-    let currentTime = getTime()
-    frameDeadline = currentTime + frameLength
-    let more = currentCallback(currentTime)
-    more ? planWork(null) : (currentCallback = null)
-  }
+  const currentTime = getTime()
+  deadline = currentTime + threshold
+  flush(currentTime) && schedule(flushWork)
 }
 
-export const planWork: (cb?: IVoidCb | undefined) => number | void = (() => {
-  if (typeof MessageChannel !== 'undefined') {
-    const { port1, port2 } = new MessageChannel()
-    port1.onmessage = flushWork
-    return (cb?: IVoidCb) =>
-      cb ? requestAnimationFrame(cb) : port2.postMessage(null)
-  }
-  return (cb?: IVoidCb) => setTimeout(cb || flushWork)
-})()
-
-export const shouldYeild = (): boolean => {
-  return getTime() >= frameDeadline
+export const shouldYield = (): boolean => {
+  return getTime() >= deadline
 }
 
-export const getTime = () => performance.now()
+const getTime = () => performance.now()

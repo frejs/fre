@@ -1,21 +1,17 @@
 import { h, Fragment } from './h'
-import { render, scheduleWork, getCurrentFiber, options } from './reconciler'
-import {
-  useState,
-  useReducer,
-  useEffect,
-  useMemo,
-  useCallback,
-  useRef,
-  useLayout
-} from './hooks'
+import { render } from './reconciler'
+import { useState, useReducer, useEffect, useMemo, useCallback, useRef, useLayout } from './hooks'
 export * from './type'
+
+const mixins: Record<string,Function> = {}
+
 
 export {
   h,
-  h as createElement,
+  h as jsx,
+  h as jsxs,
+  h as jsxDEV,
   render,
-  scheduleWork,
   useState,
   useReducer,
   useEffect,
@@ -25,23 +21,5 @@ export {
   useLayout,
   useLayout as useLayoutEffect,
   Fragment,
-  getCurrentFiber,
-  options
+  mixins,
 }
-const Fre = {
-  h,
-  createElement: h,
-  render,
-  scheduleWork,
-  useState,
-  useReducer,
-  useEffect,
-  useMemo,
-  useCallback,
-  useRef,
-  Fragment,
-  getCurrentFiber,
-  options
-}
-
-export default Fre

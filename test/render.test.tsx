@@ -1,14 +1,14 @@
 /** @jsx h */
 /** @jsxFrag Fragment */
-import { h, Fragment } from '../dist/fre.esm'
+import { h, Fragment } from '../src/index'
 import { testRender } from './test-util'
 
-const toString = elements => elements.map(child => child.outerHTML).join('')
+const toString = (elements) => elements.map((child) => child.outerHTML).join('')
 
 test('render nested HTML elements, apply attributes', async () => {
   const elements = await testRender(
     <div>
-      <span class="foo">test</span>
+      <span class='foo'>test</span>
     </div>
   )
 
@@ -37,13 +37,13 @@ test('render 3D array', async () => {
   const elements = await testRender(
     <ul>
       {Array(2)
-        .fill()
+        .fill(null)
         .map((_, i) =>
           Array(2)
-            .fill()
+            .fill(null)
             .map((_, j) =>
               Array(2)
-                .fill()
+                .fill(null)
                 .map((_, k) => (
                   <li>
                     {i},{j},{k}
