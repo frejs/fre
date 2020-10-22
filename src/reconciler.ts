@@ -8,7 +8,7 @@ import { diff, Flag } from './diff'
 let preCommit: IFiber | undefined
 let currentFiber: IFiber
 let current: IFiber = null
-let WIP: IFiber | undefined
+let fiber: IFiber | undefined
 let commits = []
 const microTask: IFiber[] = []
 
@@ -32,69 +32,82 @@ export const dispatchUpdate = (fiber?: IFiber) => {
 }
 
 const reconcileWork = (timeout: boolean): boolean => {
-  if (!WIP) WIP = microTask.shift()
-  while (WIP && (!shouldYield() || timeout)) WIP = reconcile(WIP)
-  if (WIP && !timeout) return reconcileWork.bind(null)
+  if (!fiber) fiber = microTask.shift()
+  while (fiber && (!shouldYield() || timeout)) fiber = reconcile(fiber)
+  if (fiber && !timeout) return reconcileWork.bind(null)
   if (preCommit) commitWork(preCommit)
   return null
 }
 
-const reconcile = (WIP: IFiber): IFiber | undefined => {
-  WIP.parentNode = getParentNode(WIP) as HTMLElementEx
-  !isFn(WIP.type) && updateHost(WIP)
+const reconcile = (fiber: IFiber): IFiber | undefined => {
+  const oldFiber = fiber.alternate
+  const parent = oldFiber.parent.node
+  const node = oldFiber.node
+  if (!oldFiber) {
+    // if there is no oldFiber, just mount subtree.
+    commits.push(() => createNode(fiber))
+  } else if (oldFiber && oldFiber.type !== fiber.type) {
+    // if the type is different, remove old and create new.
+    commits.push(
+      () => parent.insertBefore(createNode(fiber = maybeFiber(fiber)), node),
+      () => parent.removeChild(node)
+    )
+  } else if (oldFiber && oldFiber.type === Flag.Text) {
+    commits.push(() => (oldFiber.node.nodeValue = fiber.props.nodeValue))
+  } else {
+    // berfore we use the lcs algorithm, prepare deal with children
+    let oldKids = oldFiber.children
+    let newKids = fiber.children
+    console.log(oldKids, newKids)
+    // step 1 common prefix/suffix 
 
-  if (WIP.child) return WIP.child
-  while (WIP) {
-    if (!preCommit && !WIP.parent) {
-      preCommit = WIP
+
+    
+  }
+
+  if (fiber.child) return fiber.child
+  while (fiber) {
+    if (!preCommit && !fiber.parent) {
+      preCommit = fiber
       return null
     }
-    if (WIP.sibling) return WIP.sibling
-    WIP = WIP.parent
+    if (fiber.sibling) return fiber.sibling
+    fiber = fiber.parent
   }
 }
 
-const updateHook = <P = Attributes>(WIP: IFiber, skip: boolean): any => {
-  WIP.flag |= Flag.Hook
-  currentFiber = WIP
+const updateHook = (fiber: IFiber, skip: boolean): any => {
+  // this function do two things: run hook, and cache the double buffering.
+  fiber.flag |= Flag.Hook
   resetCursor()
-  let children = (WIP.type as FC<P>)(WIP.props)
-  currentFiber.alternate = WIP
-  return children
+  currentFiber = fiber
+  currentFiber.alternate = fiber
+  return (fiber.type as any)(fiber.props, fiber.children)
 }
 
-const updateHost = (WIP: IFiber): void => {
-  if (!WIP.node) {
-    if (WIP.type === 'svg') WIP.flag |= Flag.Svg
-    WIP.node = createElement(WIP) as HTMLElementEx
-  }
-  if (!WIP.flag) WIP.flag |= Flag.Host
-  reconcileChildren(WIP, WIP.children)
-}
-
-const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
-  while ((WIP = WIP.parent)) {
-    if (!isFn(WIP.type)) return WIP.node
+const getParentNode = (fiber: IFiber): HTMLElement | undefined => {
+  while ((fiber = fiber.parent)) {
+    if (!isFn(fiber.type)) return fiber.node
   }
 }
 
-const reconcileChildren = (WIP: IFiber, children: any): void => {
+const reconcileChildren = (fiber: IFiber, children: any): void => {
   children = arrayfy(children)
-  const oldFiber = WIP.alternate
+  const oldFiber = fiber.alternate
   if (!oldFiber) {
-    commits.push(() => createNode(WIP)) //mount
+    commits.push(() => createNode(fiber)) //mount
   } else {
     // generate the linked list
     for (var i = 0, prev, old = oldFiber?.child; i < children.length; i++) {
       const child = children[i]
 
-      child.parent = WIP
+      child.parent = fiber
       child.alternate = old
 
       if (i > 0) {
         prev.sibling = child
       } else {
-        WIP.child = child
+        fiber.child = child
       }
 
       prev = child
@@ -110,19 +123,17 @@ function createNode(fiber) {
   let node = fiber.flag & Flag.Root ? fiber.node : createElement(fiber)
   if (fiber.children) {
     for (var i = 0; i < fiber.children.length; i++) {
-      let child = createNode(maybeVNode(fiber.children[i]))
+      let child = createNode(maybeFiber(fiber.children[i]))
       node.appendChild(child)
     }
   }
   return node
 }
 
-var maybeVNode = (vnode) =>
-  isFn(vnode.type) ?
-    updateHook(vnode, true)
-    : vnode
-
-
+var maybeFiber = (fiber) =>
+  isFn(fiber.type) ?
+    updateHook(fiber, true)
+    : fiber
 
 const commitWork = (fiber: IFiber): void => {
   commits.splice(0, commits.length).forEach((c) => c())
