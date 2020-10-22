@@ -41,8 +41,8 @@ const reconcileWork = (timeout: boolean): boolean => {
 
 const reconcile = (fiber: IFiber): IFiber | undefined => {
   const oldFiber = fiber.alternate
-  const parent = oldFiber.parent.node
-  const node = oldFiber.node
+  const parent = oldFiber?.parent?.node
+  const node = oldFiber?.node
   if (!oldFiber) {
     // if there is no oldFiber, just mount subtree.
     commits.push(() => createNode(fiber))
@@ -59,10 +59,34 @@ const reconcile = (fiber: IFiber): IFiber | undefined => {
     let oldKids = oldFiber.children
     let newKids = fiber.children
     console.log(oldKids, newKids)
+    let newStart = 0
+    let newEnd = newKids.length - 1
+    let oldStart = 0
+    let oldEnd = oldKids.length - 1
+    let newKid, oldKid
     // step 1 common prefix/suffix 
 
+    // while (newStart <= newEnd && oldStart <= oldEnd) {
+    //   newKid = newKids[newStart];
+    //   oldKid = oldKids[oldStart];
+    //   if (getKey(newKid) === getKey(oldKid)) {
+    //     newStart++;
+    //     oldStart++;
+    //     continue;
+    //   }
+    //   oldKid = oldKids[oldEnd];
+    //   newKid = newKids[newEnd];
+    //   if (getKey(newKid) === null) {
+    //     oldEnd--;
+    //     newEnd--;
+    //     continue;
+    //   }
+    //   break;
+    // }
+    // if (newStart > newEnd && oldStart > oldEnd) return
 
-    
+
+
   }
 
   if (fiber.child) return fiber.child
@@ -76,13 +100,18 @@ const reconcile = (fiber: IFiber): IFiber | undefined => {
   }
 }
 
+const getKey = (fiber) => (fiber == null ? fiber : fiber.key)
+
 const updateHook = (fiber: IFiber, skip: boolean): any => {
   // this function do two things: run hook, and cache the double buffering.
   fiber.flag |= Flag.Hook
   resetCursor()
   currentFiber = fiber
+  const children = (fiber.type as any)(fiber.props, fiber.children)
+  console.log(11)
   currentFiber.alternate = fiber
-  return (fiber.type as any)(fiber.props, fiber.children)
+  currentFiber.alternate.children = children
+  return children
 }
 
 const getParentNode = (fiber: IFiber): HTMLElement | undefined => {
@@ -123,7 +152,7 @@ function createNode(fiber) {
   let node = fiber.flag & Flag.Root ? fiber.node : createElement(fiber)
   if (fiber.children) {
     for (var i = 0; i < fiber.children.length; i++) {
-      let child = createNode(maybeFiber(fiber.children[i]))
+      let child = createNode(fiber.children[i] = maybeFiber(fiber.children[i]))
       node.appendChild(child)
     }
   }
