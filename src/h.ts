@@ -1,6 +1,6 @@
 import { Attributes, FC, FreNode, IFiber, PropsWithChildren, FreElement } from './type'
-import { some, isFn,isStr } from './reconciler'
-import {Flag} from './diff'
+import { some, isFn, isStr } from './reconciler'
+import { Flag } from './diff'
 
 // Supported and simplify jsx2
 // * https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md
@@ -18,12 +18,11 @@ export const h = function <P extends Attributes = {}>(type: FC<P>, attrs: P): Pa
         rest.push(vnode[i])
       }
     } else if (some(vnode)) {
-      children.push( isStr(vnode)? createText(vnode as string):vnode )
+      children.push(isStr(vnode) ? createText(vnode as string) : vnode)
     }
   }
   // delete them to reduce loop performance
   delete props.key
-
   return { type, props, children, key, ref } as Partial<IFiber>
 }
 
