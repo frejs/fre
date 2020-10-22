@@ -15,7 +15,8 @@ const microTask: IFiber[] = []
 export const render = (vnode: FreElement, node: Node, done?: () => void): void => {
   const rootFiber = {
     node,
-    props: { children: vnode },
+    props: {},
+    children: [vnode],
     flag: Flag.Root,
     done,
   } as IFiber
@@ -40,9 +41,7 @@ const reconcileWork = (timeout: boolean): boolean => {
 
 const reconcile = (WIP: IFiber): IFiber | undefined => {
   WIP.parentNode = getParentNode(WIP) as HTMLElementEx
-  isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
-  WIP.lane = WIP.lane ? false : 0
-  // WIP.alternate = WIP
+  !isFn(WIP.type) && updateHost(WIP)
 
   if (WIP.child) return WIP.child
   while (WIP) {
@@ -55,15 +54,13 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
   }
 }
 
-const updateHook = <P = Attributes>(WIP: IFiber): void => {
+const updateHook = <P = Attributes>(WIP: IFiber, skip: boolean): any => {
   WIP.flag |= Flag.Hook
-  if (!WIP.node) WIP.node = WIP.parent.node
   currentFiber = WIP
   resetCursor()
   let children = (WIP.type as FC<P>)(WIP.props)
-  if (isStr(children)) children = createText(children as string)
-  reconcileChildren(WIP, children)
   currentFiber.alternate = WIP
+  return children
 }
 
 const updateHost = (WIP: IFiber): void => {
@@ -72,7 +69,7 @@ const updateHost = (WIP: IFiber): void => {
     WIP.node = createElement(WIP) as HTMLElementEx
   }
   if (!WIP.flag) WIP.flag |= Flag.Host
-  reconcileChildren(WIP, WIP.props.children)
+  reconcileChildren(WIP, WIP.children)
 }
 
 const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
@@ -84,51 +81,48 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
 const reconcileChildren = (WIP: IFiber, children: any): void => {
   children = arrayfy(children)
   const oldFiber = WIP.alternate
-  if (WIP.flag & Flag.Host) {
-    if (!oldFiber) {
-      // mount
-      WIP.flag |= Flag.Place
-      commits.push(() => commit(WIP))
-    } else if (WIP.type === Flag.Text) {
-      WIP.flag |= Flag.Update
-      commits.push(() => commit(WIP))
-    }
-  }
+  if (!oldFiber) {
+    commits.push(() => createNode(WIP)) //mount
+  } else {
+    // generate the linked list
+    for (var i = 0, prev, old = oldFiber?.child; i < children.length; i++) {
+      const child = children[i]
 
-  // generate the linked list
-  for (var i = 0, prev, old = oldFiber?.child; i < children.length; i++) {
-    const child = children[i]
+      child.parent = WIP
+      child.alternate = old
 
-    child.parent = WIP
-    child.alternate = old
-
-    if (i > 0) {
-      prev.sibling = child
-    } else {
-      WIP.child = child
-    }
-
-    prev = child
-
-    if (old) {
-      if (old.type !== child.type) {
-        continue
+      if (i > 0) {
+        prev.sibling = child
       } else {
+        WIP.child = child
+      }
+
+      prev = child
+
+      if (old) {
         old = old.sibling
       }
     }
   }
 }
 
-const commit = (fiber) => {
-  const { flag, parentNode, node, type, alternate, props } = fiber
-  if (flag & Flag.Place) {
-    parentNode.insertBefore(node, null)
-  } else if (flag & Flag.Update) {
-    console.log(node,props.nodeValue)
-    alternate.node.nodeValue = props.nodeValue
+function createNode(fiber) {
+  let node = fiber.flag & Flag.Root ? fiber.node : createElement(fiber)
+  if (fiber.children) {
+    for (var i = 0; i < fiber.children.length; i++) {
+      let child = createNode(maybeVNode(fiber.children[i]))
+      node.appendChild(child)
+    }
   }
+  return node
 }
+
+var maybeVNode = (vnode) =>
+  isFn(vnode.type) ?
+    updateHook(vnode, true)
+    : vnode
+
+
 
 const commitWork = (fiber: IFiber): void => {
   commits.splice(0, commits.length).forEach((c) => c())

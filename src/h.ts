@@ -21,14 +21,10 @@ export const h = function <P extends Attributes = {}>(type: FC<P>, attrs: P): Pa
       children.push( isStr(vnode)? createText(vnode as string):vnode )
     }
   }
-  if (children.length) {
-    // for render children function
-    props.children = isFn(children[0]) ? children[0] : children
-  }
   // delete them to reduce loop performance
   delete props.key
 
-  return { type, props, key, ref } as Partial<IFiber>
+  return { type, props, children, key, ref } as Partial<IFiber>
 }
 
 export function createText(vnode: string) {
