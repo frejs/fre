@@ -7,7 +7,6 @@ import { diff, Flag } from './diff'
 
 let preCommit: IFiber | undefined
 let currentFiber: IFiber
-let current: IFiber = null
 let fiber: IFiber | undefined
 let commits = []
 const microTask: IFiber[] = []
@@ -57,7 +56,7 @@ const reconcile = (fiber: IFiber): IFiber | undefined => {
   } else {
     // berfore we use the lcs algorithm, prepare deal with children
     let oldKids = oldFiber.children
-    let newKids = fiber.children
+    let newKids = maybeFiber(fiber)
     console.log(oldKids, newKids)
     let newStart = 0
     let newEnd = newKids.length - 1
@@ -102,15 +101,14 @@ const reconcile = (fiber: IFiber): IFiber | undefined => {
 
 const getKey = (fiber) => (fiber == null ? fiber : fiber.key)
 
-const updateHook = (fiber: IFiber, skip: boolean): any => {
+const updateHook = (fiber: IFiber): any => {
   // this function do two things: run hook, and cache the double buffering.
   fiber.flag |= Flag.Hook
   resetCursor()
   currentFiber = fiber
   const children = (fiber.type as any)(fiber.props, fiber.children)
-  console.log(11)
+  fiber.children = children
   currentFiber.alternate = fiber
-  currentFiber.alternate.children = children
   return children
 }
 
@@ -161,7 +159,7 @@ function createNode(fiber) {
 
 var maybeFiber = (fiber) =>
   isFn(fiber.type) ?
-    updateHook(fiber, true)
+    updateHook(fiber)
     : fiber
 
 const commitWork = (fiber: IFiber): void => {
