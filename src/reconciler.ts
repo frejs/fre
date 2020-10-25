@@ -53,6 +53,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
 }
 
 const updateHook = <P = Attributes>(WIP: IFiber): void => {
+  if(WIP.lastProps === WIP.props) return
   currentFiber = WIP
   resetCursor()
   let children = (WIP.type as FC<P>)(WIP.props)
@@ -62,9 +63,7 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
 
 const updateHost = (WIP: IFiber): void => {
   if (!WIP.node) {
-    if (WIP.type === 'svg') {
-      WIP.op |= (1 << 4)
-    }
+    if (WIP.type === 'svg')  WIP.op |= (1 << 4)
     WIP.node = createElement(WIP) as HTMLElementEx
   }
   const p = WIP.parentNode || {}
