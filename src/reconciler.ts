@@ -53,7 +53,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
 }
 
 const updateHook = <P = Attributes>(WIP: IFiber): void => {
-  if(WIP.lastProps === WIP.props) return
+  if (WIP.lastProps === WIP.props) return
   currentFiber = WIP
   resetCursor()
   let children = (WIP.type as FC<P>)(WIP.props)
@@ -63,13 +63,13 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
 
 const updateHost = (WIP: IFiber): void => {
   if (!WIP.node) {
-    if (WIP.type === 'svg')  WIP.op |= (1 << 4)
+    if (WIP.type === 'svg') WIP.op |= 1 << 4
     WIP.node = createElement(WIP) as HTMLElementEx
   }
-  const p = WIP.parentNode || {}
-  WIP.insertPoint = (p as HTMLElementEx).last || null
-    ; (p as HTMLElementEx).last = WIP
-    ; (WIP.node as HTMLElementEx).last = null
+  const p = WIP.parent || {}
+  WIP.insertPoint = (p as IFiber).last || null
+  ;(p as IFiber).last = WIP
+  WIP.last = null
   reconcileChildren(WIP, WIP.props.children)
 }
 
@@ -93,7 +93,7 @@ const reconcileChildren = (WIP: IFiber, children: FreNode): void => {
     if (newFiber && newFiber.type === oldFiber.type) {
       reused[k] = oldFiber
     } else {
-      oldFiber.op |= (1 << 3)
+      oldFiber.op |= 1 << 3
       commits.push(oldFiber)
     }
   }
@@ -105,14 +105,14 @@ const reconcileChildren = (WIP: IFiber, children: FreNode): void => {
     const oldFiber = reused[k]
 
     if (oldFiber) {
-      oldFiber.op |= (1 << 2)
+      oldFiber.op |= 1 << 2
       newFiber = { ...oldFiber, ...newFiber }
       newFiber.lastProps = oldFiber.props
       if (shouldPlace(newFiber)) {
-        newFiber.op &= (1 << 1)
+        newFiber.op &= 1 << 1
       }
     } else {
-      newFiber.op |= (1 << 1)
+      newFiber.op |= 1 << 1
     }
 
     newFibers[k] = newFiber
@@ -122,7 +122,7 @@ const reconcileChildren = (WIP: IFiber, children: FreNode): void => {
       prevFiber.sibling = newFiber
     } else {
       if (WIP.op & (1 << 4)) {
-        newFiber.op |= (1 << 4)
+        newFiber.op |= 1 << 4
       }
       WIP.child = newFiber
     }
@@ -179,7 +179,7 @@ const onError = (e: any) => {
   }
 }
 
-const reset = (h: any) => (h[2] & (1 << 2) ? h[2] = 0b1101 : h[2] & (1 << 3) ? h[2] = 0b1010 : null)
+const reset = (h: any) => (h[2] & (1 << 2) ? (h[2] = 0b1101) : h[2] & (1 << 3) ? (h[2] = 0b1010) : null)
 
 const hashfy = <P>(c: IFiber<P>): FiberMap<P> => {
   const out: FiberMap<P> = {}
