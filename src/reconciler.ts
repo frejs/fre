@@ -219,4 +219,6 @@ export const some = (v: any) => v != null && v !== false && v !== true
 const hs = (i: number, j: string | number | null, k?: string): string =>
   k != null && j != null ? '.' + i + '.' + k : j != null ? '.' + i + '.' + j : k != null ? '.' + k : '.' + i
 
-window.addEventListener('error', onError)
+const g = typeof window === 'object' ? window : Function('return this')() // for worker
+
+g.addEventListener('error', onError)
