@@ -3,7 +3,7 @@ import { render } from './reconciler'
 import { useState, useReducer, useEffect, useMemo, useCallback, useRef, useLayout } from './hooks'
 export * from './type'
 
-const mixins: Record<string,Function> = {}
+const options: Record<string,Function> = {}
 
 
 export {
@@ -21,5 +21,5 @@ export {
   useLayout,
   useLayout as useLayoutEffect,
   Fragment,
-  mixins,
+  options,
 }
