@@ -170,17 +170,6 @@ const commit = (fiber: IFiber): void => {
   refer(ref, node)
 }
 
-const onError = (e: any) => {
-  if (isFn(e.error?.then)) {
-    e.preventDefault()
-    currentFiber.lane = 0
-    currentFiber.hooks.list.forEach(reset)
-    dispatchUpdate(currentFiber)
-  }
-}
-
-const reset = (h: any) => (h[2] & (1 << 2) ? (h[2] = 0b1101) : h[2] & (1 << 3) ? (h[2] = 0b1010) : null)
-
 const hashfy = <P>(c: IFiber<P>): FiberMap<P> => {
   const out: FiberMap<P> = {}
   isArr(c)
@@ -218,7 +207,3 @@ export const some = (v: any) => v != null && v !== false && v !== true
 
 const hs = (i: number, j: string | number | null, k?: string): string =>
   k != null && j != null ? '.' + i + '.' + k : j != null ? '.' + i + '.' + j : k != null ? '.' + k : '.' + i
-
-const g = typeof window === 'object' ? window : Function('return this')() // for worker
-
-g.addEventListener('error', onError)
