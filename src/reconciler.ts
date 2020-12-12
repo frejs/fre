@@ -39,7 +39,6 @@ const reconcileWork = (timeout: boolean): boolean => {
 }
 
 const reconcile = (fiber: IFiber): IFiber | undefined => {
-  console.log(fiber)
   let oldFiber = fiber.alternate
   const parent = oldFiber?.parent?.node
   const node = oldFiber?.node
@@ -55,7 +54,6 @@ const reconcile = (fiber: IFiber): IFiber | undefined => {
   } else if (oldFiber && oldFiber.type === Flag.Text) {
     commits.push(() => (oldFiber.node.nodeValue = fiber.props.nodeValue))
   } else if (fiber.flag & Flag.Hook) {
-    // component point its child
     let oldChild = oldFiber.children
     let child = kid(fiber)
     child.alternate = oldChild
@@ -65,13 +63,6 @@ const reconcile = (fiber: IFiber): IFiber | undefined => {
     // berfore we use the lcs algorithm, prepare deal with children
     let oldKids = oldFiber.children
     let newKids = kid(fiber)
-
-    let newStart = 0
-    let newEnd = newKids.length - 1
-    let oldStart = 0
-    let oldEnd = oldKids.length - 1
-    let newKid, oldKid
-
   }
 
   if (fiber.child) return fiber.child
@@ -85,46 +76,23 @@ const reconcile = (fiber: IFiber): IFiber | undefined => {
   }
 }
 
-const getKey = (fiber) => (fiber == null ? fiber : fiber.key)
-
 const updateHook = (fiber: IFiber): any => {
-  // this function do two things: run hook, and cache the double buffering.
+  console.log(fiber)
   fiber.flag |= Flag.Hook
   resetCursor()
   currentFiber = fiber
   const child = (fiber.type as any)(fiber.props, fiber.children)
   currentFiber.alternate = fiber
-  currentFiber.children = child
   return child
 }
 
-const getParentNode = (fiber: IFiber): HTMLElement | undefined => {
-  while ((fiber = fiber.parent)) {
-    if (!isFn(fiber.type)) return fiber.node
+const updateHost = (fiber: IFiber): any => {
+  fiber.flag |= Flag.Host
+  if (!fiber.node) {
+    fiber.node = createElement(fiber) as any
   }
-}
-
-const reconcileChildren = (fiber: IFiber, children: any): void => {
-  const oldFiber = fiber.alternate
-  // generate the linked list
-  for (var i = 0, prev, old = oldFiber?.child; i < children.length; i++) {
-    const child = children[i]
-
-    child.parent = fiber
-    child.alternate = old
-
-    if (i > 0) {
-      prev.sibling = child
-    } else {
-      fiber.child = child
-    }
-
-    prev = child
-
-    if (old) {
-      old = old.sibling
-    }
-  }
+  console.log(fiber)
+  return fiber
 }
 
 function createNode(fiber) {
@@ -138,25 +106,13 @@ function createNode(fiber) {
   return node
 }
 
-var kid = (fiber) => (isFn(fiber.type) ? updateHook(fiber) : fiber)
+var kid = (fiber) => (isFn(fiber.type) ? updateHook(fiber) : updateHost(fiber))
 
 const commitWork = (fiber: IFiber): void => {
   commits.splice(0, commits.length).forEach((c) => c())
   fiber.done?.()
   preCommit = null
 }
-const onError = (e: any) => {
-  if (isFn(e.error?.then)) {
-    e.preventDefault()
-    currentFiber.lane = 0
-    currentFiber.hooks.list.forEach(reset)
-    dispatchUpdate(currentFiber)
-  }
-}
-
-const reset = (h: any) => (h[2] & (1 << 2) ? (h[2] = 0b1101) : h[2] & (1 << 3) ? (h[2] = 0b1010) : null)
-
-const arrayfy = (arr) => (!arr ? [] : arr.pop ? arr : [arr])
 
 const refer = (ref: IRef, dom?: HTMLElement): void => {
   if (ref) isFn(ref) ? ref(dom) : ((ref as { current?: HTMLElement })!.current = dom)
@@ -183,5 +139,3 @@ const cleanup = (e: IEffect): void => e[2]?.(currentFiber)
 export const isFn = (x: any): x is Function => typeof x === 'function'
 export const isStr = (s: any): s is number | string => typeof s === 'number' || typeof s === 'string'
 export const some = (v: any) => v != null && v !== false && v !== true
-
-window.addEventListener('error', onError)
