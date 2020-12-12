@@ -1,11 +1,8 @@
 import { Attributes, DOM, IFiber } from './type'
-import {Flag} from './diff'
+import { Flag } from './diff'
+import { kid } from './reconciler'
 
-export const updateElement = <P extends Attributes>(
-  dom: DOM,
-  oldProps: P,
-  newProps: P
-) => {
+export const updateElement = <P extends Attributes>(dom: DOM, oldProps: P, newProps: P) => {
   for (let name in { ...oldProps, ...newProps }) {
     let oldValue = oldProps[name]
     let newValue = newProps[name]
@@ -38,11 +35,27 @@ export const createElement = <P = Attributes>(fiber: IFiber) => {
     fiber.type === Flag.Text
       ? document.createTextNode('')
       : fiber.flag & Flag.Svg
-      ? document.createElementNS(
-          'http://www.w3.org/2000/svg',
-          fiber.type as string
-        )
+      ? document.createElementNS('http://www.w3.org/2000/svg', fiber.type as string)
       : document.createElement(fiber.type as string)
   updateElement(dom as DOM, {} as P, fiber.props as P)
   return dom
+}
+
+export function insert(parent, before, after) {
+  parent.insertBefore(before, after)
+}
+
+export function create(fiber) {
+  let node = fiber.flag & Flag.Root ? fiber.node : createElement(fiber)
+  if (fiber.children) {
+    for (var i = 0; i < fiber.children.length; i++) {
+      let child = create((fiber.children[i] = kid(fiber.children[i])))
+      node.appendChild(child)
+    }
+  }
+  return node
+}
+
+export function remove(parent, node) {
+  parent.removeChild(node)
 }

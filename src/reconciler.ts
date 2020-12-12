@@ -1,12 +1,12 @@
 import { IFiber, FreElement, ITaskCallback, FC, Attributes, HTMLElementEx, FreNode, IRef, IEffect } from './type'
-import { createElement, updateElement } from './dom'
+import { createElement, updateElement, insert, create, remove } from './dom'
 import { resetCursor } from './hooks'
 import { scheduleWork, shouldYield, schedule } from './scheduler'
-import { isArr, createText } from './h'
 import { diff, Flag } from './diff'
 
 let preCommit: IFiber | undefined
 let currentFiber: IFiber
+let alternate = null
 let fiber: IFiber | undefined
 let commits = []
 const microTask: IFiber[] = []
@@ -38,31 +38,76 @@ const reconcileWork = (timeout: boolean): boolean => {
   return null
 }
 
+function commit(op) {
+  commits.push(op)
+}
+
 const reconcile = (fiber: IFiber): IFiber | undefined => {
   let oldFiber = fiber.alternate
   const parent = oldFiber?.parent?.node
   const node = oldFiber?.node
+
   if (!oldFiber) {
     // if there is no oldFiber, just mount subtree.
-    commits.push(() => createNode(fiber))
+    commit(() => create(fiber))
   } else if (oldFiber && oldFiber.type !== fiber.type) {
     // if the type is different, remove old and create new.
-    commits.push(
-      () => parent.insertBefore(createNode(fiber), node),
-      () => parent.removeChild(node)
-    )
+    commit(() => parent.insertBefore(create(fiber), node))
+    commit(() => parent.removeChild(node))
   } else if (oldFiber && oldFiber.type === Flag.Text) {
-    commits.push(() => (oldFiber.node.nodeValue = fiber.props.nodeValue))
-  } else if (fiber.flag & Flag.Hook) {
-    let oldChild = oldFiber.children
-    let child = kid(fiber)
-    child.alternate = oldChild
-    child.parent = fiber
-    fiber.child = child
+    commit(() => (oldFiber.node.nodeValue = fiber.props.nodeValue))
   } else {
-    // berfore we use the lcs algorithm, prepare deal with children
-    let oldKids = oldFiber.children
-    let newKids = kid(fiber)
+    let oldKids = oldFiber.children,
+      newKids = kid(fiber),
+      oldHead = 0,
+      newHead = 0,
+      oldTail = oldKids.length - 1,
+      newTail = newKids.length - 1
+    while (oldHead <= oldTail && newHead <= newTail) {
+      if (oldKids[oldHead] == null) {
+        oldHead++
+      } else if (oldKids[oldTail] == null) {
+        oldTail--
+      } else if (oldKids[oldHead].key === newKids[newHead].key) {
+        // commit(() => update(parent, oldKids[oldHead], newKids[newHead]))
+        oldHead++
+        newHead++
+      } else if (oldKids[oldTail].key === newKids[newTail].key) {
+        // commit(() => update(parent, oldKids[oldTail], newKids[newTail]))
+        oldTail--
+        newTail--
+      } else if (oldKids[oldHead].key === newKids[newTail].key) {
+        // commit(() => update(parent, oldKids[oldHead], newKids[newTail]))
+        commit(() => insert(parent, oldKids[oldHead].node, oldKids[oldTail + 1].node))
+        oldHead++
+        newTail--
+      } else if (oldKids[oldTail].key === newKids[newHead].key) {
+        // commit(() => update(parent, oldKids[oldTail], newKids[newHead]))
+        commit(() => insert(parent, oldKids[oldTail].node, oldKids[oldHead].node))
+        oldTail--
+        newHead++
+      } else {
+        const i = oldKids.findIndex((kid) => kid.key === newKids[newHead].key)
+        if (i >= 0) {
+          const kid = oldKids[i]
+          // commit(() => update(parent, kid, newKids[newHead]))
+          commit(() => insert(parent, kid.node, oldKids[oldHead].node))
+          oldKids[i] = null
+        } else {
+          commit(() => insert(parent, create(newKids[newHead]), oldKids[oldHead].node))
+        }
+        newHead++
+      }
+    }
+    if (oldHead > oldTail) {
+      commit(() => {
+        for (let i = newHead; i <= newTail; i++) insert(parent, create(newKids[i]), oldKids[oldHead])
+      })
+    } else if (newHead > newTail) {
+      commit(() => {
+        for (let i = oldHead; i <= oldTail; i++) remove(parent, oldKids[i].node)
+      })
+    }
   }
 
   if (fiber.child) return fiber.child
@@ -77,12 +122,12 @@ const reconcile = (fiber: IFiber): IFiber | undefined => {
 }
 
 const updateHook = (fiber: IFiber): any => {
-  console.log(fiber)
   fiber.flag |= Flag.Hook
   resetCursor()
   currentFiber = fiber
   const child = (fiber.type as any)(fiber.props, fiber.children)
   currentFiber.alternate = fiber
+  currentFiber.children = child
   return child
 }
 
@@ -91,22 +136,10 @@ const updateHost = (fiber: IFiber): any => {
   if (!fiber.node) {
     fiber.node = createElement(fiber) as any
   }
-  console.log(fiber)
   return fiber
 }
 
-function createNode(fiber) {
-  let node = fiber.flag & Flag.Root ? fiber.node : createElement(fiber)
-  if (fiber.children) {
-    for (var i = 0; i < fiber.children.length; i++) {
-      let child = createNode((fiber.children[i] = kid(fiber.children[i])))
-      node.appendChild(child)
-    }
-  }
-  return node
-}
-
-var kid = (fiber) => (isFn(fiber.type) ? updateHook(fiber) : updateHost(fiber))
+export const kid = (fiber) => (isFn(fiber.type) ? updateHook(fiber) : updateHost(fiber))
 
 const commitWork = (fiber: IFiber): void => {
   commits.splice(0, commits.length).forEach((c) => c())
