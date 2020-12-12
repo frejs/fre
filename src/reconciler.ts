@@ -52,8 +52,8 @@ const reconcile = (fiber: IFiber): IFiber | undefined => {
     commit(() => create(fiber))
   } else if (oldFiber && oldFiber.type !== fiber.type) {
     // if the type is different, remove old and create new.
-    commit(() => parent.insertBefore(create(fiber), node))
-    commit(() => parent.removeChild(node))
+    commit(() => insert(parent, create(fiber), node))
+    commit(() => remove(parent, node))
   } else if (oldFiber && oldFiber.type === Flag.Text) {
     commit(() => (oldFiber.node.nodeValue = fiber.props.nodeValue))
   } else {
@@ -63,6 +63,7 @@ const reconcile = (fiber: IFiber): IFiber | undefined => {
       newHead = 0,
       oldTail = oldKids.length - 1,
       newTail = newKids.length - 1
+
     while (oldHead <= oldTail && newHead <= newTail) {
       if (oldKids[oldHead] == null) {
         oldHead++
@@ -107,6 +108,19 @@ const reconcile = (fiber: IFiber): IFiber | undefined => {
       commit(() => {
         for (let i = oldHead; i <= oldTail; i++) remove(parent, oldKids[i].node)
       })
+    }
+
+    for (var i = 0, prev, old = oldFiber?.child, childs = arrayfy(newKids); i < childs.length; i++) {
+      const child = childs[i]
+      child.parent = fiber
+      child.alternate = old
+      if (i > 0) {
+        prev.sibling = child
+      } else {
+        fiber.child = child
+      }
+      prev = child
+      if (old) old = old.sibling
     }
   }
 
@@ -172,3 +186,4 @@ const cleanup = (e: IEffect): void => e[2]?.(currentFiber)
 export const isFn = (x: any): x is Function => typeof x === 'function'
 export const isStr = (s: any): s is number | string => typeof s === 'number' || typeof s === 'string'
 export const some = (v: any) => v != null && v !== false && v !== true
+const arrayfy = (arr) => (!arr ? [] : arr.pop ? arr : [arr])
