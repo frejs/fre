@@ -32,7 +32,7 @@ export const updateElement = <P extends Attributes>(dom: DOM, oldProps: P, newPr
 
 export const createElement = <P = Attributes>(fiber: IFiber) => {
   const dom =
-    fiber.type === Flag.Text
+    fiber.type === 3
       ? document.createTextNode('')
       : fiber.flag & Flag.Svg
       ? document.createElementNS('http://www.w3.org/2000/svg', fiber.type as string)
@@ -42,7 +42,9 @@ export const createElement = <P = Attributes>(fiber: IFiber) => {
 }
 
 export function insert(parent, before, after) {
-  parent.insertBefore(before, after)
+  console.log(parent, before)
+
+  parent && parent.appendChild(before)
 }
 
 export function create(fiber) {

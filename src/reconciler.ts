@@ -44,20 +44,28 @@ function commit(op) {
 
 const reconcile = (fiber: IFiber): IFiber | undefined => {
   let oldFiber = fiber.alternate
-  const parent = oldFiber?.parent?.node
   const node = oldFiber?.node
-
+  fiber.parentNode = getParentNode(fiber) as any
   if (!oldFiber) {
     // if there is no oldFiber, just mount subtree.
-    commit(() => create(fiber))
+    if (isFn(fiber.type)) {
+      newKids = updateHook(fiber)
+    } else {
+      const node = createElement(fiber)
+      if(fiber.parentNode){
+        insert(fiber.parentNode,node,null)
+      }
+      // commit(() => insert(parent, node, null))
+      newKids = updateHost(fiber)
+    }
   } else if (oldFiber && oldFiber.type !== fiber.type) {
     // if the type is different, remove old and create new.
-    commit(() => insert(parent, create(fiber), node))
-    commit(() => remove(parent, node))
+    // commit(() => insert(parent, createElement(fiber), node))
+    // commit(() => remove(parent, node))
   } else if (oldFiber && oldFiber.type === Flag.Text) {
-    commit(() => (oldFiber.node.nodeValue = fiber.props.nodeValue))
+    // commit(() => (oldFiber.node.nodeValue = fiber.props.nodeValue))
   } else {
-    let oldKids = oldFiber.children,
+    var oldKids = oldFiber.children,
       newKids = kid(fiber),
       oldHead = 0,
       newHead = 0,
@@ -109,19 +117,19 @@ const reconcile = (fiber: IFiber): IFiber | undefined => {
         for (let i = oldHead; i <= oldTail; i++) remove(parent, oldKids[i].node)
       })
     }
+  }
 
-    for (var i = 0, prev, old = oldFiber?.child, childs = arrayfy(newKids); i < childs.length; i++) {
-      const child = childs[i]
-      child.parent = fiber
-      child.alternate = old
-      if (i > 0) {
-        prev.sibling = child
-      } else {
-        fiber.child = child
-      }
-      prev = child
-      if (old) old = old.sibling
+  for (var i = 0, prev, old = oldFiber?.child, childs = arrayfy(newKids); i < childs.length; i++) {
+    const child = childs[i]
+    child.parent = fiber
+    child.alternate = old
+    if (i > 0) {
+      prev.sibling = child
+    } else {
+      fiber.child = child
     }
+    prev = child
+    if (old) old = old.sibling
   }
 
   if (fiber.child) return fiber.child
@@ -132,6 +140,12 @@ const reconcile = (fiber: IFiber): IFiber | undefined => {
     }
     if (fiber.sibling) return fiber.sibling
     fiber = fiber.parent
+  }
+}
+
+const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
+  while ((WIP = WIP.parent)) {
+    if (!isFn(WIP.type)) return WIP.node
   }
 }
 
@@ -150,7 +164,7 @@ const updateHost = (fiber: IFiber): any => {
   if (!fiber.node) {
     fiber.node = createElement(fiber) as any
   }
-  return fiber
+  return fiber.children
 }
 
 export const kid = (fiber) => (isFn(fiber.type) ? updateHook(fiber) : updateHost(fiber))
