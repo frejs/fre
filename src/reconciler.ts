@@ -118,8 +118,8 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       newFiber.lastProps = oldKids[oldHead].props
       newFiber.node = oldKids[oldHead].node
       newFiber.kids = oldKids[oldHead].kids
-      // console.log(oldKids[oldHead],newKids[newTail],oldKids[oldTail + 1].node)
-      newFiber.insertPoint = oldKids[oldTail + 1].node
+      console.log(oldTail)
+      newFiber.insertPoint = oldKids[oldTail].node.nextSibling
       oldHead++
       newTail--
     } else if (oldKids[oldTail].key === newKids[newHead].key) {
