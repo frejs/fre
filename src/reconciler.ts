@@ -9,6 +9,9 @@ let currentFiber: IFiber
 let WIP: IFiber | undefined
 let commits: IFiber[] = []
 const microTask: IFiber[] = []
+const UPDATE = 1
+const INSERT = 1 << 1
+const REMOVE = 1 << 2
 
 export const render = (vnode: FreElement, node: Node, done?: () => void): void => {
   const rootFiber = {
@@ -67,9 +70,6 @@ const updateHost = (WIP: IFiber): void => {
     WIP.node = createElement(WIP) as HTMLElementEx
   }
   const p = WIP.parent || {}
-  WIP.insertPoint = (p as IFiber).last || null
-  ;(p as IFiber).last = WIP
-  WIP.last = null
   reconcileChildren(WIP, WIP.props.children)
 }
 
@@ -80,62 +80,97 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
 }
 
 const reconcileChildren = (WIP: IFiber, children: FreNode): void => {
-  delete WIP.child
-  const oldFibers = WIP.kids
-  const newFibers = (WIP.kids = hashfy(children as IFiber))
+  let oldKids = arrayfy(WIP.kids),
+    newKids = (WIP.kids = arrayfy(children as IFiber)),
+    oldHead = 0,
+    newHead = 0,
+    oldTail = oldKids.length - 1,
+    newTail = newKids.length - 1,
+    prev = null
 
-  const reused = {}
+    console.log(oldKids,newKids)
 
-  for (const k in oldFibers) {
-    const newFiber = newFibers[k]
-    const oldFiber = oldFibers[k]
-
-    if (newFiber && newFiber.type === oldFiber.type) {
-      reused[k] = oldFiber
+  while (oldHead <= oldTail && newHead <= newTail) {
+    let newFiber = null
+    if (oldKids[oldHead] == null) {
+      oldHead++
+    } else if (oldKids[oldTail] == null) {
+      oldTail--
+    } else if (oldKids[oldHead].key === newKids[newHead].key) {
+      newFiber = newKids[newHead]
+      newFiber.tag |= UPDATE
+      oldHead++
+      newHead++
+    } else if (oldKids[oldTail].key === newKids[newTail].key) {
+      newFiber = newKids[newTail]
+      newFiber |= UPDATE
+      oldTail--
+      newTail--
+    } else if (oldKids[oldHead].key === newKids[newTail].key) {
+      newFiber = newKids[newTail]
+      newFiber.tag |= UPDATE
+      newFiber.tag |= INSERT
+      newFiber.node = oldKids[oldHead].node
+      newFiber.insertPont = oldKids[oldTail + 1].node
+      oldHead++
+      newTail--
+    } else if (oldKids[oldTail].key === newKids[newHead].key) {
+      newFiber = newKids[newTail]
+      newFiber.tag |= UPDATE
+      newFiber.tag |= INSERT
+      newFiber.node = oldKids[oldTail].node
+      newFiber.insertPont = oldKids[oldHead].node
+      oldTail--
+      newHead++
     } else {
-      oldFiber.op |= 1 << 3
+      const i = oldKids.findIndex((kid) => kid.key === newKids[newHead].key)
+      if (i >= 0) {
+        const oldKid = oldKids[i]
+        newFiber = newKids[newHead]
+        newFiber.tag |= UPDATE
+        newFiber.tag |= INSERT
+        newFiber.node = oldKid.node
+        newFiber.insertPont = oldKids[oldHead].node
+        oldKids[i] = null
+      } else {
+        newFiber = newKids[newHead]
+        newFiber.tag |= INSERT
+        newFiber.node = null
+        newFiber.insertPont = oldKids[oldHead].node
+      }
+      newHead++
+    }
+    newFiber.parent = WIP
+    if (newHead === 0) {
+      WIP.child = newFiber
+    } else {
+      prev.sibling = newFiber
+    }
+    prev = newFiber
+  }
+  if (oldHead > oldTail) {
+    for (let i = newHead; i <= newTail; i++) {
+      let newFiber = newKids[i]
+      newFiber.tag |= INSERT
+      newFiber.node = null
+      newFiber.insertPont = oldKids[oldHead]?.node
+      newFiber.parent = WIP
+      if (i === 0) {
+        WIP.child = newFiber
+      } else {
+        prev.sibling = newFiber
+      }
+      prev = newFiber
+    }
+  } else if (newHead > newTail) {
+    for (let i = oldHead; i <= oldTail; i++) {
+      let oldFiber = oldKids[i]
+      oldFiber.tag |= REMOVE
       commits.push(oldFiber)
     }
   }
 
-  let prevFiber: IFiber | null
-
-  for (const k in newFibers) {
-    let newFiber = newFibers[k]
-    const oldFiber = reused[k]
-
-    if (oldFiber) {
-      oldFiber.op |= 1 << 2
-      newFiber = { ...oldFiber, ...newFiber }
-      newFiber.lastProps = oldFiber.props
-      if (shouldPlace(newFiber)) {
-        newFiber.op &= 1 << 1
-      }
-    } else {
-      newFiber.op |= 1 << 1
-    }
-
-    newFibers[k] = newFiber
-    newFiber.parent = WIP
-
-    if (prevFiber) {
-      prevFiber.sibling = newFiber
-    } else {
-      if (WIP.op & (1 << 4)) {
-        newFiber.op |= 1 << 4
-      }
-      WIP.child = newFiber
-    }
-    prevFiber = newFiber
-  }
-
-  delete prevFiber?.sibling
-}
-
-const shouldPlace = (fiber: IFiber): string | boolean | undefined => {
-  const p = fiber.parent
-  if (isFn(p.type)) return p.key && !p.lane
-  return fiber.key
+  console.log(oldKids, newKids)
 }
 
 const commitWork = (fiber: IFiber): void => {
@@ -170,13 +205,7 @@ const commit = (fiber: IFiber): void => {
   refer(ref, node)
 }
 
-const hashfy = <P>(c: IFiber<P>): FiberMap<P> => {
-  const out: FiberMap<P> = {}
-  isArr(c)
-    ? c.forEach((v, i) => (isArr(v) ? v.forEach((vi, j) => (out[hs(i, j, vi.key)] = vi)) : some(v) && (out[hs(i, null, v.key)] = v)))
-    : some(c) && (out[hs(0, null, (c as any).key)] = c)
-  return out
-}
+const arrayfy = (arr) => (!arr ? [] : arr.pop ? arr : [arr])
 
 const refer = (ref: IRef, dom?: HTMLElement): void => {
   if (ref) isFn(ref) ? ref(dom) : ((ref as { current?: HTMLElement })!.current = dom)
@@ -204,6 +233,3 @@ const cleanup = (e: IEffect): void => e[2]?.(currentFiber)
 export const isFn = (x: any): x is Function => typeof x === 'function'
 export const isStr = (s: any): s is number | string => typeof s === 'number' || typeof s === 'string'
 export const some = (v: any) => v != null && v !== false && v !== true
-
-const hs = (i: number, j: string | number | null, k?: string): string =>
-  k != null && j != null ? '.' + i + '.' + k : j != null ? '.' + i + '.' + j : k != null ? '.' + k : '.' + i
