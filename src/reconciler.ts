@@ -69,7 +69,6 @@ const updateHost = (WIP: IFiber): void => {
     if (WIP.type === 'svg') WIP.op |= 1 << 4
     WIP.node = createElement(WIP) as HTMLElementEx
   }
-  const p = WIP.parent || {}
   reconcileChildren(WIP, WIP.props.children)
 }
 
@@ -79,16 +78,17 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
   }
 }
 
-const reconcileChildren = (WIP: IFiber, children: FreNode): void => {
-  let oldKids = arrayfy(WIP.kids),
-    newKids = (WIP.kids = arrayfy(children as IFiber)),
+const reconcileChildren = (WIP: any, children: FreNode): void => {
+  let oldKids = WIP.kids || [],
+    newKids = (WIP.kids = hashfy(children) as any),
     oldHead = 0,
     newHead = 0,
     oldTail = oldKids.length - 1,
     newTail = newKids.length - 1,
-    prev = null
+    prev = null,
+    index = 0
 
-    console.log(oldKids,newKids)
+  console.log(oldKids, newKids)
 
   while (oldHead <= oldTail && newHead <= newTail) {
     let newFiber = null
@@ -141,12 +141,13 @@ const reconcileChildren = (WIP: IFiber, children: FreNode): void => {
       newHead++
     }
     newFiber.parent = WIP
-    if (newHead === 0) {
+    if (index === 0) {
       WIP.child = newFiber
     } else {
       prev.sibling = newFiber
     }
     prev = newFiber
+    index++
   }
   if (oldHead > oldTail) {
     for (let i = newHead; i <= newTail; i++) {
@@ -155,12 +156,13 @@ const reconcileChildren = (WIP: IFiber, children: FreNode): void => {
       newFiber.node = null
       newFiber.insertPont = oldKids[oldHead]?.node
       newFiber.parent = WIP
-      if (i === 0) {
+      if (index === 0) {
         WIP.child = newFiber
       } else {
         prev.sibling = newFiber
       }
       prev = newFiber
+      index++
     }
   } else if (newHead > newTail) {
     for (let i = oldHead; i <= oldTail; i++) {
@@ -205,7 +207,18 @@ const commit = (fiber: IFiber): void => {
   refer(ref, node)
 }
 
-const arrayfy = (arr) => (!arr ? [] : arr.pop ? arr : [arr])
+const hashfy = (arr) => {
+  if (!arr) return []
+  if (isArr(arr)) {
+    return arr.map((a, i) => {
+      a.key = '.' + a.key + '.' + i || '.' + i
+      return a
+    })
+  } else {
+    arr.key = arr.key || '.0'
+    return [arr]
+  }
+}
 
 const refer = (ref: IRef, dom?: HTMLElement): void => {
   if (ref) isFn(ref) ? ref(dom) : ((ref as { current?: HTMLElement })!.current = dom)
