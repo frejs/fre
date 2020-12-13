@@ -68,7 +68,6 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
 
 const updateHost = (WIP: IFiber): void => {
   if (!WIP.node) {
-    if (WIP.type === 'svg') WIP.op |= 1 << 4
     WIP.node = createElement(WIP) as HTMLElementEx
   }
   reconcileChildren(WIP, WIP.props.children)
@@ -189,8 +188,8 @@ const commitWork = (fiber: IFiber): void => {
 }
 
 const commit = (fiber: IFiber): void => {
-  const { tag, op, parentNode, node, ref, hooks } = fiber
-  if (op & (1 << 3)) {
+  const { tag, parentNode, node, ref, hooks } = fiber
+  if (tag & (1 << 3)) {
     hooks?.list.forEach(cleanup)
     cleanupRef(fiber.kids)
     while (isFn(fiber.type)) fiber = fiber.child
