@@ -1,6 +1,6 @@
 <p align="center"><img src="http://wx2.sinaimg.cn/mw690/0060lm7Tly1ftpm5b3ihfj3096097aaj.jpg" alt="fre logo" width="150"></p>
 <h1 align="center">Fre</h1>
-<p align="center">:ghost: Tiny React like framework with Concurrent.</p>
+<p align="center">:ghost: Tiny Coroutine framework with Fiber.</p>
 <p align="center">
 <a href="https://github.com/yisar/fre/actions"><img src="https://img.shields.io/github/workflow/status/yisar/fre/main.svg" alt="Build Status"></a>
 <a href="https://codecov.io/gh/yisar/fre"><img src="https://img.shields.io/codecov/c/github/yisar/fre.svg" alt="Code Coverage"></a>
@@ -9,17 +9,12 @@
 <a href="https://bundlephobia.com/result?p=fre"><img src="http://img.badgesize.io/https://unpkg.com/fre/dist/fre.js?compression=brotli&label=brotli" alt="brotli"></a>
 </p>
 
-### Feature
 
-- :tada: Functional Component and hooks API
-- :confetti_ball: Time slicing and Algebraic effects
-- :telescope: keyed reconcilation algorithm
+- **Coroutine with Fiber** — This is a amazing idea, which implements the coroutine scheduler in JavaScript, and the rendering is asynchronous, which supports Time slicing and Suspense.
 
-### Real world
+- **Highly-optimized algorithm** — Like other frameworks, Fre has a perfect reconciliation algorithm, which traverses both ends at the same time with O (n) complexity, support keyed.
 
-[clicli.me](https://www.clicli.me)
-
-Any other demos [click here](https://github.com/yisar/fre/tree/master/demo/src)
+- **Do more with less** — After tree shaking, project of hello world is only 1KB, but it has all fetures, virtual DOM, hooks API, functional component and more.
 
 ### Use
 
@@ -58,8 +53,6 @@ render(<App />, document.getElementById('root'))
 - [useMemo](https://github.com/yisar/fre#usememo)
 
 - [useRef](https://github.com/yisar/fre#useref)
-
-- [useContext](https://github.com/yisar/fre#usecontext)
 
 #### useState
 
@@ -146,7 +139,7 @@ useEffect(() => {
 
 #### useLayout
 
-More like useEffect, but useEffect queue in `requestAnimationFrame`, but useLayout is sync and block commitWork.
+More like useEffect, but useLayout is sync and blocking UI.
 
 ```js
 useLayout(() => {
@@ -156,7 +149,7 @@ useLayout(() => {
 
 #### useMemo
 
-`useMemo` has the same parameters as `useEffect`, but `useMemo` will return a cached value.
+`useMemo` has the same rules as `useEffect`, but `useMemo` will return a cached value.
 
 ```js
 function App() {
@@ -233,20 +226,6 @@ The above code needs babel plugin `@babel/plugin-transform-react-jsx`
   }
 ]
 ```
-
-#### time slicing
-
-Time slicing is the scheduling of reconcilation, synchronous tasks, sacrifice CPU and reduce blocking time
-
-#### resumable exception
-
-resumable exception is a concept of algebraic effects. It can synchronously throw effects and then resume the execution of other logic of components.
-
-#### key-based reconcilation
-
-Fre implements a compact reconcilation algorithm support keyed, which also called diff.
-
-It uses hash to mark locations to reduce much size.
 
 #### License
 _MIT @yisar
