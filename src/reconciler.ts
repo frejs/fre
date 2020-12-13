@@ -9,10 +9,12 @@ let currentFiber: IFiber
 let WIP: IFiber | undefined
 let commits: IFiber[] = []
 const microTask: IFiber[] = []
-const UPDATE = 1
-const INSERT = 1 << 1
-const REMOVE = 1 << 2
-
+export const enum OP {
+  UPDATE = 1,
+  INSERT = 1 << 1,
+  REMOVE = 1 << 2,
+  MOUNT = UPDATE | INSERT,
+}
 export const render = (vnode: FreElement, node: Node, done?: () => void): void => {
   const rootFiber = {
     node,
@@ -88,8 +90,6 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     prev = null,
     index = 0
 
-  console.log(oldKids, newKids)
-
   while (oldHead <= oldTail && newHead <= newTail) {
     let newFiber = null
     if (oldKids[oldHead] == null) {
@@ -98,26 +98,30 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       oldTail--
     } else if (oldKids[oldHead].key === newKids[newHead].key) {
       newFiber = newKids[newHead]
-      newFiber.tag |= UPDATE
+      newFiber.tag |= OP.UPDATE
+      newFiber.lastProps = oldKids[oldHead].props
+      newFiber.kids = oldKids[oldHead].kids
+      newFiber.node = oldKids[oldHead].node
       oldHead++
       newHead++
     } else if (oldKids[oldTail].key === newKids[newTail].key) {
       newFiber = newKids[newTail]
-      newFiber |= UPDATE
+      newFiber |= OP.UPDATE
+      newFiber.lastProps = oldKids[oldTail].props
       oldTail--
       newTail--
     } else if (oldKids[oldHead].key === newKids[newTail].key) {
       newFiber = newKids[newTail]
-      newFiber.tag |= UPDATE
-      newFiber.tag |= INSERT
+      newFiber.tag |= OP.MOUNT
+      newFiber.lastProps = oldKids[oldHead].props
       newFiber.node = oldKids[oldHead].node
       newFiber.insertPont = oldKids[oldTail + 1].node
       oldHead++
       newTail--
     } else if (oldKids[oldTail].key === newKids[newHead].key) {
       newFiber = newKids[newTail]
-      newFiber.tag |= UPDATE
-      newFiber.tag |= INSERT
+      newFiber.tag |= OP.MOUNT
+      newFiber.lastProps = oldKids[oldTail].props
       newFiber.node = oldKids[oldTail].node
       newFiber.insertPont = oldKids[oldHead].node
       oldTail--
@@ -127,14 +131,14 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       if (i >= 0) {
         const oldKid = oldKids[i]
         newFiber = newKids[newHead]
-        newFiber.tag |= UPDATE
-        newFiber.tag |= INSERT
+        newFiber.tag |= OP.MOUNT
+        newFiber.lastProps = oldKid.props
         newFiber.node = oldKid.node
         newFiber.insertPont = oldKids[oldHead].node
         oldKids[i] = null
       } else {
         newFiber = newKids[newHead]
-        newFiber.tag |= INSERT
+        newFiber.tag |= OP.INSERT
         newFiber.node = null
         newFiber.insertPont = oldKids[oldHead].node
       }
@@ -152,7 +156,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
   if (oldHead > oldTail) {
     for (let i = newHead; i <= newTail; i++) {
       let newFiber = newKids[i]
-      newFiber.tag |= INSERT
+      newFiber.tag |= OP.INSERT
       newFiber.node = null
       newFiber.insertPont = oldKids[oldHead]?.node
       newFiber.parent = WIP
@@ -167,15 +171,16 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
   } else if (newHead > newTail) {
     for (let i = oldHead; i <= oldTail; i++) {
       let oldFiber = oldKids[i]
-      oldFiber.tag |= REMOVE
+      oldFiber.tag |= OP.REMOVE
       commits.push(oldFiber)
     }
   }
 
-  console.log(oldKids, newKids)
+  // console.log(oldKids, newKids)
 }
 
 const commitWork = (fiber: IFiber): void => {
+  console.log(commits)
   commits.forEach(commit)
   fiber.done?.()
   commits = []
@@ -184,7 +189,7 @@ const commitWork = (fiber: IFiber): void => {
 }
 
 const commit = (fiber: IFiber): void => {
-  const { op, parentNode, node, ref, hooks } = fiber
+  const { tag, op, parentNode, node, ref, hooks } = fiber
   if (op & (1 << 3)) {
     hooks?.list.forEach(cleanup)
     cleanupRef(fiber.kids)
@@ -195,7 +200,7 @@ const commit = (fiber: IFiber): void => {
       side(hooks.layout)
       schedule(() => side(hooks.effect))
     }
-  } else if (op & (1 << 2)) {
+  } else if (tag & OP.UPDATE) {
     updateElement(node, fiber.lastProps, fiber.props)
   } else {
     const point = fiber.insertPoint ? fiber.insertPoint.node : null
