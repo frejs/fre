@@ -79,17 +79,15 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
   }
 }
 
+
 const reconcileChildren = (WIP: any, children: FreNode): void => {
   let oldKids = WIP.kids || [],
     newKids = (WIP.kids = hashfy(children) as any),
     oldHead = 0,
     newHead = 0,
     oldTail = oldKids.length - 1,
-    newTail = newKids.length - 1,
-    prev = null,
-    index = 0
+    newTail = newKids.length - 1
 
-  // console.log(oldKids,newKids)
   while (oldHead <= oldTail && newHead <= newTail) {
     let newFiber = null
     if (oldKids[oldHead] == null) {
@@ -118,7 +116,6 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       newFiber.lastProps = oldKids[oldHead].props
       newFiber.node = oldKids[oldHead].node
       newFiber.kids = oldKids[oldHead].kids
-      console.log(oldTail)
       newFiber.insertPoint = oldKids[oldTail].node.nextSibling
       oldHead++
       newTail--
@@ -150,14 +147,6 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       }
       newHead++
     }
-    newFiber.parent = WIP
-    if (index === 0) {
-      WIP.child = newFiber
-    } else {
-      prev.sibling = newFiber
-    }
-    prev = newFiber
-    index++
   }
   if (oldHead > oldTail) {
     for (let i = newHead; i <= newTail; i++) {
@@ -165,14 +154,6 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       newFiber.tag = OP.INSERT
       newFiber.node = null
       newFiber.insertPont = oldKids[oldHead]?.node
-      newFiber.parent = WIP
-      if (index === 0) {
-        WIP.child = newFiber
-      } else {
-        prev.sibling = newFiber
-      }
-      prev = newFiber
-      index++
     }
   } else if (newHead > newTail) {
     for (let i = oldHead; i <= oldTail; i++) {
@@ -181,10 +162,20 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       commits.push(oldFiber)
     }
   }
+
+  for (var i = 0, prev = null; i < newKids.length; i++) {
+    const child = newKids[i]
+    child.parent = WIP
+    if (i > 0) {
+      prev.sibling = child
+    } else {
+      WIP.child = child
+    }
+    prev = child
+  }
 }
 
 const commitWork = (fiber: IFiber): void => {
-  console.log(commits)
   commits.forEach(commit)
   fiber.done?.()
   commits = []
@@ -209,7 +200,6 @@ const commit = (fiber: IFiber): void => {
   }
   if (tag & OP.INSERT) {
     const after = fiber.insertPoint as any
-    console.log(node, after)
     if (after === node) return
     if (after === null && node === parentNode.lastChild) return
     parentNode.insertBefore(node, after)
