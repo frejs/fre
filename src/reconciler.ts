@@ -154,6 +154,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       newFiber.tag = OP.INSERT
       newFiber.node = null
       newFiber.insertPont = oldKids[oldHead]?.node
+      console.log(newFiber)
     }
   } else if (newHead > newTail) {
     for (let i = oldHead; i <= oldTail; i++) {
