@@ -120,7 +120,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       oldHead++
       newTail--
     } else if (oldKids[oldTail].key === newKids[newHead].key) {
-      newFiber = newKids[newTail]
+      newFiber = newKids[newHead]
       newFiber.tag = OP.MOUNT
       newFiber.lastProps = oldKids[oldTail].props
       newFiber.node = oldKids[oldTail].node
@@ -192,6 +192,7 @@ const commit = (fiber: IFiber): void => {
     }
     return
   }
+  console.log(node,fiber)
   if (tag & OP.UPDATE) {
     updateElement(node, fiber.lastProps, fiber.props)
   }
