@@ -125,7 +125,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       newFiber.lastProps = oldKids[oldTail].props
       newFiber.node = oldKids[oldTail].node
       newFiber.kids = oldKids[oldTail].kids
-      newFiber.insertPont = oldKids[oldHead].node
+      newFiber.insertPoint = oldKids[oldHead].node
       oldTail--
       newHead++
     } else {
@@ -137,13 +137,13 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
         newFiber.lastProps = oldKid.props
         newFiber.node = oldKid.node
         newFiber.kids = oldKid.kids
-        newFiber.insertPont = oldKids[oldHead].node
+        newFiber.insertPoint = oldKids[oldHead].node
         oldKids[i] = null
       } else {
         newFiber = newKids[newHead]
         newFiber.tag = OP.INSERT
         newFiber.node = null
-        newFiber.insertPont = oldKids[oldHead].node
+        newFiber.insertPoint = oldKids[oldHead].node
       }
       newHead++
     }
@@ -153,8 +153,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       let newFiber = newKids[i]
       newFiber.tag = OP.INSERT
       newFiber.node = null
-      newFiber.insertPont = oldKids[oldHead]?.node
-      console.log(newFiber)
+      newFiber.insertPoint = oldKids[oldHead]?.node
     }
   } else if (newHead > newTail) {
     for (let i = oldHead; i <= oldTail; i++) {
