@@ -12,9 +12,9 @@
 
 - **Coroutine with Fiber** — This is a amazing idea, which implements the coroutine scheduler in JavaScript, and the rendering is asynchronous, which supports Time slicing and Suspense.
 
-- **Highly-optimized algorithm** — Like other frameworks, Fre has a perfect reconciliation algorithm, which traverses both ends at the same time with O (n) complexity, support keyed.
+- **Highly-optimized algorithm** — Fre has a better reconciliation algorithm, which traverses both ends at the same time with O (n) complexity, which supports keyed.
 
-- **Do more with less** — After tree shaking, project of hello world is only 1KB, but it has all fetures, virtual DOM, hooks API, functional component and more.
+- **Do more with less** — After tree shaking, project of hello world is only 1KB, but it has most fetures, virtual DOM, hooks API, functional component and more.
 
 ### Use
 
