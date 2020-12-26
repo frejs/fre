@@ -131,7 +131,7 @@ If it return a function, the function can do cleanups:
 ```js
 useEffect(() => {
     document.title = 'count is ' + count
-    reutn () => {
+    return () => {
       store.unsubscribe()
     }
 }, [])
