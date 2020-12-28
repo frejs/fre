@@ -95,7 +95,7 @@ function App() {
     <div>
       {state.count}
       <button onClick={() => dispatch({ type: 'up' })}>+</button>
-      <button onClick={() => dispatch({ type: 'down' })}>+</button>
+      <button onClick={() => dispatch({ type: 'down' })}>-</button>
     </div>
   )
 }
