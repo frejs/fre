@@ -27,8 +27,8 @@ export const render = (vnode: FreElement, node: Node, done?: () => void): void =
 }
 
 export const dispatchUpdate = (fiber?: IFiber) => {
-  if (fiber && !fiber.lane) {
-    fiber.lane = true
+  if (fiber && !fiber.dirty) {
+    fiber.dirty = true
     microTask.push(fiber)
   }
   scheduleWork(reconcileWork as ITaskCallback)
@@ -45,12 +45,12 @@ const reconcileWork = (timeout: boolean): boolean => {
 const reconcile = (WIP: IFiber): IFiber | undefined => {
   WIP.parentNode = getParentNode(WIP) as HTMLElementEx
   isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
-  WIP.lane = WIP.lane ? false : 0
+  WIP.dirty = WIP.dirty ? false : 0
   WIP.parent && commits.push(WIP)
 
   if (WIP.child) return WIP.child
   while (WIP) {
-    if (!preCommit && WIP.lane === false) {
+    if (!preCommit && WIP.dirty === false) {
       preCommit = WIP
       return null
     }
@@ -191,6 +191,7 @@ const commitWork = (fiber: IFiber): void => {
   deletes.forEach(commit)
   fiber.done?.()
   commits = []
+  deletes = []
   preCommit = null
   WIP = null
 }
@@ -205,11 +206,13 @@ const commit = (fiber: IFiber): void => {
     if ((fiber.tag & OP.INSERT) && fiber.insertPoint === undefined) return
     if (hooks) {
       if (fiber.tag & OP.REMOVE) {
+        console.log(hooks.list)
         hooks.list.forEach(cleanup)
         cleanupRef(fiber.kids)
+      } else {
+        side(hooks.layout)
+        schedule(() => side(hooks.effect))
       }
-      side(hooks.layout)
-      schedule(() => side(hooks.effect))
     }
   }
   if (tag & OP.UPDATE) {

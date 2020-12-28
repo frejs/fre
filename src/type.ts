@@ -41,7 +41,7 @@ export type FiberMap<P> = Record<string, IFiber<P>>
 
 export interface IFiber<P extends Attributes = any> {
   key?: string
-  lane?: any
+  dirty?: any
   type: string | FC<P>
   parentNode: HTMLElementEx
   node: HTMLElementEx
