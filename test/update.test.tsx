@@ -9,7 +9,7 @@ test('batch updates', async () => {
     const [count, setState] = useState(0)
     updates++
     const asyncUp = () => {
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i <= 10; i++) {
         setState(i)
       }
     }
@@ -29,7 +29,7 @@ test('batch updates', async () => {
     {
       content: <Component />,
       test: ([button]) => {
-        expect(+button.textContent).toBe(9)
+        expect(+button.textContent).toBe(10)
         expect(updates).toBe(2)
       }
     }

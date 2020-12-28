@@ -12,8 +12,8 @@ let deletes = []
 
 const microTask: IFiber[] = []
 export const enum OP {
-  REMOVE = 1 << 1,
-  UPDATE = 1 << 2,
+  REMOVE = 1 << 4,
+  UPDATE = 1 << 1,
   INSERT = 1 << 3,
   MOUNT = UPDATE | INSERT,
 }
@@ -44,7 +44,6 @@ const reconcileWork = (timeout: boolean): boolean => {
 }
 
 const reconcile = (WIP: IFiber): IFiber | undefined => {
-  console.log(WIP)
   WIP.parentNode = getParentNode(WIP) as HTMLElementEx
   isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
   WIP.dirty = WIP.dirty ? false : 0
@@ -64,8 +63,8 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
 const updateHook = <P = Attributes>(WIP: IFiber): void => {
   if (WIP.lastProps === WIP.props) return
   currentFiber = WIP
-  resetCursor()
   let children = (WIP.type as FC<P>)(WIP.props)
+  resetCursor()
   if (isStr(children)) children = createText(children as string)
   reconcileChildren(WIP, children)
 }
@@ -110,6 +109,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       newFiber.lastProps = oldKids[oldHead].props
       newFiber.kids = oldKids[oldHead].kids
       newFiber.node = oldKids[oldHead].node
+      newFiber.hooks = oldKids[oldHead].hooks
       oldHead++
       newHead++
     } else if (oldKids[oldTail].key === newKids[newTail].key) {
@@ -118,6 +118,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       newFiber.kids = oldKids[oldTail].kids
       newFiber.node = oldKids[oldTail].node
       newFiber.lastProps = oldKids[oldTail].props
+      newFiber.hooks = oldKids[oldTail].hooks
       oldTail--
       newTail--
     } else if (oldKids[oldHead].key === newKids[newTail].key) {
@@ -126,6 +127,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       newFiber.lastProps = oldKids[oldHead].props
       newFiber.node = oldKids[oldHead].node
       newFiber.kids = oldKids[oldHead].kids
+      newFiber.hooks = oldKids[oldHead].hooks
       newFiber.insertPoint = oldKids[oldTail].node.nextSibling
       oldHead++
       newTail--
@@ -135,6 +137,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       newFiber.lastProps = oldKids[oldTail].props
       newFiber.node = oldKids[oldTail].node
       newFiber.kids = oldKids[oldTail].kids
+      newFiber.hooks = oldKids[oldTail].hooks
       newFiber.insertPoint = oldKids[oldHead].node
       oldTail--
       newHead++
@@ -205,17 +208,16 @@ const commit = (fiber: IFiber): void => {
       fiber.node = getChildNode(fiber) as any
     }
     fiber.child.insertPoint = fiber.insertPoint
-    if ((fiber.tag & OP.INSERT) && fiber.insertPoint === undefined) return
     if (hooks) {
       if (fiber.tag & OP.REMOVE) {
-        console.log(hooks.list)
         hooks.list.forEach(cleanup)
         cleanupRef(fiber.kids)
       } else {
-        side(hooks.layout)
-        schedule(() => side(hooks.effect))
+        side(fiber.hooks.layout)
+        schedule(() => side(fiber.hooks.effect))
       }
     }
+    if ((fiber.tag & OP.INSERT) && fiber.insertPoint === undefined) return
   }
   if (tag & OP.UPDATE) {
     updateElement(node, fiber.lastProps, fiber.props)
@@ -275,8 +277,12 @@ const side = (effects: IEffect[]): void => {
 
 export const getCurrentFiber = () => currentFiber || null
 
-const effect = (e: IEffect): void => (e[2] = e[0](currentFiber))
-const cleanup = (e: IEffect): void => e[2]?.(currentFiber)
+const effect = (e: IEffect): void => {
+  e[2] = e[0]()
+}
+const cleanup = (e: IEffect): void => {
+  e[2] && e[2]()
+}
 
 export const isFn = (x: any): x is Function => typeof x === 'function'
 export const isStr = (s: any): s is number | string => typeof s === 'number' || typeof s === 'string'
