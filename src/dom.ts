@@ -36,7 +36,7 @@ export const createElement = <P = Attributes>(fiber: IFiber) => {
   const dom =
     fiber.type === 'text'
       ? document.createTextNode('')
-      : fiber.op & (1 << 4)
+      : fiber.tag & (1 << 4)
       ? document.createElementNS(
           'http://www.w3.org/2000/svg',
           fiber.type as string

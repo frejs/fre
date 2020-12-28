@@ -9,6 +9,7 @@ let currentFiber: IFiber
 let WIP: IFiber | undefined
 let commits: IFiber[] = []
 const microTask: IFiber[] = []
+let deletes = []
 export const enum OP {
   REMOVE = 1 << 1,
   UPDATE = 1 << 2,
@@ -143,7 +144,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
         newFiber = newKids[newHead]
         newFiber.tag = OP.INSERT
         newFiber.node = null
-        newFiber.insertPoint = oldKids[oldHead].nextSibling.nextSibling // === append
+        newFiber.insertPoint = oldKids[oldHead]?.node // === append
       }
       newHead++
     }
@@ -153,14 +154,14 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       let newFiber = newKids[i]
       newFiber.tag = OP.INSERT
       newFiber.node = null
-      newFiber.insertPoint = oldKids[oldHead]?.node.nextSibling.nextSibling
+      newFiber.insertPoint = oldKids[oldHead]?.node
     }
   } else if (newHead > newTail) {
     for (let i = oldHead; i <= oldTail; i++) {
       let oldFiber = oldKids[i]
       if (oldFiber) {
         oldFiber.tag = OP.REMOVE
-        commits.push(oldFiber)
+        deletes.push(oldFiber)
       }
 
     }
@@ -180,6 +181,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
 
 const commitWork = (fiber: IFiber): void => {
   commits.forEach(commit)
+  deletes.forEach(commit)
   fiber.done?.()
   commits = []
   preCommit = null

@@ -52,7 +52,7 @@ export interface IFiber<P extends Attributes = any> {
   ref: IRef
   hooks: IHook
   lastProps: P
-  insertPoint: IFiber | null
+  insertPoint: IFiber | null,
   props: P
   tag: number
 }
