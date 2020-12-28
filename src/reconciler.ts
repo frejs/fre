@@ -10,10 +10,9 @@ let WIP: IFiber | undefined
 let commits: IFiber[] = []
 const microTask: IFiber[] = []
 export const enum OP {
-  UPDATE = 1 << 1,
-  INSERT = 1 << 2,
-  REMOVE = 1 << 3,
-  APPEND = 1 << 4,
+  REMOVE = 1 << 1,
+  UPDATE = 1 << 2,
+  INSERT = 1 << 3,
   MOUNT = UPDATE | INSERT,
 }
 export const render = (vnode: FreElement, node: Node, done?: () => void): void => {
@@ -130,7 +129,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       oldTail--
       newHead++
     } else {
-      const i = oldKids.findIndex((kid) => kid.key === newKids[newHead].key)
+      const i = oldKids.findIndex((kid) => kid?.key === newKids[newHead].key)
       if (i >= 0) {
         const oldKid = oldKids[i]
         newFiber = newKids[newHead]
@@ -138,29 +137,32 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
         newFiber.lastProps = oldKid.props
         newFiber.node = oldKid.node
         newFiber.kids = oldKid.kids
-        newFiber.insertPoint = oldKids[oldHead].node
         oldKids[i] = null
+        newFiber.insertPoint = oldKids[oldHead]?.node
       } else {
         newFiber = newKids[newHead]
-        newFiber.tag = OP.MOUNT
+        newFiber.tag = OP.INSERT
         newFiber.node = null
-        newFiber.insertPoint = null
+        newFiber.insertPoint = oldKids[oldHead].nextSibling.nextSibling // === append
       }
       newHead++
     }
   }
-  if (oldHead > oldTail) {
+  if (oldTail < oldHead) {
     for (let i = newHead; i <= newTail; i++) {
       let newFiber = newKids[i]
       newFiber.tag = OP.INSERT
       newFiber.node = null
-      newFiber.insertPoint = null
+      newFiber.insertPoint = oldKids[oldHead]?.node.nextSibling.nextSibling
     }
   } else if (newHead > newTail) {
     for (let i = oldHead; i <= oldTail; i++) {
       let oldFiber = oldKids[i]
-      oldFiber.tag = OP.REMOVE
-      commits.push(oldFiber)
+      if (oldFiber) {
+        oldFiber.tag = OP.REMOVE
+        commits.push(oldFiber)
+      }
+
     }
   }
 
@@ -204,6 +206,7 @@ const commit = (fiber: IFiber): void => {
     if (after === node) return
     if (after === null && node === parentNode.lastChild) return
     parentNode.insertBefore(node, after)
+
   }
   refer(ref, node)
 }
@@ -211,7 +214,11 @@ const commit = (fiber: IFiber): void => {
 const hashfy = (arr) => {
   if (!arr) return []
   if (isArr(arr)) {
-    return arr.map((a, i) => {
+    let ar = arr
+    while (ar.some((v) => isArr(v))) {
+      ar = [].concat(...arr)
+    }
+    return ar.map((a, i) => {
       a.key = '.' + a.key || '.' + i
       return a
     })
