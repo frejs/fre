@@ -103,7 +103,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       oldHead++
     } else if (oldKids[oldTail] == null) {
       oldTail--
-    } else if (oldKids[oldHead].key === newKids[newHead].key) {
+    } else if (same(oldKids[oldHead], newKids[newHead])) {
       newFiber = newKids[newHead]
       newFiber.tag = OP.UPDATE
       newFiber.lastProps = oldKids[oldHead].props
@@ -112,7 +112,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       newFiber.hooks = oldKids[oldHead].hooks
       oldHead++
       newHead++
-    } else if (oldKids[oldTail].key === newKids[newTail].key) {
+    } else if (same(oldKids[oldTail], newKids[newTail])) {
       newFiber = newKids[newTail]
       newFiber.tag = OP.UPDATE
       newFiber.kids = oldKids[oldTail].kids
@@ -121,7 +121,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       newFiber.hooks = oldKids[oldTail].hooks
       oldTail--
       newTail--
-    } else if (oldKids[oldHead].key === newKids[newTail].key) {
+    } else if (same(oldKids[oldHead], newKids[newTail])) {
       newFiber = newKids[newTail]
       newFiber.tag = OP.MOUNT
       newFiber.lastProps = oldKids[oldHead].props
@@ -131,7 +131,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       newFiber.insertPoint = oldKids[oldTail].node.nextSibling
       oldHead++
       newTail--
-    } else if (oldKids[oldTail].key === newKids[newHead].key) {
+    } else if (same(oldKids[oldTail], newKids[newHead])) {
       newFiber = newKids[newHead]
       newFiber.tag = OP.MOUNT
       newFiber.lastProps = oldKids[oldTail].props
@@ -142,7 +142,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       oldTail--
       newHead++
     } else {
-      const i = oldKids.findIndex((kid) => kid?.key === newKids[newHead].key)
+      const i = oldKids.findIndex((kid) => same(kid, newKids[newHead]))
       if (i >= 0) {
         const oldKid = oldKids[i]
         newFiber = newKids[newHead]
@@ -150,13 +150,14 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
         newFiber.lastProps = oldKid.props
         newFiber.node = oldKid.node
         newFiber.kids = oldKid.kids
+        newFiber.hooks = oldKid.hooks
         oldKids[i] = null
         newFiber.insertPoint = oldKids[oldHead]?.node
       } else {
         newFiber = newKids[newHead]
         newFiber.tag = OP.INSERT
         newFiber.node = null
-        newFiber.insertPoint = oldKids[oldHead]?.node // === append
+        newFiber.insertPoint = oldKids[oldHead]?.node
       }
       newHead++
     }
@@ -175,7 +176,6 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
         oldFiber.tag = OP.REMOVE
         deletes.push(oldFiber)
       }
-
     }
   }
 
@@ -211,7 +211,6 @@ const commit = (fiber: IFiber): void => {
     if (hooks) {
       if (fiber.tag & OP.REMOVE) {
         hooks.list.forEach(cleanup)
-        cleanupRef(fiber.kids)
       } else {
         side(fiber.hooks.layout)
         schedule(() => side(fiber.hooks.effect))
@@ -223,6 +222,8 @@ const commit = (fiber: IFiber): void => {
     updateElement(node, fiber.lastProps, fiber.props)
   }
   if (tag & OP.REMOVE) {
+    node = null
+    cleanupRef(fiber.kids)
     if (isChild(parentNode, fiber.node)) {
       parentNode.removeChild(fiber.node)
     }
@@ -240,6 +241,8 @@ function isChild(p, c) {
   return Array.from(p.childNodes).some(i => c == i)
 }
 
+const same = (a, b) => a.type === b.type && a.key === b.key
+
 const hashfy = (arr) => {
   if (!arr) return []
   if (isArr(arr)) {
@@ -248,7 +251,7 @@ const hashfy = (arr) => {
       ar = [].concat(...arr)
     }
     return ar.map((a, i) => {
-      a.key = '.' + a.key || '.' + i
+      a.key = '.' + (a.key || i)
       return a
     })
   } else {
@@ -263,7 +266,7 @@ const refer = (ref: IRef, dom?: HTMLElement): void => {
 
 const cleanupRef = (kids: any): void => {
   kids.forEach(kid => {
-    refer(kid)
+    refer(kid.ref, null)
     kid.kids && cleanupRef(kid.kids)
   })
 
