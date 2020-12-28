@@ -13,6 +13,7 @@ export const enum OP {
   UPDATE = 1 << 1,
   INSERT = 1 << 2,
   REMOVE = 1 << 3,
+  APPEND = 1 << 4,
   MOUNT = UPDATE | INSERT,
 }
 export const render = (vnode: FreElement, node: Node, done?: () => void): void => {
@@ -141,9 +142,9 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
         oldKids[i] = null
       } else {
         newFiber = newKids[newHead]
-        newFiber.tag = OP.INSERT
+        newFiber.tag = OP.MOUNT
         newFiber.node = null
-        newFiber.insertPoint = oldKids[oldHead].node
+        newFiber.insertPoint = null
       }
       newHead++
     }
@@ -153,7 +154,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       let newFiber = newKids[i]
       newFiber.tag = OP.INSERT
       newFiber.node = null
-      newFiber.insertPoint = oldKids[oldHead]?.node
+      newFiber.insertPoint = null
     }
   } else if (newHead > newTail) {
     for (let i = oldHead; i <= oldTail; i++) {
@@ -192,7 +193,6 @@ const commit = (fiber: IFiber): void => {
     }
     return
   }
-  console.log(node,fiber)
   if (tag & OP.UPDATE) {
     updateElement(node, fiber.lastProps, fiber.props)
   }
