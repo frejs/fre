@@ -196,10 +196,13 @@ const commitWork = (fiber: IFiber): void => {
 }
 
 const commit = (fiber: IFiber): void => {
-  const { tag, parentNode, node, ref, hooks } = fiber
+  let { tag, parentNode, node, ref, hooks } = fiber
   if (isFn(fiber.type)) {
-    if (!fiber.node) fiber.node = getChildNode(fiber) as any
-    if (fiber.insertPoint === undefined) return
+    if (!fiber.node) {
+      fiber.node = getChildNode(fiber) as any
+    }
+    fiber.child.insertPoint = fiber.insertPoint
+    if ((fiber.tag & OP.INSERT) && fiber.insertPoint === undefined) return
     if (hooks) {
       if (fiber.tag & OP.REMOVE) {
         hooks.list.forEach(cleanup)
@@ -213,16 +216,21 @@ const commit = (fiber: IFiber): void => {
     updateElement(node, fiber.lastProps, fiber.props)
   }
   if (tag & OP.REMOVE) {
-    parentNode.removeChild(fiber.node)
+    if (isChild(parentNode, fiber.node)) {
+      parentNode.removeChild(fiber.node)
+    }
   }
   if (tag & OP.INSERT) {
     const after = fiber.insertPoint as any
-    if (after === node) return
-    if (after === null && node === parentNode.lastChild) return
-    parentNode.insertBefore(node, after)
-
+    if (after === fiber.node) return
+    if (after === null && fiber.node === parentNode.lastChild) return
+    parentNode.insertBefore(fiber.node, after)
   }
   refer(ref, node)
+}
+
+function isChild(p, c) {
+  return Array.from(p.childNodes).some(i => c == i)
 }
 
 const hashfy = (arr) => {
@@ -249,7 +257,7 @@ const refer = (ref: IRef, dom?: HTMLElement): void => {
 const cleanupRef = (kids: any): void => {
   kids.forEach(kid => {
     refer(kid)
-    kid.kids&&cleanupRef(kid.kids)
+    kid.kids && cleanupRef(kid.kids)
   })
 
 }
