@@ -28,13 +28,11 @@ test('reorder and reuse elements during key-based reconciliation of child-nodes'
           {state.map(value => (
             <li key={value}>{value}</li>
           ))}
-          <li/>
         </ul>
       ),
       test: elements => {
         const children = [...elements[0].children]
-        children.pop()
-        expect(children.map(el => el.textContent)).toStrictEqual(
+        expect(children.map(el => el.textContent)).toEqual(
           state.map(value => '' + value)
         )
 

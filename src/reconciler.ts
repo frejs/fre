@@ -8,8 +8,9 @@ let preCommit: IFiber | undefined
 let currentFiber: IFiber
 let WIP: IFiber | undefined
 let commits: IFiber[] = []
-const microTask: IFiber[] = []
 let deletes = []
+
+const microTask: IFiber[] = []
 export const enum OP {
   REMOVE = 1 << 1,
   UPDATE = 1 << 2,
@@ -76,6 +77,12 @@ const updateHost = (WIP: IFiber): void => {
 
 const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
   while ((WIP = WIP.parent)) {
+    if (!isFn(WIP.type)) return WIP.node
+  }
+}
+
+const getChildNode = (WIP: IFiber): HTMLElement | undefined => {
+  while ((WIP = WIP.child)) {
     if (!isFn(WIP.type)) return WIP.node
   }
 }
@@ -191,11 +198,16 @@ const commitWork = (fiber: IFiber): void => {
 const commit = (fiber: IFiber): void => {
   const { tag, parentNode, node, ref, hooks } = fiber
   if (isFn(fiber.type)) {
+    if (!fiber.node) fiber.node = getChildNode(fiber) as any
+    if (fiber.insertPoint === undefined) return
     if (hooks) {
+      if (fiber.tag & OP.REMOVE) {
+        hooks.list.forEach(cleanup)
+        cleanupRef(fiber.kids)
+      }
       side(hooks.layout)
       schedule(() => side(hooks.effect))
     }
-    return
   }
   if (tag & OP.UPDATE) {
     updateElement(node, fiber.lastProps, fiber.props)
@@ -234,12 +246,12 @@ const refer = (ref: IRef, dom?: HTMLElement): void => {
   if (ref) isFn(ref) ? ref(dom) : ((ref as { current?: HTMLElement })!.current = dom)
 }
 
-const cleanupRef = <P = Attributes>(kids: FiberMap<P>): void => {
-  for (const k in kids) {
-    const kid = kids[k]
-    refer(kid.ref, null)
-    if (kid.kids) cleanupRef(kid.kids)
-  }
+const cleanupRef = (kids: any): void => {
+  kids.forEach(kid => {
+    refer(kid)
+    kid.kids&&cleanupRef(kid.kids)
+  })
+
 }
 
 const side = (effects: IEffect[]): void => {
