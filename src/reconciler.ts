@@ -29,6 +29,7 @@ export const render = (vnode: FreElement, node: Node, done?: () => void): void =
 export const dispatchUpdate = (fiber?: IFiber) => {
   if (fiber && !fiber.dirty) {
     fiber.dirty = true
+    fiber.tag = OP.UPDATE
     microTask.push(fiber)
   }
   scheduleWork(reconcileWork as ITaskCallback)
@@ -43,6 +44,7 @@ const reconcileWork = (timeout: boolean): boolean => {
 }
 
 const reconcile = (WIP: IFiber): IFiber | undefined => {
+  console.log(WIP)
   WIP.parentNode = getParentNode(WIP) as HTMLElementEx
   isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
   WIP.dirty = WIP.dirty ? false : 0
