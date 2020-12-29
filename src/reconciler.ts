@@ -199,7 +199,7 @@ const commit = (fiber: IFiber): void => {
     if (!fiber.node) {
       fiber.node = getChildNode(fiber) as any
     }
-    fiber.child.insertPoint = fiber.insertPoint
+    delete fiber.child.insertPoint
     if (hooks) {
       if (fiber.tag & OP.REMOVE) {
         hooks.list.forEach(cleanup)
