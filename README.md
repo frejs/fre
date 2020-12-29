@@ -10,7 +10,7 @@
 </p>
 
 
-- **Coroutine with Fiber** — This is a amazing idea, which implements the coroutine scheduler in JavaScript, and the rendering is asynchronous, which supports Time slicing and suspense components.
+- **Coroutine with Fiber** — This is an amazing idea, which implements the coroutine scheduler in JavaScript, and the rendering is asynchronous, which supports Time slicing and suspense components.
 
 - **Highly-optimized algorithm** — Fre has a better reconciliation algorithm, which traverses from both ends with O (n) complexity, and supports keyed.
 
