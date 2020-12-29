@@ -105,7 +105,7 @@ const getChildNode = (WIP: IFiber): HTMLElement | undefined => {
 
 const reconcileChildren = (WIP: any, children: FreNode): void => {
   let oldKids = WIP.kids || [],
-    newKids = (WIP.kids = hashfy(children) as any),
+    newKids = (WIP.kids = arrayfy(children) as any),
     oldHead = 0,
     newHead = 0,
     oldTail = oldKids.length - 1,
@@ -197,6 +197,8 @@ function clone(a, b) {
   a.hooks = b.hooks
 }
 
+const getKey = (vdom) => (vdom == null ? vdom : vdom.key)
+
 const commitWork = (fiber: IFiber): void => {
   commits.forEach(commit)
   deletes.forEach(commit)
@@ -245,24 +247,9 @@ function isChild(p, c) {
   return Array.from(p.childNodes).some((i) => c == i)
 }
 
-const same = (a, b) => a.type === b.type && a.key === b.key
+const same = (a, b) => a.type === b.type && getKey(a) === getKey(b)
 
-const hashfy = (arr) => {
-  if (!arr) return []
-  if (isArr(arr)) {
-    let ar = arr
-    while (ar.some((v) => isArr(v))) {
-      ar = [].concat(...arr)
-    }
-    return ar.map((a, i) => {
-      a.key = "." + (a.key || i)
-      return a
-    })
-  } else {
-    arr.key = arr.key || ".0"
-    return [arr]
-  }
-}
+const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr])
 
 const refer = (ref: IRef, dom?: HTMLElement): void => {
   if (ref)
