@@ -119,26 +119,26 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       oldTail--
     } else if (same(oldKids[oldHead], newKids[newHead])) {
       newFiber = newKids[newHead]
-      ref(newFiber, oldKids[oldHead])
+      clone(newFiber, oldKids[oldHead])
       newFiber.tag = OP.UPDATE
       oldHead++
       newHead++
     } else if (same(oldKids[oldTail], newKids[newTail])) {
       newFiber = newKids[newTail]
-      ref(newFiber, oldKids[oldTail])
+      clone(newFiber, oldKids[oldTail])
       newFiber.tag = OP.UPDATE
       oldTail--
       newTail--
     } else if (same(oldKids[oldHead], newKids[newTail])) {
       newFiber = newKids[newTail]
-      ref(newFiber, oldKids[oldHead])
+      clone(newFiber, oldKids[oldHead])
       newFiber.tag = OP.MOUNT
       newFiber.insertPoint = oldKids[oldTail].node.nextSibling
       oldHead++
       newTail--
     } else if (same(oldKids[oldTail], newKids[newHead])) {
       newFiber = newKids[newHead]
-      ref(newFiber, oldKids[oldTail])
+      clone(newFiber, oldKids[oldTail])
       newFiber.tag = OP.MOUNT
       newFiber.insertPoint = oldKids[oldHead].node
       oldTail--
@@ -148,7 +148,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       if (i >= 0) {
         const oldKid = oldKids[i]
         newFiber = newKids[newHead]
-        ref(newFiber, oldKid)
+        clone(newFiber, oldKid)
         newFiber.tag = OP.MOUNT
         oldKids[i] = null
         newFiber.insertPoint = oldKids[oldHead]?.node
@@ -190,7 +190,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
   }
 }
 
-function ref(a, b) {
+function clone(a, b) {
   a.lastProps = b.props
   a.node = b.node
   a.kids = b.kids
@@ -284,13 +284,8 @@ const side = (effects: IEffect[]): void => {
 
 export const getCurrentFiber = () => currentFiber || null
 
-const effect = (e: IEffect): void => {
-  e[2] = e[0]()
-}
-const cleanup = (e: IEffect): void => {
-  e[2] && e[2]()
-}
-
+const effect = (e: IEffect): void => e[2] = e[0]()
+const cleanup = (e: IEffect): void => e[2] && e[2]()
 export const isFn = (x: any): x is Function => typeof x === "function"
 export const isStr = (s: any): s is number | string =>
   typeof s === "number" || typeof s === "string"
