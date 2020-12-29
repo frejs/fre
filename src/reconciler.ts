@@ -249,7 +249,7 @@ function isChild(p, c) {
 
 const same = (a, b) => a.type === b.type && getKey(a) === getKey(b)
 
-const arrayfy = arr => (!arr ? [] : arr.pop ? arr : [arr])
+const arrayfy = arr => (!arr ? [] : isArr(arr) ? arr : [arr])
 
 const refer = (ref: IRef, dom?: HTMLElement): void => {
   if (ref)
