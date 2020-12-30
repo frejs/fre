@@ -66,5 +66,5 @@ export const getHook = <S = Function | undefined, Dependency = any>(cursor: numb
 }
 
 export const isChanged = (a: DependencyList, b: DependencyList) => {
-  return !a || b.some((arg, index) => arg !== a[index])
+  return !a || a.length !== b.length || b.some((arg, index) => arg !== a[index])
 }
