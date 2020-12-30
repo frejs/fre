@@ -15,9 +15,8 @@ export const useReducer = <S, A>(reducer?: Reducer<S, A>, initState?: S): [S, Di
   hook[0] = isFn(hook[1]) ? hook[1](hook[0]) : hook.length ? hook[1] : initState
   return [
     hook[0] as S,
-    (action: A | Dispatch<A>) => {
-      hook[1] = reducer ? reducer(hook[0], action as A) : action
-      hook[2] = reducer && (action as any).type[0] === '*' ? 0b1100 : 0b1000
+    (value: A | Dispatch<A>) => {
+      hook[1] = reducer || value
       dispatchUpdate(current)
     },
   ]
@@ -67,5 +66,5 @@ export const getHook = <S = Function | undefined, Dependency = any>(cursor: numb
 }
 
 export const isChanged = (a: DependencyList, b: DependencyList) => {
-  return !a || a.length !== b.length || b.some((arg, index) => arg !== a[index])
+  return !a || b.some((arg, index) => arg !== a[index])
 }

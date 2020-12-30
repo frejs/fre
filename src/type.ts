@@ -24,6 +24,7 @@ export interface FC<P extends Attributes = {}> {
 export interface FreElement<P extends Attributes = any, T = string> {
   type: T
   props: P
+  key: string
 }
 
 export type HookTypes = 'list' | 'effect' | 'layout'
@@ -34,46 +35,36 @@ export interface IHook {
   effect: IEffect[]
 }
 
-export type IRef = (
-  e: HTMLElement | undefined
-) => void | { current?: HTMLElement }
+export type IRef = (e: HTMLElement | undefined) => void | { current?: HTMLElement }
 
 export type FiberMap<P> = Record<string, IFiber<P>>
 
 export interface IFiber<P extends Attributes = any> {
   key?: string
-  lane?: any
+  dirty?: any
   type: string | FC<P>
-  op: number
   parentNode: HTMLElementEx
   node: HTMLElementEx
   kids?: FiberMap<P>
   parent?: IFiber<P>
   sibling?: IFiber<P>
-  last?: IFiber<P>
   child?: IFiber<P>
   done?: () => void
   ref: IRef
   hooks: IHook
   lastProps: P
-  insertPoint: IFiber | null
+  insertPoint: IFiber | null,
   props: P
-  oldProps?: P
+  tag: number
 }
 
 export type HTMLElementEx = HTMLElement & { last: IFiber | null }
 export type IEffect = [Function?, number?, Function?]
 
 export type FreText = string | number
-export type FreNode =
-  | FreText
-  | FreElement
-  | FreNode[]
-  | boolean
-  | null
-  | undefined
+export type FreNode = FreText | FreElement | FreNode[] | boolean | null | undefined
 export type SetStateAction<S> = S | ((prevState: S) => S)
-export type Dispatch<A> = (value: A, resume?:boolean) => void
+export type Dispatch<A> = (value: A, resume?: boolean) => void
 export type Reducer<S, A> = (prevState: S, action: A) => S
 export type IVoidCb = () => void
 export type EffectCallback = () => void | (IVoidCb | undefined)
@@ -83,9 +74,7 @@ export interface PropsWithChildren {
   children?: FreNode
 }
 
-export type ITaskCallback =
-| ((time: boolean) => boolean)
-| null
+export type ITaskCallback = ((time: boolean) => boolean) | null
 
 export interface ITask {
   callback?: ITaskCallback

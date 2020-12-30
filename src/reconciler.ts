@@ -1,16 +1,38 @@
-import { IFiber, FreElement, ITaskCallback, FC, Attributes, HTMLElementEx, FreNode, FiberMap, IRef, IEffect } from './type'
-import { createElement, updateElement } from './dom'
-import { resetCursor } from './hooks'
-import { scheduleWork, shouldYield, schedule } from './scheduler'
-import { isArr, createText } from './h'
+import {
+  IFiber,
+  FreElement,
+  ITaskCallback,
+  FC,
+  Attributes,
+  HTMLElementEx,
+  FreNode,
+  FiberMap,
+  IRef,
+  IEffect,
+} from "./type"
+import { createElement, updateElement } from "./dom"
+import { resetCursor } from "./hooks"
+import { scheduleWork, shouldYield, schedule } from "./scheduler"
+import { isArr, createText } from "./h"
 
 let preCommit: IFiber | undefined
 let currentFiber: IFiber
 let WIP: IFiber | undefined
 let commits: IFiber[] = []
-const microTask: IFiber[] = []
+let deletes = []
 
-export const render = (vnode: FreElement, node: Node, done?: () => void): void => {
+const microTask: IFiber[] = []
+export const enum OP {
+  REMOVE = 1 << 4,
+  UPDATE = 1 << 1,
+  INSERT = 1 << 3,
+  MOUNT = UPDATE | INSERT,
+}
+export const render = (
+  vnode: FreElement,
+  node: Node,
+  done?: () => void
+): void => {
   const rootFiber = {
     node,
     props: { children: vnode },
@@ -20,8 +42,9 @@ export const render = (vnode: FreElement, node: Node, done?: () => void): void =
 }
 
 export const dispatchUpdate = (fiber?: IFiber) => {
-  if (fiber && !fiber.lane) {
-    fiber.lane = true
+  if (fiber && !fiber.dirty) {
+    fiber.dirty = true
+    fiber.tag = OP.UPDATE
     microTask.push(fiber)
   }
   scheduleWork(reconcileWork as ITaskCallback)
@@ -38,12 +61,12 @@ const reconcileWork = (timeout: boolean): boolean => {
 const reconcile = (WIP: IFiber): IFiber | undefined => {
   WIP.parentNode = getParentNode(WIP) as HTMLElementEx
   isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
-  WIP.lane = WIP.lane ? false : 0
+  WIP.dirty = WIP.dirty ? false : 0
   WIP.parent && commits.push(WIP)
 
   if (WIP.child) return WIP.child
   while (WIP) {
-    if (!preCommit && WIP.lane === false) {
+    if (!preCommit && WIP.dirty === false) {
       preCommit = WIP
       return null
     }
@@ -55,21 +78,16 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
 const updateHook = <P = Attributes>(WIP: IFiber): void => {
   if (WIP.lastProps === WIP.props) return
   currentFiber = WIP
-  resetCursor()
   let children = (WIP.type as FC<P>)(WIP.props)
+  resetCursor()
   if (isStr(children)) children = createText(children as string)
   reconcileChildren(WIP, children)
 }
 
 const updateHost = (WIP: IFiber): void => {
   if (!WIP.node) {
-    if (WIP.type === 'svg') WIP.op |= 1 << 4
     WIP.node = createElement(WIP) as HTMLElementEx
   }
-  const p = WIP.parent || {}
-  WIP.insertPoint = (p as IFiber).last || null
-  ;(p as IFiber).last = WIP
-  WIP.last = null
   reconcileChildren(WIP, WIP.props.children)
 }
 
@@ -79,115 +97,170 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
   }
 }
 
-const reconcileChildren = (WIP: IFiber, children: FreNode): void => {
-  delete WIP.child
-  const oldFibers = WIP.kids
-  const newFibers = (WIP.kids = hashfy(children as IFiber))
+const getChildNode = (WIP: IFiber): HTMLElement | undefined => {
+  while ((WIP = WIP.child)) {
+    if (!isFn(WIP.type)) return WIP.node
+  }
+}
 
-  const reused = {}
+const reconcileChildren = (WIP: any, children: FreNode): void => {
+  let oldKids = WIP.kids || [],
+    newKids = (WIP.kids = arrayfy(children) as any),
+    oldHead = 0,
+    newHead = 0,
+    oldTail = oldKids.length - 1,
+    newTail = newKids.length - 1
 
-  for (const k in oldFibers) {
-    const newFiber = newFibers[k]
-    const oldFiber = oldFibers[k]
-
-    if (newFiber && newFiber.type === oldFiber.type) {
-      reused[k] = oldFiber
+  while (oldHead <= oldTail && newHead <= newTail) {
+    let newFiber = null
+    if (oldKids[oldHead] == null) {
+      oldHead++
+    } else if (oldKids[oldTail] == null) {
+      oldTail--
+    } else if (same(oldKids[oldHead], newKids[newHead])) {
+      newFiber = newKids[newHead]
+      clone(newFiber, oldKids[oldHead])
+      newFiber.tag = OP.UPDATE
+      oldHead++
+      newHead++
+    } else if (same(oldKids[oldTail], newKids[newTail])) {
+      newFiber = newKids[newTail]
+      clone(newFiber, oldKids[oldTail])
+      newFiber.tag = OP.UPDATE
+      oldTail--
+      newTail--
+    } else if (same(oldKids[oldHead], newKids[newTail])) {
+      newFiber = newKids[newTail]
+      clone(newFiber, oldKids[oldHead])
+      newFiber.tag = OP.MOUNT
+      newFiber.insertPoint = oldKids[oldTail].node.nextSibling
+      oldHead++
+      newTail--
+    } else if (same(oldKids[oldTail], newKids[newHead])) {
+      newFiber = newKids[newHead]
+      clone(newFiber, oldKids[oldTail])
+      newFiber.tag = OP.MOUNT
+      newFiber.insertPoint = oldKids[oldHead].node
+      oldTail--
+      newHead++
     } else {
-      oldFiber.op |= 1 << 3
-      commits.push(oldFiber)
+      const i = oldKids.findIndex((kid) => same(kid, newKids[newHead]))
+      if (i >= 0) {
+        const oldKid = oldKids[i]
+        newFiber = newKids[newHead]
+        clone(newFiber, oldKid)
+        newFiber.tag = OP.MOUNT
+        oldKids[i] = null
+        newFiber.insertPoint = oldKids[oldHead]?.node
+      } else {
+        newFiber = newKids[newHead]
+        newFiber.tag = OP.INSERT
+        newFiber.node = null
+        newFiber.insertPoint = oldKids[oldHead]?.node
+      }
+      newHead++
+    }
+  }
+  if (oldTail < oldHead) {
+    for (let i = newHead; i <= newTail; i++) {
+      let newFiber = newKids[i]
+      newFiber.tag = OP.INSERT
+      newFiber.node = null
+      newFiber.insertPoint = oldKids[oldHead]?.node
+    }
+  } else if (newHead > newTail) {
+    for (let i = oldHead; i <= oldTail; i++) {
+      let oldFiber = oldKids[i]
+      if (oldFiber) {
+        oldFiber.tag = OP.REMOVE
+        deletes.push(oldFiber)
+      }
     }
   }
 
-  let prevFiber: IFiber | null
-
-  for (const k in newFibers) {
-    let newFiber = newFibers[k]
-    const oldFiber = reused[k]
-
-    if (oldFiber) {
-      oldFiber.op |= 1 << 2
-      newFiber = { ...oldFiber, ...newFiber }
-      newFiber.lastProps = oldFiber.props
-      if (shouldPlace(newFiber)) {
-        newFiber.op &= 1 << 1
-      }
+  for (var i = 0, prev = null; i < newKids.length; i++) {
+    const child = newKids[i]
+    child.parent = WIP
+    if (i > 0) {
+      prev.sibling = child
     } else {
-      newFiber.op |= 1 << 1
+      WIP.child = child
     }
-
-    newFibers[k] = newFiber
-    newFiber.parent = WIP
-
-    if (prevFiber) {
-      prevFiber.sibling = newFiber
-    } else {
-      if (WIP.op & (1 << 4)) {
-        newFiber.op |= 1 << 4
-      }
-      WIP.child = newFiber
-    }
-    prevFiber = newFiber
+    prev = child
   }
-
-  delete prevFiber?.sibling
 }
 
-const shouldPlace = (fiber: IFiber): string | boolean | undefined => {
-  const p = fiber.parent
-  if (isFn(p.type)) return p.key && !p.lane
-  return fiber.key
+function clone(a, b) {
+  a.lastProps = b.props
+  a.node = b.node
+  a.kids = b.kids
+  a.hooks = b.hooks
 }
+
+const getKey = (vdom) => (vdom == null ? vdom : vdom.key)
 
 const commitWork = (fiber: IFiber): void => {
   commits.forEach(commit)
+  deletes.forEach(commit)
   fiber.done?.()
   commits = []
+  deletes = []
   preCommit = null
   WIP = null
 }
 
 const commit = (fiber: IFiber): void => {
-  const { op, parentNode, node, ref, hooks } = fiber
-  if (op & (1 << 3)) {
-    hooks?.list.forEach(cleanup)
-    cleanupRef(fiber.kids)
-    while (isFn(fiber.type)) fiber = fiber.child
-    parentNode.removeChild(fiber.node)
-  } else if (isFn(fiber.type)) {
+  let { tag, parentNode, node, ref, hooks } = fiber
+  if (isFn(fiber.type)) {
+    if (!fiber.node) fiber.node = getChildNode(fiber) as any
+    delete fiber.child.insertPoint
     if (hooks) {
-      side(hooks.layout)
-      schedule(() => side(hooks.effect))
+      if (fiber.tag & OP.REMOVE) {
+        hooks.list.forEach(cleanup)
+      } else {
+        side(fiber.hooks.layout)
+        schedule(() => side(fiber.hooks.effect))
+      }
     }
-  } else if (op & (1 << 2)) {
+    if (fiber.tag & OP.INSERT && fiber.insertPoint === undefined) return
+  }
+  if (tag & OP.UPDATE) {
     updateElement(node, fiber.lastProps, fiber.props)
-  } else {
-    const point = fiber.insertPoint ? fiber.insertPoint.node : null
-    const after = point ? point.nextSibling : parentNode.firstChild
-    if (after === node) return
-    if (after === null && node === parentNode.lastChild) return
-    parentNode.insertBefore(node, after)
+  }
+  if (tag & OP.REMOVE) {
+    node = null
+    cleanupRef(fiber.kids)
+    if (isChild(parentNode, fiber.node)) {
+      parentNode.removeChild(fiber.node)
+    }
+  }
+  if (tag & OP.INSERT) {
+    const after = fiber.insertPoint as any
+    if (after === fiber.node) return
+    if (after === null && fiber.node === parentNode.lastChild) return
+    parentNode.insertBefore(fiber.node, after)
   }
   refer(ref, node)
 }
 
-const hashfy = <P>(c: IFiber<P>): FiberMap<P> => {
-  const out: FiberMap<P> = {}
-  isArr(c)
-    ? c.forEach((v, i) => (isArr(v) ? v.forEach((vi, j) => (out[hs(i, j, vi.key)] = vi)) : some(v) && (out[hs(i, null, v.key)] = v)))
-    : some(c) && (out[hs(0, null, (c as any).key)] = c)
-  return out
+function isChild(p, c) {
+  return Array.from(p.childNodes).some((i) => c == i)
 }
+
+const same = (a, b) => a.type === b.type && getKey(a) === getKey(b)
+
+const arrayfy = arr => (!arr ? [] : isArr(arr) ? arr : [arr])
 
 const refer = (ref: IRef, dom?: HTMLElement): void => {
-  if (ref) isFn(ref) ? ref(dom) : ((ref as { current?: HTMLElement })!.current = dom)
+  if (ref)
+    isFn(ref) ? ref(dom) : ((ref as { current?: HTMLElement })!.current = dom)
 }
 
-const cleanupRef = <P = Attributes>(kids: FiberMap<P>): void => {
-  for (const k in kids) {
-    const kid = kids[k]
+const cleanupRef = (kids: any): void => {
+  kids.forEach((kid) => {
     refer(kid.ref, null)
-    if (kid.kids) cleanupRef(kid.kids)
-  }
+    kid.kids && cleanupRef(kid.kids)
+  })
 }
 
 const side = (effects: IEffect[]): void => {
@@ -198,12 +271,9 @@ const side = (effects: IEffect[]): void => {
 
 export const getCurrentFiber = () => currentFiber || null
 
-const effect = (e: IEffect): void => (e[2] = e[0](currentFiber))
-const cleanup = (e: IEffect): void => e[2]?.(currentFiber)
-
-export const isFn = (x: any): x is Function => typeof x === 'function'
-export const isStr = (s: any): s is number | string => typeof s === 'number' || typeof s === 'string'
+const effect = (e: IEffect): void => e[2] = e[0]()
+const cleanup = (e: IEffect): void => e[2] && e[2]()
+export const isFn = (x: any): x is Function => typeof x === "function"
+export const isStr = (s: any): s is number | string =>
+  typeof s === "number" || typeof s === "string"
 export const some = (v: any) => v != null && v !== false && v !== true
-
-const hs = (i: number, j: string | number | null, k?: string): string =>
-  k != null && j != null ? '.' + i + '.' + k : j != null ? '.' + i + '.' + j : k != null ? '.' + k : '.' + i
