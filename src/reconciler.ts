@@ -7,7 +7,6 @@ import { isArr, createText } from './h'
 let preCommit: IFiber | undefined
 let currentFiber: IFiber
 let WIP: IFiber | undefined
-let commits: IFiber[] = []
 let deletes = []
 
 const microTask: IFiber[] = []
@@ -46,7 +45,6 @@ const reconcileWork = (timeout: boolean): boolean => {
 const reconcile = (WIP: IFiber): IFiber | undefined => {
   isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
   WIP.dirty = WIP.dirty ? false : 0
-  WIP.parent && commits.push(WIP)
 
   if (WIP.child) return WIP.child
   while (WIP) {
@@ -179,10 +177,9 @@ function clone(a, b) {
 const getKey = (vdom) => (vdom == null ? vdom : vdom.key)
 
 const commitWork = (fiber: IFiber): void => {
-  commits.forEach(commit)
+  fiber.parent ? commit(fiber) : commit(fiber.child)
   deletes.forEach(commit)
   fiber.done?.()
-  commits = []
   deletes = []
   preCommit = null
   WIP = null
@@ -200,6 +197,7 @@ const getChild = (WIP: IFiber): any => {
 }
 
 const commit = (fiber: IFiber): void => {
+  if (!fiber) return
   let { tag, parentNode, node, ref, hooks } = fiber
   if (isFn(fiber.type)) {
     const realChild = getChild(fiber)
@@ -212,16 +210,19 @@ const commit = (fiber: IFiber): void => {
         side(fiber.hooks.layout)
         schedule(() => side(fiber.hooks.effect))
       }
+      commit(fiber.child)
+      commit(fiber.sibling)
     }
+    return
+  }
+  if (tag & OP.REMOVE) {
+    kidsRefer(fiber.kids)
+    parentNode.removeChild(fiber.node)
+    refer(ref, null)
     return
   }
   if (tag & OP.UPDATE) {
     updateElement(node, fiber.lastProps || {}, fiber.props)
-  }
-  if (tag & OP.REMOVE) {
-    node = null
-    cleanupRef(fiber.kids)
-    parentNode.removeChild(fiber.node)
   }
   if (tag & OP.INSERT) {
     const after = fiber.insertPoint as any
@@ -230,10 +231,8 @@ const commit = (fiber: IFiber): void => {
     parentNode.insertBefore(fiber.node, after)
   }
   refer(ref, node)
-}
-
-function isChild(p, c) {
-  return Array.from(p.childNodes).some((i) => c == i)
+  commit(fiber.child)
+  commit(fiber.sibling)
 }
 
 const same = (a, b) => a.type === b.type && getKey(a) === getKey(b)
@@ -244,10 +243,10 @@ const refer = (ref: IRef, dom?: HTMLElement): void => {
   if (ref) isFn(ref) ? ref(dom) : ((ref as { current?: HTMLElement })!.current = dom)
 }
 
-const cleanupRef = (kids: any): void => {
+const kidsRefer = (kids: any): void => {
   kids.forEach((kid) => {
     refer(kid.ref, null)
-    kid.kids && cleanupRef(kid.kids)
+    kid.kids && kidsRefer(kid.kids)
   })
 }
 
