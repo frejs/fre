@@ -11,12 +11,13 @@ export const useState = <T>(initState: T): [T, Dispatch<SetStateAction<T>>] => {
 }
 
 export const useReducer = <S, A>(reducer?: Reducer<S, A>, initState?: S): [S, Dispatch<A>] => {
+  console.log(reducer)
   const [hook, current]: [any, IFiber] = getHook<S>(cursor++)
   hook[0] = isFn(hook[1]) ? hook[1](hook[0]) : hook.length ? hook[1] : initState
   return [
     hook[0] as S,
-    (value: A | Dispatch<A>) => {
-      hook[1] = reducer || value
+    (action: A | Dispatch<A>) => {
+      hook[1] = reducer ? reducer(hook[0], action as A) : action
       dispatchUpdate(current)
     },
   ]
