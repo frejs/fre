@@ -42,8 +42,8 @@ function App() {
     <button onClick={() => setKey([3, 2, 1])}>x</button>,
     <ul>
       {key.map((i) => (
-        // <Li i={i} key={i} />
-        <li key={i}>{i}</li>
+        <Li i={i} key={i} />
+        // <li key={i}>{i}</li>
       ))}
     </ul>,
   ]
