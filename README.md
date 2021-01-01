@@ -207,25 +207,5 @@ function App() {
 }
 ```
 
-### Fragments
-
-Fragments will not create dom element.
-
-```jsx
-<>someThing</>
-```
-
-The above code needs babel plugin `@babel/plugin-transform-react-jsx`
-
-```json
-[
-  "@babel/plugin-transform-react-jsx",
-  {
-    "pragma": "h",
-    "pragmaFrag": "Fragment"
-  }
-]
-```
-
 #### License
 _MIT @yisar
