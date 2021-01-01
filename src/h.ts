@@ -8,16 +8,12 @@ export const h = function <P extends Attributes = {}>(type: FC<P>, attrs: P): Pa
   const key = props.key || null
   const ref = props.ref || null
 
-  const children: FreNode[] = []
+  let children: FreNode[] = []
   let simple = ''
   const len = arguments.length
   for (let i = 2; i < len; i++) {
     let child = arguments[i]
     const end = i === len - 1
-    // if vnode is a nest array, flat them first
-    while (isArr(child) && child.some((v) => isArr(v))) {
-      child = [].concat(...child)
-    }
     const vnode = some(child) ? child : ''
     const str = isStr(vnode)
     // merge simple nodes
@@ -27,6 +23,10 @@ export const h = function <P extends Attributes = {}>(type: FC<P>, attrs: P): Pa
       simple = ''
     }
     if (!str) children.push(vnode)
+    // flat the nested array
+    while (children.some((v) => isArr(v))) {
+      children = [].concat(...children)
+    }
   }
 
   if (children.length) {
