@@ -1,6 +1,6 @@
 import { ITask, ITaskCallback } from './type'
 
-const macroTask: ITask[] = []
+const queue: ITask[] = []
 let deadline: number = 0
 const threshold: number = 1000 / 60
 const callbacks = []
@@ -9,11 +9,11 @@ export const schedule = (cb) => callbacks.push(cb) === 1 && postMessage()
 
 export const scheduleWork = (callback: ITaskCallback): void => {
   const currentTime = getTime()
-  const newTask = {
+  const job = {
     callback,
     time: currentTime + 3000,
   }
-  macroTask.push(newTask)
+  queue.push(job)
   schedule(flushWork)
 }
 
@@ -29,27 +29,25 @@ const postMessage = (() => {
 
 const flush = (initTime: number): boolean => {
   let currentTime = initTime
-  let currentTask = peek(macroTask)
+  let job = queue[0]
 
-  while (currentTask) {
-    const timeout = currentTask.time <= currentTime
+  while (job) {
+    const timeout = job.time <= currentTime
     if (!timeout && shouldYield()) break
 
-    const callback = currentTask.callback
-    currentTask.callback = null
+    const callback = job.callback
+    job.callback = null
 
     const next = callback(timeout)
-    next ? (currentTask.callback = next as any) : macroTask.shift()
-
-    currentTask = peek(macroTask)
+    if (next) {
+      job.callback = next as any
+    } else {
+      queue.shift()
+    }
+    job = queue[0]
     currentTime = getTime()
   }
-  return !!currentTask
-}
-
-const peek = (queue: ITask[]) => {
-  queue.sort((a, b) => a.time - b.time)
-  return queue[0]
+  return !!job
 }
 
 const flushWork = (): void => {
