@@ -6,10 +6,8 @@ import { isArr, createText } from './h'
 
 let preCommit: IFiber | undefined
 let currentFiber: IFiber
-let WIP: IFiber | undefined
 let deletes = []
 
-const microTask: IFiber[] = []
 export const enum OP {
   REMOVE = 1 << 4,
   UPDATE = 1 << 1,
@@ -29,15 +27,13 @@ export const dispatchUpdate = (fiber?: IFiber) => {
   if (fiber && !fiber.dirty) {
     fiber.dirty = true
     fiber.tag = OP.UPDATE
-    microTask.push(fiber)
+    scheduleWork(reconcileWork.bind(null, fiber))
   }
-  scheduleWork(reconcileWork as ITaskCallback)
 }
 
-const reconcileWork = (timeout: boolean): boolean => {
-  if (!WIP) WIP = microTask.shift()
+const reconcileWork = (WIP, timeout: boolean): boolean => {
   while (WIP && (!shouldYield() || timeout)) WIP = reconcile(WIP)
-  if (WIP && !timeout) return reconcileWork.bind(null)
+  if (WIP && !timeout) return reconcileWork.bind(null, WIP)
   if (preCommit) commitWork(preCommit)
   return null
 }
@@ -182,7 +178,6 @@ const commitWork = (fiber: IFiber): void => {
   fiber.done?.()
   deletes = []
   preCommit = null
-  WIP = null
 }
 
 const getChild = (WIP: IFiber): any => {
