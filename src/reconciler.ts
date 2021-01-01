@@ -6,7 +6,6 @@ import {
   Attributes,
   HTMLElementEx,
   FreNode,
-  FiberMap,
   IRef,
   IEffect,
 } from "./type"

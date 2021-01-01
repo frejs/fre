@@ -37,15 +37,13 @@ export interface IHook {
 
 export type IRef = (e: HTMLElement | undefined) => void | { current?: HTMLElement }
 
-export type FiberMap<P> = Record<string, IFiber<P>>
-
 export interface IFiber<P extends Attributes = any> {
   key?: string
   dirty?: any
   type: string | FC<P>
   parentNode: HTMLElementEx
   node: HTMLElementEx
-  kids?: FiberMap<P>
+  kids?: any
   parent?: IFiber<P>
   sibling?: IFiber<P>
   child?: IFiber<P>
