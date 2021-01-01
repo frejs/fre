@@ -6,10 +6,8 @@ import { isArr, createText } from './h'
 
 let preCommit: IFiber | undefined
 let currentFiber: IFiber
-let WIP: IFiber | undefined
 let deletes = []
 
-const microTask: IFiber[] = []
 export const enum OP {
   REMOVE = 1 << 4,
   UPDATE = 1 << 1,
@@ -29,15 +27,13 @@ export const dispatchUpdate = (fiber?: IFiber) => {
   if (fiber && !fiber.dirty) {
     fiber.dirty = true
     fiber.tag = OP.UPDATE
-    microTask.push(fiber)
+    scheduleWork(reconcileWork.bind(null, fiber))
   }
-  scheduleWork(reconcileWork as ITaskCallback)
 }
 
-const reconcileWork = (timeout: boolean): boolean => {
-  if (!WIP) WIP = microTask.shift()
+const reconcileWork = (WIP, timeout: boolean): boolean => {
   while (WIP && (!shouldYield() || timeout)) WIP = reconcile(WIP)
-  if (WIP && !timeout) return reconcileWork.bind(null)
+  if (WIP && !timeout) return reconcileWork.bind(null, WIP)
   if (preCommit) commitWork(preCommit)
   return null
 }
@@ -182,7 +178,6 @@ const commitWork = (fiber: IFiber): void => {
   fiber.done?.()
   deletes = []
   preCommit = null
-  WIP = null
 }
 
 const getChild = (WIP: IFiber): any => {
@@ -198,7 +193,7 @@ const getChild = (WIP: IFiber): any => {
 
 const commit = (fiber: IFiber): void => {
   if (!fiber) return
-  let { type,tag, parentNode, node, ref, hooks } = fiber
+  let { type, tag, parentNode, node, ref, hooks } = fiber
   if (isFn(type)) {
     const realChild = getChild(fiber)
     if (fiber.tag & OP.REMOVE) {
@@ -229,12 +224,15 @@ const commit = (fiber: IFiber): void => {
     if (after === null && fiber.node === parentNode.lastChild) return
     parentNode.insertBefore(fiber.node, after)
   }
+  fiber.tag = 0
   refer(ref, node)
   commit(fiber.child)
   commit(fiber.sibling)
 }
 
-const same = (a, b) => a.type === b.type && getKey(a) === getKey(b)
+const same = (a, b) => {
+  return a && b && a.type === b.type && getKey(a) === getKey(b)
+}
 
 const arrayfy = (arr) => (!arr ? [] : isArr(arr) ? arr : [arr])
 
