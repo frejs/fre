@@ -198,7 +198,7 @@ const getChild = (WIP: IFiber): any => {
 
 const commit = (fiber: IFiber): void => {
   if (!fiber) return
-  let { type,tag, parentNode, node, ref, hooks } = fiber
+  let { type, tag, parentNode, node, ref, hooks } = fiber
   if (isFn(type)) {
     const realChild = getChild(fiber)
     if (fiber.tag & OP.REMOVE) {
@@ -229,12 +229,15 @@ const commit = (fiber: IFiber): void => {
     if (after === null && fiber.node === parentNode.lastChild) return
     parentNode.insertBefore(fiber.node, after)
   }
+  fiber.tag = 0
   refer(ref, node)
   commit(fiber.child)
   commit(fiber.sibling)
 }
 
-const same = (a, b) => a.type === b.type && getKey(a) === getKey(b)
+const same = (a, b) => {
+  return a && b && a.type === b.type && getKey(a) === getKey(b)
+}
 
 const arrayfy = (arr) => (!arr ? [] : isArr(arr) ? arr : [arr])
 
