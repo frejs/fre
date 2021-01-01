@@ -16,28 +16,28 @@ test('persist reference to any value', async () => {
       content: <Component />,
       test: ([p]) => {
         expect(p.textContent).toBe('x')
-      }
+      },
     },
     {
       content: <Component />,
       test: ([p]) => {
         expect(p.textContent).toBe('xx')
-      }
-    }
+      },
+    },
   ])
 })
 
 test('refs with callback and clenups', async () => {
   let refs = []
   const Component = () => {
-    const p = dom => {
+    const p = (dom) => {
       if (dom) {
         refs.push('ref')
       } else {
         refs.push('cleanup')
       }
     }
-    const c = dom => {
+    const c = (dom) => {
       if (dom) {
         refs.push('ref2')
       } else {
@@ -57,13 +57,13 @@ test('refs with callback and clenups', async () => {
       test: () => {
         expect(refs).toEqual(['ref', 'ref2'])
         refs = [] // next time the Component will not rerender, we need clean here
-      }
+      },
     },
     {
       content: <div>removed</div>,
       test: () => {
-        expect(refs).toEqual(['cleanup', 'cleanup2'])
-      }
-    }
+        expect(refs).toEqual(['cleanup2', 'cleanup'])
+      },
+    },
   ])
 })
