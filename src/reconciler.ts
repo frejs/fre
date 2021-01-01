@@ -198,8 +198,8 @@ const getChild = (WIP: IFiber): any => {
 
 const commit = (fiber: IFiber): void => {
   if (!fiber) return
-  let { tag, parentNode, node, ref, hooks } = fiber
-  if (isFn(fiber.type)) {
+  let { type,tag, parentNode, node, ref, hooks } = fiber
+  if (isFn(type)) {
     const realChild = getChild(fiber)
     if (fiber.tag & OP.REMOVE) {
       commit(realChild)
@@ -207,8 +207,8 @@ const commit = (fiber: IFiber): void => {
     } else {
       fiber.node = realChild.node
       if (hooks) {
-        side(fiber.hooks.layout)
-        schedule(() => side(fiber.hooks.effect))
+        side(hooks.layout)
+        schedule(() => side(hooks.effect))
       }
       commit(fiber.child)
       commit(fiber.sibling)
@@ -226,7 +226,6 @@ const commit = (fiber: IFiber): void => {
   }
   if (tag & OP.INSERT) {
     const after = fiber.insertPoint as any
-    if (after === fiber.node) return
     if (after === null && fiber.node === parentNode.lastChild) return
     parentNode.insertBefore(fiber.node, after)
   }
