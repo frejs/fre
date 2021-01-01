@@ -32,7 +32,7 @@ const flush = (initTime: number): boolean => {
   let currentTime = initTime
   let job = queue[0]
   while (job) {
-    const timeout = job.time + 14 * Math.ceil(frame * (1.0 / 10.0))  <= currentTime
+    const timeout = job.time + 1000 * Math.ceil(frame * (1.0 / 10.0))  <= currentTime
     if (!timeout && shouldYield()) break
     const callback = job.callback
     job.callback = null
