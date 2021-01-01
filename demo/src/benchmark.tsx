@@ -93,7 +93,6 @@ function buildData(count) {
 }
 
 function listReducer(state, action) {
-  console.log(action)
   const { data, selected } = state
   switch (action.type) {
     case 'RUN':
