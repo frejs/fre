@@ -1,4 +1,4 @@
-<p align="center"><img src="http://wx2.sinaimg.cn/mw690/0060lm7Tly1ftpm5b3ihfj3096097aaj.jpg" alt="fre logo" width="150"></p>
+<p align="center"><img src="https://ws1.sinaimg.cn/large/0065Zy9egy1gm9f612urfj30j70j7tc3.jpg" alt="fre logo" width="150"></p>
 <h1 align="center">Fre</h1>
 <p align="center">:ghost: Tiny Coroutine framework with Fiber.</p>
 <p align="center">
@@ -8,7 +8,6 @@
 <a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/dt/fre.svg" alt="npm-d"></a>
 <a href="https://bundlephobia.com/result?p=fre"><img src="http://img.badgesize.io/https://unpkg.com/fre/dist/fre.js?compression=brotli&label=brotli" alt="brotli"></a>
 </p>
-
 
 - **Coroutine with Fiber** — This is an amazing idea, which implements the coroutine scheduler in JavaScript, and the rendering is asynchronous, which supports Time slicing and suspense components.
 
@@ -130,10 +129,10 @@ If it return a function, the function can do cleanups:
 
 ```js
 useEffect(() => {
-    document.title = 'count is ' + count
-    return () => {
-      store.unsubscribe()
-    }
+  document.title = 'count is ' + count
+  return () => {
+    store.unsubscribe()
+  }
 }, [])
 ```
 
@@ -196,7 +195,7 @@ If it use a function, It can return a cleanup and executes when removed.
 
 ```js
 function App() {
-  const t = useRef(dom => {
+  const t = useRef((dom) => {
     if (dom) {
       doSomething()
     } else {
@@ -207,25 +206,31 @@ function App() {
 }
 ```
 
-### Fragments
+### Compare with other frameworks
 
-Fragments will not create dom element.
+The comparison is difficult because the roadmap and trade-offs of each framework are different, but we have to do so.
 
-```jsx
-<>someThing</>
-```
+- react
 
-The above code needs babel plugin `@babel/plugin-transform-react-jsx`
+React is the source of inspiration for fre. Their implementation and asynchronous rendering are similar. The most amazing thing is ** concurrent mode **, which means that react and fre have the same readmap -- ** Exploring concurrent use cases **.
 
-```json
-[
-  "@babel/plugin-transform-react-jsx",
-  {
-    "pragma": "h",
-    "pragmaFrag": "Fragment"
-  }
-]
-```
+But at the same time, fre has obvious advantages in reconciliation algorithm and binding size.
+
+- vue / preact
+
+To some extent, Vue and preact are similar. They have similar synchronous rendering, only the API is different.
+
+The reconciliation algorithm of fre is similar to Vue, but the biggest difference is that Vue and preact do not support concurrent mode, this means that the development route is totally different.
+
+| framework | concurrent | reconcilation algorithm | size |
+| --------- | ---------- | ----------------------- | ---- |
+| fre2      | √          | ⭐⭐⭐⭐                | 1kb  |
+| react17   | √          | ⭐⭐                    | 39kb |
+| vue3      | ×          | ⭐⭐⭐⭐⭐              | 30kb |
+| preactX   | ×          | ⭐⭐⭐⭐                | 4kb  |
+
+
 
 #### License
-_MIT @yisar
+
+MIT @yisar
