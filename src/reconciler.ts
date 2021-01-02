@@ -242,8 +242,8 @@ const refer = (ref: IRef, dom?: HTMLElement): void => {
 
 const kidsRefer = (kids: any): void => {
   kids.forEach((kid) => {
-    refer(kid.ref, null)
     kid.kids && kidsRefer(kid.kids)
+    refer(kid.ref, null)
   })
 }
 
