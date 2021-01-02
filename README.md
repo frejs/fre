@@ -1,6 +1,6 @@
-<p align="center"><img src="https://files.imgdb.cn/tuchuang/2021/01/02/5ff036463ffa7d37b36a6e80.png" alt="fre logo" width="150"></p>
+<p align="center"><img src="https://files.imgdb.cn/tuchuang/2021/01/02/5ff036463ffa7d37b36a6e80.png" alt="fre logo" width="120"></p>
 <h1 align="center">Fre</h1>
-<p align="center">:ghost: Tiny Coroutine framework with Fiber.</p>
+<p align="center">:ghost: 1kb Concurrent UI library with Fiber.</p>
 <p align="center">
 <a href="https://github.com/yisar/fre/actions"><img src="https://img.shields.io/github/workflow/status/yisar/fre/main.svg" alt="Build Status"></a>
 <a href="https://codecov.io/gh/yisar/fre"><img src="https://img.shields.io/codecov/c/github/yisar/fre.svg" alt="Code Coverage"></a>
