@@ -1,4 +1,4 @@
-<p align="center"><img src="https://pic.downk.cc/item/5ff0331b3ffa7d37b368a752.png" alt="fre logo" width="150"></p>
+<p align="center"><img src="https://pic.downk.cc/item/5ff036463ffa7d37b36a6e80.png" alt="fre logo" width="150"></p>
 <h1 align="center">Fre</h1>
 <p align="center">:ghost: Tiny Coroutine framework with Fiber.</p>
 <p align="center">
