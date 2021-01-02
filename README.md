@@ -224,10 +224,10 @@ The reconciliation algorithm of fre is similar to Vue, but the biggest differenc
 
 | framework | concurrent | reconcilation algorithm | size |
 | --------- | ---------- | ----------------------- | ---- |
-| fre2      | √          | ⭐⭐⭐⭐                | 1kb  |
-| react17   | √          | ⭐⭐                    | 39kb |
-| vue3      | ×          | ⭐⭐⭐⭐⭐              | 30kb |
-| preactX   | ×          | ⭐⭐⭐⭐                | 4kb  |
+| fre2      | √          | ★★★★              | 1kb  |
+| react17   | √          | ★★              | 39kb |
+| vue3      | ×          | ★★★★★             | 30kb |
+| preactX   | ×          | ★★★★               | 4kb  |
 
 
 
