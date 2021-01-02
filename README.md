@@ -1,4 +1,4 @@
-<p align="center"><img src="https://files.imgdb.cn/tuchuang/2021/01/02/5ff036463ffa7d37b36a6e80.png" alt="fre logo" width="120"></p>
+<p align="center"><img src="https://files.imgdb.cn/tuchuang/2021/01/02/5ff036463ffa7d37b36a6e80.png" alt="fre logo" width="130"></p>
 <h1 align="center">Fre</h1>
 <p align="center">:ghost: 1kb Concurrent UI library with Fiber.</p>
 <p align="center">
