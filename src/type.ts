@@ -53,7 +53,8 @@ export interface IFiber<P extends Attributes = any> {
   lastProps: P
   insertPoint: IFiber | null,
   props: P
-  tag: number
+  tag: number,
+  time:number
 }
 
 export type HTMLElementEx = HTMLElement & { last: IFiber | null }

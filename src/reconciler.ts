@@ -1,7 +1,7 @@
-import { IFiber, FreElement, ITaskCallback, FC, Attributes, HTMLElementEx, FreNode, IRef, IEffect } from './type'
+import { IFiber, FreElement, FC, Attributes, HTMLElementEx, FreNode, IRef, IEffect } from './type'
 import { createElement, updateElement } from './dom'
 import { resetCursor } from './hooks'
-import { scheduleWork, shouldYield, schedule } from './scheduler'
+import { scheduleWork, shouldYield, schedule, getTime } from './scheduler'
 import { isArr, createText } from './h'
 
 let preCommit: IFiber | undefined
@@ -27,7 +27,7 @@ export const dispatchUpdate = (fiber?: IFiber) => {
   if (fiber && !fiber.dirty) {
     fiber.dirty = true
     fiber.tag = OP.UPDATE
-    scheduleWork(reconcileWork.bind(null, fiber))
+    scheduleWork(reconcileWork.bind(null, fiber), fiber.time)
   }
 }
 
@@ -56,7 +56,9 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
 const updateHook = <P = Attributes>(WIP: IFiber): void => {
   if (WIP.lastProps === WIP.props) return
   currentFiber = WIP
+  let start = getTime()
   let children = (WIP.type as FC<P>)(WIP.props)
+  WIP.time = getTime() - start
   resetCursor()
   if (isStr(children)) children = createText(children as string)
   reconcileChildren(WIP, children)
