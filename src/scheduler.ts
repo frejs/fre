@@ -2,10 +2,10 @@ import { ITask, ITaskCallback } from './type'
 
 const queue: ITask[] = []
 const threshold: number = 1000 / 60
-const callbacks = []
+const unit = []
 let deadline: number = 0
 
-export const schedule = (cb) => callbacks.push(cb) === 1 && postMessage()
+export const schedule = (cb) => unit.push(cb) === 1 && postMessage()
 
 export const scheduleWork = (callback: ITaskCallback, time: number): void => {
   const job = {
@@ -17,7 +17,7 @@ export const scheduleWork = (callback: ITaskCallback, time: number): void => {
 }
 
 const postMessage = (() => {
-  const cb = () => callbacks.splice(0, callbacks.length).forEach((c) => c())
+  const cb = () => unit.splice(0, unit.length).forEach((c) => c())
   if (typeof MessageChannel !== 'undefined') {
     const { port1, port2 } = new MessageChannel()
     port1.onmessage = cb
