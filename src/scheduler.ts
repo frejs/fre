@@ -58,7 +58,4 @@ export const shouldYield = (): boolean => {
 
 export const getTime = () => performance.now()
 
-const peek = (queue: ITask[]) => {
-  queue.sort((a, b) => a.time - b.time)
-  return queue[0]
-}
+const peek = (queue: ITask[]) => queue.sort((a, b) => a.time - b.time)[0]
