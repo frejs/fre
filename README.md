@@ -13,7 +13,7 @@
 
 - **Highly-optimized algorithm** — Fre has a better reconciliation algorithm, which traverses from both ends with O (n) complexity, and supports keyed.
 
-- **Do more with less** — After tree shaking, project of hello world is only 1KB, but it has most fetures, virtual DOM, hooks API, functional component and more.
+- **Do more with less** — After tree shaking, project of hello world is only 1KB, but it has most features, virtual DOM, hooks API, functional component and more.
 
 ### Use
 
@@ -55,7 +55,7 @@ render(<App />, document.getElementById('root'))
 
 #### useState
 
-`useState` is a base API, It will receive initial state and return a Array
+`useState` is a base API, It will receive initial state and return an Array
 
 You can use it many times, new state is available when component is rerender
 
@@ -125,7 +125,7 @@ function App({ flag }) {
 }
 ```
 
-If it return a function, the function can do cleanups:
+If it returns a function, the function can do cleanups:
 
 ```js
 useEffect(() => {
@@ -191,7 +191,7 @@ function App() {
 }
 ```
 
-If it use a function, It can return a cleanup and executes when removed.
+If it uses a function, it can return a cleanup and executes when removed.
 
 ```js
 function App() {
