@@ -212,15 +212,15 @@ The comparison is difficult because the roadmap and trade-offs of each framework
 
 - react
 
-React is the source of inspiration for fre. Their implementation and asynchronous rendering are similar. The most amazing thing is **concurrent mode**, which means that react and fre have the same readmap -- **Exploring concurrent use cases**.
+React is the source of inspiration for fre. Their implementation and asynchronous rendering are similar. The most amazing thing is **concurrent mode**, which means that react and fre have the same roadmap -- **Exploring concurrent use cases**.
 
 But at the same time, fre has obvious advantages in reconciliation algorithm and bundle size.
 
 - vue / preact
 
-To some extent, Vue and preact are similar. They have similar synchronous rendering, only the API is different.
+To some extent, vue and preact are similar. They have similar synchronous rendering, only the API is different.
 
-The reconciliation algorithm of fre is similar to Vue, but the biggest difference is that Vue and preact do not support concurrent mode, this means that the development route is totally different.
+The reconciliation algorithm of fre is similar to vue, but the biggest difference is that vue/preact do not support concurrent mode, this means that the roadmap is totally different.
 
 | framework | concurrent | reconcilation algorithm | bundle size |
 | --------- | ---------- | ----------------------- | ----------- |
