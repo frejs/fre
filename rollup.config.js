@@ -15,8 +15,8 @@ const plugins = [
 export default {
   input: 'src/index.ts',
   output: [
-    { file: 'dist/fre.js', format: 'umd', name: 'fre', sourcemap: true },
-    { file: 'dist/fre.esm.js', format: 'esm', sourcemap: true },
+    { file: 'dist/fre.umd.js', format: 'umd', name: 'fre', sourcemap: true },
+    { file: 'dist/fre.js', format: 'esm', sourcemap: true },
   ],
   plugins,
 }

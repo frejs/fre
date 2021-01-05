@@ -3,17 +3,17 @@
   "version": "2.0.0-rc7",
   "description": "",
   "main": "dist/fre.js",
-  "unpkg": "dist/fre.js",
-  "module": "dist/fre.esm.js",
+  "unpkg": "dist/fre.umd.js",
+  "module": "dist/fre.js",
   "exports": {
     "./jsx-runtime": {
-      "main": "./dist/fre.esm.js"
+      "main": "./dist/fre.js"
     },
     "./jsx-dev-runtime": {
-      "main": "./dist/fre.esm.js"
+      "main": "./dist/fre.js"
     }
   },
-  "typings": "dist/types/index.d.ts",
+  "typings": "./dist/types/index.d.ts",
   "files": [
     "src/**/*",
     "dist/*.js",
