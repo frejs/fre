@@ -233,7 +233,7 @@ const commit = (fiber: IFiber): void => {
 }
 
 const same = (a, b) => {
-  return a && b && a.type === b.type && getKey(a) === getKey(b)
+  return getKey(a) === getKey(b) && a.type === b.type
 }
 
 const arrayfy = (arr) => (!arr ? [] : isArr(arr) ? arr : [arr])
