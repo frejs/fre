@@ -6,6 +6,7 @@
   "unpkg": "dist/fre.umd.js",
   "module": "dist/fre.js",
   "exports": {
+    "import": "./dist/fre.esm.js",
     "./jsx-runtime": {
       "main": "./dist/fre.js"
     },
