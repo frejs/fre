@@ -1,12 +1,12 @@
 {
   "name": "fre",
   "version": "2.0.0-rc7",
-  "description": "",
+  "description": "1kb Concurrent UI library with Fiber.",
   "main": "dist/fre.js",
   "unpkg": "dist/fre.umd.js",
   "module": "dist/fre.js",
   "exports": {
-    "import": "./dist/fre.esm.js",
+    "import": "./dist/fre.js",
     "./jsx-runtime": {
       "main": "./dist/fre.js"
     },
@@ -29,7 +29,16 @@
     "dev": "rollup -c --watch",
     "prepublishOnly": "yarn build"
   },
-  "keywords": [],
+  "keywords": [
+    "fre",
+    "frontend",
+    "framework",
+    "vdom",
+    "concurrent-mode",
+    "fiber",
+    "web",
+    "ui-library"
+  ],
   "author": "132yse",
   "license": "MIT",
   "devDependencies": {
