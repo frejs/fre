@@ -1,16 +1,16 @@
 {
   "name": "fre",
   "version": "2.0.0-rc7",
-  "description": "1kb Concurrent UI library with Fiber.",
+  "type": "module",
   "main": "dist/fre.js",
   "unpkg": "dist/fre.umd.js",
   "module": "dist/fre.js",
   "exports": {
-    "import": "./dist/fre.js",
-    "./jsx-runtime": {
-      "main": "./dist/fre.js"
+    ".": {
+      "import": "./dist/fre.js",
+      "require": "./dist/fre.umd.js"
     },
-    "./jsx-dev-runtime": {
+    "./jsx-runtime": {
       "main": "./dist/fre.js"
     }
   },
@@ -29,6 +29,7 @@
     "dev": "rollup -c --watch",
     "prepublishOnly": "yarn build"
   },
+  "description": "1kb Concurrent UI library with Fiber.",
   "keywords": [
     "fre",
     "frontend",
@@ -42,6 +43,7 @@
   "author": "132yse",
   "license": "MIT",
   "devDependencies": {
+    "@skypack/package-check": "^0.2.2",
     "@types/jest": "^24.0.15",
     "codecov": "^3.6.1",
     "cross-env": "^5.2.0",
@@ -55,6 +57,8 @@
     "typescript": "^4.0.2",
     "yarpm": "^0.2.1"
   },
+  "repository": "yisar/fre",
+  "homepage": "https://fre.js.org",
   "jest": {
     "coveragePathIgnorePatterns": [
       "<rootDir>/test/test-util.tsx"
