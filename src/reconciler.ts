@@ -170,6 +170,7 @@ function clone(a, b) {
   a.node = b.node
   a.kids = b.kids
   a.hooks = b.hooks
+  a.ref = b.ref
 }
 
 const getKey = (vdom) => (vdom == null ? vdom : vdom.key)
