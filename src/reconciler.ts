@@ -31,9 +31,9 @@ export const dispatchUpdate = (fiber?: IFiber) => {
   }
 }
 
-const reconcileWork = (WIP, timeout: boolean): boolean => {
-  while (WIP && (!shouldYield() || timeout)) WIP = reconcile(WIP)
-  if (WIP && !timeout) return reconcileWork.bind(null, WIP)
+const reconcileWork = (WIP?:IFiber): boolean => {
+  while (WIP && (!shouldYield())) WIP = reconcile(WIP)
+  if (WIP) return reconcileWork.bind(null, WIP)
   if (preCommit) commitWork(preCommit)
   return null
 }
