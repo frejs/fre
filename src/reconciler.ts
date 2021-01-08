@@ -84,7 +84,8 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     oldHead = 0,
     newHead = 0,
     oldTail = oldKids.length - 1,
-    newTail = newKids.length - 1
+    newTail = newKids.length - 1,
+    map = null
 
   while (oldHead <= oldTail && newHead <= newTail) {
     let newFiber = null
@@ -119,8 +120,13 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       oldTail--
       newHead++
     } else {
-      const i = oldKids.findIndex((kid) => same(kid, newKids[newHead]))
-      if (i >= 0) {
+      if (!map) {
+        map = new Map();
+        let i = newKids[newHead];
+        while (i < newKids[newTail]) map.set(newKids[i], i++);
+      }
+      if (map.has(oldKids[oldHead])) {
+        const i = map.get(oldKids[oldHead])
         const oldKid = oldKids[i]
         newFiber = newKids[newHead]
         clone(newFiber, oldKid)
