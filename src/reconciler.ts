@@ -31,8 +31,8 @@ export const dispatchUpdate = (fiber?: IFiber) => {
   }
 }
 
-const reconcileWork = (WIP?:IFiber): boolean => {
-  while (WIP && (!shouldYield())) WIP = reconcile(WIP)
+const reconcileWork = (WIP?: IFiber): boolean => {
+  while (WIP && !shouldYield()) WIP = reconcile(WIP)
   if (WIP) return reconcileWork.bind(null, WIP)
   if (preCommit) commitWork(preCommit)
   return null
@@ -121,9 +121,9 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       newHead++
     } else {
       if (!map) {
-        map = new Map();
-        let i = newKids[newHead];
-        while (i < newKids[newTail]) map.set(newKids[i], i++);
+        map = new Map()
+        let i = newKids[newHead]
+        while (i < newKids[newTail]) map.set(newKids[i], i++)
       }
       if (map.has(oldKids[oldHead])) {
         const i = map.get(oldKids[oldHead])
@@ -180,6 +180,7 @@ function clone(a, b) {
 }
 
 const getKey = (vdom) => (vdom == null ? vdom : vdom.key)
+const getType = (vdom) => (isFn(vdom) ? vdom.type.name : vdom.type)
 
 const commitWork = (fiber: IFiber): void => {
   fiber.parent ? commit(fiber) : commit(fiber.child)
@@ -240,7 +241,7 @@ const commit = (fiber: IFiber): void => {
 }
 
 const same = (a, b) => {
-  return getKey(a) === getKey(b) && a.type === b.type
+  return getKey(a) === getKey(b) && getType(a) === getType(b)
 }
 
 const arrayfy = (arr) => (!arr ? [] : isArr(arr) ? arr : [arr])
