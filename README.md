@@ -1,6 +1,6 @@
 <p align="center"><img src="https://files.imgdb.cn/tuchuang/2021/01/02/5ff036463ffa7d37b36a6e80.png" alt="fre logo" width="130"></p>
 <h1 align="center">Fre</h1>
-<p align="center">:ghost: 1kb Concurrent UI library with Fiber.</p>
+<p align="center">:ghost: Tiny Concurrent UI library with Fiber.</p>
 <p align="center">
 <a href="https://github.com/yisar/fre/actions"><img src="https://img.shields.io/github/workflow/status/yisar/fre/main.svg" alt="Build Status"></a>
 <a href="https://codecov.io/gh/yisar/fre"><img src="https://img.shields.io/codecov/c/github/yisar/fre.svg" alt="Code Coverage"></a>
@@ -13,7 +13,7 @@
 
 - **Highly-optimized algorithm** — Fre has a better reconciliation algorithm, which traverses from both ends with O (n) complexity, and supports keyed.
 
-- **Do more with less** — After tree shaking, project of hello world is only 1KB, but it has most features, virtual DOM, hooks API, functional component and more.
+- **Do more with less** — After tree shaking, project of hello world is only 2KB, but it has most features, virtual DOM, hooks API, functional component and more.
 
 ### Use
 
@@ -224,7 +224,7 @@ The reconciliation algorithm of fre is similar to vue, but the biggest differenc
 
 | framework | concurrent | reconcilation algorithm | bundle size |
 | --------- | ---------- | ----------------------- | ----------- |
-| fre2      | √          | ★★★★                    | 1kb         |
+| fre2      | √          | ★★★★                    | 2kb         |
 | react17   | √          | ★★                      | 39kb        |
 | vue3      | ×          | ★★★★★                   | 30kb        |
 | preactX   | ×          | ★★★★                    | 4kb         |
