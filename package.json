@@ -29,7 +29,7 @@
     "dev": "rollup -c --watch",
     "prepublishOnly": "yarn build"
   },
-  "description": "1kb Concurrent UI library with Fiber.",
+  "description": "2kb Concurrent UI library with Fiber.",
   "keywords": [
     "fre",
     "frontend",
