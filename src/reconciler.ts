@@ -46,6 +46,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
   while (WIP) {
     if (!preCommit && WIP.dirty === false) {
       preCommit = WIP
+      WIP.sibling = null
       return null
     }
     if (WIP.sibling) return WIP.sibling
