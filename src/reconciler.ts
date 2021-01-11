@@ -180,7 +180,7 @@ function clone(a, b) {
 }
 
 const getKey = (vdom) => (vdom == null ? vdom : vdom.key)
-const getType = (vdom) => (isFn(vdom) ? vdom.type.name : vdom.type)
+const getType = (vdom) => (isFn(vdom.type) ? vdom.type.name : vdom.type)
 
 const commitWork = (fiber: IFiber): void => {
   fiber.parent ? commit(fiber) : commit(fiber.child)
