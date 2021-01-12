@@ -30,11 +30,11 @@ const flush = (initTime: number): boolean => {
   let currentTime = initTime
   let job = peek(queue)
   while (job) {
-    const timeout = job.time + 3000 <= currentTime
-    if (!timeout && shouldYield()) break
-    const callback = job.callback
+    const timeout = false
+    if (shouldYield()) break
+    const callback = job.callback as any
     job.callback = null
-    const next = callback(timeout)
+    const next = callback()
     if (next) {
       job.callback = next as any
     } else {

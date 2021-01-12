@@ -1,6 +1,6 @@
 {
   "name": "fre",
-  "version": "2.0.0-rc8",
+  "version": "2.0.0-rc9",
   "type": "module",
   "main": "dist/fre.js",
   "unpkg": "dist/fre.umd.js",
@@ -29,7 +29,7 @@
     "dev": "rollup -c --watch",
     "prepublishOnly": "yarn build"
   },
-  "description": "1kb Concurrent UI library with Fiber.",
+  "description": "Tiny Concurrent UI library with Fiber.",
   "keywords": [
     "fre",
     "frontend",

@@ -31,9 +31,9 @@ export const dispatchUpdate = (fiber?: IFiber) => {
   }
 }
 
-const reconcileWork = (WIP, timeout: boolean): boolean => {
-  while (WIP && (!shouldYield() || timeout)) WIP = reconcile(WIP)
-  if (WIP && !timeout) return reconcileWork.bind(null, WIP)
+const reconcileWork = (WIP?: IFiber): boolean => {
+  while (WIP && !shouldYield()) WIP = reconcile(WIP)
+  if (WIP) return reconcileWork.bind(null, WIP)
   if (preCommit) commitWork(preCommit)
   return null
 }
@@ -46,6 +46,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
   while (WIP) {
     if (!preCommit && WIP.dirty === false) {
       preCommit = WIP
+      WIP.sibling = null
       return null
     }
     if (WIP.sibling) return WIP.sibling
@@ -84,7 +85,8 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     oldHead = 0,
     newHead = 0,
     oldTail = oldKids.length - 1,
-    newTail = newKids.length - 1
+    newTail = newKids.length - 1,
+    map = null
 
   while (oldHead <= oldTail && newHead <= newTail) {
     let newFiber = null
@@ -119,8 +121,13 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       oldTail--
       newHead++
     } else {
-      const i = oldKids.findIndex((kid) => same(kid, newKids[newHead]))
-      if (i >= 0) {
+      if (!map) {
+        map = new Map()
+        let i = newHead
+        while (i < newTail) map.set(newKids[newHead], i++)
+      }
+      if (map.has(oldKids[oldHead])) {
+        const i = map.get(oldKids[oldHead])
         const oldKid = oldKids[i]
         newFiber = newKids[newHead]
         clone(newFiber, oldKid)
@@ -174,6 +181,7 @@ function clone(a, b) {
 }
 
 const getKey = (vdom) => (vdom == null ? vdom : vdom.key)
+const getType = (vdom) => (isFn(vdom.type) ? vdom.type.name : vdom.type)
 
 const commitWork = (fiber: IFiber): void => {
   fiber.parent ? commit(fiber) : commit(fiber.child)
@@ -234,7 +242,7 @@ const commit = (fiber: IFiber): void => {
 }
 
 const same = (a, b) => {
-  return getKey(a) === getKey(b) && a.type === b.type
+  return getKey(a) === getKey(b) && getType(a) === getType(b)
 }
 
 const arrayfy = (arr) => (!arr ? [] : isArr(arr) ? arr : [arr])
