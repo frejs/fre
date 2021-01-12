@@ -123,8 +123,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     } else {
       if (!map) {
         map = new Map()
-        let i = newKids[newHead]
-        while (i < newKids[newTail]) map.set(newKids[i], i++)
+        while (newHead < newTail) map.set(newKids[newHead], newHead++)
       }
       if (map.has(oldKids[oldHead])) {
         const i = map.get(oldKids[oldHead])
