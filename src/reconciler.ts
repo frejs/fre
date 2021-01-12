@@ -124,9 +124,9 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       if (!map) {
         map = new Map()
         let i = newHead
-        while (i < newTail) map.set(newKids[newHead], i++)
+        while (i < newTail) map.set(getKey(newKids[i]), i++)
       }
-      if (map.has(oldKids[oldHead])) {
+      if (map.has(getKey(oldKids[oldHead]))) {
         const i = map.get(oldKids[oldHead])
         const oldKid = oldKids[i]
         newFiber = newKids[newHead]
