@@ -28,7 +28,7 @@ const postMessage = (() => {
 
 const flush = (initTime: number): boolean => {
   let currentTime = initTime
-  let job = peek(queue)
+  let job = sortAndPeek(queue)
   while (job) {
     if (shouldYield()) break
     const callback = job.callback as any
@@ -57,4 +57,4 @@ export const shouldYield = (): boolean => {
 
 export const getTime = () => performance.now()
 
-const peek = (queue: ITask[]) => queue.sort((a, b) => a.time - b.time)[0]
+const sortAndPeek = (queue: ITask[]) => queue.sort((a, b) => a.time - b.time)[0]
