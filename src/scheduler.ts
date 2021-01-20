@@ -29,8 +29,7 @@ const postMessage = (() => {
 const flush = (initTime: number): boolean => {
   let currentTime = initTime
   let job = sortAndPeek(queue)
-  while (job) {
-    if (shouldYield()) break
+  while (job && shouldYield()) {
     const callback = job.callback as any
     job.callback = null
     const next = callback()
@@ -39,7 +38,7 @@ const flush = (initTime: number): boolean => {
     } else {
       queue.shift()
     }
-    job = peek(queue)
+    job = sortAndPeek(queue)
     currentTime = getTime()
   }
   return !!job
