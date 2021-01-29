@@ -33,7 +33,7 @@ export const useLayout = (cb: EffectCallback, deps?: DependencyList): void => {
 const effectImpl = (cb: EffectCallback, deps: DependencyList, key: HookTypes): void => {
   const [hook, current] = getHook(cursor++)
   if (isChanged(hook[1], deps)) {
-    hook[0] = useCallback(cb, deps)
+    hook[0] = cb
     hook[1] = deps
     current.hooks[key].push(hook)
   }
