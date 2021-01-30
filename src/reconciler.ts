@@ -127,8 +127,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
         while (i < newTail) map.set(getKey(newKids[i]), i++)
       }
       if (map.has(getKey(oldKids[oldHead]))) {
-        const i = map.get(oldKids[oldHead])
-        const oldKid = oldKids[i]
+        const oldKid = oldKids[map.get(oldKids[oldHead])]
         newFiber = newKids[newHead]
         clone(newFiber, oldKid)
         newFiber.tag = OP.MOUNT
@@ -143,21 +142,20 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       newHead++
     }
   }
-  if (oldTail < oldHead) {
-    for (let i = newHead; i <= newTail; i++) {
-      let newFiber = newKids[i]
-      newFiber.tag = OP.INSERT
-      newFiber.node = null
-      newFiber.insertPoint = oldKids[oldHead]?.node
+  while (newHead <= newTail) {
+    let newFiber = newKids[newHead]
+    newFiber.tag = OP.INSERT
+    newFiber.node = null
+    newFiber.insertPoint = oldKids[oldHead]?.node
+    newHead++
+  }
+  while (oldHead <= oldTail) {
+    let oldFiber = oldKids[oldHead]
+    if (oldFiber) {
+      oldFiber.tag = OP.REMOVE
+      deletes.push(oldFiber)
     }
-  } else if (newHead > newTail) {
-    for (let i = oldHead; i <= oldTail; i++) {
-      let oldFiber = oldKids[i]
-      if (oldFiber) {
-        oldFiber.tag = OP.REMOVE
-        deletes.push(oldFiber)
-      }
-    }
+    oldHead++
   }
 
   for (var i = 0, prev = null; i < newKids.length; i++) {
