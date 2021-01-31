@@ -43,4 +43,8 @@ export function createText(vnode: string) {
   return { type: 'text', props: { nodeValue: vnode } } as FreElement
 }
 
+export function Fragment(props) {
+  return props.children
+}
+
 export const isArr = Array.isArray
