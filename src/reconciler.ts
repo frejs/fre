@@ -138,6 +138,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
         temp.tag = OP.MOUNT
         aCh[i] = null
         temp.insertPoint = aCh[aHead]?.node
+        ch[bHead] = temp
       } else {
         temp = bCh[bHead]
         temp.tag = OP.INSERT
