@@ -39,7 +39,7 @@ import { h, render, useEffect, useState } from '../../src/index'
 function App() {
   const [key, setKey] = useState([1, 2, 3])
   return [
-    <button onClick={() => setKey([3,2,4,1])}>x</button>,
+    <button onClick={() => setKey([3,2,5,4])}>x</button>,
     <ul>
       {key.map((i) => (
         // <Li i={i} key={i} />
