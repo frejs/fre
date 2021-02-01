@@ -26,7 +26,8 @@ const postMessage = (() => {
   return () => setTimeout(cb)
 })()
 
-const flush = (): boolean => {
+const flushWork = (): void => {
+  deadline = currentTime + threshold
   let job = sortAndPeek(queue)
   while (job && !shouldYield()) {
     const callback = job.callback as any
@@ -39,13 +40,7 @@ const flush = (): boolean => {
     }
     job = sortAndPeek(queue)
   }
-  return !!job
-}
-
-const flushWork = (): void => {
-  const currentTime = getTime()
-  deadline = currentTime + threshold
-  flush(currentTime) && schedule(flushWork)
+  job && schedule(flushWork)
 }
 
 export const shouldYield = (): boolean => {
