@@ -12,11 +12,10 @@ export const useState = <T>(initState: T): [T, Dispatch<SetStateAction<T>>] => {
 
 export const useReducer = <S, A>(reducer?: Reducer<S, A>, initState?: S): [S, Dispatch<A>] => {
   const [hook, current]: [any, IFiber] = getHook<S>(cursor++)
-  hook[0] = isFn(hook[1]) ? hook[1](hook[0]) : hook.length ? hook[1] : initState
   return [
-    hook[0] as S,
-    (action: A | Dispatch<A>) => {
-      hook[1] = reducer ? reducer(hook[0], action as A) : action
+    hook.length > 0 ? hook[0] : initState,
+    (value: A | Dispatch<A>) => {
+      hook[0] = reducer ? reducer(hook[0], value as any) : value
       dispatchUpdate(current)
     },
   ]
@@ -33,7 +32,7 @@ export const useLayout = (cb: EffectCallback, deps?: DependencyList): void => {
 const effectImpl = (cb: EffectCallback, deps: DependencyList, key: HookTypes): void => {
   const [hook, current] = getHook(cursor++)
   if (isChanged(hook[1], deps)) {
-    hook[0] = useCallback(cb, deps)
+    hook[0] = cb
     hook[1] = deps
     current.hooks[key].push(hook)
   }

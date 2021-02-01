@@ -31,9 +31,9 @@ export const dispatchUpdate = (fiber?: IFiber) => {
   }
 }
 
-const reconcileWork = (WIP, timeout: boolean): boolean => {
-  while (WIP && (!shouldYield() || timeout)) WIP = reconcile(WIP)
-  if (WIP && !timeout) return reconcileWork.bind(null, WIP)
+const reconcileWork = (WIP?: IFiber): boolean => {
+  while (WIP && !shouldYield()) WIP = reconcile(WIP)
+  if (WIP) return reconcileWork.bind(null, WIP)
   if (preCommit) commitWork(preCommit)
   return null
 }
@@ -46,6 +46,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
   while (WIP) {
     if (!preCommit && WIP.dirty === false) {
       preCommit = WIP
+      WIP.sibling = null
       return null
     }
     if (WIP.sibling) return WIP.sibling
@@ -79,82 +80,94 @@ const updateHost = (WIP: IFiber): void => {
 }
 
 const reconcileChildren = (WIP: any, children: FreNode): void => {
-  let oldKids = WIP.kids || [],
-    newKids = (WIP.kids = arrayfy(children) as any),
-    oldHead = 0,
-    newHead = 0,
-    oldTail = oldKids.length - 1,
-    newTail = newKids.length - 1
+  let aCh = WIP.kids || [],
+    bCh = (WIP.kids = arrayfy(children) as any),
+    aHead = 0,
+    bHead = 0,
+    aTail = aCh.length - 1,
+    bTail = bCh.length - 1,
+    map = null,
+    ch = Array(bCh.length)
 
-  while (oldHead <= oldTail && newHead <= newTail) {
-    let newFiber = null
-    if (oldKids[oldHead] == null) {
-      oldHead++
-    } else if (oldKids[oldTail] == null) {
-      oldTail--
-    } else if (same(oldKids[oldHead], newKids[newHead])) {
-      newFiber = newKids[newHead]
-      clone(newFiber, oldKids[oldHead])
-      newFiber.tag = OP.UPDATE
-      oldHead++
-      newHead++
-    } else if (same(oldKids[oldTail], newKids[newTail])) {
-      newFiber = newKids[newTail]
-      clone(newFiber, oldKids[oldTail])
-      newFiber.tag = OP.UPDATE
-      oldTail--
-      newTail--
-    } else if (same(oldKids[oldHead], newKids[newTail])) {
-      newFiber = newKids[newTail]
-      clone(newFiber, oldKids[oldHead])
-      newFiber.tag = OP.MOUNT
-      newFiber.insertPoint = oldKids[oldTail].node.nextSibling
-      oldHead++
-      newTail--
-    } else if (same(oldKids[oldTail], newKids[newHead])) {
-      newFiber = newKids[newHead]
-      clone(newFiber, oldKids[oldTail])
-      newFiber.tag = OP.MOUNT
-      newFiber.insertPoint = oldKids[oldHead].node
-      oldTail--
-      newHead++
+  while (aHead <= aTail && bHead <= bTail) {
+    let temp = null
+    if (aCh[aHead] == null) {
+      aHead++
+    } else if (aCh[aTail] == null) {
+      aTail--
+    } else if (same(aCh[aHead], bCh[bHead])) {
+      temp = bCh[bHead]
+      clone(temp, aCh[aHead])
+      temp.tag = OP.UPDATE
+      ch[bHead] = temp
+      aHead++
+      bHead++
+    } else if (same(aCh[aTail], bCh[bTail])) {
+      temp = bCh[bTail]
+      clone(temp, aCh[aTail])
+      temp.tag = OP.UPDATE
+      ch[bTail] = temp
+      aTail--
+      bTail--
+    } else if (same(aCh[aHead], bCh[bTail])) {
+      temp = bCh[bTail]
+      clone(temp, aCh[aHead])
+      temp.tag = OP.MOUNT
+      temp.insertPoint = aCh[aTail].node.nextSibling
+      ch[bTail] = temp
+      aHead++
+      bTail--
+    } else if (same(aCh[aTail], bCh[bHead])) {
+      temp = bCh[bHead]
+      clone(temp, aCh[aTail])
+      temp.tag = OP.MOUNT
+      temp.insertPoint = aCh[aHead].node
+      ch[bHead] = temp
+      aTail--
+      bHead++
     } else {
-      const i = oldKids.findIndex((kid) => same(kid, newKids[newHead]))
-      if (i >= 0) {
-        const oldKid = oldKids[i]
-        newFiber = newKids[newHead]
-        clone(newFiber, oldKid)
-        newFiber.tag = OP.MOUNT
-        oldKids[i] = null
-        newFiber.insertPoint = oldKids[oldHead]?.node
-      } else {
-        newFiber = newKids[newHead]
-        newFiber.tag = OP.INSERT
-        newFiber.node = null
-        newFiber.insertPoint = oldKids[oldHead]?.node
+      if (!map) {
+        map = new Map()
+        let i = bHead
+        while (i < bTail) map.set(getKey(bCh[i]), i++)
       }
-      newHead++
+      if (map.has(getKey(aCh[aHead]))) {
+        const oldKid = aCh[map.get(aCh[aHead])]
+        temp = bCh[bHead]
+        clone(temp, oldKid)
+        temp.tag = OP.MOUNT
+        aCh[i] = null
+        temp.insertPoint = aCh[aHead]?.node
+        ch[bHead] = temp
+      } else {
+        temp = bCh[bHead]
+        temp.tag = OP.INSERT
+        temp.node = null
+        temp.insertPoint = aCh[aHead]?.node
+      }
+      bHead++
     }
   }
-  if (oldTail < oldHead) {
-    for (let i = newHead; i <= newTail; i++) {
-      let newFiber = newKids[i]
-      newFiber.tag = OP.INSERT
-      newFiber.node = null
-      newFiber.insertPoint = oldKids[oldHead]?.node
+  const before = ch[bTail+1]?.node
+  while (bHead <= bTail) {
+    let temp = bCh[bHead]
+    temp.tag = OP.INSERT
+    temp.node = null
+
+    temp.insertPoint = before
+    bHead++
+  }
+  while (aHead <= aTail) {
+    let oldFiber = aCh[aHead]
+    if (oldFiber) {
+      oldFiber.tag = OP.REMOVE
+      deletes.push(oldFiber)
     }
-  } else if (newHead > newTail) {
-    for (let i = oldHead; i <= oldTail; i++) {
-      let oldFiber = oldKids[i]
-      if (oldFiber) {
-        oldFiber.tag = OP.REMOVE
-        deletes.push(oldFiber)
-      }
-    }
+    aHead++
   }
 
-  for (var i = 0, prev = null; i < newKids.length; i++) {
-    const child = newKids[i]
+  for (var i = 0, prev = null; i < bCh.length; i++) {
+    const child = bCh[i]
     child.parent = WIP
     if (i > 0) {
       prev.sibling = child
@@ -170,9 +183,11 @@ function clone(a, b) {
   a.node = b.node
   a.kids = b.kids
   a.hooks = b.hooks
+  a.ref = b.ref
 }
 
 const getKey = (vdom) => (vdom == null ? vdom : vdom.key)
+const getType = (vdom) => (isFn(vdom.type) ? vdom.type.name : vdom.type)
 
 const commitWork = (fiber: IFiber): void => {
   fiber.parent ? commit(fiber) : commit(fiber.child)
@@ -223,7 +238,6 @@ const commit = (fiber: IFiber): void => {
   }
   if (tag & OP.INSERT) {
     const after = fiber.insertPoint as any
-    if (after === null && fiber.node === parentNode.lastChild) return
     parentNode.insertBefore(fiber.node, after)
   }
   fiber.tag = 0
@@ -233,7 +247,7 @@ const commit = (fiber: IFiber): void => {
 }
 
 const same = (a, b) => {
-  return a && b && a.type === b.type && getKey(a) === getKey(b)
+  return getKey(a) === getKey(b) && getType(a) === getType(b)
 }
 
 const arrayfy = (arr) => (!arr ? [] : isArr(arr) ? arr : [arr])

@@ -28,19 +28,17 @@ const postMessage = (() => {
 
 const flush = (initTime: number): boolean => {
   let currentTime = initTime
-  let job = peek(queue)
-  while (job) {
-    const timeout = job.time + 3000 <= currentTime
-    if (!timeout && shouldYield()) break
-    const callback = job.callback
+  let job = sortAndPeek(queue)
+  while (job && !shouldYield()) {
+    const callback = job.callback as any
     job.callback = null
-    const next = callback(timeout)
+    const next = callback()
     if (next) {
       job.callback = next as any
     } else {
       queue.shift()
     }
-    job = peek(queue)
+    job = sortAndPeek(queue)
     currentTime = getTime()
   }
   return !!job
@@ -58,7 +56,4 @@ export const shouldYield = (): boolean => {
 
 export const getTime = () => performance.now()
 
-const peek = (queue: ITask[]) => {
-  queue.sort((a, b) => a.time - b.time)
-  return queue[0]
-}
+const sortAndPeek = (queue: ITask[]) => queue.sort((a, b) => a.time - b.time)[0]

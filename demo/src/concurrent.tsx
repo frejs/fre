@@ -1,4 +1,6 @@
 // import { h, render, useState, useEffect } from 'fre'
+// import { h, render } from 'preact'
+// import {useState, useEffect } from 'preact/hooks'
 import { h, render, useState, useEffect } from '../../src/index'
 
 const UPDATE_EVERY = 500

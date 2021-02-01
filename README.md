@@ -1,6 +1,6 @@
 <p align="center"><img src="https://files.imgdb.cn/tuchuang/2021/01/02/5ff036463ffa7d37b36a6e80.png" alt="fre logo" width="130"></p>
 <h1 align="center">Fre</h1>
-<p align="center">:ghost: 1kb Concurrent UI library with Fiber.</p>
+<p align="center">👻 Tiny Concurrent UI library with Fiber.</p>
 <p align="center">
 <a href="https://github.com/yisar/fre/actions"><img src="https://img.shields.io/github/workflow/status/yisar/fre/main.svg" alt="Build Status"></a>
 <a href="https://codecov.io/gh/yisar/fre"><img src="https://img.shields.io/codecov/c/github/yisar/fre.svg" alt="Code Coverage"></a>
@@ -13,7 +13,7 @@
 
 - **Highly-optimized algorithm** — Fre has a better reconciliation algorithm, which traverses from both ends with O (n) complexity, and supports keyed.
 
-- **Do more with less** — After tree shaking, project of hello world is only 1KB, but it has most fetures, virtual DOM, hooks API, functional component and more.
+- **Do more with less** — After tree shaking, project of hello world is only 2KB, but it has most features, virtual DOM, hooks API, functional component and more.
 
 ### Use
 
@@ -55,7 +55,7 @@ render(<App />, document.getElementById('root'))
 
 #### useState
 
-`useState` is a base API, It will receive initial state and return a Array
+`useState` is a base API, It will receive initial state and return an Array
 
 You can use it many times, new state is available when component is rerender
 
@@ -125,7 +125,7 @@ function App({ flag }) {
 }
 ```
 
-If it return a function, the function can do cleanups:
+If it returns a function, the function can do cleanups:
 
 ```js
 useEffect(() => {
@@ -191,7 +191,7 @@ function App() {
 }
 ```
 
-If it use a function, It can return a cleanup and executes when removed.
+If it uses a function, it can return a cleanup and executes when removed.
 
 ```js
 function App() {
@@ -212,19 +212,19 @@ The comparison is difficult because the roadmap and trade-offs of each framework
 
 - react
 
-React is the source of inspiration for fre. Their implementation and asynchronous rendering are similar. The most amazing thing is **concurrent mode**, which means that react and fre have the same readmap -- **Exploring concurrent use cases**.
+React is the source of inspiration for fre. Their implementation and asynchronous rendering are similar. The most amazing thing is **concurrent mode**, which means that react and fre have the same roadmap -- **Exploring concurrent use cases**.
 
 But at the same time, fre has obvious advantages in reconciliation algorithm and bundle size.
 
 - vue / preact
 
-To some extent, Vue and preact are similar. They have similar synchronous rendering, only the API is different.
+To some extent, vue and preact are similar. They have similar synchronous rendering, only the API is different.
 
-The reconciliation algorithm of fre is similar to Vue, but the biggest difference is that Vue and preact do not support concurrent mode, this means that the development route is totally different.
+The reconciliation algorithm of fre is similar to vue, but the biggest difference is that vue/preact do not support concurrent mode, this means that the roadmap is totally different.
 
 | framework | concurrent | reconcilation algorithm | bundle size |
 | --------- | ---------- | ----------------------- | ----------- |
-| fre2      | √          | ★★★★                    | 1kb         |
+| fre2      | √          | ★★★★                    | 2kb         |
 | react17   | √          | ★★                      | 39kb        |
 | vue3      | ×          | ★★★★★                   | 30kb        |
 | preactX   | ×          | ★★★★                    | 4kb         |

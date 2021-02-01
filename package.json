@@ -1,19 +1,20 @@
 {
   "name": "fre",
-  "version": "2.0.0-rc7",
-  "description": "",
+  "version": "2.0.0-rc.11",
+  "type": "module",
   "main": "dist/fre.js",
-  "unpkg": "dist/fre.js",
-  "module": "dist/fre.esm.js",
+  "unpkg": "dist/fre.umd.js",
+  "module": "dist/fre.js",
   "exports": {
-    "./jsx-runtime": {
-      "main": "./dist/fre.esm.js"
+    ".": {
+      "import": "./dist/fre.js",
+      "require": "./dist/fre.umd.js"
     },
-    "./jsx-dev-runtime": {
-      "main": "./dist/fre.esm.js"
+    "./jsx-runtime": {
+      "main": "./dist/fre.js"
     }
   },
-  "typings": "dist/types/index.d.ts",
+  "typings": "./dist/types/index.d.ts",
   "files": [
     "src/**/*",
     "dist/*.js",
@@ -28,10 +29,21 @@
     "dev": "rollup -c --watch",
     "prepublishOnly": "yarn build"
   },
-  "keywords": [],
+  "description": "Tiny Concurrent UI library with Fiber.",
+  "keywords": [
+    "fre",
+    "frontend",
+    "framework",
+    "vdom",
+    "concurrent-mode",
+    "fiber",
+    "web",
+    "ui-library"
+  ],
   "author": "132yse",
   "license": "MIT",
   "devDependencies": {
+    "@skypack/package-check": "^0.2.2",
     "@types/jest": "^24.0.15",
     "codecov": "^3.6.1",
     "cross-env": "^5.2.0",
@@ -45,6 +57,8 @@
     "typescript": "^4.0.2",
     "yarpm": "^0.2.1"
   },
+  "repository": "yisar/fre",
+  "homepage": "https://fre.js.org",
   "jest": {
     "coveragePathIgnorePatterns": [
       "<rootDir>/test/test-util.tsx"
