@@ -27,7 +27,7 @@ const postMessage = (() => {
 })()
 
 const flushWork = (): void => {
-  deadline = currentTime + threshold
+  deadline = getTime() + threshold
   let job = sortAndPeek(queue)
   while (job && !shouldYield()) {
     const callback = job.callback as any
