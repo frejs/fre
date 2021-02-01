@@ -51,7 +51,7 @@ const flushWork = (): void => {
 }
 
 export const shouldYield = (): boolean => {
-  return getTime() >= deadline
+  return (navigator as any)?.scheduling?.isInputPending() || getTime() >= deadline
 }
 
 export const getTime = () => performance.now()
