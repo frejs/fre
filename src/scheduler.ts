@@ -26,7 +26,7 @@ const postMessage = (() => {
   return () => setTimeout(cb)
 })()
 
-const flush = (initTime: number): boolean => {
+const flush = (): boolean => {
   let job = sortAndPeek(queue)
   while (job && !shouldYield()) {
     const callback = job.callback as any
