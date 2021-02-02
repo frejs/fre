@@ -20,36 +20,6 @@
 ```shell
 yarn add fre
 ```
-### Webpack loader config for jsx
-```js
-rules: [
-  {
-    test: /\.jsx?$/,
-    use: {
-      loader: 'babel-loader',
-      options: {
-        presets: [
-          [
-            "@babel/preset-env",
-            {
-             targets: "> 0.25%, not dead",
-            }
-          ],
-        ],
-        plugins: [
-          [
-            '@babel/plugin-transform-react-jsx',
-            {
-              runtime: "automatic",
-              importSource: "fre"
-            }
-          ],
-        ],
-      },
-    },
-  },
-]
-```
 
 ```js
 import { h, render, useState } from 'fre'
@@ -236,6 +206,20 @@ function App() {
 }
 ```
 
+### jsx2
+
+```js
+plugins: [
+  [
+    '@babel/plugin-transform-react-jsx',
+    {
+      runtime: 'automatic',
+      importSource: 'fre',
+    },
+  ],
+]
+```
+
 ### Compare with other frameworks
 
 The comparison is difficult because the roadmap and trade-offs of each framework are different, but we have to do so.
@@ -262,3 +246,7 @@ The reconciliation algorithm of fre is similar to vue, but the biggest differenc
 #### License
 
 MIT @yisar
+
+```
+
+```
