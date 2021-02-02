@@ -129,7 +129,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       if (!map) {
         map = new Map()
         let i = aHead
-        while (i <= aTail) map.set(getKey(aCh[i]), i++)
+        while (i < aTail) map.set(getKey(aCh[i]), i++)
       }
       const key = getKey(bCh[bHead])
       if (map.has(key)) {
@@ -149,7 +149,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       bHead++
     }
   }
-  const after = ch[bTail+1]?.node
+  const after = ch[bTail + 1]?.node
   while (bHead <= bTail) {
     let temp = bCh[bHead]
     temp.tag = OP.INSERT
@@ -236,9 +236,10 @@ const commit = (fiber: IFiber): void => {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (tag & OP.INSERT) {
-    parentNode.insertBefore(fiber.node, fiber.after as any)
+    const after = fiber.after as any
+    parentNode.insertBefore(fiber.node, after)
   }
-  // fiber.tag = 0
+  fiber.tag = 0
   refer(ref, node)
   commit(fiber.child)
   commit(fiber.sibling)
