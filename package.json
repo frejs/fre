@@ -11,7 +11,8 @@
       "require": "./dist/fre.umd.js"
     },
     "./jsx-runtime": {
-      "main": "./dist/fre.js"
+      "import": "./jsx-runtime.js",
+      "require": "./jsx-runtime"
     }
   },
   "typings": "./dist/types/index.d.ts",
