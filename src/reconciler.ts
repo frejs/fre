@@ -113,7 +113,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       temp = bCh[bTail]
       clone(temp, aCh[aHead])
       temp.tag = OP.MOUNT
-      temp.insertPoint = aCh[aTail].node.nextSibling
+      temp.before = aCh[aTail].node.nextSibling
       ch[bTail] = temp
       aHead++
       bTail--
@@ -121,7 +121,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       temp = bCh[bHead]
       clone(temp, aCh[aTail])
       temp.tag = OP.MOUNT
-      temp.insertPoint = aCh[aHead].node
+      temp.before = aCh[aHead].node
       ch[bHead] = temp
       aTail--
       bHead++
@@ -137,13 +137,13 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
         clone(temp, oldKid)
         temp.tag = OP.MOUNT
         aCh[i] = null
-        temp.insertPoint = aCh[aHead]?.node
+        temp.before = aCh[aHead]?.node
         ch[bHead] = temp
       } else {
         temp = bCh[bHead]
         temp.tag = OP.INSERT
         temp.node = null
-        temp.insertPoint = aCh[aHead]?.node
+        temp.before = aCh[aHead]?.node
       }
       bHead++
     }
@@ -154,7 +154,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     temp.tag = OP.INSERT
     temp.node = null
 
-    temp.insertPoint = before
+    temp.before = before
     bHead++
   }
   while (aHead <= aTail) {
@@ -202,7 +202,7 @@ const getChild = (WIP: IFiber): any => {
   while ((WIP = WIP.child)) {
     if (!isFn(WIP.type)) {
       WIP.tag |= fiber.tag
-      WIP.insertPoint = fiber.insertPoint
+      WIP.before = fiber.before
       return WIP
     }
   }
@@ -237,7 +237,7 @@ const commit = (fiber: IFiber): void => {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (tag & OP.INSERT) {
-    const after = fiber.insertPoint as any
+    const after = fiber.before as any
     parentNode.insertBefore(fiber.node, after)
   }
   fiber.tag = 0
