@@ -16,6 +16,7 @@ test('reorder and reuse elements during key-based reconciliation of child-nodes'
     [1, 2], // remove last
     [1, 2, 3],
     [3, 2, 1], // reverse order
+    [3, 4, 2, 5, 1], // reverse order
   ]
 
   let lastChildren
