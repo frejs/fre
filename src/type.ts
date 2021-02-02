@@ -51,7 +51,7 @@ export interface IFiber<P extends Attributes = any> {
   ref: IRef
   hooks: IHook
   lastProps: P
-  before: IFiber | null
+  after: IFiber | null
   props: P
   tag: number
   time: number
