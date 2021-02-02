@@ -49,33 +49,33 @@ yarn add fre
 ```
 ### Webpack loader config for jsx
 ```js
-    rules: [
-      {
-        test: /\.jsx?$/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: [
-              [
-                "@babel/preset-env",
-                {
-                 targets: "> 0.25%, not dead",
-                }
-              ],
-            ],
-            plugins: [
-              [
-                '@babel/plugin-transform-react-jsx',
-                {
-                  runtime: "automatic",
-                  importSource: "fre"
-                }
-              ],
-            ],
-          },
-        },
+rules: [
+  {
+    test: /\.jsx?$/,
+    use: {
+      loader: 'babel-loader',
+      options: {
+        presets: [
+          [
+            "@babel/preset-env",
+            {
+             targets: "> 0.25%, not dead",
+            }
+          ],
+        ],
+        plugins: [
+          [
+            '@babel/plugin-transform-react-jsx',
+            {
+              runtime: "automatic",
+              importSource: "fre"
+            }
+          ],
+        ],
       },
-    ]
+    },
+  },
+]
 ```
 
 ```js
