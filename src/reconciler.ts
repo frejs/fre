@@ -12,6 +12,7 @@ export const enum OP {
   REMOVE = 1 << 4,
   UPDATE = 1 << 1,
   INSERT = 1 << 3,
+  SIBLING = 1 << 5,
   MOUNT = UPDATE | INSERT,
 }
 export const render = (vnode: FreElement, node: Node, done?: () => void): void => {
@@ -117,8 +118,8 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     } else if (same(aCh[aHead], bCh[bTail])) {
       temp = bCh[bTail]
       clone(temp, aCh[aHead])
-      temp.tag = OP.MOUNT
-      temp.after = aCh[aTail].node.nextSibling
+      temp.tag = OP.MOUNT | OP.SIBLING
+      temp.after = aCh[aTail]
       ch[bTail] = temp
       commitment.next = temp
       commitment = temp
@@ -128,7 +129,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       temp = bCh[bHead]
       clone(temp, aCh[aTail])
       temp.tag = OP.MOUNT
-      temp.after = aCh[aHead].node
+      temp.after = aCh[aHead]
       ch[bHead] = temp
       commitment.next = temp
       commitment = temp
@@ -146,21 +147,21 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
         temp = bCh[bHead]
         clone(temp, oldKid)
         temp.tag = OP.MOUNT
-        temp.after = aCh[aHead]?.node
+        temp.after = aCh[aHead]
         ch[bHead] = temp
         aCh[map.get(key)] = null
       } else {
         temp = bCh[bHead]
         temp.tag = OP.INSERT
         temp.node = null
-        temp.after = aCh[aHead]?.node
+        temp.after = aCh[aHead]
       }
       commitment.next = temp
       commitment = temp
       bHead++
     }
   }
-  const after = ch[bTail + 1]?.node
+  const after = ch[bTail + 1]
   while (bHead <= bTail) {
     let temp = bCh[bHead]
     temp.tag = OP.INSERT
@@ -250,8 +251,9 @@ const commit = (fiber: IFiber): void => {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (tag & OP.INSERT) {
-    const after = fiber.after as any
-    parentNode.insertBefore(fiber.node, after)
+    let after = fiber.after as any
+    after = tag & OP.SIBLING ? after?.node?.nextSibling : after?.node
+    parentNode.insertBefore(node, after)
   }
   fiber.tag = 0
   refer(ref, node)
