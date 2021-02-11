@@ -45,7 +45,7 @@ function App() {
         // <Li i={i} key={i} />
         <li key={i}>{i}</li>
       ))}
-    </ul>,
+    </ul>
   ]
 }
 

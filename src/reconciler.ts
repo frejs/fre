@@ -27,6 +27,7 @@ export const dispatchUpdate = (fiber?: IFiber) => {
   if (fiber && !fiber.dirty) {
     fiber.dirty = true
     fiber.tag = OP.UPDATE
+    fiber.first = fiber.last = fiber.next = null
     scheduleWork(reconcileWork.bind(null, fiber), fiber.time)
   }
 }
@@ -44,6 +45,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
 
   if (WIP.child) return WIP.child
   while (WIP) {
+    finishWork(WIP)
     if (!preCommit && WIP.dirty === false) {
       preCommit = WIP
       WIP.sibling = null
@@ -51,6 +53,27 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
     }
     if (WIP.sibling) return WIP.sibling
     WIP = WIP.parent
+  }
+}
+
+const finishWork = (WIP) => {
+  const p = WIP.parent
+  if (p) {
+    if (!p.first) {
+      p.first = WIP.first
+    }
+    if (WIP.last) {
+      if (p.last) p.last.next = WIP.first
+      p.last = WIP.last
+    }
+    if(WIP.tag){
+      if (p.last) {
+        p.last.next = WIP
+      } else {
+        p.first = WIP
+      }
+      p.last = WIP
+    }
   }
 }
 
@@ -189,11 +212,19 @@ const getKey = (vdom) => (vdom == null ? vdom : vdom.key)
 const getType = (vdom) => (isFn(vdom.type) ? vdom.type.name : vdom.type)
 
 const commitWork = (fiber: IFiber): void => {
-  fiber.parent ? commit(fiber) : commit(fiber.child)
-  deletes.forEach(commit)
+  commitNew(fiber.first)
   fiber.done?.()
   deletes = []
   preCommit = null
+}
+
+const commitNew = (fiber) => {
+  deletes.forEach(commit)
+  while (fiber) {
+    commit(fiber)
+    if(fiber.dirty === false) break
+    fiber = fiber.next
+  }
 }
 
 const getChild = (WIP: IFiber): any => {
@@ -208,7 +239,6 @@ const getChild = (WIP: IFiber): any => {
 }
 
 const commit = (fiber: IFiber): void => {
-  if (!fiber) return
   let { type, tag, parentNode, node, ref, hooks } = fiber
   if (isFn(type)) {
     const realChild = getChild(fiber)
@@ -221,8 +251,6 @@ const commit = (fiber: IFiber): void => {
         side(hooks.layout)
         schedule(() => side(hooks.effect))
       }
-      commit(fiber.child)
-      commit(fiber.sibling)
     }
     return
   }
@@ -241,8 +269,6 @@ const commit = (fiber: IFiber): void => {
   }
   fiber.tag = 0
   refer(ref, node)
-  commit(fiber.child)
-  commit(fiber.sibling)
 }
 
 const same = (a, b) => {
