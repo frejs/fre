@@ -102,8 +102,6 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       clone(temp, aCh[aHead])
       temp.tag = OP.UPDATE
       ch[bHead] = temp
-      commitment.next = temp
-      commitment = temp
       aHead++
       bHead++
     } else if (same(aCh[aTail], bCh[bTail])) {
@@ -111,8 +109,6 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       clone(temp, aCh[aTail])
       temp.tag = OP.UPDATE
       ch[bTail] = temp
-      commitment.next = temp
-      commitment = temp
       aTail--
       bTail--
     } else if (same(aCh[aHead], bCh[bTail])) {
@@ -121,8 +117,6 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       temp.tag = OP.MOUNT | OP.SIBLING
       temp.after = aCh[aTail]
       ch[bTail] = temp
-      commitment.next = temp
-      commitment = temp
       aHead++
       bTail--
     } else if (same(aCh[aTail], bCh[bHead])) {
@@ -131,8 +125,6 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       temp.tag = OP.MOUNT
       temp.after = aCh[aHead]
       ch[bHead] = temp
-      commitment.next = temp
-      commitment = temp
       aTail--
       bHead++
     } else {
@@ -156,10 +148,10 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
         temp.node = null
         temp.after = aCh[aHead]
       }
-      commitment.next = temp
-      commitment = temp
       bHead++
     }
+    commitment.next = temp
+    commitment = temp
   }
   const after = ch[bTail + 1]
   while (bHead <= bTail) {
