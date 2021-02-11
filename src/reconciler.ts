@@ -76,6 +76,7 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
 const updateHost = (WIP: IFiber): void => {
   WIP.parentNode = getParentNode(WIP) as any
   if (!WIP.node) {
+    if (WIP.type === 'svg') WIP.tag |= OP.SVG
     WIP.node = createElement(WIP) as HTMLElementEx
   }
   reconcileChildren(WIP, WIP.props.children)
