@@ -4,14 +4,14 @@ import { resetCursor } from './hooks'
 import { scheduleWork, shouldYield, schedule, getTime } from './scheduler'
 import { isArr, createText } from './h'
 
-let preCommit: IFiber | undefined
 let currentFiber: IFiber
-let deletes = []
+let commitment = null
 
 export const enum OP {
   REMOVE = 1 << 4,
   UPDATE = 1 << 1,
   INSERT = 1 << 3,
+  SIBLING = 1 << 5,
   MOUNT = UPDATE | INSERT,
 }
 export const render = (vnode: FreElement, node: Node, done?: () => void): void => {
@@ -27,6 +27,7 @@ export const dispatchUpdate = (fiber?: IFiber) => {
   if (fiber && !fiber.dirty) {
     fiber.dirty = true
     fiber.tag = OP.UPDATE
+    commitment = fiber
     scheduleWork(reconcileWork.bind(null, fiber), fiber.time)
   }
 }
@@ -34,7 +35,7 @@ export const dispatchUpdate = (fiber?: IFiber) => {
 const reconcileWork = (WIP?: IFiber): boolean => {
   while (WIP && !shouldYield()) WIP = reconcile(WIP)
   if (WIP) return reconcileWork.bind(null, WIP)
-  if (preCommit) commitWork(preCommit)
+  if (commitment.last) commitWork(commitment.last)
   return null
 }
 
@@ -44,8 +45,8 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
 
   if (WIP.child) return WIP.child
   while (WIP) {
-    if (!preCommit && WIP.dirty === false) {
-      preCommit = WIP
+    if (!commitment.last && WIP.dirty === false) {
+      commitment.last = WIP
       WIP.sibling = null
       return null
     }
@@ -100,6 +101,8 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       clone(temp, aCh[aHead])
       temp.tag = OP.UPDATE
       ch[bHead] = temp
+      commitment.next = temp
+      commitment = temp
       aHead++
       bHead++
     } else if (same(aCh[aTail], bCh[bTail])) {
@@ -107,22 +110,28 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       clone(temp, aCh[aTail])
       temp.tag = OP.UPDATE
       ch[bTail] = temp
+      commitment.next = temp
+      commitment = temp
       aTail--
       bTail--
     } else if (same(aCh[aHead], bCh[bTail])) {
       temp = bCh[bTail]
       clone(temp, aCh[aHead])
-      temp.tag = OP.MOUNT
-      temp.after = aCh[aTail].node.nextSibling
+      temp.tag = OP.MOUNT | OP.SIBLING
+      temp.after = aCh[aTail]
       ch[bTail] = temp
+      commitment.next = temp
+      commitment = temp
       aHead++
       bTail--
     } else if (same(aCh[aTail], bCh[bHead])) {
       temp = bCh[bHead]
       clone(temp, aCh[aTail])
       temp.tag = OP.MOUNT
-      temp.after = aCh[aHead].node
+      temp.after = aCh[aHead]
       ch[bHead] = temp
+      commitment.next = temp
+      commitment = temp
       aTail--
       bHead++
     } else {
@@ -137,31 +146,36 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
         temp = bCh[bHead]
         clone(temp, oldKid)
         temp.tag = OP.MOUNT
-        temp.after = aCh[aHead]?.node
+        temp.after = aCh[aHead]
         ch[bHead] = temp
         aCh[map.get(key)] = null
       } else {
         temp = bCh[bHead]
         temp.tag = OP.INSERT
         temp.node = null
-        temp.after = aCh[aHead]?.node
+        temp.after = aCh[aHead]
       }
+      commitment.next = temp
+      commitment = temp
       bHead++
     }
   }
-  const after = ch[bTail + 1]?.node
+  const after = ch[bTail + 1]
   while (bHead <= bTail) {
     let temp = bCh[bHead]
     temp.tag = OP.INSERT
     temp.after = after
     temp.node = null
+    commitment.next = temp
+    commitment = temp
     bHead++
   }
   while (aHead <= aTail) {
     let oldFiber = aCh[aHead]
     if (oldFiber) {
       oldFiber.tag = OP.REMOVE
-      deletes.push(oldFiber)
+      commitment.next = oldFiber
+      commitment = oldFiber
     }
     aHead++
   }
@@ -189,11 +203,12 @@ const getKey = (vdom) => (vdom == null ? vdom : vdom.key)
 const getType = (vdom) => (isFn(vdom.type) ? vdom.type.name : vdom.type)
 
 const commitWork = (fiber: IFiber): void => {
-  fiber.parent ? commit(fiber) : commit(fiber.child)
-  deletes.forEach(commit)
+  let current = fiber
+  while (current) {
+    commit(current)
+    current = current.next
+  }
   fiber.done?.()
-  deletes = []
-  preCommit = null
 }
 
 const getChild = (WIP: IFiber): any => {
@@ -221,8 +236,6 @@ const commit = (fiber: IFiber): void => {
         side(hooks.layout)
         schedule(() => side(hooks.effect))
       }
-      commit(fiber.child)
-      commit(fiber.sibling)
     }
     return
   }
@@ -236,13 +249,12 @@ const commit = (fiber: IFiber): void => {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (tag & OP.INSERT) {
-    const after = fiber.after as any
-    parentNode.insertBefore(fiber.node, after)
+    let after = fiber.after as any
+    after = tag & OP.SIBLING ? after?.node?.nextSibling : after?.node
+    parentNode.insertBefore(node, after)
   }
   fiber.tag = 0
   refer(ref, node)
-  commit(fiber.child)
-  commit(fiber.sibling)
 }
 
 const same = (a, b) => {
