@@ -8,10 +8,11 @@ let currentFiber: IFiber
 let commitment = null
 
 export const enum OP {
-  REMOVE = 1 << 4,
   UPDATE = 1 << 1,
   INSERT = 1 << 3,
+  REMOVE = 1 << 4,
   SIBLING = 1 << 5,
+  SVG = 1 << 6,
   MOUNT = UPDATE | INSERT,
 }
 export const render = (vnode: FreElement, node: Node, done?: () => void): void => {
@@ -185,6 +186,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     if (i > 0) {
       prev.sibling = child
     } else {
+      if (WIP.tag & OP.SVG) child.tag |= OP.SVG
       WIP.child = child
     }
     prev = child

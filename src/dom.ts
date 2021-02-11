@@ -1,4 +1,5 @@
 import { Attributes, DOM, IFiber } from './type'
+import {OP} from './reconciler'
 
 export const updateElement = <P extends Attributes>(
   dom: DOM,
@@ -34,7 +35,7 @@ export const createElement = <P = Attributes>(fiber: IFiber) => {
   const dom =
     fiber.type === 'text'
       ? document.createTextNode('')
-      : fiber.tag & (1 << 4)
+      : fiber.tag & OP.SVG
       ? document.createElementNS(
           'http://www.w3.org/2000/svg',
           fiber.type as string
