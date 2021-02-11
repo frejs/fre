@@ -4,7 +4,6 @@ import { resetCursor } from './hooks'
 import { scheduleWork, shouldYield, schedule, getTime } from './scheduler'
 import { isArr, createText } from './h'
 
-let preCommit: IFiber | undefined
 let currentFiber: IFiber
 let commitment = null
 
@@ -36,7 +35,7 @@ export const dispatchUpdate = (fiber?: IFiber) => {
 const reconcileWork = (WIP?: IFiber): boolean => {
   while (WIP && !shouldYield()) WIP = reconcile(WIP)
   if (WIP) return reconcileWork.bind(null, WIP)
-  if (preCommit) commitWork(preCommit)
+  if (commitment.last) commitWork(commitment.last)
   return null
 }
 
@@ -46,8 +45,8 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
 
   if (WIP.child) return WIP.child
   while (WIP) {
-    if (!preCommit && WIP.dirty === false) {
-      preCommit = WIP
+    if (!commitment.last && WIP.dirty === false) {
+      commitment.last = WIP
       WIP.sibling = null
       return null
     }
@@ -210,7 +209,6 @@ const commitWork = (fiber: IFiber): void => {
     current = current.next
   }
   fiber.done?.()
-  preCommit = null
 }
 
 const getChild = (WIP: IFiber): any => {

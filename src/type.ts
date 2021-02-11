@@ -56,7 +56,7 @@ export interface IFiber<P extends Attributes = any> {
   tag: number
   time: number
   next: IFiber
-  a:any
+  last: any
 }
 
 export type HTMLElementEx = HTMLElement & { last: IFiber | null }
