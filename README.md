@@ -13,7 +13,7 @@
 
 - **Highly-optimized algorithm** — Fre has a better reconciliation algorithm, which traverses from both ends with O (n) complexity, and supports keyed.
 
-- **Do more with less** — After tree shaking, project of hello world is only 2KB, but it has most features, virtual DOM, hooks API, Fragment, functional component and more.
+- **Do more with less** — After tree shaking, project of hello world is only 2KB, but it has most features, virtual DOM, hooks API, functional component and more.
 
 ### Use
 
@@ -27,10 +27,10 @@ import { h, render, useState } from 'fre'
 function App() {
   const [count, setCount] = useState(0)
   return (
-    <div>
+    <>
       <h1>{count}</h1>
       <button onClick={() => setCount(count + 1)}>+</button>
-    </div>
+    </>
   )
 }
 
@@ -64,12 +64,12 @@ function App() {
   const [up, setUp] = useState(0)
   const [down, setDown] = useState(0)
   return (
-    <div>
+    <>
       <h1>{up}</h1>
       <button onClick={() => setUp(up + 1)}>+</button>
       <h1>{down}</h1>
       <button onClick={() => setDown(down - 1)}>-</button>
-    </div>
+    </>
   )
 }
 ```
@@ -91,11 +91,11 @@ function reducer(state, action) {
 function App() {
   const [state, dispatch] = useReducer(reducer, { count: 1 })
   return (
-    <div>
+    <>
       {state.count}
       <button onClick={() => dispatch({ type: 'up' })}>+</button>
       <button onClick={() => dispatch({ type: 'down' })}>-</button>
-    </div>
+    </>
   )
 }
 ```
@@ -117,10 +117,10 @@ function App({ flag }) {
     document.title = 'count is ' + count
   }, [flag])
   return (
-    <div>
+    <>
       <h1>{count}</h1>
       <button onClick={() => setCount(count + 1)}>+</button>
-    </div>
+    </>
   )
 }
 ```
@@ -151,20 +151,7 @@ useLayout(() => {
 `useMemo` has the same rules as `useEffect`, but `useMemo` will return a cached value.
 
 ```js
-function App() {
-  const [count, setCount] = useState(0)
-  const val = useMemo(() => {
-    return new Date()
-  }, [count])
-  return (
-    <div>
-      <h1>
-        {count} - {val}
-      </h1>
-      <button onClick={() => setCount(count + 1)}>+</button>
-    </div>
-  )
-}
+const memo = (c) => (props) => useMemo(() => c, [Object.values(props)])
 ```
 
 #### useCallback
@@ -246,7 +233,3 @@ The reconciliation algorithm of fre is similar to vue, but the biggest differenc
 #### License
 
 MIT @yisar
-
-```
-
-```
