@@ -9,8 +9,9 @@ let commitment = null
 
 export const enum OP {
   UPDATE = 1 << 1,
-  INSERT = 1 << 3,
-  REMOVE = 1 << 4,
+  INSERT = 1 << 2,
+  REMOVE = 1 << 3,
+  FRAGMENT = 1 << 4,
   SIBLING = 1 << 5,
   SVG = 1 << 6,
   MOUNT = UPDATE | INSERT,
@@ -59,11 +60,12 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
 const updateHook = <P = Attributes>(WIP: IFiber): void => {
   if (WIP.lastProps === WIP.props) return
   currentFiber = WIP
+  resetCursor()
   let start = getTime()
   let children = (WIP.type as FC<P>)(WIP.props)
   WIP.time = getTime() - start
-  resetCursor()
   if (isStr(children)) children = createText(children as string)
+  if (isArr(children)) WIP.tag |= OP.FRAGMENT
   reconcileChildren(WIP, children)
 }
 
@@ -197,13 +199,22 @@ function clone(a, b) {
 const getKey = (vdom) => (vdom == null ? vdom : vdom.key)
 const getType = (vdom) => (isFn(vdom.type) ? vdom.type.name : vdom.type)
 
-const commitWork = (fiber: IFiber): void => {
-  let current = fiber
-  while (current) {
-    commit(current)
-    current = current.next
+const commitWork = (commitment: IFiber): void => {
+  let fiber = commitment
+  while (fiber) {
+    if (fiber.tag & OP.FRAGMENT) {
+      fiber.kids.forEach(kid => {
+        kid.tag |= fiber.tag
+        kid.after = fiber.after?.kids[fiber.after?.kids.length - 1]
+        commit(kid)
+        kid.tag = 0
+      })
+    } else if (fiber.tag) {
+      commit(fiber)
+    }
+    fiber = fiber.next
   }
-  fiber.done?.()
+  commitment.done?.()
 }
 
 const getChild = (WIP: IFiber): any => {
@@ -218,19 +229,15 @@ const getChild = (WIP: IFiber): any => {
 }
 
 const commit = (fiber: IFiber): void => {
-  if (!fiber) return
   let { type, tag, parentNode, node, ref, hooks } = fiber
   if (isFn(type)) {
-    const realChild = getChild(fiber)
+    const child = getChild(fiber)
     if (fiber.tag & OP.REMOVE) {
-      commit(realChild)
+      commit(child)
       hooks && hooks.list.forEach(cleanup)
-    } else {
-      fiber.node = realChild.node
-      if (hooks) {
-        side(hooks.layout)
-        schedule(() => side(hooks.effect))
-      }
+    } else if (hooks) {
+      side(hooks.layout)
+      schedule(() => side(hooks.effect))
     }
     return
   }
