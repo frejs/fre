@@ -116,6 +116,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       bTail--
     } else if (same(aCh[aHead], bCh[bTail])) {
       temp = bCh[bTail]
+      console.log(temp)
       clone(temp, aCh[aHead])
       temp.tag = OP.MOUNT | OP.SIBLING
       temp.after = aCh[aTail]
@@ -205,12 +206,13 @@ const commitWork = (commitment: IFiber): void => {
     if (fiber.tag & OP.FRAGMENT) {
       fiber.kids.forEach(kid => {
         kid.tag |= fiber.tag
-        kid.after = fiber.after?.kids[fiber.after?.kids.length - 1]
+        kid.after = fiber.after
         commit(kid)
         kid.tag = 0
       })
     } else if (fiber.tag) {
       commit(fiber)
+      fiber.tag = 0
     }
     fiber = fiber.next
   }
@@ -229,7 +231,7 @@ const getChild = (WIP: IFiber): any => {
 }
 
 const commit = (fiber: IFiber): void => {
-  let { type, tag, parentNode, node, ref, hooks } = fiber
+  let { type, tag, parentNode, node, ref, hooks, after } = fiber
   if (isFn(type)) {
     const child = getChild(fiber)
     if (fiber.tag & OP.REMOVE) {
@@ -251,11 +253,13 @@ const commit = (fiber: IFiber): void => {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (tag & OP.INSERT) {
-    let after = fiber.after as any
-    after = tag & OP.SIBLING ? after?.node?.nextSibling : after?.node
+    if (tag & OP.FRAGMENT) {
+      after = tag & OP.SIBLING ? after?.kids[after?.kids.length - 1].nextSibling : after?.child.node
+    } else {
+      after = tag & OP.SIBLING ? after?.node?.nextSibling : after?.node
+    }
     parentNode.insertBefore(node, after)
   }
-  fiber.tag = 0
   refer(ref, node)
 }
 
