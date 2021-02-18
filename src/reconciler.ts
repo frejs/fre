@@ -1,8 +1,17 @@
-import { IFiber, FreElement, FC, Attributes, HTMLElementEx, FreNode, IRef, IEffect } from './type'
-import { createElement, updateElement } from './dom'
-import { resetCursor } from './hooks'
-import { scheduleWork, shouldYield, schedule, getTime } from './scheduler'
-import { isArr, createText } from './h'
+import {
+  IFiber,
+  FreElement,
+  FC,
+  Attributes,
+  HTMLElementEx,
+  FreNode,
+  IRef,
+  IEffect,
+} from "./type"
+import { createElement, updateElement } from "./dom"
+import { resetCursor } from "./hooks"
+import { scheduleWork, shouldYield, schedule, getTime } from "./scheduler"
+import { isArr, createText } from "./h"
 
 let currentFiber: IFiber
 let commitment = null
@@ -16,7 +25,11 @@ export const enum OP {
   SVG = 1 << 6,
   MOUNT = UPDATE | INSERT,
 }
-export const render = (vnode: FreElement, node: Node, done?: () => void): void => {
+export const render = (
+  vnode: FreElement,
+  node: Node,
+  done?: () => void
+): void => {
   const rootFiber = {
     node,
     props: { children: vnode },
@@ -78,7 +91,7 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
 const updateHost = (WIP: IFiber): void => {
   WIP.parentNode = getParentNode(WIP) as any
   if (!WIP.node) {
-    if (WIP.type === 'svg') WIP.tag |= OP.SVG
+    if (WIP.type === "svg") WIP.tag |= OP.SVG
     WIP.node = createElement(WIP) as HTMLElementEx
   }
   reconcileChildren(WIP, WIP.props.children)
@@ -92,7 +105,8 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     aTail = aCh.length - 1,
     bTail = bCh.length - 1,
     map = null,
-    ch = Array(bCh.length)
+    ch = Array(bCh.length),
+    next = WIP.sibling?.node ? WIP.sibling : null
 
   while (aHead <= aTail && bHead <= bTail) {
     let c = null
@@ -157,7 +171,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     commitment.next = c
     commitment = c
   }
-  const after = bTail < bCh.length - 1? ch[bTail + 1] : WIP.sibling
+  const after = bTail <= bCh.length - 1 ? ch[bTail + 1] : next
   while (bHead <= bTail) {
     let c = bCh[bHead]
     c.tag = OP.INSERT
@@ -204,7 +218,7 @@ const commitWork = (commitment: IFiber): void => {
   let fiber = commitment
   while (fiber) {
     if (fiber.tag & OP.FRAGMENT) {
-      fiber.kids.forEach(kid => {
+      fiber.kids.forEach((kid) => {
         kid.tag |= fiber.tag
         kid.after = fiber.after
         commit(kid)
@@ -254,7 +268,10 @@ const commit = (fiber: IFiber): void => {
   }
   if (tag & OP.INSERT) {
     if (tag & OP.FRAGMENT) {
-      after = tag & OP.SIBLING ? after?.kids[after?.kids.length - 1].nextSibling : after?.child.node
+      after =
+        tag & OP.SIBLING
+          ? after?.kids[after?.kids.length - 1].nextSibling
+          : after?.child.node
     } else {
       after = tag & OP.SIBLING ? after?.node?.nextSibling : after?.node
     }
@@ -270,7 +287,8 @@ const same = (a, b) => {
 const arrayfy = (arr) => (!arr ? [] : isArr(arr) ? arr : [arr])
 
 const refer = (ref: IRef, dom?: HTMLElement): void => {
-  if (ref) isFn(ref) ? ref(dom) : ((ref as { current?: HTMLElement })!.current = dom)
+  if (ref)
+    isFn(ref) ? ref(dom) : ((ref as { current?: HTMLElement })!.current = dom)
 }
 
 const kidsRefer = (kids: any): void => {
@@ -290,6 +308,7 @@ export const getCurrentFiber = () => currentFiber || null
 
 const effect = (e: IEffect): void => (e[2] = e[0]())
 const cleanup = (e: IEffect): void => e[2] && e[2]()
-export const isFn = (x: any): x is Function => typeof x === 'function'
-export const isStr = (s: any): s is number | string => typeof s === 'number' || typeof s === 'string'
+export const isFn = (x: any): x is Function => typeof x === "function"
+export const isStr = (s: any): s is number | string =>
+  typeof s === "number" || typeof s === "string"
 export const some = (v: any) => v != null && v !== false && v !== true

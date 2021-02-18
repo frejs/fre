@@ -1,10 +1,6 @@
 {
   "name": "fre",
-<<<<<<< HEAD
-  "version": "2.0.0-rc.12",
-=======
   "version": "2.0.0-rc.16",
->>>>>>> f48190e57533c2dfb69b3a643048a9061fcbd4dc
   "type": "module",
   "main": "dist/fre.js",
   "unpkg": "dist/fre.umd.js",
