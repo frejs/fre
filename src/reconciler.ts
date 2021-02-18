@@ -23,7 +23,7 @@ export const enum OP {
   FRAGMENT = 1 << 4,
   SIBLING = 1 << 5,
   SVG = 1 << 6,
-  DIRTY = 1<<7,
+  DIRTY = 1 << 7,
   MOUNT = UPDATE | INSERT,
 }
 export const render = (
@@ -59,7 +59,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
 
   if (WIP.child) return WIP.child
   while (WIP) {
-    if (!commitment.last && (WIP.tag & OP.DIRTY)) {
+    if (!commitment.last && WIP.tag & OP.DIRTY) {
       commitment.last = WIP
       WIP.tag &= ~OP.DIRTY
       return null
