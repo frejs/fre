@@ -23,6 +23,7 @@ export const enum OP {
   FRAGMENT = 1 << 4,
   SIBLING = 1 << 5,
   SVG = 1 << 6,
+  DIRTY = 1<<7,
   MOUNT = UPDATE | INSERT,
 }
 export const render = (
@@ -39,9 +40,8 @@ export const render = (
 }
 
 export const dispatchUpdate = (fiber?: IFiber) => {
-  if (fiber && !fiber.dirty) {
-    fiber.dirty = true
-    fiber.tag = OP.UPDATE
+  if (fiber && !(fiber.tag & OP.DIRTY)) {
+    fiber.tag = OP.UPDATE | OP.DIRTY
     commitment = fiber
     scheduleWork(reconcileWork.bind(null, fiber), fiber.time)
   }
@@ -56,13 +56,12 @@ const reconcileWork = (WIP?: IFiber): boolean => {
 
 const reconcile = (WIP: IFiber): IFiber | undefined => {
   isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
-  WIP.dirty = WIP.dirty ? false : 0
 
   if (WIP.child) return WIP.child
   while (WIP) {
-    if (!commitment.last && WIP.dirty === false) {
+    if (!commitment.last && (WIP.tag & OP.DIRTY)) {
       commitment.last = WIP
-      WIP.sibling = null
+      WIP.tag &= ~OP.DIRTY
       return null
     }
     if (WIP.sibling) return WIP.sibling
