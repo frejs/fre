@@ -16,6 +16,7 @@ test('reorder and reuse elements during key-based reconciliation of child-nodes'
     [1, 2], // remove last
     [1, 2, 3],
     [3, 2, 1], // reverse order
+    [3, 4, 2, 5, 1], // reverse order
   ]
 
   let lastChildren
@@ -24,18 +25,14 @@ test('reorder and reuse elements during key-based reconciliation of child-nodes'
     states.map((state, stateNumber) => ({
       content: (
         <ul>
-          {state.map(value => (
+          {state.map((value) => (
             <li key={value}>{value}</li>
           ))}
         </ul>
       ),
-      test: elements => {
+      test: (elements) => {
         const children = [...elements[0].children]
-        expect(children.map(el => el.textContent)).toEqual(
-          state.map(value => '' + value)
-        )
-
-        console.log(state)
+        expect(children.map((el) => el.textContent)).toEqual(state.map((value) => '' + value))
 
         if (stateNumber > 1) {
           const lastState = states[stateNumber - 1]
@@ -49,7 +46,7 @@ test('reorder and reuse elements during key-based reconciliation of child-nodes'
         }
 
         lastChildren = children
-      }
+      },
     }))
   )
 })

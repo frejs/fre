@@ -1,6 +1,10 @@
 {
   "name": "fre",
+<<<<<<< HEAD
   "version": "2.0.0-rc.12",
+=======
+  "version": "2.0.0-rc.16",
+>>>>>>> f48190e57533c2dfb69b3a643048a9061fcbd4dc
   "type": "module",
   "main": "dist/fre.js",
   "unpkg": "dist/fre.umd.js",
@@ -12,7 +16,7 @@
     },
     "./jsx-runtime": {
       "import": "./jsx-runtime.js",
-      "require": "./jsx-runtime"
+      "require": "./jsx-runtime.js"
     }
   },
   "typings": "./dist/types/index.d.ts",
@@ -20,7 +24,8 @@
     "src/**/*",
     "dist/*.js",
     "dist/*.map",
-    "dist/types"
+    "dist/types",
+    "jsx-runtime.js"
   ],
   "scripts": {
     "test": "jest --coverage",

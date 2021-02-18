@@ -3,10 +3,7 @@
 /.cache/
 /coverage/
 yarn-error.log
-.ignore/
-packages/.fre/
 demo/**/node_modules/
-server/**/node_modules/
 demo/**/.cache/
 demo/**/dist/
 /dist/

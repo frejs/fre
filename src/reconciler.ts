@@ -4,14 +4,16 @@ import { resetCursor } from './hooks'
 import { scheduleWork, shouldYield, schedule, getTime } from './scheduler'
 import { isArr, createText } from './h'
 
-let preCommit: IFiber | undefined
 let currentFiber: IFiber
-let deletes = []
+let commitment = null
 
 export const enum OP {
-  REMOVE = 1 << 4,
   UPDATE = 1 << 1,
-  INSERT = 1 << 3,
+  INSERT = 1 << 2,
+  REMOVE = 1 << 3,
+  FRAGMENT = 1 << 4,
+  SIBLING = 1 << 5,
+  SVG = 1 << 6,
   MOUNT = UPDATE | INSERT,
 }
 export const render = (vnode: FreElement, node: Node, done?: () => void): void => {
@@ -27,6 +29,7 @@ export const dispatchUpdate = (fiber?: IFiber) => {
   if (fiber && !fiber.dirty) {
     fiber.dirty = true
     fiber.tag = OP.UPDATE
+    commitment = fiber
     scheduleWork(reconcileWork.bind(null, fiber), fiber.time)
   }
 }
@@ -34,7 +37,7 @@ export const dispatchUpdate = (fiber?: IFiber) => {
 const reconcileWork = (WIP?: IFiber): boolean => {
   while (WIP && !shouldYield()) WIP = reconcile(WIP)
   if (WIP) return reconcileWork.bind(null, WIP)
-  if (preCommit) commitWork(preCommit)
+  if (commitment.last) commitWork(commitment.last)
   return null
 }
 
@@ -44,8 +47,8 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
 
   if (WIP.child) return WIP.child
   while (WIP) {
-    if (!preCommit && WIP.dirty === false) {
-      preCommit = WIP
+    if (!commitment.last && WIP.dirty === false) {
+      commitment.last = WIP
       WIP.sibling = null
       return null
     }
@@ -57,11 +60,12 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
 const updateHook = <P = Attributes>(WIP: IFiber): void => {
   if (WIP.lastProps === WIP.props) return
   currentFiber = WIP
+  resetCursor()
   let start = getTime()
   let children = (WIP.type as FC<P>)(WIP.props)
   WIP.time = getTime() - start
-  resetCursor()
   if (isStr(children)) children = createText(children as string)
+  if (isArr(children)) WIP.tag |= OP.FRAGMENT
   reconcileChildren(WIP, children)
 }
 
@@ -74,6 +78,7 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
 const updateHost = (WIP: IFiber): void => {
   WIP.parentNode = getParentNode(WIP) as any
   if (!WIP.node) {
+    if (WIP.type === 'svg') WIP.tag |= OP.SVG
     WIP.node = createElement(WIP) as HTMLElementEx
   }
   reconcileChildren(WIP, WIP.props.children)
@@ -111,9 +116,10 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       bTail--
     } else if (same(aCh[aHead], bCh[bTail])) {
       c = bCh[bTail]
+      console.log(c)
       clone(c, aCh[aHead])
-      c.tag = OP.MOUNT
-      c.insertPoint = aCh[aTail].node.nextSibling
+      c.tag = OP.MOUNT | OP.SIBLING
+      c.after = aCh[aTail]
       ch[bTail] = c
       aHead++
       bTail--
@@ -121,57 +127,62 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       c = bCh[bHead]
       clone(c, aCh[aTail])
       c.tag = OP.MOUNT
-      c.insertPoint = aCh[aHead].node
+      c.after = aCh[aHead]
       ch[bHead] = c
       aTail--
       bHead++
     } else {
       if (!map) {
         map = new Map()
-        let i = bHead
-        while (i < bTail) map.set(getKey(bCh[i]), i++)
+        let i = aHead
+        while (i < aTail) map.set(getKey(aCh[i]), i++)
       }
-      if (map.has(getKey(aCh[aHead]))) {
-        const oldKid = aCh[map.get(aCh[aHead])]
+      const key = getKey(bCh[bHead])
+      if (map.has(key)) {
+        const oldKid = aCh[map.get(key)]
         c = bCh[bHead]
         clone(c, oldKid)
         c.tag = OP.MOUNT
-        aCh[i] = null
-        c.insertPoint = aCh[aHead]?.node
+        c.after = aCh[aHead]
         ch[bHead] = c
+        aCh[map.get(key)] = null
       } else {
         c = bCh[bHead]
         c.tag = OP.INSERT
         c.node = null
-        c.insertPoint = aCh[aHead]?.node
+        c.after = aCh[aHead]
       }
       bHead++
     }
+    commitment.next = c
+    commitment = c
   }
-  const before = ch[bTail+1]?.node
+  const after = bTail < bCh.length - 1? ch[bTail + 1] : WIP.sibling
   while (bHead <= bTail) {
     let c = bCh[bHead]
     c.tag = OP.INSERT
+    c.after = after
     c.node = null
-
-    c.insertPoint = before
+    commitment.next = c
+    commitment = c
     bHead++
   }
   while (aHead <= aTail) {
     let oldFiber = aCh[aHead]
     if (oldFiber) {
       oldFiber.tag = OP.REMOVE
-      deletes.push(oldFiber)
+      commitment.next = oldFiber
+      commitment = oldFiber
     }
     aHead++
   }
-
   for (var i = 0, prev = null; i < bCh.length; i++) {
     const child = bCh[i]
     child.parent = WIP
     if (i > 0) {
       prev.sibling = child
     } else {
+      if (WIP.tag & OP.SVG) child.tag |= OP.SVG
       WIP.child = child
     }
     prev = child
@@ -189,12 +200,23 @@ function clone(a, b) {
 const getKey = (vdom) => (vdom == null ? vdom : vdom.key)
 const getType = (vdom) => (isFn(vdom.type) ? vdom.type.name : vdom.type)
 
-const commitWork = (fiber: IFiber): void => {
-  fiber.parent ? commit(fiber) : commit(fiber.child)
-  deletes.forEach(commit)
-  fiber.done?.()
-  deletes = []
-  preCommit = null
+const commitWork = (commitment: IFiber): void => {
+  let fiber = commitment
+  while (fiber) {
+    if (fiber.tag & OP.FRAGMENT) {
+      fiber.kids.forEach(kid => {
+        kid.tag |= fiber.tag
+        kid.after = fiber.after
+        commit(kid)
+        kid.tag = 0
+      })
+    } else if (fiber.tag) {
+      commit(fiber)
+      fiber.tag = 0
+    }
+    fiber = fiber.next
+  }
+  commitment.done?.()
 }
 
 const getChild = (WIP: IFiber): any => {
@@ -202,28 +224,22 @@ const getChild = (WIP: IFiber): any => {
   while ((WIP = WIP.child)) {
     if (!isFn(WIP.type)) {
       WIP.tag |= fiber.tag
-      WIP.insertPoint = fiber.insertPoint
+      WIP.after = fiber.after
       return WIP
     }
   }
 }
 
 const commit = (fiber: IFiber): void => {
-  if (!fiber) return
-  let { type, tag, parentNode, node, ref, hooks } = fiber
+  let { type, tag, parentNode, node, ref, hooks, after } = fiber
   if (isFn(type)) {
-    const realChild = getChild(fiber)
+    const child = getChild(fiber)
     if (fiber.tag & OP.REMOVE) {
-      commit(realChild)
+      commit(child)
       hooks && hooks.list.forEach(cleanup)
-    } else {
-      fiber.node = realChild.node
-      if (hooks) {
-        side(hooks.layout)
-        schedule(() => side(hooks.effect))
-      }
-      commit(fiber.child)
-      commit(fiber.sibling)
+    } else if (hooks) {
+      side(hooks.layout)
+      schedule(() => side(hooks.effect))
     }
     return
   }
@@ -237,13 +253,14 @@ const commit = (fiber: IFiber): void => {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (tag & OP.INSERT) {
-    const after = fiber.insertPoint as any
-    parentNode.insertBefore(fiber.node, after)
+    if (tag & OP.FRAGMENT) {
+      after = tag & OP.SIBLING ? after?.kids[after?.kids.length - 1].nextSibling : after?.child.node
+    } else {
+      after = tag & OP.SIBLING ? after?.node?.nextSibling : after?.node
+    }
+    parentNode.insertBefore(node, after)
   }
-  fiber.tag = 0
   refer(ref, node)
-  commit(fiber.child)
-  commit(fiber.sibling)
 }
 
 const same = (a, b) => {
