@@ -90,39 +90,39 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     ch = Array(bCh.length)
 
   while (aHead <= aTail && bHead <= bTail) {
-    let temp = null
+    let c = null
     if (aCh[aHead] == null) {
       aHead++
     } else if (aCh[aTail] == null) {
       aTail--
     } else if (same(aCh[aHead], bCh[bHead])) {
-      temp = bCh[bHead]
-      clone(temp, aCh[aHead])
-      temp.tag = OP.UPDATE
-      ch[bHead] = temp
+      c = bCh[bHead]
+      clone(c, aCh[aHead])
+      c.tag = OP.UPDATE
+      ch[bHead] = c
       aHead++
       bHead++
     } else if (same(aCh[aTail], bCh[bTail])) {
-      temp = bCh[bTail]
-      clone(temp, aCh[aTail])
-      temp.tag = OP.UPDATE
-      ch[bTail] = temp
+      c = bCh[bTail]
+      clone(c, aCh[aTail])
+      c.tag = OP.UPDATE
+      ch[bTail] = c
       aTail--
       bTail--
     } else if (same(aCh[aHead], bCh[bTail])) {
-      temp = bCh[bTail]
-      clone(temp, aCh[aHead])
-      temp.tag = OP.MOUNT
-      temp.insertPoint = aCh[aTail].node.nextSibling
-      ch[bTail] = temp
+      c = bCh[bTail]
+      clone(c, aCh[aHead])
+      c.tag = OP.MOUNT
+      c.insertPoint = aCh[aTail].node.nextSibling
+      ch[bTail] = c
       aHead++
       bTail--
     } else if (same(aCh[aTail], bCh[bHead])) {
-      temp = bCh[bHead]
-      clone(temp, aCh[aTail])
-      temp.tag = OP.MOUNT
-      temp.insertPoint = aCh[aHead].node
-      ch[bHead] = temp
+      c = bCh[bHead]
+      clone(c, aCh[aTail])
+      c.tag = OP.MOUNT
+      c.insertPoint = aCh[aHead].node
+      ch[bHead] = c
       aTail--
       bHead++
     } else {
@@ -133,28 +133,28 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       }
       if (map.has(getKey(aCh[aHead]))) {
         const oldKid = aCh[map.get(aCh[aHead])]
-        temp = bCh[bHead]
-        clone(temp, oldKid)
-        temp.tag = OP.MOUNT
+        c = bCh[bHead]
+        clone(c, oldKid)
+        c.tag = OP.MOUNT
         aCh[i] = null
-        temp.insertPoint = aCh[aHead]?.node
-        ch[bHead] = temp
+        c.insertPoint = aCh[aHead]?.node
+        ch[bHead] = c
       } else {
-        temp = bCh[bHead]
-        temp.tag = OP.INSERT
-        temp.node = null
-        temp.insertPoint = aCh[aHead]?.node
+        c = bCh[bHead]
+        c.tag = OP.INSERT
+        c.node = null
+        c.insertPoint = aCh[aHead]?.node
       }
       bHead++
     }
   }
   const before = ch[bTail+1]?.node
   while (bHead <= bTail) {
-    let temp = bCh[bHead]
-    temp.tag = OP.INSERT
-    temp.node = null
+    let c = bCh[bHead]
+    c.tag = OP.INSERT
+    c.node = null
 
-    temp.insertPoint = before
+    c.insertPoint = before
     bHead++
   }
   while (aHead <= aTail) {
