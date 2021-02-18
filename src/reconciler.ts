@@ -157,7 +157,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     commitment.next = temp
     commitment = temp
   }
-  const after = ch[bTail + 1]
+  const after = bTail < bCh.length - 1? ch[bTail + 1] : WIP.sibling
   while (bHead <= bTail) {
     let temp = bCh[bHead]
     temp.tag = OP.INSERT
