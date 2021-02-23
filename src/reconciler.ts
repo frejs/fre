@@ -195,6 +195,17 @@ const commitWork = (fiber: IFiber): void => {
   finish = null
 }
 
+function invokeHooks({hooks,tag}){
+  if (hooks) {
+    if (tag & OP.REMOVE) {
+      hooks.list.forEach(cleanup)
+    } else {
+      side(hooks.layout)
+      schedule(() => side(hooks.effect))
+    }
+  }
+}
+
 const commit = (fiber: IFiber): void => {
   if (!fiber) return
   let { type, tag, parentNode, node, ref, hooks, after } = fiber
@@ -202,15 +213,11 @@ const commit = (fiber: IFiber): void => {
     let kid = fiber
     while (isFn(kid.type)) kid = kid.child
     fiber.node = kid.node // for after node
+    invokeHooks(fiber)
     if (fiber.tag & OP.REMOVE) {
       kid.tag = OP.REMOVE
       commit(kid)
-      hooks && hooks.list.forEach(cleanup)
     } else {
-      if (hooks) {
-        side(hooks.layout)
-        schedule(() => side(hooks.effect))
-      }
       commit(fiber.child)
       commit(fiber.sibling)
     }
