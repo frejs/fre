@@ -127,9 +127,10 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     } else {
       if (!map) {
         map = new Map()
-        let i = aHead
-        let k = getKey(aCh[i])
-        while (i <= aTail) k && map.set(k, i++)
+        for (let i = aHead; i <= aTail; i++) {
+          let k = getKey(aCh[i])
+          k && map.set(k, i)
+        }
       }
       const key = getKey(bCh[bHead])
       if (map.has(key)) {
