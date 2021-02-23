@@ -16,7 +16,6 @@ test('reorder and reuse elements during key-based reconciliation of child-nodes'
     [1, 2], // remove last
     [1, 2, 3],
     [3, 2, 1], // reverse order
-    [3, 4, 2, 5, 1], // reverse order
   ]
 
   let lastChildren
@@ -40,7 +39,7 @@ test('reorder and reuse elements during key-based reconciliation of child-nodes'
             const lastIndex = lastState.indexOf(value)
             if (lastIndex !== -1) {
               // console.log(`item ${value} position ${lastIndex} -> ${index}`)
-              expect(children[index]).toBe(lastChildren[lastIndex])
+              expect(children[index]).toStrictEqual(lastChildren[lastIndex])
             }
           })
         }

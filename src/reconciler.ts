@@ -127,23 +127,6 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       ch[bTail] = c
       aTail--
       bTail--
-    } else if (same(aCh[aHead], bCh[bTail])) {
-      c = bCh[bTail]
-      console.log(c)
-      clone(c, aCh[aHead])
-      c.tag = OP.MOUNT | OP.SIBLING
-      c.after = aCh[aTail]
-      ch[bTail] = c
-      aHead++
-      bTail--
-    } else if (same(aCh[aTail], bCh[bHead])) {
-      c = bCh[bHead]
-      clone(c, aCh[aTail])
-      c.tag = OP.MOUNT
-      c.after = aCh[aHead]
-      ch[bHead] = c
-      aTail--
-      bHead++
     } else {
       if (!map) {
         map = new Map()
@@ -267,12 +250,9 @@ const commit = (fiber: IFiber): void => {
   }
   if (tag & OP.INSERT) {
     if (tag & OP.FRAGMENT) {
-      after =
-        tag & OP.SIBLING
-          ? after?.kids[after?.kids.length - 1].nextSibling
-          : after?.child.node
+      after = after?.child.node
     } else {
-      after = tag & OP.SIBLING ? after?.node?.nextSibling : after?.node
+      after = after?.node
     }
     parentNode.insertBefore(node, after)
   }
