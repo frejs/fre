@@ -21,7 +21,6 @@ export const enum OP {
   UPDATE = 1 << 1,
   INSERT = 1 << 2,
   REMOVE = 1 << 3,
-  FRAGMENT = 1 << 4,
   SVG = 1 << 6,
   DIRTY = 1 << 7,
 }
@@ -77,9 +76,6 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
   WIP.time = getTime() - start
   if (isStr(children)) {
     children = createText(children as string)
-  }
-  if (isArr(children)) {
-    WIP.tag |= OP.FRAGMENT
   }
   reconcileChildren(WIP, children)
 }
@@ -220,6 +216,13 @@ function getKid(fiber) {
   while (isFn(kid.type)) kid = kid.child
   kid.after = fiber.after
   kid.tag |= fiber.tag
+  let s = kid.sibling
+  while (s) {
+    s.after = fiber.after
+    s.tag |= fiber.tag
+    s = s.sibling
+  }
+
   return kid
 }
 
@@ -231,22 +234,18 @@ const commit = (fiber: IFiber): void => {
     invokeHooks(fiber)
     let kid = getKid(fiber)
     fiber.node = kid.node
-    // if (fiber.tag & OP.FRAGMENT) {
-    //   fiber.kids.forEach((k) => {
-    //     k.tag |= fiber.tag
-    //     k.after = fiber.after
-    //     commit(k)
-    //     k.tag = 0
-    //   })
-    // } 
     if (fiber.tag & OP.REMOVE) {
       kid.tag = OP.REMOVE
       commit(kid)
-    } else if(fiber.tag) {
+      let s = kid.sibling
+      while (s) {
+        s.tag = OP.REMOVE
+        commit(s)
+        s = s.slibing
+      }
+    } else {
       commit(fiber.child)
       commit(fiber.sibling)
-    }else{
-      console.log(fiber)
     }
     fiber.tag = 0
     return
