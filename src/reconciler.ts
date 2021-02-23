@@ -211,11 +211,11 @@ const commit = (fiber: IFiber): void => {
   let { type, tag, parentNode, node, ref, hooks, after } = fiber
   if (isFn(type)) {
     const realChild = getChild(fiber)
+
     if (fiber.tag & OP.REMOVE) {
       commit(realChild)
       hooks && hooks.list.forEach(cleanup)
     } else {
-      fiber.node = realChild.node
       if (hooks) {
         side(hooks.layout)
         schedule(() => side(hooks.effect))
@@ -235,11 +235,7 @@ const commit = (fiber: IFiber): void => {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (tag & OP.INSERT) {
-    if (tag & OP.FRAGMENT) {
-      after = after?.child.node
-    } else {
-      after = after?.node
-    }
+    after = after?.node
     parentNode.insertBefore(fiber.node, after)
   }
   fiber.tag = 0
