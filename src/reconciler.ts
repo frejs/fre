@@ -21,8 +21,8 @@ export const enum OP {
   UPDATE = 1 << 1,
   INSERT = 1 << 2,
   REMOVE = 1 << 3,
-  SVG = 1 << 6,
-  DIRTY = 1 << 7,
+  SVG = 1 << 4,
+  DIRTY = 1 << 5,
 }
 export const render = (
   vnode: FreElement,
