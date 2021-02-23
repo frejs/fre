@@ -13,7 +13,7 @@
 
 - **Highly-optimized algorithm** — Fre has a better reconciliation algorithm, which traverses from both ends with O (n) complexity, and supports keyed.
 
-- **Do more with less** — After tree shaking, project of hello world is only 2KB, but it has most features, virtual DOM, hooks API, functional component and more.
+- **Do more with less** — After tree shaking, project of hello world is only 2KB, but it has most features, virtual DOM, hooks API, Fragment and more.
 
 ### Use
 
