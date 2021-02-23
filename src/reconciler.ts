@@ -21,8 +21,6 @@ export const enum OP {
   UPDATE = 1 << 1,
   INSERT = 1 << 2,
   REMOVE = 1 << 3,
-  FRAGMENT = 1 << 4,
-  SINGLE = 1 << 5,
   SVG = 1 << 6,
   DIRTY = 1 << 7,
 }
@@ -76,11 +74,6 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
   let children = (WIP.type as FC<P>)(WIP.props)
   WIP.time = getTime() - start
   if (isStr(children)) children = createText(children as string)
-  if (isArr(children)) {
-    WIP.tag |= OP.FRAGMENT
-  } else {
-    WIP.tag |= OP.SINGLE
-  }
   reconcileChildren(WIP, children)
 }
 
