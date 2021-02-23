@@ -21,10 +21,9 @@ export const enum OP {
   INSERT = 1 << 2,
   REMOVE = 1 << 3,
   FRAGMENT = 1 << 4,
-  SIBLING = 1 << 5,
+  SINGLE = 1 << 5,
   SVG = 1 << 6,
   DIRTY = 1 << 7,
-  MOUNT = UPDATE | INSERT,
 }
 export const render = (
   vnode: FreElement,
@@ -77,7 +76,11 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
   let children = (WIP.type as FC<P>)(WIP.props)
   WIP.time = getTime() - start
   if (isStr(children)) children = createText(children as string)
-  if (isArr(children)) WIP.tag |= OP.FRAGMENT
+  if (isArr(children)) {
+    WIP.tag |= OP.FRAGMENT
+  }else {
+    WIP.tag |= OP.SINGLE
+  }
   reconcileChildren(WIP, children)
 }
 
@@ -138,7 +141,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
         const oldKid = aCh[map.get(key)]
         c = bCh[bHead]
         clone(c, oldKid)
-        c.tag = OP.MOUNT
+        c.tag = OP.INSERT
         c.after = aCh[aHead]
         ch[bHead] = c
         aCh[map.get(key)] = null
