@@ -195,25 +195,16 @@ const commitWork = (fiber: IFiber): void => {
   finish = null
 }
 
-const getChild = (WIP: IFiber): any => {
-  let fiber = WIP
-  while ((WIP = WIP.child)) {
-    if (!isFn(WIP.type)) {
-      WIP.tag |= fiber.tag
-      WIP.after = fiber.after
-      return WIP
-    }
-  }
-}
-
 const commit = (fiber: IFiber): void => {
   if (!fiber) return
   let { type, tag, parentNode, node, ref, hooks, after } = fiber
   if (isFn(type)) {
-    const realChild = getChild(fiber)
-
+    let kid = fiber
+    while (isFn(kid.type)) kid = kid.child
+    fiber.node = kid.node // for after node
     if (fiber.tag & OP.REMOVE) {
-      commit(realChild)
+      kid.tag = OP.REMOVE
+      commit(kid)
       hooks && hooks.list.forEach(cleanup)
     } else {
       if (hooks) {
