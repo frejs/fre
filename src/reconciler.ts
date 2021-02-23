@@ -206,14 +206,22 @@ function invokeHooks({ hooks, tag }) {
   }
 }
 
+function getKid(fiber) {
+  let kid = fiber
+  while (isFn(kid.type)) kid = kid.child
+  kid.after = fiber.after
+  kid.tag |= fiber.tag
+  return kid
+}
+
 const commit = (fiber: IFiber): void => {
   if (!fiber) return
-  let { type, tag, parentNode, node, ref, after } = fiber
+  let { type, tag, parentNode, node, ref, hooks, after } = fiber
   if (isFn(type)) {
-    let kid = fiber
-    while (isFn(kid.type)) kid = kid.child
-    fiber.node = kid.node // for after node
+    let kid = getKid(fiber)
+    fiber.node = kid.node
     invokeHooks(fiber)
+
     if (fiber.tag & OP.REMOVE) {
       kid.tag = OP.REMOVE
       commit(kid)
