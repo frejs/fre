@@ -63,13 +63,13 @@ import { h, render, useEffect, useState } from "../../src/index"
 // }
 
 function App() {
-  const [key, setKey] = useState([1,7, 2, 3,4,5])
+  const [key, setKey] = useState([1,2,3])
   return (
     <div>
       {key.map((i) => (
         <Li i={i} key={i} />
       ))}
-      <button onClick={() => setKey([3,1,4,5])}>x</button>
+      <button onClick={() => setKey([3,2,1])}>x</button>
     </div>
   )
 }
@@ -77,5 +77,9 @@ function App() {
 function Li(props) {
   return <li>{props.i}</li>
 }
+
+// function Li(props) {
+//   return [<li>{props.i}</li>, <li>{props.i}</li>]
+// }
 
 render(<App />, document.getElementById("root"))

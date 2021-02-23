@@ -40,6 +40,7 @@ export const render = (
 export const dispatchUpdate = (fiber?: IFiber) => {
   if (fiber && !(fiber.tag & OP.DIRTY)) {
     fiber.tag = OP.UPDATE | OP.DIRTY
+    fiber.sibling = null
     scheduleWork(reconcileWork.bind(null, fiber), fiber.time)
   }
 }
@@ -127,7 +128,8 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       if (!map) {
         map = new Map()
         let i = aHead
-        while (i < aTail) map.set(getKey(aCh[i]), i++)
+        let k = getKey(aCh[i])
+        while (i <= aTail) k && map.set(k, i++)
       }
       const key = getKey(bCh[bHead])
       if (map.has(key)) {
@@ -216,12 +218,12 @@ function getKid(fiber) {
 
 const commit = (fiber: IFiber): void => {
   if (!fiber) return
-  let { type, tag, parentNode, node, ref, hooks, after } = fiber
+
+  let { type, tag, parentNode, node, ref } = fiber
   if (isFn(type)) {
+    invokeHooks(fiber)
     let kid = getKid(fiber)
     fiber.node = kid.node
-    invokeHooks(fiber)
-
     if (fiber.tag & OP.REMOVE) {
       kid.tag = OP.REMOVE
       commit(kid)
@@ -229,12 +231,14 @@ const commit = (fiber: IFiber): void => {
       commit(fiber.child)
       commit(fiber.sibling)
     }
+    fiber.tag = 0
     return
   }
   if (tag & OP.REMOVE) {
     kidsRefer(fiber.kids)
     parentNode.removeChild(fiber.node)
     refer(ref, null)
+    fiber.tag = 0
     return
   }
   if (tag & OP.UPDATE) {
