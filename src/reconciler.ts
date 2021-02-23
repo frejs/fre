@@ -235,14 +235,7 @@ const commit = (fiber: IFiber): void => {
     let kid = getKid(fiber)
     fiber.node = kid.node
     if (fiber.tag & OP.REMOVE) {
-      kid.tag = OP.REMOVE
       commit(kid)
-      let s = kid.sibling
-      while (s) {
-        s.tag = OP.REMOVE
-        commit(s)
-        s = s.slibing
-      }
     } else {
       commit(fiber.child)
       commit(fiber.sibling)
