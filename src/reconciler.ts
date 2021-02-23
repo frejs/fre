@@ -208,7 +208,7 @@ function invokeHooks({ hooks, tag }) {
 
 const commit = (fiber: IFiber): void => {
   if (!fiber) return
-  let { type, tag, parentNode, node, ref, after } = fiber
+  let { type, tag, parentNode, node, ref } = fiber
   if (isFn(type)) {
     let kid = fiber
     while (isFn(kid.type)) kid = kid.child
@@ -217,7 +217,9 @@ const commit = (fiber: IFiber): void => {
     if (fiber.tag & OP.REMOVE) {
       kid.tag = OP.REMOVE
       commit(kid)
-    } else commit(fiber.child || fiber.sibling)
+    } else {
+      commit(fiber.child || fiber.sibling)
+    }
     return
   }
   if (tag & OP.REMOVE) {
@@ -230,8 +232,7 @@ const commit = (fiber: IFiber): void => {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (tag & OP.INSERT) {
-    after = after?.node
-    parentNode.insertBefore(fiber.node, after)
+    parentNode.insertBefore(fiber.node, fiber.after?.node)
   }
   fiber.tag = 0
   refer(ref, node)
