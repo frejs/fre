@@ -27,7 +27,8 @@ import { render, useState } from 'fre'
 function App() {
   const [count, setCount] = useState(0)
   return <>
-      <button onClick={() => setCount(count + 1)}>{count}</button>
+      <h1>{count}</h1>
+      <button onClick={() => setCount(count + 1)}>+</button>
     </>
 }
 
