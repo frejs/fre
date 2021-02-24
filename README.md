@@ -22,19 +22,16 @@ yarn add fre
 ```
 
 ```js
-import { h, render, useState } from 'fre'
+import { render, useState } from 'fre'
 
 function App() {
   const [count, setCount] = useState(0)
-  return (
-    <>
-      <h1>{count}</h1>
-      <button onClick={() => setCount(count + 1)}>+</button>
+  return <>
+      <button onClick={() => setCount(count + 1)}>{count}</button>
     </>
-  )
 }
 
-render(<App />, document.getElementById('root'))
+render(<App />, document.body)
 ```
 
 ### Hooks API
