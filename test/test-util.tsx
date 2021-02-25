@@ -1,4 +1,4 @@
-import React, { render, useEffect, useState } from '../src/index'
+import { h, render, useEffect, useState } from '../src/index'
 
 export const testRender = jsx =>
   new Promise(resolve => {

@@ -1,4 +1,5 @@
-import React from '../src/index'
+/** @jsx h */
+import { h } from '../src/index'
 
 test('create JSX node', () => {
   const div = <div/>

@@ -1,4 +1,6 @@
-import React from '../src/index'
+/** @jsx h */
+/** @jsxFrag Fragment */
+import { h, Fragment } from '../src/index'
 import { testRender } from './test-util'
 
 const toString = (elements) => elements.map((child) => child.outerHTML).join('')

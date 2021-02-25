@@ -1,4 +1,5 @@
-import React, { useLayout } from '../src/index'
+/** @jsx h */
+import { h, useLayout } from '../src/index'
 import { testUpdates } from './test-util'
 
 test('useLayout(f, [x]) should run on changes to x', async () => {
