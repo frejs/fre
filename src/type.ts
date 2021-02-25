@@ -24,7 +24,7 @@ export interface FC<P extends Attributes = {}> {
 export interface FreElement<P extends Attributes = any, T = string> {
   type: T
   props: P
-  key: string
+  key: string | number | null
 }
 
 export type HookTypes = 'list' | 'effect' | 'layout'

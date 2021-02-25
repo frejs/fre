@@ -1,5 +1,4 @@
-/** @jsx h */
-import { h, useState } from '../src/index'
+import React, { useState } from '../src/index'
 import { testUpdates } from './test-util'
 
 test('batch updates', async () => {

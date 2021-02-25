@@ -26,7 +26,7 @@ export const enum OP {
 }
 export const render = (
   vnode: FreElement,
-  node: Node,
+  node: Node | null,
   done?: () => void
 ): void => {
   const rootFiber = {

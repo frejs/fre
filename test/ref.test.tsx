@@ -1,5 +1,4 @@
-/** @jsx h */
-import { h, useRef } from '../src/index'
+import React, { useRef } from '../src/index'
 import { testUpdates } from './test-util'
 
 test('persist reference to any value', async () => {
