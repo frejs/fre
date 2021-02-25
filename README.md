@@ -22,7 +22,7 @@ yarn add fre
 ```
 
 ```js
-import { render, useState } from 'fre'
+import React, { render, useState } from 'fre'
 
 function App() {
   const [count, setCount] = useState(0)

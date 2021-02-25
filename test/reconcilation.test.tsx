@@ -1,5 +1,4 @@
-/** @jsx h */
-import { h, useState } from '../src/index'
+import React from '../src/index'
 import { testUpdates } from './test-util'
 
 test('reorder and reuse elements during key-based reconciliation of child-nodes', async () => {

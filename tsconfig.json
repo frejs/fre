@@ -9,9 +9,7 @@
     "sourceMap": false,
     "declaration": true,
     "declarationDir": "dist/types/",
-    "jsx": "react",
-    "jsxFactory": "h",
-    "jsxFragmentFactory": "Fragment"
+    "jsx": "react"
   },
   "exclude": ["node_modules", "dist"],
   "include": ["src"]
