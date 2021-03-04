@@ -15,7 +15,7 @@ export const useReducer = <S, A>(reducer?: Reducer<S, A>, initState?: S): [S, Di
   return [
     hook.length > 0 ? hook[0] : initState,
     (value: A | Dispatch<A>) => {
-      hook[0] = reducer ? reducer(hook[0], value as any) : value
+      hook[0] = reducer ? reducer(hook[0], value as any): isFn(value)? value(hook[0]) : value
       dispatchUpdate(current)
     },
   ]
