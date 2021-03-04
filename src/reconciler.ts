@@ -161,10 +161,10 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     bHead++
   }
   while (aHead <= aTail) {
-    let oldFiber = aCh[aHead]
-    if (oldFiber) {
-      oldFiber.tag = OP.REMOVE
-      deletes.push(oldFiber)
+    let oldKid = aCh[aHead]
+    if (oldKid) {
+      oldKid.tag = OP.REMOVE
+      deletes.push(oldKid)
     }
     aHead++
   }
@@ -214,11 +214,11 @@ function invokeHooks({ hooks, tag }) {
 function wireKid(fiber) {
   let kid = fiber
   while (isFn(kid.type)) kid = kid.child
-  kid.after = fiber.after
+  kid.after = fiber.after || kid.after
   kid.tag |= fiber.tag
   let s = kid.sibling
   while (s) {
-    s.after = fiber.after
+    s.after = fiber.after || s.after
     s.tag |= fiber.tag
     s = s.sibling
   }
@@ -252,6 +252,7 @@ const commit = (fiber: IFiber): void => {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (tag & OP.INSERT) {
+    console.log(fiber.after)
     parentNode.insertBefore(fiber.node, fiber.after?.node)
   }
   fiber.tag = 0

@@ -1,4 +1,4 @@
-import { h, render, useEffect, useState } from "../../src/index"
+import { h, render, useEffect, useState,Fragment } from "../../src/index"
 
 // function App() {
 //   const [key, setKey] = useState([3,1,2])
@@ -62,16 +62,37 @@ import { h, render, useEffect, useState } from "../../src/index"
 //   </div>
 // }
 
-function App() {
-  const [key, setKey] = useState([1,2,3])
+// function App() {
+//   const [key, setKey] = useState([1,2,3,4,5])
+//   return (
+//     <div>
+//       {key.map((i) => (
+//         // <Li i={i} key={i} />
+//         <li key={i} >{i}</li>
+//       ))}
+//       <button onClick={() => setKey([5,3,4])}>x</button>
+//     </div>
+//   )
+// }
+
+export default function App() {
+  const [state, setState] = useState( ["A", "B", "C", "D", "E"]);
+
   return (
-    <div>
-      {key.map((i) => (
-        <Li i={i} key={i} />
-      ))}
-      <button onClick={() => setKey([3,2,5])}>x</button>
-    </div>
-  )
+    <>
+      {state.map((item) => {
+        return <div key={item}>{item}</div>;
+      })}
+
+      <button
+        onClick={() => {
+          setState(["E", "C", "D"] );
+        }}
+      >
+        set
+      </button>
+    </>
+  );
 }
 
 // function Li(props) {
