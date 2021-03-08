@@ -280,15 +280,12 @@ const kidsRefer = (kids: any): void => {
 }
 
 const side = (effects: IEffect[]): void => {
-  effects.forEach(cleanup)
-  effects.forEach(effect)
+  effects.forEach(e => e[2] && e[2]())
+  effects.forEach(e => e[2] = e[0]())
   effects.length = 0
 }
 
 export const getCurrentFiber = () => currentFiber || null
-
-const effect = (e: IEffect): void => (e[2] = e[0]())
-const cleanup = (e: IEffect): void => e[2] && e[2]()
 export const isFn = (x: any): x is Function => typeof x === "function"
 export const isStr = (s: any): s is number | string =>
   typeof s === "number" || typeof s === "string"
