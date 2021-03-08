@@ -203,7 +203,7 @@ const commitWork = (fiber: IFiber): void => {
 function invokeHooks({ hooks, tag }) {
   if (hooks) {
     if (tag & OP.REMOVE) {
-      hooks.list.forEach(cleanup)
+      hooks.list.forEach(e => e[2] && e[2]())
     } else {
       side(hooks.layout)
       schedule(() => side(hooks.effect))
