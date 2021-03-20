@@ -23,6 +23,7 @@ export const enum LANE {
   REMOVE = 1 << 3,
   SVG = 1 << 4,
   DIRTY = 1 << 5,
+  SUSPENSE = 1 << 6
 }
 export const render = (
   vnode: FreElement,
