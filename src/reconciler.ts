@@ -74,10 +74,12 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
     var children = (WIP.type as FC<P>)(WIP.props)
   } catch (e) {
     if (!!e && typeof e.then === 'function') {
-      const suspense = getParent(WIP)
-      children = suspense.props.fallback
-      suspense.laziness = suspense.laziness || []
-      suspense.laziness.push(e)
+      const p = getParent(WIP)
+      if (!p.laziness) {
+        children = p.props.fallback
+        p.laziness = []
+      }
+      p.laziness.push(e)
     } else throw e
   }
   isStr(children) && (children = createText(children as string))
