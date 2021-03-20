@@ -62,10 +62,8 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
       p.suspensers = p.suspensers || []
       p.lane |= LANE.SUSPENSE
       p.suspensers.push(e as any)
-      scheduleWork(reconcileWork.bind(null, p), p.lane)
-    }
+    } else throw e
   }
-
   if (WIP.child) return WIP.child
   while (WIP) {
     if (!finish && WIP.lane & LANE.DIRTY) {
@@ -85,9 +83,6 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
   let children = (WIP.type as FC<P>)(WIP.props)
   if (isStr(children)) {
     children = createText(children as string)
-  }
-  if (isArr(children)) { //TOTO remove filter
-    children = children.filter(i => i != null) as any
   }
   reconcileChildren(WIP, children)
 }
@@ -165,24 +160,30 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       bHead++
     }
   }
+
   const after = bTail <= bCh.length - 1 ? ch[bTail + 1] : next
+
   while (bHead <= bTail) {
     let c = bCh[bHead]
-    c.lane = LANE.INSERT
-    c.after = after
-    c.node = null
+    if (c) {
+      c.lane = LANE.INSERT
+      c.after = after
+      c.node = null
+    }
     bHead++
   }
+
   while (aHead <= aTail) {
-    let oldKid = aCh[aHead]
-    if (oldKid) {
-      oldKid.lane = LANE.REMOVE
-      deletes.push(oldKid)
+    let c = aCh[aHead]
+    if (c) {
+      c.lane = LANE.REMOVE
+      deletes.push(c)
     }
     aHead++
   }
   for (var i = 0, prev = null; i < bCh.length; i++) {
     const child = bCh[i]
+    if (child == null) continue
     child.parent = WIP
     if (i > 0) {
       prev.sibling = child
