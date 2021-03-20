@@ -55,7 +55,7 @@ export interface IFiber<P extends Attributes = any> {
   lane: number
   time: number
   next: IFiber,
-  suspensers: any[]
+  laziness: any[]
 }
 
 export type HTMLElementEx = HTMLElement & { last: IFiber | null }

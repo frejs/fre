@@ -74,9 +74,10 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
     var children = (WIP.type as FC<P>)(WIP.props)
   } catch (e) {
     if (!!e && typeof e.then === 'function') {
-      const suspend = getParent(WIP)
-      children = suspend.props.fallback
-      e.then(() => dispatchUpdate(suspend))
+      const suspense = getParent(WIP)
+      children = suspense.props.fallback
+      suspense.laziness = suspense.laziness || []
+      suspense.laziness.push(e)
     } else throw e
   }
   isStr(children) && (children = createText(children as string))
@@ -216,7 +217,11 @@ const commitWork = (fiber: IFiber): void => {
   finish = null
 }
 
-function invokeHooks({ hooks, lane }) {
+function invokeHooks(fiber) {
+  const { hooks, lane, laziness } = fiber
+  if (laziness) {
+    Promise.all(laziness).then(() => dispatchUpdate(fiber))
+  }
   if (hooks) {
     if (lane & LANE.REMOVE) {
       hooks.list.forEach(e => e[2] && e[2]())
