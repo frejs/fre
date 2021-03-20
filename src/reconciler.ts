@@ -54,7 +54,14 @@ const reconcileWork = (WIP?: IFiber): boolean => {
 }
 
 const reconcile = (WIP: IFiber): IFiber | undefined => {
-  isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
+  try {
+    isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
+  } catch (e) {
+    if (!!e && typeof e.then === 'function') {
+      // for lazy component
+      console.log(WIP)
+    }
+  }
 
   if (WIP.child) return WIP.child
   while (WIP) {
