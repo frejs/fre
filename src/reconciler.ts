@@ -12,6 +12,7 @@ import { createElement, updateElement } from "./dom"
 import { resetCursor } from "./hooks"
 import { scheduleWork, shouldYield, schedule } from "./scheduler"
 import { isArr, createText } from "./h"
+import { lazy } from "./suspense"
 
 let currentFiber: IFiber
 let finish = null
@@ -54,16 +55,7 @@ const reconcileWork = (WIP?: IFiber): boolean => {
 }
 
 const reconcile = (WIP: IFiber): IFiber | undefined => {
-  try {
-    isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
-  } catch (e) {
-    if (!!e && typeof e.then === 'function') {
-      const p = WIP.parent // TOTO find nearist preant
-      p.suspensers = p.suspensers || []
-      p.lane |= LANE.SUSPENSE
-      p.suspensers.push(e as any)
-    } else throw e
-  }
+  isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
   while (WIP) {
     if (!finish && WIP.lane & LANE.DIRTY) {
@@ -80,7 +72,14 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
   if (WIP.lastProps === WIP.props) return
   currentFiber = WIP
   resetCursor()
-  let children = (WIP.type as FC<P>)(WIP.props)
+  try {
+    var children = (WIP.type as FC<P>)(WIP.props)
+  } catch (e) {
+    if (!!e && typeof e.then === 'function') {
+      WIP.lane |= LANE.SUSPENSE
+      children = '' as any // make a text node placeholder
+    } else throw e
+  }
   if (isStr(children)) {
     children = createText(children as string)
   }
@@ -227,9 +226,7 @@ function invokeHooks({ hooks, lane }) {
 
 function wireKid(fiber) {
   let kid = fiber
-  while (isFn(kid.type)) {
-    kid = kid.child
-  }
+  while (isFn(kid.type)) kid = kid.child
   const after = fiber.after || kid.after
   kid.after = after
   kid.lane |= fiber.lane
