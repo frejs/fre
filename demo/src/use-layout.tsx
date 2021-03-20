@@ -4,7 +4,7 @@ function App() {
     const [count, setCount] = useState(0)
     return (
       <div>
-        {count < 5 && <A count={count < 1 ? count : 2} />}
+        {count < 5 && <A count={count} />}
         <h1>{count}</h1>
         <button onClick={() => setCount(count + 1)}>+</button>
       </div>
@@ -12,7 +12,7 @@ function App() {
   }
   
   function A(props) {
-      useLayoutEffect(() => {
+    useEffect(() => {
         console.log(333)
         return () => {
           console.log(444)

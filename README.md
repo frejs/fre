@@ -13,7 +13,7 @@
 
 - **Highly-optimized algorithm** — Fre has a better reconciliation algorithm, which traverses from both ends with O (n) complexity, and supports keyed.
 
-- **Do more with less** — After tree shaking, project of hello world is only 2KB, but it has most features, virtual DOM, hooks API, functional component and more.
+- **Do more with less** — After tree shaking, project of hello world is only 2KB, but it has most features, virtual DOM, hooks API, Fragment and more.
 
 ### Use
 
@@ -22,19 +22,17 @@ yarn add fre
 ```
 
 ```js
-import { h, render, useState } from 'fre'
+import { render, useState } from 'fre'
 
 function App() {
   const [count, setCount] = useState(0)
-  return (
-    <>
+  return <>
       <h1>{count}</h1>
       <button onClick={() => setCount(count + 1)}>+</button>
     </>
-  )
 }
 
-render(<App />, document.getElementById('root'))
+render(<App />, document.body)
 ```
 
 ### Hooks API

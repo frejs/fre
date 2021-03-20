@@ -3,6 +3,7 @@ import { h, useLayout } from '../src/index'
 import { testUpdates } from './test-util'
 
 test('useLayout(f, [x]) should run on changes to x', async () => {
+  console.log(123)
   let effects = []
 
   const effect = value => {
@@ -49,6 +50,7 @@ test('useLayout(f, [x]) should run on changes to x', async () => {
 })
 
 test('useEffect(f, []) should run only once', async () => {
+  console.log(456)
   let effects = []
 
   const effect = () => {
@@ -89,6 +91,7 @@ test('useEffect(f, []) should run only once', async () => {
 })
 
 test('useLayout(f) should run every time', async () => {
+  console.log(789)
   let effects = []
 
   const effect = value => {
