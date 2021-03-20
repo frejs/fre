@@ -23,8 +23,7 @@ export const enum LANE {
   INSERT = 1 << 2,
   REMOVE = 1 << 3,
   SVG = 1 << 4,
-  DIRTY = 1 << 5,
-  SUSPENSE = 1 << 6
+  DIRTY = 1 << 5
 }
 export const render = (
   vnode: FreElement,
@@ -69,15 +68,14 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
 }
 
 const updateHook = <P = Attributes>(WIP: IFiber): void => {
-  if (WIP.lastProps === WIP.props) return
   currentFiber = WIP
   resetCursor()
   try {
     var children = (WIP.type as FC<P>)(WIP.props)
   } catch (e) {
     if (!!e && typeof e.then === 'function') {
-      WIP.lane |= LANE.SUSPENSE
-      children = '' as any // make a text node placeholder
+      children = WIP.parent.props.fallback // make a text node placeholder
+      e.then(() => dispatchUpdate(WIP.parent))
     } else throw e
   }
   if (isStr(children)) {

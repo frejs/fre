@@ -19,5 +19,5 @@ export function lazy(loader) {
 }
 
 export function Suspense(props) {
-  return [props.fallback, props.children]
+  return props.children
 }
