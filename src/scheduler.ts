@@ -7,10 +7,10 @@ let deadline: number = 0
 
 export const schedule = (cb) => unit.push(cb) === 1 && postMessage()
 
-export const scheduleWork = (callback: ITaskCallback, time: number): void => {
+export const scheduleWork = (callback: ITaskCallback, lane: number): void => {
   const job = {
     callback,
-    time,
+    lane,
   }
   queue.push(job)
   schedule(flushWork)
@@ -49,4 +49,4 @@ export const shouldYield = (): boolean => {
 
 export const getTime = () => performance.now()
 
-const sortAndPeek = (queue: ITask[]) => queue.sort((a, b) => a.time - b.time)[0]
+const sortAndPeek = (queue: ITask[]) => queue[0]

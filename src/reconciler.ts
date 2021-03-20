@@ -10,7 +10,7 @@ import {
 } from "./type"
 import { createElement, updateElement } from "./dom"
 import { resetCursor } from "./hooks"
-import { scheduleWork, shouldYield, schedule, getTime } from "./scheduler"
+import { scheduleWork, shouldYield, schedule } from "./scheduler"
 import { isArr, createText } from "./h"
 
 let currentFiber: IFiber
@@ -42,7 +42,7 @@ export const dispatchUpdate = (fiber?: IFiber) => {
   if (fiber && !(fiber.lane & LANE.DIRTY)) {
     fiber.lane = LANE.UPDATE | LANE.DIRTY
     fiber.sibling = null
-    scheduleWork(reconcileWork.bind(null, fiber), fiber.time)
+    scheduleWork(reconcileWork.bind(null, fiber), fiber.lane)
   }
 }
 
@@ -61,7 +61,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
       const p = WIP.parent // TOTO find nearist preant
       p.suspensers = p.suspensers || []
       p.suspensers.push(e as any)
-      scheduleWork(reconcileWork.bind(null, p), p.time)
+      scheduleWork(reconcileWork.bind(null, p), p.lane)
     }
   }
 
@@ -81,9 +81,7 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
   if (WIP.lastProps === WIP.props) return
   currentFiber = WIP
   resetCursor()
-  let start = getTime()
   let children = (WIP.type as FC<P>)(WIP.props)
-  WIP.time = getTime() - start
   if (isStr(children)) {
     children = createText(children as string)
   }
