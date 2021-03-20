@@ -76,8 +76,8 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
     if (!!e && typeof e.then === 'function') {
       const p = getParent(WIP)
       if (!p.laziness) {
-        children = p.props.fallback
         p.laziness = []
+        children = p.props.fallback
       }
       p.laziness.push(e)
     } else throw e
