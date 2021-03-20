@@ -60,6 +60,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
     if (!!e && typeof e.then === 'function') {
       const p = WIP.parent // TOTO find nearist preant
       p.suspensers = p.suspensers || []
+      p.lane |= LANE.SUSPENSE
       p.suspensers.push(e as any)
       scheduleWork(reconcileWork.bind(null, p), p.lane)
     }
@@ -262,7 +263,6 @@ const commit = (fiber: IFiber): void => {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (lane & LANE.INSERT) {
-    console.log(fiber)
     parentNode.insertBefore(fiber.node, fiber.after?.node)
   }
   fiber.lane = 0

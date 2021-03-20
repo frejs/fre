@@ -19,5 +19,6 @@ export function lazy(loader) {
 }
 
 export function Suspense(props) {
+  console.log(123)
   return props.fallback
 }
