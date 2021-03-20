@@ -9,7 +9,7 @@
 <a href="https://bundlephobia.com/result?p=fre"><img src="http://img.badgesize.io/https://unpkg.com/fre/dist/fre.js?compression=brotli&label=brotli" alt="brotli"></a>
 </p>
 
-- **Concurrent with Fiber** — This is an amazing idea, which implements the coroutine scheduler in JavaScript, and the rendering is asynchronous, which supports Time slicing and suspense components.
+- **Concurrent with Fiber** — This is an amazing idea, which implements the coroutine scheduler in JavaScript, and the rendering is asynchronous, which supports Time slicing and Suspense.
 
 - **Highly-optimized algorithm** — Fre has a better reconciliation algorithm, which traverses from both ends with O (n) complexity, and supports keyed.
 
@@ -190,6 +190,21 @@ function App() {
   return flag && <span ref={t}>I will removed</span>
 }
 ```
+
+### Suspense
+
+This is another feature of concurrent rendering, which can achieve asynchronous refresh without the aid of state.
+
+```js
+const LazyComponent = lazy(Component)
+
+function App() {
+  return <Suspense fallback={<div>Loading...</div>}>
+    <LazyComponent/>
+  </Suspense>
+}
+```
+
 
 ### jsx2
 
