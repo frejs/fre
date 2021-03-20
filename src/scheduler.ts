@@ -40,7 +40,6 @@ const flushWork = (): void => {
     }
     job = sortAndPeek(queue)
   }
-  console.log(job)
   job && schedule(flushWork)
 }
 

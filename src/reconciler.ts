@@ -86,6 +86,9 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
   if (isStr(children)) {
     children = createText(children as string)
   }
+  if (isArr(children)) { //TOTO remove filter
+    children = children.filter(i => i != null) as any
+  }
   reconcileChildren(WIP, children)
 }
 
@@ -101,7 +104,6 @@ const updateHost = (WIP: IFiber): void => {
   if (!WIP.node) {
     if (WIP.type === "svg") WIP.lane |= LANE.SVG
     WIP.node = createElement(WIP) as HTMLElementEx
-
   }
   reconcileChildren(WIP, WIP.props.children)
 }
@@ -224,12 +226,15 @@ function invokeHooks({ hooks, lane }) {
 
 function wireKid(fiber) {
   let kid = fiber
-  while (isFn(kid.type)) kid = kid.child
-  kid.after = fiber.after || kid.after
+  while (isFn(kid.type)) {
+    kid = kid.child
+  }
+  const after = fiber.after || kid.after
+  kid.after = after
   kid.lane |= fiber.lane
   let s = kid.sibling
   while (s) {
-    s.after = fiber.after || s.after
+    s.after = after
     s.lane |= fiber.lane
     s = s.sibling
   }
