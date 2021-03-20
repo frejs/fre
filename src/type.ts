@@ -52,9 +52,10 @@ export interface IFiber<P extends Attributes = any> {
   lastProps: P
   after: any
   props: P
-  tag: number
+  lane: number
   time: number
-  next: IFiber
+  next: IFiber,
+  laziness: any[]
 }
 
 export type HTMLElementEx = HTMLElement & { last: IFiber | null }
@@ -77,7 +78,7 @@ export type ITaskCallback = ((time: boolean) => boolean) | null
 
 export interface ITask {
   callback?: ITaskCallback
-  time: number
+  lane: number
 }
 
 export type DOM = HTMLElement | SVGElement

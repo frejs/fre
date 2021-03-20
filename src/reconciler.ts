@@ -10,19 +10,20 @@ import {
 } from "./type"
 import { createElement, updateElement } from "./dom"
 import { resetCursor } from "./hooks"
-import { scheduleWork, shouldYield, schedule, getTime } from "./scheduler"
+import { scheduleWork, shouldYield, schedule } from "./scheduler"
 import { isArr, createText } from "./h"
+import { lazy } from "./suspense"
 
 let currentFiber: IFiber
 let finish = null
 let deletes = []
 
-export const enum OP {
+export const enum LANE {
   UPDATE = 1 << 1,
   INSERT = 1 << 2,
   REMOVE = 1 << 3,
   SVG = 1 << 4,
-  DIRTY = 1 << 5,
+  DIRTY = 1 << 5
 }
 export const render = (
   vnode: FreElement,
@@ -38,10 +39,10 @@ export const render = (
 }
 
 export const dispatchUpdate = (fiber?: IFiber) => {
-  if (fiber && !(fiber.tag & OP.DIRTY)) {
-    fiber.tag = OP.UPDATE | OP.DIRTY
+  if (fiber && !(fiber.lane & LANE.DIRTY)) {
+    fiber.lane = LANE.UPDATE | LANE.DIRTY
     fiber.sibling = null
-    scheduleWork(reconcileWork.bind(null, fiber), fiber.time)
+    scheduleWork(reconcileWork.bind(null, fiber), fiber.lane)
   }
 }
 
@@ -54,12 +55,11 @@ const reconcileWork = (WIP?: IFiber): boolean => {
 
 const reconcile = (WIP: IFiber): IFiber | undefined => {
   isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
-
   if (WIP.child) return WIP.child
   while (WIP) {
-    if (!finish && WIP.tag & OP.DIRTY) {
+    if (!finish && WIP.lane & LANE.DIRTY) {
       finish = WIP
-      WIP.tag &= ~OP.DIRTY
+      WIP.lane &= ~LANE.DIRTY
       return null
     }
     if (WIP.sibling) return WIP.sibling
@@ -68,15 +68,21 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
 }
 
 const updateHook = <P = Attributes>(WIP: IFiber): void => {
-  if (WIP.lastProps === WIP.props) return
   currentFiber = WIP
   resetCursor()
-  let start = getTime()
-  let children = (WIP.type as FC<P>)(WIP.props)
-  WIP.time = getTime() - start
-  if (isStr(children)) {
-    children = createText(children as string)
+  try {
+    var children = (WIP.type as FC<P>)(WIP.props)
+  } catch (e) {
+    if (!!e && typeof e.then === 'function') {
+      const p = getParent(WIP)
+      if (!p.laziness) {
+        children = p.props.fallback
+        p.laziness = []
+      }
+      p.laziness.push(e)
+    } else throw e
   }
+  isStr(children) && (children = createText(children as string))
   reconcileChildren(WIP, children)
 }
 
@@ -86,10 +92,17 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
   }
 }
 
+const getParent = (WIP: IFiber): IFiber | undefined => {
+  while ((WIP = WIP.parent)) {
+    if (isFn(WIP.type)) return WIP
+  }
+}
+
 const updateHost = (WIP: IFiber): void => {
   WIP.parentNode = getParentNode(WIP) as any
+
   if (!WIP.node) {
-    if (WIP.type === "svg") WIP.tag |= OP.SVG
+    if (WIP.type === "svg") WIP.lane |= LANE.SVG
     WIP.node = createElement(WIP) as HTMLElementEx
   }
   reconcileChildren(WIP, WIP.props.children)
@@ -115,14 +128,14 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     } else if (same(aCh[aHead], bCh[bHead])) {
       c = bCh[bHead]
       clone(c, aCh[aHead])
-      c.tag = OP.UPDATE
+      c.lane = LANE.UPDATE
       ch[bHead] = c
       aHead++
       bHead++
     } else if (same(aCh[aTail], bCh[bTail])) {
       c = bCh[bTail]
       clone(c, aCh[aTail])
-      c.tag = OP.UPDATE
+      c.lane = LANE.UPDATE
       ch[bTail] = c
       aTail--
       bTail--
@@ -139,42 +152,48 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
         const oldKid = aCh[map.get(key)]
         c = bCh[bHead]
         clone(c, oldKid)
-        c.tag = OP.INSERT
+        c.lane = LANE.INSERT
         c.after = aCh[aHead]
         ch[bHead] = c
         aCh[map.get(key)] = null
       } else {
         c = bCh[bHead]
-        c.tag = OP.INSERT
+        c.lane = LANE.INSERT
         c.node = null
         c.after = aCh[aHead]
       }
       bHead++
     }
   }
+
   const after = bTail <= bCh.length - 1 ? ch[bTail + 1] : next
+
   while (bHead <= bTail) {
     let c = bCh[bHead]
-    c.tag = OP.INSERT
-    c.after = after
-    c.node = null
+    if (c) {
+      c.lane = LANE.INSERT
+      c.after = after
+      c.node = null
+    }
     bHead++
   }
+
   while (aHead <= aTail) {
-    let oldKid = aCh[aHead]
-    if (oldKid) {
-      oldKid.tag = OP.REMOVE
-      deletes.push(oldKid)
+    let c = aCh[aHead]
+    if (c) {
+      c.lane = LANE.REMOVE
+      deletes.push(c)
     }
     aHead++
   }
   for (var i = 0, prev = null; i < bCh.length; i++) {
     const child = bCh[i]
+    if (child == null) continue
     child.parent = WIP
     if (i > 0) {
       prev.sibling = child
     } else {
-      if (WIP.tag & OP.SVG) child.tag |= OP.SVG
+      if (WIP.lane & LANE.SVG) child.lane |= LANE.SVG
       WIP.child = child
     }
     prev = child
@@ -200,9 +219,13 @@ const commitWork = (fiber: IFiber): void => {
   finish = null
 }
 
-function invokeHooks({ hooks, tag }) {
+function invokeHooks(fiber) {
+  const { hooks, lane, laziness } = fiber
+  if (laziness) {
+    Promise.all(laziness).then(() => dispatchUpdate(fiber))
+  }
   if (hooks) {
-    if (tag & OP.REMOVE) {
+    if (lane & LANE.REMOVE) {
       hooks.list.forEach(e => e[2] && e[2]())
     } else {
       side(hooks.layout)
@@ -214,12 +237,13 @@ function invokeHooks({ hooks, tag }) {
 function wireKid(fiber) {
   let kid = fiber
   while (isFn(kid.type)) kid = kid.child
-  kid.after = fiber.after || kid.after
-  kid.tag |= fiber.tag
+  const after = fiber.after || kid.after
+  kid.after = after
+  kid.lane |= fiber.lane
   let s = kid.sibling
   while (s) {
-    s.after = fiber.after || s.after
-    s.tag |= fiber.tag
+    s.after = after
+    s.lane |= fiber.lane
     s = s.sibling
   }
   return kid
@@ -227,34 +251,34 @@ function wireKid(fiber) {
 
 const commit = (fiber: IFiber): void => {
   if (!fiber) return
-  let { type, tag, parentNode, node, ref } = fiber
+  let { type, lane, parentNode, node, ref } = fiber
   if (isFn(type)) {
     invokeHooks(fiber)
     let kid = wireKid(fiber)
     fiber.node = kid.node
-    if (fiber.tag & OP.REMOVE) {
+    if (fiber.lane & LANE.REMOVE) {
       commit(kid)
     } else {
       commit(fiber.child)
       commit(fiber.sibling)
     }
-    fiber.tag = 0
+    fiber.lane = 0
     return
   }
-  if (tag & OP.REMOVE) {
+  if (lane & LANE.REMOVE) {
     kidsRefer(fiber.kids)
     parentNode.removeChild(fiber.node)
     refer(ref, null)
-    fiber.tag = 0
+    fiber.lane = 0
     return
   }
-  if (tag & OP.UPDATE) {
+  if (lane & LANE.UPDATE) {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
-  if (tag & OP.INSERT) {
+  if (lane & LANE.INSERT) {
     parentNode.insertBefore(fiber.node, fiber.after?.node)
   }
-  fiber.tag = 0
+  fiber.lane = 0
   refer(ref, node)
   commit(fiber.child)
   commit(fiber.sibling)
