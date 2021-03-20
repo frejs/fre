@@ -17,7 +17,7 @@ let currentFiber: IFiber
 let finish = null
 let deletes = []
 
-export const enum OP {
+export const enum LANE {
   UPDATE = 1 << 1,
   INSERT = 1 << 2,
   REMOVE = 1 << 3,
@@ -38,8 +38,8 @@ export const render = (
 }
 
 export const dispatchUpdate = (fiber?: IFiber) => {
-  if (fiber && !(fiber.tag & OP.DIRTY)) {
-    fiber.tag = OP.UPDATE | OP.DIRTY
+  if (fiber && !(fiber.lane & LANE.DIRTY)) {
+    fiber.lane = LANE.UPDATE | LANE.DIRTY
     fiber.sibling = null
     scheduleWork(reconcileWork.bind(null, fiber), fiber.time)
   }
@@ -57,9 +57,9 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
 
   if (WIP.child) return WIP.child
   while (WIP) {
-    if (!finish && WIP.tag & OP.DIRTY) {
+    if (!finish && WIP.lane & LANE.DIRTY) {
       finish = WIP
-      WIP.tag &= ~OP.DIRTY
+      WIP.lane &= ~LANE.DIRTY
       return null
     }
     if (WIP.sibling) return WIP.sibling
@@ -89,7 +89,7 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
 const updateHost = (WIP: IFiber): void => {
   WIP.parentNode = getParentNode(WIP) as any
   if (!WIP.node) {
-    if (WIP.type === "svg") WIP.tag |= OP.SVG
+    if (WIP.type === "svg") WIP.lane |= LANE.SVG
     WIP.node = createElement(WIP) as HTMLElementEx
   }
   reconcileChildren(WIP, WIP.props.children)
@@ -115,14 +115,14 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     } else if (same(aCh[aHead], bCh[bHead])) {
       c = bCh[bHead]
       clone(c, aCh[aHead])
-      c.tag = OP.UPDATE
+      c.lane = LANE.UPDATE
       ch[bHead] = c
       aHead++
       bHead++
     } else if (same(aCh[aTail], bCh[bTail])) {
       c = bCh[bTail]
       clone(c, aCh[aTail])
-      c.tag = OP.UPDATE
+      c.lane = LANE.UPDATE
       ch[bTail] = c
       aTail--
       bTail--
@@ -139,13 +139,13 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
         const oldKid = aCh[map.get(key)]
         c = bCh[bHead]
         clone(c, oldKid)
-        c.tag = OP.INSERT
+        c.lane = LANE.INSERT
         c.after = aCh[aHead]
         ch[bHead] = c
         aCh[map.get(key)] = null
       } else {
         c = bCh[bHead]
-        c.tag = OP.INSERT
+        c.lane = LANE.INSERT
         c.node = null
         c.after = aCh[aHead]
       }
@@ -155,7 +155,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
   const after = bTail <= bCh.length - 1 ? ch[bTail + 1] : next
   while (bHead <= bTail) {
     let c = bCh[bHead]
-    c.tag = OP.INSERT
+    c.lane = LANE.INSERT
     c.after = after
     c.node = null
     bHead++
@@ -163,7 +163,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
   while (aHead <= aTail) {
     let oldKid = aCh[aHead]
     if (oldKid) {
-      oldKid.tag = OP.REMOVE
+      oldKid.lane = LANE.REMOVE
       deletes.push(oldKid)
     }
     aHead++
@@ -174,7 +174,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     if (i > 0) {
       prev.sibling = child
     } else {
-      if (WIP.tag & OP.SVG) child.tag |= OP.SVG
+      if (WIP.lane & LANE.SVG) child.lane |= LANE.SVG
       WIP.child = child
     }
     prev = child
@@ -200,9 +200,9 @@ const commitWork = (fiber: IFiber): void => {
   finish = null
 }
 
-function invokeHooks({ hooks, tag }) {
+function invokeHooks({ hooks, lane }) {
   if (hooks) {
-    if (tag & OP.REMOVE) {
+    if (lane & LANE.REMOVE) {
       hooks.list.forEach(e => e[2] && e[2]())
     } else {
       side(hooks.layout)
@@ -215,11 +215,11 @@ function wireKid(fiber) {
   let kid = fiber
   while (isFn(kid.type)) kid = kid.child
   kid.after = fiber.after || kid.after
-  kid.tag |= fiber.tag
+  kid.lane |= fiber.lane
   let s = kid.sibling
   while (s) {
     s.after = fiber.after || s.after
-    s.tag |= fiber.tag
+    s.lane |= fiber.lane
     s = s.sibling
   }
   return kid
@@ -227,34 +227,34 @@ function wireKid(fiber) {
 
 const commit = (fiber: IFiber): void => {
   if (!fiber) return
-  let { type, tag, parentNode, node, ref } = fiber
+  let { type, lane, parentNode, node, ref } = fiber
   if (isFn(type)) {
     invokeHooks(fiber)
     let kid = wireKid(fiber)
     fiber.node = kid.node
-    if (fiber.tag & OP.REMOVE) {
+    if (fiber.lane & LANE.REMOVE) {
       commit(kid)
     } else {
       commit(fiber.child)
       commit(fiber.sibling)
     }
-    fiber.tag = 0
+    fiber.lane = 0
     return
   }
-  if (tag & OP.REMOVE) {
+  if (lane & LANE.REMOVE) {
     kidsRefer(fiber.kids)
     parentNode.removeChild(fiber.node)
     refer(ref, null)
-    fiber.tag = 0
+    fiber.lane = 0
     return
   }
-  if (tag & OP.UPDATE) {
+  if (lane & LANE.UPDATE) {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
-  if (tag & OP.INSERT) {
+  if (lane & LANE.INSERT) {
     parentNode.insertBefore(fiber.node, fiber.after?.node)
   }
-  fiber.tag = 0
+  fiber.lane = 0
   refer(ref, node)
   commit(fiber.child)
   commit(fiber.sibling)

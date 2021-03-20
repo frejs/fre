@@ -52,7 +52,7 @@ export interface IFiber<P extends Attributes = any> {
   lastProps: P
   after: any
   props: P
-  tag: number
+  lane: number
   time: number
   next: IFiber
 }
