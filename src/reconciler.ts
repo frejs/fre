@@ -74,19 +74,24 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
     var children = (WIP.type as FC<P>)(WIP.props)
   } catch (e) {
     if (!!e && typeof e.then === 'function') {
-      children = WIP.parent.props.fallback // make a text node placeholder
-      e.then(() => dispatchUpdate(WIP.parent))
+      const suspend = getParent(WIP)
+      children = suspend.props.fallback
+      e.then(() => dispatchUpdate(suspend))
     } else throw e
   }
-  if (isStr(children)) {
-    children = createText(children as string)
-  }
+  isStr(children) && (children = createText(children as string))
   reconcileChildren(WIP, children)
 }
 
 const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
   while ((WIP = WIP.parent)) {
     if (!isFn(WIP.type)) return WIP.node
+  }
+}
+
+const getParent = (WIP: IFiber): IFiber | undefined => {
+  while ((WIP = WIP.parent)) {
+    if (isFn(WIP.type)) return WIP
   }
 }
 
