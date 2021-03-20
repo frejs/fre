@@ -1,6 +1,4 @@
 import { h } from './h'
-import { dispatchUpdate, isFn, getCurrentFiber, LANE } from './reconciler'
-
 
 export function lazy(loader) {
   let p
@@ -14,7 +12,6 @@ export function lazy(loader) {
         e => (err = e)
       )
     }
-
     if (err) throw err
     if (!comp) throw p
     return h(comp, props)
@@ -22,6 +19,5 @@ export function lazy(loader) {
 }
 
 export function Suspense(props) {
-  const current = getCurrentFiber()
   return props.fallback
 }

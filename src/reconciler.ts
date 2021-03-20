@@ -58,8 +58,10 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
     isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
   } catch (e) {
     if (!!e && typeof e.then === 'function') {
-      // for lazy component
-      console.log(WIP)
+      const p = WIP.parent // TOTO find nearist preant
+      p.suspensers = p.suspensers || []
+      p.suspensers.push(e as any)
+      scheduleWork(reconcileWork.bind(null, p), p.time)
     }
   }
 

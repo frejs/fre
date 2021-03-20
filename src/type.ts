@@ -54,7 +54,8 @@ export interface IFiber<P extends Attributes = any> {
   props: P
   lane: number
   time: number
-  next: IFiber
+  next: IFiber,
+  suspensers: any[]
 }
 
 export type HTMLElementEx = HTMLElement & { last: IFiber | null }
