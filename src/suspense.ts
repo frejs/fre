@@ -23,5 +23,5 @@ export function lazy(loader) {
 
 export function Suspense(props) {
   const current = getCurrentFiber()
-  return [props.children, (current.lane & LANE.SUSPENSE) && props.fallback]
+  return props.fallback
 }
