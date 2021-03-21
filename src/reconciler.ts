@@ -12,7 +12,6 @@ import { createElement, updateElement } from "./dom"
 import { resetCursor } from "./hooks"
 import { scheduleWork, shouldYield, schedule } from "./scheduler"
 import { isArr, createText } from "./h"
-import { lazy } from "./suspense"
 
 let currentFiber: IFiber
 let finish = null
