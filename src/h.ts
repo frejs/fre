@@ -8,7 +8,7 @@ export const h = function <P extends Attributes = {}>(type: FC<P>, attrs: P): Pa
   const key = props.key || null
   const ref = props.ref || null
 
-  let children: FreNode[] = []
+  let children: FreNode[] = props.children as any || []
   let simple = ''
   const len = arguments.length
   for (let i = 2; i < len; i++) {
@@ -23,10 +23,11 @@ export const h = function <P extends Attributes = {}>(type: FC<P>, attrs: P): Pa
       simple = ''
     }
     if (!str) children.push(vnode)
-    // flat the nested array
-    while (children.some((v) => isArr(v))) {
-      children = [].concat(...children)
-    }
+  }
+
+  // flat the nested array
+  while (children.some((v) => isArr(v))) {
+    children = [].concat(...children)
   }
 
   if (children.length) {

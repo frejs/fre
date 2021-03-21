@@ -94,7 +94,7 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
 
 const getParent = (WIP: IFiber): IFiber | undefined => {
   while ((WIP = WIP.parent)) {
-    if (isFn(WIP.type)) return WIP
+    if ((WIP.type as any).name === 'Suspense') return WIP
   }
 }
 
