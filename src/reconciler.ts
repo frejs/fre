@@ -221,7 +221,10 @@ const commitWork = (fiber: IFiber): void => {
 function invokeHooks(fiber) {
   const { hooks, lane, laziness } = fiber
   if (laziness) {
-    Promise.all(laziness).then(() => dispatchUpdate(fiber))
+    Promise.all(laziness).then(() => {
+      fiber.laziness=null
+      dispatchUpdate(fiber)
+    })
   }
   if (hooks) {
     if (lane & LANE.REMOVE) {
