@@ -41,7 +41,7 @@ export const dispatchUpdate = (fiber?: IFiber) => {
   if (fiber && !(fiber.lane & LANE.DIRTY)) {
     fiber.lane = LANE.UPDATE | LANE.DIRTY
     fiber.sibling = null
-    scheduleWork(reconcileWork.bind(null, fiber), fiber.lane)
+    scheduleWork(reconcileWork as any, fiber)
   }
 }
 
