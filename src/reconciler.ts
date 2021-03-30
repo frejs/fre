@@ -22,7 +22,7 @@ export const enum LANE {
   INSERT = 1 << 2,
   REMOVE = 1 << 3,
   SVG = 1 << 4,
-  DIRTY = 1 << 5
+  DIRTY = 1 << 5,
 }
 export const render = (
   vnode: FreElement,
@@ -72,7 +72,7 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
   try {
     var children = (WIP.type as FC<P>)(WIP.props)
   } catch (e) {
-    if (!!e && typeof e.then === 'function') {
+    if (!!e && typeof e.then === "function") {
       const p = getParent(WIP)
       if (!p.laziness) {
         p.laziness = []
@@ -93,7 +93,7 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
 
 const getParent = (WIP: IFiber): IFiber | undefined => {
   while ((WIP = WIP.parent)) {
-    if ((WIP.type as any).name === 'Suspense') return WIP
+    if ((WIP.type as any).name === "Suspense") return WIP
   }
 }
 
@@ -222,13 +222,13 @@ function invokeHooks(fiber) {
   const { hooks, lane, laziness } = fiber
   if (laziness) {
     Promise.all(laziness).then(() => {
-      fiber.laziness=null
+      fiber.laziness = null
       dispatchUpdate(fiber)
     })
   }
   if (hooks) {
     if (lane & LANE.REMOVE) {
-      hooks.list.forEach(e => e[2] && e[2]())
+      hooks.list.forEach((e) => e[2] && e[2]())
     } else {
       side(hooks.layout)
       schedule(() => side(hooks.effect))
@@ -238,7 +238,7 @@ function invokeHooks(fiber) {
 
 function wireKid(fiber) {
   let kid = fiber
-  while (isFn(kid.type)) kid = kid.child
+  while (isFn(kid.type) && kid.child) kid = kid.child
   const after = fiber.after || kid.after
   kid.after = after
   kid.lane |= fiber.lane
@@ -305,8 +305,8 @@ const kidsRefer = (kids: any): void => {
 }
 
 const side = (effects: IEffect[]): void => {
-  effects.forEach(e => e[2] && e[2]())
-  effects.forEach(e => e[2] = e[0]())
+  effects.forEach((e) => e[2] && e[2]())
+  effects.forEach((e) => (e[2] = e[0]()))
   effects.length = 0
 }
 

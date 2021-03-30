@@ -1,11 +1,11 @@
-import { h, render, useEffect, useState } from "../../src/index"
+import { h, render, useEffect, useState,Fragment } from "../../src/index"
 
 function App() {
   const [count, setCount] = useState(0)
   const [two, setTwo] = useState(0)
-  console.log(count, two)
   return (
-    <div>
+    <>
+      <Nil/>
       <button
         onClick={() =>
           setCount((c) => {
@@ -16,8 +16,12 @@ function App() {
         {count}
       </button>
       <button onClick={() => setTwo(two + 1)} style="color:#2ef">{two}</button>
-    </div>
+    </>
   )
+}
+
+function Nil(){
+  return <></>
 }
 
 render(<App />, document.body)
