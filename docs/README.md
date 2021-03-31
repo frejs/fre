@@ -35,7 +35,7 @@ render(<App />, document.body)
 export default () => {
   const [count, setCount] = useState(0)
   return html`<button
-    style="background: rgb(189 30 104);padding: 5px;color: #fff;"
+    style="background: rgb(189 30 104);padding: 10px 50px;color: #fff;"
     onClick=${() => setCount(count + 1)}
   >
     ${count}
