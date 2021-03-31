@@ -9,36 +9,37 @@
 // import { render } from "react-dom";
 
 // // fre:
-import { render, h, useState, useEffect, useRef } from '../../src'
-
+import { render, h, useState, useEffect, useRef } from "../../src"
 
 const Wrapper = () => {
   const [showApp, setShowApp] = useState(true)
 
-  useEffect(()=>{
+  useEffect(() => {
     setTimeout(() => {
       setShowApp(false)
     }, 2000)
-  },[])
+  }, [])
 
-  const p = dom => {
+  const p = (dom) => {
     if (dom) {
+      console.log(dom)
     } else {
       console.log(111)
     }
   }
-  const c = dom => {
+  const c = (dom) => {
     if (dom) {
       console.log(dom)
     } else {
       console.log(222)
     }
   }
-  console.log(showApp)
 
-  return showApp ? <div ref={p}>
-    <p ref={c}>before</p>
-  </div> : <p>App removed...</p>
+  return (
+    <div>
+      {showApp ? <div ref={p}>111</div> : <div ref={c}>App removed...</div>}
+    </div>
+  )
 }
 
-render(<Wrapper />, document.getElementById('root'))
+render(<Wrapper />, document.getElementById("root"))
