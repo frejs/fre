@@ -6,7 +6,7 @@ function handleRequest(request) {
       <meta http-equiv="X-UA-Compatible" content="IE=edge" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>Fre doc</title>
-      <link rel="stylesheet" href="https://fre.js.org/fre/docup.min.css">
+      <link rel="stylesheet" href="https://fre.js.org/docup.min.css">
       <script src="https://fre.js.org/docup.fre.min.js"></script>
       <style>
           :root{
