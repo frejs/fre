@@ -1,14 +1,8 @@
-<p align="center"><img src="https://files.imgdb.cn/tuchuang/2021/01/02/5ff036463ffa7d37b36a6e80.png" alt="fre logo" width="130"></p>
-<h1 align="center">Fre</h1>
-<p align="center">👻 Tiny Concurrent UI library with Fiber.</p>
-<p align="center">
-<a href="https://github.com/yisar/fre/actions"><img src="https://img.shields.io/github/workflow/status/yisar/fre/main.svg" alt="Build Status"></a>
-<a href="https://codecov.io/gh/yisar/fre"><img src="https://img.shields.io/codecov/c/github/yisar/fre.svg" alt="Code Coverage"></a>
-<a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/v/fre.svg" alt="npm-v"></a>
-<a href="https://npmjs.com/package/fre"><img src="https://img.shields.io/npm/dt/fre.svg" alt="npm-d"></a>
-<a href="https://bundlephobia.com/result?p=fre"><img src="http://img.badgesize.io/https://unpkg.com/fre/dist/fre.js?compression=brotli&label=brotli" alt="brotli"></a>
-</p>
+<div style="font-size:2rem;">
 
+**Fre** is a Tiny Javascript framework with Fiber.
+
+</div>
 - **Concurrent with Fiber** — This is an amazing idea, which implements the coroutine scheduler in JavaScript, and the rendering is asynchronous, which supports Time slicing and Suspense.
 
 - **Highly-optimized algorithm** — Fre has a better reconciliation algorithm, which traverses from both ends with O (n) complexity, and supports keyed.
