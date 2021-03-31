@@ -52,18 +52,15 @@ render(<App />, document.body)
 
 You can use it many times, new state is available when component is rerender
 
-```fre
-function App() {
-  const [up, setUp] = useState(0)
-  const [down, setDown] = useState(0)
-  return (
-    <>
-      <h1>{up}</h1>
-      <button onClick={() => setUp(up + 1)}>+</button>
-      <h1>{down}</h1>
-      <button onClick={() => setDown(down - 1)}>-</button>
-    </>
-  )
+```js fre
+export default () => {
+  const [count, setCount] = useState(0)
+  return html`<button
+    style="width:100px;background:#ccc;padding:5px"
+    onClick=${() => setCount(count + 1)}
+  >
+    ${count}
+  </button>`
 }
 ```
 
