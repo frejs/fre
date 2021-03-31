@@ -29,6 +29,7 @@ const Wrapper = () => {
   }
   const c = dom => {
     if (dom) {
+      console.log(dom)
     } else {
       console.log(222)
     }

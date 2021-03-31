@@ -36,6 +36,7 @@ export const h = function <P extends Attributes = {}>(type: FC<P>, attrs: P): Pa
   }
   // delete them to reduce loop performance
   delete props.key
+  delete props.ref
 
   return { type, props, key, ref } as Partial<IFiber>
 }
