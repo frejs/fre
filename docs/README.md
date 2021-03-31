@@ -15,7 +15,7 @@
 
 - **Do more with less** — After tree shaking, project of hello world is only 2KB, but it has most features, virtual DOM, hooks API, Fragment and more.
 
-# Use
+## Use
 
 ```shell
 yarn add fre
@@ -35,7 +35,7 @@ function App() {
 render(<App />, document.body)
 ```
 
-# Hooks API
+## Hooks API
 
 - [useState](https://github.com/yisar/fre#usestate)
 
@@ -51,7 +51,7 @@ render(<App />, document.body)
 
 - [useRef](https://github.com/yisar/fre#useref)
 
-## useState
+### useState
 
 `useState` is a base API, It will receive initial state and return an Array
 
@@ -72,7 +72,7 @@ function App() {
 }
 ```
 
-## useReducer
+### useReducer
 
 `useReducer` and `useState` are almost the same，but `useReducer` needs a global reducer
 
@@ -98,7 +98,7 @@ function App() {
 }
 ```
 
-## useEffect
+### useEffect
 
 It is the execution and cleanup of effects, which is represented by the second parameter
 
@@ -134,7 +134,7 @@ useEffect(() => {
 }, [])
 ```
 
-## useLayout
+### useLayout
 
 More like useEffect, but useLayout is sync and blocking UI.
 
@@ -144,7 +144,7 @@ useLayout(() => {
 }, [flag])
 ```
 
-## useMemo
+### useMemo
 
 `useMemo` has the same rules as `useEffect`, but `useMemo` will return a cached value.
 
@@ -152,7 +152,7 @@ useLayout(() => {
 const memo = (c) => (props) => useMemo(() => c, [Object.values(props)])
 ```
 
-## useCallback
+### useCallback
 
 `useCallback` is based `useMemo`, it will return a cached function.
 
@@ -162,7 +162,7 @@ const cb = useCallback(() => {
 }, [])
 ```
 
-## useRef
+### useRef
 
 `useRef` will return a function or an object.
 
@@ -191,7 +191,7 @@ function App() {
 }
 ```
 
-# Suspense
+## Suspense
 
 This is another feature of concurrent rendering, which can achieve asynchronous refresh without the aid of state.
 
@@ -206,7 +206,7 @@ function App() {
 ```
 
 
-# jsx2
+## jsx2
 
 ```js
 plugins: [
@@ -220,7 +220,7 @@ plugins: [
 ]
 ```
 
-# Compare with other frameworks
+## Compare with other frameworks
 
 The comparison is difficult because the roadmap and trade-offs of each framework are different, but we have to do so.
 
@@ -243,6 +243,6 @@ The reconciliation algorithm of fre is similar to vue, but the biggest differenc
 | vue3      | ×          | ★★★★★                   | 30kb        |
 | preactX   | ×          | ★★★★                    | 4kb         |
 
-# License
+## License
 
 MIT @yisar
