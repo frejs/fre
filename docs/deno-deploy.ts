@@ -1,4 +1,7 @@
 function handleRequest(request) {
+  const { pathname } = new URL(request.url)
+  console.log(pathname)
+
   return new Response(
     `<html lang="en">
     <head>
@@ -29,7 +32,6 @@ function handleRequest(request) {
         docup.init({
           title: "Fre",
           highlightLanguages: ["nginx"],
-          indexFile:"https://fre.js.org/README.md",
           props: {
             langs: {},
           },
