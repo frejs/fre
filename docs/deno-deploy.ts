@@ -29,6 +29,7 @@ function handleRequest(request) {
         docup.init({
           title: "Fre",
           highlightLanguages: ["nginx"],
+          indexFile:"https://fre.js.org/README.md",
           props: {
             langs: {},
           },
