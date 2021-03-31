@@ -1,9 +1,8 @@
-<div style="font-size:2rem;">
+<div style="font-size:1rem;">
 
 **Fre** is a Tiny Javascript framework with Fiber.
 
 </div>
-
 - **Concurrent with Fiber** — This is an amazing idea, which implements the coroutine scheduler in JavaScript, and the rendering is asynchronous, which supports Time slicing and Suspense.
 
 - **Highly-optimized algorithm** — Fre has a better reconciliation algorithm, which traverses from both ends with O (n) complexity, and supports keyed.
@@ -17,17 +16,31 @@ yarn add fre
 ```
 
 ```js
-import { render, useState } from 'fre'
+import { render, useState } from "fre"
 
 function App() {
   const [count, setCount] = useState(0)
-  return <>
+  return (
+    <>
       <h1>{count}</h1>
       <button onClick={() => setCount(count + 1)}>+</button>
     </>
+  )
 }
 
 render(<App />, document.body)
+```
+
+```js fre
+export default () => {
+  const [count, setCount] = useState(0)
+  return html`<button
+    style="background: rgb(189 30 104);padding: 5px;color: #fff;"
+    onClick=${() => setCount(count + 1)}
+  >
+    ${count}
+  </button>`
+}
 ```
 
 ## Hooks API
@@ -52,15 +65,18 @@ render(<App />, document.body)
 
 You can use it many times, new state is available when component is rerender
 
-```js fre
-export default () => {
-  const [count, setCount] = useState(0)
-  return html`<button
-    style="width:100px;background:#ccc;padding:5px"
-    onClick=${() => setCount(count + 1)}
-  >
-    ${count}
-  </button>`
+```js
+function App() {
+  const [up, setUp] = useState(0)
+  const [down, setDown] = useState(0)
+  return (
+    <>
+      <h1>{up}</h1>
+      <button onClick={() => setUp(up + 1)}>+</button>
+      <h1>{down}</h1>
+      <button onClick={() => setDown(down - 1)}>-</button>
+    </>
+  )
 }
 ```
 
@@ -71,9 +87,9 @@ export default () => {
 ```js
 function reducer(state, action) {
   switch (action.type) {
-    case 'up':
+    case "up":
       return { count: state.count + 1 }
-    case 'down':
+    case "down":
       return { count: state.count - 1 }
   }
 }
@@ -83,8 +99,8 @@ function App() {
   return (
     <>
       {state.count}
-      <button onClick={() => dispatch({ type: 'up' })}>+</button>
-      <button onClick={() => dispatch({ type: 'down' })}>-</button>
+      <button onClick={() => dispatch({ type: "up" })}>+</button>
+      <button onClick={() => dispatch({ type: "down" })}>-</button>
     </>
   )
 }
@@ -104,7 +120,7 @@ useEffect(f, [x])  //  effect (and clean-up) when property x changes in a compon
 function App({ flag }) {
   const [count, setCount] = useState(0)
   useEffect(() => {
-    document.title = 'count is ' + count
+    document.title = "count is " + count
   }, [flag])
   return (
     <>
@@ -119,7 +135,7 @@ If it returns a function, the function can do cleanups:
 
 ```js
 useEffect(() => {
-  document.title = 'count is ' + count
+  document.title = "count is " + count
   return () => {
     store.unsubscribe()
   }
@@ -132,7 +148,7 @@ More like useEffect, but useLayout is sync and blocking UI.
 
 ```js
 useLayout(() => {
-  document.title = 'count is ' + count
+  document.title = "count is " + count
 }, [flag])
 ```
 
@@ -150,7 +166,7 @@ const memo = (c) => (props) => useMemo(() => c, [Object.values(props)])
 
 ```js
 const cb = useCallback(() => {
-  console.log('cb was cached')
+  console.log("cb was cached")
 }, [])
 ```
 
@@ -191,22 +207,23 @@ This is another feature of concurrent rendering, which can achieve asynchronous 
 const LazyComponent = lazy(Component)
 
 function App() {
-  return <Suspense fallback={<div>Loading...</div>}>
-    <LazyComponent/>
-  </Suspense>
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LazyComponent />
+    </Suspense>
+  )
 }
 ```
-
 
 ## jsx2
 
 ```js
 plugins: [
   [
-    '@babel/plugin-transform-react-jsx',
+    "@babel/plugin-transform-react-jsx",
     {
-      runtime: 'automatic',
-      importSource: 'fre',
+      runtime: "automatic",
+      importSource: "fre",
     },
   ],
 ]
