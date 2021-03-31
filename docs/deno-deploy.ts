@@ -1,6 +1,11 @@
 function handleRequest(request) {
   const { pathname } = new URL(request.url)
-  console.log(pathname)
+  if(pathname === '/README.md'){
+      fetch('https://fre.js.org/README.md').then(res=>{
+          console.log(res)
+          
+      })
+  }
 
   return new Response(
     `<html lang="en">
