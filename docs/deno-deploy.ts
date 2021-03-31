@@ -1,10 +1,17 @@
 function handleRequest(request) {
   const { pathname } = new URL(request.url)
   if (pathname === "/README.md") {
-    fetch("https://fre.js.org/README.md").then((res) => res.text())
-    .then((data) => {
-        console.log(data)
-    })
+    fetch("https://fre.js.org/README.md")
+      .then((res) => res.text())
+      .then((data) => {
+        return new Response(data, {
+          status: 200,
+          headers: {
+            server: "denosr",
+            "content-type": "text/plain",
+          },
+        })
+      })
   }
 
   return new Response(
