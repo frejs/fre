@@ -28,15 +28,15 @@ function index() {
           <link rel="stylesheet" href="/docup.min.css">
           <script src="/docup.fre.min.js"></script>
           <style>
-              :root{
-                  --navbar-bg: #3e2e98;
-                  --navlink-hover-bg: #28127e;
-                  --sidebar-bg: #f0f4ff;
-                  --sidebar-menu-item-active-fg: #80092f;
-                  --code-span-bg: #ffecfc;
-                  --content-link-fg: rgb(189 30 104);
-                  --code-block-bg: #302b38;
-              }
+          :root{
+            --navbar-bg: #3e2e98;
+            --navlink-hover-bg: #28127e;
+            --sidebar-bg: #f0f4ff;
+            --sidebar-menu-item-active-fg: #bd1e68;
+            --code-span-bg: #ffecfc;
+            --content-link-fg: #bd1e68;
+            --code-block-bg: #302b38;
+        }
               .content ul{
                   list-style-position: outside;
                   margin-left: 1.25rem;
