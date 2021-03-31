@@ -31,6 +31,8 @@ function App() {
 render(<App />, document.body)
 ```
 
+### Output
+
 ```js fre
 export default () => {
   const [count, setCount] = useState(0)
