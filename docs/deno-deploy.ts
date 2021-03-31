@@ -1,10 +1,10 @@
 function handleRequest(request) {
   const { pathname } = new URL(request.url)
-  if(pathname === '/README.md'){
-      fetch('https://fre.js.org/README.md').then(res=>{
-          console.log(res)
-          
-      })
+  if (pathname === "/README.md") {
+    fetch("https://fre.js.org/README.md").then((res) => res.json())
+    .then((data) => {
+        console.log(data)
+    })
   }
 
   return new Response(
