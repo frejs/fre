@@ -6,8 +6,8 @@ function handleRequest(request) {
       <meta http-equiv="X-UA-Compatible" content="IE=edge" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>Fre doc</title>
-      <link rel="stylesheet" href="https://yisar.github.io/fre/docup.min.css">
-      <script src="https://yisar.github.io/fre/docup.fre.min.js"></script>
+      <link rel="stylesheet" href="https://fre.js.org/fre/docup.min.css">
+      <script src="https://fre.js.org/docup.fre.min.js"></script>
       <style>
           :root{
               --navbar-bg: #3e2e98;
