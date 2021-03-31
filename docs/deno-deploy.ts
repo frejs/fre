@@ -3,7 +3,7 @@ async function handleRequest(request) {
 
   if (pathname === "/") {
     return index()
-  } else if(pathname[0] === '/'){
+  } else if (pathname[0] === "/") {
     const data = await fetch(`https://fre.js.org${pathname}`)
       .then((res) => res.text())
       .then((data) => data)
@@ -25,8 +25,8 @@ function index() {
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <title>Fre doc</title>
-          <link rel="stylesheet" href="https://fre.js.org/docup.min.css">
-          <script src="https://fre.js.org/docup.fre.min.js"></script>
+          <link rel="stylesheet" href="/docup.min.css">
+          <script src="/docup.fre.min.js"></script>
           <style>
               :root{
                   --navbar-bg: #3e2e98;
