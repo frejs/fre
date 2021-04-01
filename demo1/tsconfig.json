@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "commonjs",
+    "strict": false,
+    "jsx": "react",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment",
+    "rootDir": "./src",
+    "incremental": true,
+    "experimentalDecorators": true,
+    "lib": ["dom", "es2015"],
+  }
+}
