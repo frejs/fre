@@ -1,21 +1,32 @@
 async function handleRequest(request) {
-  let { pathname } = new URL(request.url)
+  const { pathname } = new URL(request.url)
+  if (pathname === "/") {
+    return index()
+  } else if (pathname[0] === "/") {
+    const data = await fetch(
+      `https://raw.githubusercontent.com/yisar/fre/master/docs/${pathname}`
+    )
+      .then((res) => res.text())
+      .then((data) => data)
+    return new Response(data, {
+      status: 200,
+      headers: {
+        server: "denosr",
+        "content-type": "text/plain",
+      },
+    })
+  }
+}
 
-  pathname = pathname === "/" || pathname === "/zh"  ? "/index.html" : pathname
-
+async function index() {
   const data = await fetch(
-    `https://raw.githubusercontent.com/yisar/fre/master/docs/${pathname}`
+    `https://raw.githubusercontent.com/yisar/fre/master/docs/index.html`
   )
     .then((res) => res.text())
     .then((data) => data)
   return new Response(data, {
-    status: 200,
     headers: {
-      server: "denosr",
-      "content-type":
-        pathname === "/index.html"
-          ? "text/html; charset=UTF-8"
-          : "text/plain",
+      "content-type": "text/html; charset=UTF-8",
     },
   })
 }
