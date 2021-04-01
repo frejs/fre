@@ -10,9 +10,11 @@ After tree shaking, project of hello world is only 2KB, but it has most features
 yarn add fre
 ```
 
-### via Vite
+### Via Vite
 
-We recommend that you use vite + fre, [here](https://github.com/richajak/vite-fre) is a template.
+We recommend that you use [vite](https://github.com/vitejs/vite) to develop and build fre projects.
+
+[richajak/vite-fre](https://github.com/richajak/vite-fre) is a template, [wcastand/esm-fre](https://github.com/wcastand/esm-fre) is another one.
 
 ```js
 import { render, useState } from "fre"
