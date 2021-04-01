@@ -1,6 +1,6 @@
 async function handleRequest(request) {
   const { pathname } = new URL(request.url)
-  if (pathname === "/") {
+  if (pathname === "/" || pathname === '/zh') {
     return index()
   } else if (pathname[0] === "/") {
     const data = await fetch(
