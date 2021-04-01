@@ -251,6 +251,6 @@ The reconciliation algorithm of fre is similar to vue, but the biggest differenc
 
 ## License
 
-MIT @yisar Fre is inspired by many libraries, pay our respects to them
+MIT @yisar 
 
-[react](https://github.com/facebook/react) [snabbdom](https://github.com/snabbdom/snabbdom) [preact](https://github.com/preactjs/preact) [anu](https://github.com/RubyLouvre/anu)
+Fre is inspired by many libraries, pay our respects to them: [react](https://github.com/facebook/react) [snabbdom](https://github.com/snabbdom/snabbdom) [preact](https://github.com/preactjs/preact) [anu](https://github.com/RubyLouvre/anu)
