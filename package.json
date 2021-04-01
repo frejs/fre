@@ -25,12 +25,9 @@
   ],
   "scripts": {
     "test": "jest --coverage",
-    "ref": "jest ./test/ref.test.tsx",
     "build": "rollup -c && gzip-size dist/fre.js",
-    "build:compat": "rollup --config compat/rollup.config.js",
     "dev": "rollup -c --watch",
     "prepublishOnly": "yarn build",
-    "effect":"jest ./test/ref.test.tsx"
   },
   "description": "Tiny Concurrent UI library with Fiber.",
   "keywords": [
