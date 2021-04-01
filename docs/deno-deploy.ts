@@ -12,7 +12,9 @@ async function handleRequest(request) {
       status: 200,
       headers: {
         server: "denosr",
-        "content-type": "text/plain",
+        "content-type": pathname.includes(".css")
+          ? "text/css; charset=utf-8"
+          : "text/plain",
       },
     })
   }
