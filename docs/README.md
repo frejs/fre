@@ -212,7 +212,7 @@ function App() {
 }
 ```
 
-## jsx2
+## New JSX transform
 
 ```js
 plugins: [
