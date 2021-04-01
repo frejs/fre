@@ -1,14 +1,8 @@
-<div style="font-size:1rem;">
+**Fre** is a Tiny Javascript framework with Fiber. It implements the coroutine scheduler in JavaScript, and the rendering is asynchronous, which supports Time slicing and Suspense.
 
-**Fre** is a Tiny Javascript framework with Fiber.
+It also has a better reconciliation algorithm, which traverses from both ends with O (n) complexity, and supports keyed.
 
-</div>
-
-- **Concurrent with Fiber** — This is an amazing idea, which implements the coroutine scheduler in JavaScript, and the rendering is asynchronous, which supports Time slicing and Suspense.
-
-- **Highly-optimized algorithm** — Fre has a better reconciliation algorithm, which traverses from both ends with O (n) complexity, and supports keyed.
-
-- **Do more with less** — After tree shaking, project of hello world is only 2KB, but it has most features, virtual DOM, hooks API, Fragment and more.
+After tree shaking, project of hello world is only 2KB, but it has most features, virtual DOM, hooks API, Fragment and more.
 
 ## Quick start
 
