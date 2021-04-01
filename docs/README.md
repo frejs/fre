@@ -16,6 +16,8 @@ We recommend that you use [vite](https://github.com/vitejs/vite) to develop and 
 
 [-richajak/vite-fre-](https://github.com/richajak/vite-fre) is a template, [-wcastand/esm-fre-](https://github.com/wcastand/esm-fre) is another one.
 
+### Usage
+
 ```js
 import { render, useState } from "fre"
 
