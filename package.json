@@ -27,7 +27,7 @@
     "test": "jest --coverage",
     "build": "rollup -c && gzip-size dist/fre.js",
     "dev": "rollup -c --watch",
-    "prepublishOnly": "yarn build",
+    "prepublishOnly": "yarn build"
   },
   "description": "Tiny Concurrent UI library with Fiber.",
   "keywords": [
