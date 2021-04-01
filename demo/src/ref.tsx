@@ -1,5 +1,3 @@
-/** @jsx h */
-
 // // preact:
 // import { render, createElement as h } from "preact/compat";
 // import { useState, useEffect } from "preact/hooks";
@@ -9,7 +7,7 @@
 // import { render } from "react-dom";
 
 // // fre:
-import { render, h, useState, useEffect, useRef } from "../../src"
+import { render, useState, useEffect, useRef } from "../../src"
 
 const Wrapper = () => {
   const [showApp, setShowApp] = useState(true)
