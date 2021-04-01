@@ -1,7 +1,7 @@
 async function handleRequest(request) {
   let { pathname } = new URL(request.url)
 
-  pathname = pathname === "/" ? "/index.html" : pathname
+  pathname = pathname === "/" || pathname === "/zh"  ? "/index.html" : pathname
 
   const data = await fetch(
     `https://raw.githubusercontent.com/yisar/fre/master/docs/${pathname}`
@@ -13,7 +13,7 @@ async function handleRequest(request) {
     headers: {
       server: "denosr",
       "content-type":
-        pathname === "/" || pathname === "/zh"
+        pathname === "/index.html"
           ? "text/html; charset=UTF-8"
           : "text/plain",
     },
