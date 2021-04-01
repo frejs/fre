@@ -14,7 +14,7 @@ yarn add fre
 
 We recommend that you use [vite](https://github.com/vitejs/vite) to develop and build fre projects.
 
-[richajak/vite-fre](https://github.com/richajak/vite-fre) is a template, [wcastand/esm-fre](https://github.com/wcastand/esm-fre) is another one.
+[-richajak/vite-fre-](https://github.com/richajak/vite-fre) is a template, [-wcastand/esm-fre-](https://github.com/wcastand/esm-fre) is another one.
 
 ```js
 import { render, useState } from "fre"
