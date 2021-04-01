@@ -45,36 +45,32 @@ function index() {
         </head>
         <body>
           <script>
-            docup.init({
-              title: "Fre",
-              highlightLanguages: ["nginx"],
-              props: {
-                langs: {},
-              },
-              navLinks: [
-                {
-                  text: "Guide",
-                  link: "#guide",
-                },
-                {
-                  text: "API",
-                  link: "#api",
-                },
-                {
-                  text: "Resources",
-                  link: "#resources",
-                },
-                {
-                  text: "GitHub",
-                  link: "https://github.com/yisar/fre",
-                },
-                {
-                  text: "Donate",
-                  link: "https://github.com/sponsors/yisar",
-                },
-              ],
-            })
-          </script>
+      docup.init({
+        title: "Fre",
+        highlightLanguages: ["nginx"],
+        props: {
+          langs: {},
+        },
+        navLinks: [
+          {
+            text: "Guide",
+            link: "#guide",
+          },
+          {
+            text: "API",
+            link: "#api",
+          },
+          {
+            text: "中文",
+            link: "/zh",
+          },
+          {
+            text: "GitHub",
+            link: "https://github.com/yisar/fre",
+          },
+        ],
+      })
+    </script>
         </body>
       </html>
       `,
