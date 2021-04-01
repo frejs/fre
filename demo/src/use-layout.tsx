@@ -1,4 +1,4 @@
-import { h, render, useState, useEffect, useLayoutEffect } from '../../src'
+import { render, useState, useEffect, useLayoutEffect } from '../../src/index'
 
 function App() {
     const [count, setCount] = useState(0)
@@ -12,7 +12,7 @@ function App() {
   }
   
   function A(props) {
-    useEffect(() => {
+    useLayoutEffect(() => {
         console.log(333)
         return () => {
           console.log(444)

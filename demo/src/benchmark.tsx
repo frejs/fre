@@ -1,4 +1,4 @@
-import { h, render, useReducer, useMemo, useEffect } from "../../src"
+import { render, useReducer, useMemo, useEffect } from "../../src/index"
 
 var startTime
 var lastMeasure
