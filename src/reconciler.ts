@@ -115,9 +115,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     aTail = aCh.length - 1,
     bTail = bCh.length - 1,
     map = null,
-    ch = Array(bCh.length),
-    next = WIP.sibling?.node ? WIP.sibling : null
-
+    ch = Array(bCh.length)
   while (aHead <= aTail && bHead <= bTail) {
     let c = null
     if (aCh[aHead] == null) {
@@ -165,7 +163,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     }
   }
 
-  const after = bTail <= bCh.length - 1 ? ch[bTail + 1] : next
+  const after = ch[bTail + 1]
 
   while (bHead <= bTail) {
     let c = bCh[bHead]
