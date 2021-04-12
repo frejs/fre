@@ -11,14 +11,10 @@ export const updateElement = <P extends Attributes>(
     let newValue = newProps[name]
 
     if (oldValue === newValue || name === "children") {
-    } else if (name === "style") {
-      if (isStr(newValue)) {
-        dom.setAttribute(name, newValue)
-      } else {
-        for (const k in { ...oldValue, ...newValue }) {
-          if (!(oldValue && newValue && oldValue[k] === newValue[k])) {
-            ;(dom as any)[name][k] = newValue?.[k] || ""
-          }
+    } else if (name === "style" && !isStr(newValue)) {
+      for (const k in { ...oldValue, ...newValue }) {
+        if (!(oldValue && newValue && oldValue[k] === newValue[k])) {
+          ;(dom as any)[name][k] = newValue?.[k] || ""
         }
       }
     } else if (name[0] === "o" && name[1] === "n") {
@@ -26,7 +22,8 @@ export const updateElement = <P extends Attributes>(
       if (oldValue) dom.removeEventListener(name, oldValue)
       dom.addEventListener(name, newValue)
     } else if (name in dom && !(dom instanceof SVGElement)) {
-      ;(dom as any)[name] = JSON.parse(newValue)
+      console.log(newValue)
+      ;(dom as any)[name] = newValue||''
     } else if (newValue == null || newValue === false) {
       dom.removeAttribute(name)
     } else {

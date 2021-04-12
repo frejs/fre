@@ -1,3 +1,5 @@
+
+
 **Fre** is a Tiny Javascript framework with Fiber. It implements the coroutine scheduler in JavaScript, and the rendering is asynchronous, which supports Time slicing and Suspense.
 
 It also has a better reconciliation algorithm, which traverses from both ends with O (n) complexity, and supports keyed.
@@ -50,19 +52,19 @@ export default () => {
 
 ## Hooks API
 
-- [useState](https://github.com/yisar/fre#usestate)
+- [useState](#usestate)
 
-- [useEffect](https://github.com/yisar/fre#useeffect)
+- [useEffect](#useeffect)
 
-- [useReducer](https://github.com/yisar/fre#usereducer)
+- [useReducer](#usereducer)
 
-- [useLayout](https://github.com/yisar/fre#uselayout)
+- [useLayout](uselayout)
 
-- [useCallback](https://github.com/yisar/fre#usecallback)
+- [useCallback](usecallback)
 
-- [useMemo](https://github.com/yisar/fre#usememo)
+- [useMemo](usememo)
 
-- [useRef](https://github.com/yisar/fre#useref)
+- [useRef](useref)
 
 ### useState
 
