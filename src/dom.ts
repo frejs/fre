@@ -22,7 +22,6 @@ export const updateElement = <P extends Attributes>(
       if (oldValue) dom.removeEventListener(name, oldValue)
       dom.addEventListener(name, newValue)
     } else if (name in dom && !(dom instanceof SVGElement)) {
-      console.log(newValue)
       ;(dom as any)[name] = newValue||''
     } else if (newValue == null || newValue === false) {
       dom.removeAttribute(name)

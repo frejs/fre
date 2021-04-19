@@ -75,18 +75,18 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
   try {
     var children = (WIP.type as FC<P>)(WIP.props)
   } catch (e) {
-    const p = getBoundary(WIP)
+    const then = typeof e?.then === 'function'
+    const p = getBoundary(WIP, then ? LANE.Suspense : LANE.Error)
     const fb = isFn(p.props.fallback) ? p.props.fallback(e) : p.props.fallback
-    if ((p.type as any).lane & LANE.Suspense) {
+    if (!p) throw e
+    if (then) {
       if (!p.laziness) {
         p.laziness = []
         children = fb
       }
       p.laziness.push(e)
-    } else if ((p.type as any).lane & LANE.Error) {
-      children = fb
     } else {
-      throw e
+      children = fb
     }
   }
   isStr(children) && (children = createText(children as string))
@@ -99,9 +99,9 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
   }
 }
 
-const getBoundary = (WIP: IFiber): IFiber | undefined => {
+const getBoundary = (WIP: IFiber, boundary): IFiber | undefined => {
   while ((WIP = WIP.parent)) {
-    if ((WIP.type as any).lane & LANE.Boundary) return WIP
+    if ((WIP.type as any).lane & boundary) return WIP
   }
 }
 
@@ -193,7 +193,6 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
   }
   for (var i = 0, prev = null; i < bCh.length; i++) {
     const child = bCh[i]
-    if (child == null) continue
     child.parent = WIP
     if (i > 0) {
       prev.sibling = child
