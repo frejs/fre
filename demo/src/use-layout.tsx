@@ -21,4 +21,4 @@ function App() {
     return <div>{props.count}</div>
   }
   
-  render(<App />, document.body)
+  render(<App />, document.getElementById('app'))

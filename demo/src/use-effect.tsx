@@ -59,7 +59,7 @@ function App() {
   )
 }
 
-render(<App />, document.body)
+render(<App />, document.getElementById('app'))
 
 // useEffect.js:10 111
 // useEffect.js:13 222

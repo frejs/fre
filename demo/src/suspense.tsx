@@ -19,4 +19,4 @@ function App() {
   </Suspense>
 }
 
-render(<App />, document.getElementById('root'))
+render(<App />, document.getElementById('app'))

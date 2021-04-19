@@ -244,4 +244,4 @@ const Main = () => {
   )
 }
 
-render(<Main />, document.getElementById("root"))
+render(<Main />, document.getElementById("app"))

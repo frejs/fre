@@ -18,4 +18,4 @@ function App() {
     </div>
   )
 }
-render(<App />, document.body)
+render(<App />, document.getElementById('app'))

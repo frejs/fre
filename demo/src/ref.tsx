@@ -40,4 +40,4 @@ const Wrapper = () => {
   )
 }
 
-render(<Wrapper />, document.getElementById("root"))
+render(<Wrapper />, document.getElementById("app"))

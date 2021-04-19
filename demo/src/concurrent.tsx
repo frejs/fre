@@ -37,7 +37,7 @@ const SlowComponent = ({ value }) => {
   return <li className="slow">{value}</li>
 }
 
-const root = document.getElementById('root')
+const app = document.getElementById('app')
 let div = document.createElement('div')
 div.innerHTML = `<style>
 body {
@@ -296,7 +296,7 @@ ul.solarsystem li.jupiter {
 </ul>
 </div>`
 
-document.body.insertBefore(div, root)
-render(<App />, root)
-// const root = createRoot(document.getElementById('root'))
-// root.render(<App />)
+document.body.insertBefore(div, app)
+render(<App />, app)
+// const app = createapp(document.getElementById('app'))
+// app.render(<App />)

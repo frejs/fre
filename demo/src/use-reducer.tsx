@@ -30,4 +30,4 @@ function Counter() {
   )
 }
 
-render(<Counter />, document.getElementById('root'))
+render(<Counter />, document.getElementById('app'))

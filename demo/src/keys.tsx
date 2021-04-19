@@ -103,4 +103,4 @@ function Li(props) {
   return [<li>{props.i}</li>, <li>{props.i}</li>]
 }
 
-render(<App />, document.getElementById("root"))
+render(<App />, document.getElementById("app"))
