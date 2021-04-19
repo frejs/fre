@@ -1,4 +1,4 @@
-<p align="center"><img src="https://files.imgdb.cn/tuchuang/2021/01/02/5ff036463ffa7d37b36a6e80.png" alt="fre logo" width="130"></p>
+<p align="center"><img src="https://img.imgdb.cn/item/5ff036463ffa7d37b36a6e80.png" alt="fre logo" width="130"></p>
 <h1 align="center">Fre</h1>
 <p align="center">👻 Tiny Concurrent UI library with Fiber.</p>
 <p align="center">
@@ -202,6 +202,22 @@ function App() {
   return <Suspense fallback={<div>Loading...</div>}>
     <LazyComponent/>
   </Suspense>
+}
+```
+
+### ErrorBoundary
+
+Similar to Suspense is ErrorBoundary, where rendering can fallback when errors are caught.
+
+```js
+
+function App() {
+  return <ErrorBoundary fallback={(error)=>{
+    console.error(error)
+    return 'error'
+  }}>
+    <LazyComponent/>
+  </ErrorBoundary>
 }
 ```
 
