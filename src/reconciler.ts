@@ -9,7 +9,7 @@ import {
   IEffect,
 } from "./type"
 import { createElement, updateElement } from "./dom"
-import { resetCursor } from "./hooks"
+import { resetCursor } from "./hook"
 import { scheduleWork, shouldYield, schedule } from "./scheduler"
 import { isArr, createText } from "./h"
 
@@ -23,6 +23,9 @@ export const enum LANE {
   REMOVE = 1 << 3,
   SVG = 1 << 4,
   DIRTY = 1 << 5,
+  Suspense = 1 << 6,
+  Error = 1 << 7,
+  Boundary = Suspense | Error
 }
 export const render = (
   vnode: FreElement,
@@ -72,14 +75,19 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
   try {
     var children = (WIP.type as FC<P>)(WIP.props)
   } catch (e) {
-    if (!!e && typeof e.then === "function") {
-      const p = getParent(WIP)
+    const p = getBoundary(WIP)
+    const fb = isFn(p.props.fallback) ? p.props.fallback(e) : p.props.fallback
+    if ((p.type as any).lane & LANE.Suspense) {
       if (!p.laziness) {
         p.laziness = []
-        children = p.props.fallback
+        children = fb
       }
       p.laziness.push(e)
-    } else throw e
+    } else if ((p.type as any).lane & LANE.Error) {
+      children = fb
+    } else {
+      throw e
+    }
   }
   isStr(children) && (children = createText(children as string))
   reconcileChildren(WIP, children)
@@ -91,9 +99,9 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
   }
 }
 
-const getParent = (WIP: IFiber): IFiber | undefined => {
+const getBoundary = (WIP: IFiber): IFiber | undefined => {
   while ((WIP = WIP.parent)) {
-    if ((WIP.type as any).name === "Suspense") return WIP
+    if ((WIP.type as any).lane & LANE.Boundary) return WIP
   }
 }
 

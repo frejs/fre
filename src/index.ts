@@ -9,7 +9,7 @@ export {
   useRef,
   useLayout,
   useLayout as useLayoutEffect,
-} from "./hooks"
+} from "./hook"
 export { shouldYield } from "./scheduler"
-export { lazy, Suspense } from "./boundary"
+export { lazy, Suspense, ErrorBoundary } from "./boundary"
 export * from "./type"
