@@ -78,7 +78,7 @@ export type ITaskCallback = ((time: boolean) => boolean) | null
 
 export interface ITask {
   callback?: ITaskCallback
-  lane: number
+  fiber: IFiber
 }
 
 export type DOM = HTMLElement | SVGElement

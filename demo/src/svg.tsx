@@ -1,4 +1,4 @@
-import { h, render, useState } from '../../src'
+import { render, useState } from '../../src/index'
 
 function App() {
   const [flag, setFlag] = useState(true)

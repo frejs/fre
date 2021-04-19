@@ -22,7 +22,7 @@ export const enum LANE {
   INSERT = 1 << 2,
   REMOVE = 1 << 3,
   SVG = 1 << 4,
-  DIRTY = 1 << 5
+  DIRTY = 1 << 5,
 }
 export const render = (
   vnode: FreElement,
@@ -41,7 +41,7 @@ export const dispatchUpdate = (fiber?: IFiber) => {
   if (fiber && !(fiber.lane & LANE.DIRTY)) {
     fiber.lane = LANE.UPDATE | LANE.DIRTY
     fiber.sibling = null
-    scheduleWork(reconcileWork.bind(null, fiber), fiber.lane)
+    scheduleWork(reconcileWork as any, fiber)
   }
 }
 
@@ -72,7 +72,7 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
   try {
     var children = (WIP.type as FC<P>)(WIP.props)
   } catch (e) {
-    if (!!e && typeof e.then === 'function') {
+    if (!!e && typeof e.then === "function") {
       const p = getParent(WIP)
       if (!p.laziness) {
         p.laziness = []
@@ -93,7 +93,7 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
 
 const getParent = (WIP: IFiber): IFiber | undefined => {
   while ((WIP = WIP.parent)) {
-    if ((WIP.type as any).name === 'Suspense') return WIP
+    if ((WIP.type as any).name === "Suspense") return WIP
   }
 }
 
@@ -115,9 +115,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     aTail = aCh.length - 1,
     bTail = bCh.length - 1,
     map = null,
-    ch = Array(bCh.length),
-    next = WIP.sibling?.node ? WIP.sibling : null
-
+    ch = Array(bCh.length)
   while (aHead <= aTail && bHead <= bTail) {
     let c = null
     if (aCh[aHead] == null) {
@@ -165,7 +163,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     }
   }
 
-  const after = bTail <= bCh.length - 1 ? ch[bTail + 1] : next
+  const after = ch[bTail + 1]
 
   while (bHead <= bTail) {
     let c = bCh[bHead]
@@ -221,11 +219,14 @@ const commitWork = (fiber: IFiber): void => {
 function invokeHooks(fiber) {
   const { hooks, lane, laziness } = fiber
   if (laziness) {
-    Promise.all(laziness).then(() => dispatchUpdate(fiber))
+    Promise.all(laziness).then(() => {
+      fiber.laziness = null
+      dispatchUpdate(fiber)
+    })
   }
   if (hooks) {
     if (lane & LANE.REMOVE) {
-      hooks.list.forEach(e => e[2] && e[2]())
+      hooks.list.forEach((e) => e[2] && e[2]())
     } else {
       side(hooks.layout)
       schedule(() => side(hooks.effect))
@@ -235,7 +236,7 @@ function invokeHooks(fiber) {
 
 function wireKid(fiber) {
   let kid = fiber
-  while (isFn(kid.type)) kid = kid.child
+  while (isFn(kid.type) && kid.child) kid = kid.child
   const after = fiber.after || kid.after
   kid.after = after
   kid.lane |= fiber.lane
@@ -302,8 +303,8 @@ const kidsRefer = (kids: any): void => {
 }
 
 const side = (effects: IEffect[]): void => {
-  effects.forEach(e => e[2] && e[2]())
-  effects.forEach(e => e[2] = e[0]())
+  effects.forEach((e) => e[2] && e[2]())
+  effects.forEach((e) => (e[2] = e[0]()))
   effects.length = 0
 }
 

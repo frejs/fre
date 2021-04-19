@@ -1,4 +1,4 @@
-import { ITask, ITaskCallback } from './type'
+import { IFiber, ITask, ITaskCallback } from "./type"
 
 const queue: ITask[] = []
 const threshold: number = 1000 / 60
@@ -7,10 +7,10 @@ let deadline: number = 0
 
 export const schedule = (cb) => unit.push(cb) === 1 && postMessage()
 
-export const scheduleWork = (callback: ITaskCallback, lane: number): void => {
+export const scheduleWork = (callback: ITaskCallback, fiber: IFiber): void => {
   const job = {
     callback,
-    lane,
+    fiber,
   }
   queue.push(job)
   schedule(flushWork)
@@ -18,7 +18,7 @@ export const scheduleWork = (callback: ITaskCallback, lane: number): void => {
 
 const postMessage = (() => {
   const cb = () => unit.splice(0, unit.length).forEach((c) => c())
-  if (typeof MessageChannel !== 'undefined') {
+  if (typeof MessageChannel !== "undefined") {
     const { port1, port2 } = new MessageChannel()
     port1.onmessage = cb
     return () => port2.postMessage(null)
@@ -28,25 +28,27 @@ const postMessage = (() => {
 
 const flushWork = (): void => {
   deadline = getTime() + threshold
-  let job = sortAndPeek(queue)
+  let job = peek(queue)
   while (job && !shouldYield()) {
-    const callback = job.callback as any
+    const { callback, fiber } = job as any
     job.callback = null
-    const next = callback()
+    const next = callback(fiber)
     if (next) {
       job.callback = next as any
     } else {
       queue.shift()
     }
-    job = sortAndPeek(queue)
+    job = peek(queue)
   }
   job && schedule(flushWork)
 }
 
 export const shouldYield = (): boolean => {
-  return (navigator as any)?.scheduling?.isInputPending() || getTime() >= deadline
+  return (
+    (navigator as any)?.scheduling?.isInputPending() || getTime() >= deadline
+  )
 }
 
 export const getTime = () => performance.now()
 
-const sortAndPeek = (queue: ITask[]) => queue[0]
+const peek = (queue: ITask[]) => queue[0]

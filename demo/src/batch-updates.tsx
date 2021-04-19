@@ -1,4 +1,4 @@
-import { h, render, useState } from '../../src'
+import { render, useState } from '../../src/index'
 
 function App() {
   console.log(123)

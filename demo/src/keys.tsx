@@ -1,4 +1,4 @@
-import { h, render, useEffect, useState,Fragment } from "../../src/index"
+import { render, useEffect, useState,Fragment } from "../../src/index"
 
 // function App() {
 //   const [key, setKey] = useState([3,1,2])

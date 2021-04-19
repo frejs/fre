@@ -1,6 +1,6 @@
 {
   "name": "fre",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "type": "module",
   "main": "dist/fre.js",
   "unpkg": "dist/fre.umd.js",
@@ -25,12 +25,9 @@
   ],
   "scripts": {
     "test": "jest --coverage",
-    "ref": "jest ./test/ref.test.tsx",
     "build": "rollup -c && gzip-size dist/fre.js",
-    "build:compat": "rollup --config compat/rollup.config.js",
     "dev": "rollup -c --watch",
-    "prepublishOnly": "yarn build",
-    "effect":"jest ./test/ref.test.tsx"
+    "prepublishOnly": "yarn build"
   },
   "description": "Tiny Concurrent UI library with Fiber.",
   "keywords": [
