@@ -76,7 +76,7 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
     var children = (WIP.type as FC<P>)(WIP.props)
   } catch (e) {
     const then = typeof e?.then === "function",
-      p = getBoundary(WIP, then ? LANE.Suspense : LANE.Error),
+      p = getBoundary(WIP, then),
       fb = isFn(p.props.fallback) ? p.props.fallback(e) : p.props.fallback
 
     if (!p || !fb) throw e
@@ -100,9 +100,11 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
   }
 }
 
-const getBoundary = (WIP: IFiber, boundary): IFiber | undefined => {
+const getBoundary = (WIP: IFiber, then): IFiber | undefined => {
   while ((WIP = WIP.parent)) {
-    if ((WIP.type as any).lane & boundary) return WIP
+    if ((WIP.type as any).lane & (then ? LANE.Suspense : LANE.Error)) {
+      return WIP
+    }
   }
 }
 
