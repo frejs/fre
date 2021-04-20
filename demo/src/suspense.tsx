@@ -14,6 +14,7 @@ const Lazy = lazy(() => {
 
 function App() {
   return <Suspense fallback={<div>Loading...</div>}>
+    <div>111</div>
     <Lazy/>
     <Lazy/>
   </Suspense>

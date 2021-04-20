@@ -25,7 +25,7 @@ export const enum LANE {
   DIRTY = 1 << 5,
   Suspense = 1 << 6,
   Error = 1 << 7,
-  Boundary = Suspense | Error
+  Boundary = Suspense | Error,
 }
 export const render = (
   vnode: FreElement,
@@ -75,19 +75,18 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
   try {
     var children = (WIP.type as FC<P>)(WIP.props)
   } catch (e) {
-    const then = typeof e?.then === 'function'
+    const then = typeof e?.then === "function"
     const p = getBoundary(WIP, then ? LANE.Suspense : LANE.Error)
     const fb = isFn(p.props.fallback) ? p.props.fallback(e) : p.props.fallback
-    if (!p) throw e
+    if (!p || !fb) throw e
     if (then) {
       if (!p.laziness) {
         p.laziness = []
-        children = fb
+        p.child = children = fb
       }
       p.laziness.push(e)
-    } else {
-      children = fb
     }
+    children = fb
   }
   isStr(children) && (children = createText(children as string))
   reconcileChildren(WIP, children)
