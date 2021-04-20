@@ -1,6 +1,8 @@
 import { h } from './h'
 import { LANE } from "./reconciler"
 
+// TODO: The lazy function has nothing to do with the core. 
+// It just throw a promise . We will move it out of the core in the future.
 export function lazy(loader) {
   let p
   let comp
