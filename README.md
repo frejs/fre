@@ -214,7 +214,7 @@ Similar to Suspense is ErrorBoundary, where rendering can fallback when errors a
 function App() {
   return <ErrorBoundary fallback={(e)=>{
     console.error(e)
-    return 'error'
+    return e
   }}>
     <ErrorComponent/>
   </ErrorBoundary>
