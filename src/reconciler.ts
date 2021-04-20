@@ -129,6 +129,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     bTail = bCh.length - 1,
     map = null,
     ch = Array(bCh.length)
+
   while (aHead <= aTail && bHead <= bTail) {
     let c = null
     if (aCh[aHead] == null) {
@@ -138,14 +139,14 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     } else if (same(aCh[aHead], bCh[bHead])) {
       c = bCh[bHead]
       clone(c, aCh[aHead])
-      c.lane = LANE.UPDATE
+      c.lane |= LANE.UPDATE
       ch[bHead] = c
       aHead++
       bHead++
     } else if (same(aCh[aTail], bCh[bTail])) {
       c = bCh[bTail]
       clone(c, aCh[aTail])
-      c.lane = LANE.UPDATE
+      c.lane |= LANE.UPDATE
       ch[bTail] = c
       aTail--
       bTail--
@@ -198,6 +199,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
   }
   for (var i = 0, prev = null; i < bCh.length; i++) {
     const child = bCh[i]
+    // console.log(child)
     child.parent = WIP
     if (i > 0) {
       prev.sibling = child
@@ -232,7 +234,7 @@ function invokeHooks(fiber) {
   const { hooks, lane, laziness } = fiber
   if (laziness) {
     Promise.all(laziness).then(() => {
-      fiber.laziness = []
+      fiber.laziness = null
       dispatchUpdate(fiber)
     })
   }
