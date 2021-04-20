@@ -212,12 +212,15 @@ Similar to Suspense is ErrorBoundary, where rendering can fallback when errors a
 ```js
 
 function App() {
-  return <ErrorBoundary fallback={(error)=>{
-    console.error(error)
+  return <ErrorBoundary fallback={(e)=>{
+    console.error(e)
     return 'error'
   }}>
-    <LazyComponent/>
+    <ErrorComponent/>
   </ErrorBoundary>
+}
+function ErrorComponent(){
+  throw 'err'
 }
 ```
 
