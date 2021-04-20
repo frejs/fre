@@ -13,7 +13,7 @@ const Lazy = lazy(() => {
 })
 
 function App() {
-  return <Suspense fallback={<div>Loading...</div>}>
+  return <Suspense fallback={'Loading'}>
     <div>111</div>
     <Lazy/>
     <Lazy/>

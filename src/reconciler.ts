@@ -77,8 +77,7 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
   } catch (e) {
     const then = typeof e?.then === "function",
       p = getBoundary(WIP, then),
-      fb = isFn(p.props.fallback) ? p.props.fallback(e) : p.props.fallback
-
+      fb = simpleVnode(p.props.fallback, e)
     if (!p || !fb) throw e
     if (then) {
       if (!p.laziness) {
@@ -90,9 +89,12 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
       children = fb
     }
   }
-  isStr(children) && (children = createText(children as string))
+  isStr(children) && (children = simpleVnode(children))
   reconcileChildren(WIP, children)
 }
+
+const simpleVnode = (type: any, props?: any) =>
+  isStr(type) ? createText(type as string) : isFn(type) ? type(props) : type
 
 const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
   while ((WIP = WIP.parent)) {
