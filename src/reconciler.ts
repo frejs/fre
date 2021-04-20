@@ -232,7 +232,7 @@ function invokeHooks(fiber) {
   const { hooks, lane, laziness } = fiber
   if (laziness) {
     Promise.all(laziness).then(() => {
-      fiber.laziness = null
+      fiber.laziness = []
       dispatchUpdate(fiber)
     })
   }
