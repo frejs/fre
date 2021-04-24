@@ -24,7 +24,7 @@ export const createVnode = (type, props, key, ref) => {
 }
 
 export function createText(vnode: string) {
-  return { type: 'text', props: { nodeValue: vnode } } as FreElement
+  return { type: 'text', props: { nodeValue: vnode + '' } } as FreElement
 }
 
 export function Fragment(props) {
