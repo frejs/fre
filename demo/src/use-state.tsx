@@ -1,6 +1,7 @@
 import { render, useState } from "../../src/index"
 
 function App() {
+  console.log(123)
   const [count, setCount] = useState(0)
   return (
     <>
