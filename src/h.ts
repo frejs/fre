@@ -17,10 +17,6 @@ export const createVnode = (type, props, key = null, ref = null) => ({ type, pro
 
 export const createText = (vnode: string) => ({ type: 'text', props: { nodeValue: vnode + '' } } as FreElement)
 
-export function Fragment(props) {
-  return props.children
-}
-
 export const recycleNode = (node) =>
   node.nodeType === 3
     ? createText(node.nodeValue)

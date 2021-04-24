@@ -11,7 +11,7 @@ import {
 import { createElement, updateElement } from "./dom"
 import { resetCursor } from "./hook"
 import { scheduleWork, shouldYield, schedule } from "./scheduler"
-import { isArr, createText } from "./h"
+import { isArr, createText, recycleNode } from "./h"
 
 let currentFiber: IFiber
 let finish = null
@@ -35,6 +35,7 @@ export const render = (
   const rootFiber = {
     node,
     props: { children: vnode },
+    oldProps: { children: recycleNode(node) },
     done,
   } as IFiber
   dispatchUpdate(rootFiber)
@@ -212,7 +213,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
 }
 
 function clone(a, b) {
-  a.lastProps = b.props
+  a.oldProps = b.props
   a.node = b.node
   a.kids = b.kids
   a.hooks = b.hooks
@@ -287,7 +288,7 @@ const commit = (fiber: IFiber): void => {
     return
   }
   if (lane & LANE.UPDATE) {
-    updateElement(node, fiber.lastProps || {}, fiber.props)
+    updateElement(node, fiber.oldProps || {}, fiber.props)
   }
   if (lane & LANE.INSERT) {
     parentNode.insertBefore(fiber.node, fiber.after?.node)
