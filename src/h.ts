@@ -1,5 +1,5 @@
 import { isStr } from './reconciler'
-import { FreElement } from './type'
+import { FreElement, IFiber } from './type'
 
 // for jsx2
 export const h = (type, props, ...kids) => {
@@ -17,12 +17,13 @@ export const createVnode = (type, props, key = null, ref = null) => ({ type, pro
 
 export const createText = (vnode: string) => ({ type: 'text', props: { nodeValue: vnode + '' } } as FreElement)
 
-export const recycleNode = (node) =>
-  node.nodeType === 3
-    ? createText(node.nodeValue)
-    : createVnode(
-      node.nodeName.toLowerCase(),
-      { children: node.childNodes.map(recycleNode) }
-    )
+export const recycleNode = (node) =>{
+  return node.nodeType === 3
+  ? createText(node.nodeValue) as FreElement
+  : createVnode(
+    node.nodeName.toLowerCase(),
+    { children: [].map.call(node.childNodes, recycleNode) }
+  ) as FreElement
+}
 
 export const isArr = Array.isArray
