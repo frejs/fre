@@ -3,12 +3,11 @@ import { h } from '../src/index'
 
 test('create JSX node', () => {
   const div = <div/>
-  console.log(div)
 
   expect(div).toStrictEqual({
     type: "div",
-    key: undefined,
-    ref: undefined,
+    key: null,
+    ref: null,
     props: {}
   })
 })
@@ -19,7 +18,7 @@ test('create JSX node with key and props', () => {
   expect(div).toStrictEqual({
     type: "input",
     key: "foo",
-    ref: undefined,
+    ref: null,
     props: {
       name: "foo",
       value: "bar"
@@ -39,17 +38,17 @@ test('create JSX node with children', () => {
   expect(divs).toStrictEqual({
     type: "div",
     key: "a",
-    ref: undefined,
+    ref: null,
     props: {
       children: {
         type: "div",
         key: "b",
-        ref: undefined,
+        ref: null,
         props: {
           children: {
             type: "div",
             key: "c",
-            ref: undefined,
+            ref: null,
             props: {}
           }
         }
@@ -63,10 +62,12 @@ test('emit JSX component nodes', () => {
 
   const div = <Component value={"foo"}>bar</Component>
 
+  console.log(Component.toString())
+
   expect(div).toStrictEqual({
     type: Component,
-    key: undefined,
-    ref: undefined,
+    key: null,
+    ref: null,
     props: {
       value: "foo",
       children: {
