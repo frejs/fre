@@ -14,18 +14,9 @@ export const h = (type, props, ...kids) => {
   return createVnode(type, props, key, ref)
 }
 
-export const createVnode = (type, props, key, ref) => {
-  return {
-    type,
-    props,
-    key,
-    ref,
-  }
-}
+export const createVnode = (type, props, key, ref) => ({ type, props, key, ref })
 
-export function createText(vnode: string) {
-  return { type: 'text', props: { nodeValue: vnode + '' } } as FreElement
-}
+export const createText = (vnode: string) => ({ type: 'text', props: { nodeValue: vnode + '' } } as FreElement)
 
 export function Fragment(props) {
   return props.children
