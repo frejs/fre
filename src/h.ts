@@ -5,8 +5,10 @@ import { FreElement } from './type'
 export const h = (type, props, ...kids) => {
   props = props || {}
   kids = props.children || kids
-  kids.length && (props.children = flat(kids))
   let key = props.key || null, ref = props.ref || null
+  while (kids.some(isArr)) kids = [].concat(...kids)
+  kids = kids.map(kid => isStr(kid) ? createText(kid as string) : kid)
+  if (kids.length) props.children = kids.length === 1 ? kids[0] : kids
   delete props.key
   delete props.ref
   return createVnode(type, props, key, ref)
@@ -27,10 +29,6 @@ export function createText(vnode: string) {
 
 export function Fragment(props) {
   return props.children
-}
-
-const flat = (arr) => {
-  return isArr(arr) ? arr.reduce((pre, cur) => isArr(cur) ? pre.concat(flat(cur)) : flat(cur), []) : isStr(arr) ? createText(arr as string) : arr
 }
 
 export const isArr = Array.isArray
