@@ -2,8 +2,7 @@ import { isStr } from './reconciler'
 import { FreElement } from './type'
 
 // for jsx2
-export const h = (type, props, ...kids) => {
-  props = props || {}
+export const h = (type, props={}, ...kids) => {
   kids = flat(props.children || kids)
   if (kids.length) props.children = kids.length === 1 ? kids[0] : kids
   delete props.key
@@ -11,7 +10,7 @@ export const h = (type, props, ...kids) => {
   return createVnode(type, props, props.key, props.ref)
 }
 
-const flat = (arr) => [].concat(...arr.map(v => isArr(v) ? [].concat(flat3(v)) : isStr(kid) ? createText(v) : v))
+const flat = (arr) => [].concat(...arr.map(v => isArr(v) ? [].concat(flat(v)) : isStr(kid) ? createText(v) : v))
 
 export const createVnode = (type, props, key=null, ref=null) => ({ type, props, key, ref })
 
