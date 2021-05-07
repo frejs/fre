@@ -199,7 +199,6 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
   }
   for (var i = 0, prev = null; i < bCh.length; i++) {
     const child = bCh[i]
-    // console.log(child)
     child.parent = WIP
     if (i > 0) {
       prev.sibling = child
@@ -250,12 +249,13 @@ function invokeHooks(fiber) {
 
 function wireKid(fiber) {
   let kid = fiber
-  while (isFn(kid.type) && kid.child) kid = kid.child
+  while (isFn(kid.type)) kid = kid.child
   const after = fiber.after || kid.after
   kid.after = after
   kid.lane |= fiber.lane
   let s = kid.sibling
   while (s) {
+    // for fragment
     s.after = after
     s.lane |= fiber.lane
     s = s.sibling
@@ -270,12 +270,8 @@ const commit = (fiber: IFiber): void => {
     invokeHooks(fiber)
     let kid = wireKid(fiber)
     fiber.node = kid.node
-    if (fiber.lane & LANE.REMOVE) {
-      commit(kid)
-    } else {
-      commit(fiber.child)
-      commit(fiber.sibling)
-    }
+    commit(fiber.child)
+    commit(fiber.sibling)
     fiber.lane = 0
     return
   }
