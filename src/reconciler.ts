@@ -261,9 +261,6 @@ function wireKid(fiber) {
       s.lane = fiber.lane
       s = s.sibling
     }
-    if (isStr(kid.type)) {
-      fiber.node = kid.node
-    }
   }
 }
 
