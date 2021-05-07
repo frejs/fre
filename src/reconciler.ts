@@ -270,10 +270,7 @@ const commit = (fiber: IFiber): void => {
   if (isFn(type)) {
     invokeHooks(fiber)
     wireKid(fiber)
-    commit(fiber.child)
-    commit(fiber.sibling)
-    fiber.lane = 0
-    return
+    return next(fiber)
   }
   if (lane & LANE.REMOVE) {
     kidsRefer(fiber.kids)
@@ -286,12 +283,10 @@ const commit = (fiber: IFiber): void => {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (lane & LANE.INSERT) {
-    parentNode.insertBefore(fiber.node, fiber.after?.node)
+    parentNode.insertBefore(fiber.node, fiber.after ? fiber.after.node : null)
   }
-  fiber.lane = 0
   refer(ref, node)
-  commit(fiber.child)
-  commit(fiber.sibling)
+  next(fiber)
 }
 
 const same = (a, b) => {
@@ -316,6 +311,12 @@ const side = (effects: IEffect[]): void => {
   effects.forEach((e) => e[2] && e[2]())
   effects.forEach((e) => (e[2] = e[0]()))
   effects.length = 0
+}
+
+const next = (fiber)=>{
+  fiber.lane = 0
+  commit(fiber.child)
+  commit(fiber.sibling)
 }
 
 export const getCurrentFiber = () => currentFiber || null
