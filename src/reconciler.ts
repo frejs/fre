@@ -248,19 +248,23 @@ function invokeHooks(fiber) {
 }
 
 function wireKid(fiber) {
-  let kid = fiber
-  while (isFn(kid.type)) kid = kid.child
-  const after = fiber.after || kid.after
-  kid.after = after
-  kid.lane |= fiber.lane
-  let s = kid.sibling
-  while (s) {
-    // for fragment
-    s.after = after
-    s.lane |= fiber.lane
-    s = s.sibling
+  let kid = fiber.child
+  if (fiber.lane & LANE.REMOVE) {
+    kid.lane = LANE.REMOVE
+  } else {
+    kid.lane |= fiber.lane
+    kid.after = fiber.after || kid.after
+    let s = kid.sibling
+    while (s) {
+      // fragment
+      s.after = fiber.after
+      s.lane = fiber.lane
+      s = s.sibling
+    }
+    if (isStr(kid.type)) {
+      fiber.node = kid.node
+    }
   }
-  return kid
 }
 
 const commit = (fiber: IFiber): void => {
@@ -268,8 +272,7 @@ const commit = (fiber: IFiber): void => {
   let { type, lane, parentNode, node, ref } = fiber
   if (isFn(type)) {
     invokeHooks(fiber)
-    let kid = wireKid(fiber)
-    fiber.node = kid.node
+    wireKid(fiber)
     commit(fiber.child)
     commit(fiber.sibling)
     fiber.lane = 0
