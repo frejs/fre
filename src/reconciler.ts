@@ -257,8 +257,8 @@ function wireKid(fiber) {
     let s = kid.sibling
     while (s) {
       // fragment
-      s.after = fiber.after
-      s.lane = fiber.lane
+      s.after = kid.after
+      s.lane = kid.lane
       s = s.sibling
     }
   }
