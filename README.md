@@ -158,7 +158,7 @@ const memo = (c) => (props) => useMemo(() => c, [Object.values(props)])
 
 ```js
 const cb = useCallback(() => {
-  console.log('cb was cached')
+  console.log('cb was cached.')
 }, [])
 ```
 
