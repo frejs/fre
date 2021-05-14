@@ -16,7 +16,7 @@ const flat = (arr) => [].concat(...arr.map(v => isArr(v) ? [].concat(flat(v)) : 
 
 export const createVnode = (type, props, key, ref) => ({ type, props, key, ref })
 
-export const createText = (vnode: any) => ({ type: 'text', props: { nodeValue: vnode + '' } } as FreElement)
+export const createText = (vnode: any) => ({ type: '', props: { nodeValue: vnode + '' } } as FreElement)
 
 export function Fragment(props) {
   return props.children
