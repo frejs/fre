@@ -62,8 +62,6 @@ test('emit JSX component nodes', () => {
 
   const div = <Component value={"foo"}>bar</Component>
 
-  console.log(Component.toString())
-
   expect(div).toStrictEqual({
     type: Component,
     key: null,
@@ -71,8 +69,37 @@ test('emit JSX component nodes', () => {
     props: {
       value: "foo",
       children: {
-        type: "text",
+        type: "",
         props: { nodeValue: "bar" }
+      }
+    }
+  })
+
+  const svg = (
+    <svg viewBox="0 0 240 80" xmlns="http://www.w3.org/2000/svg">
+      <text x="20" y="35">fre</text>
+    </svg>
+  );
+
+  expect(svg).toStrictEqual({
+    type: 'svg',
+    key: null,
+    ref: null,
+    props: {
+      viewBox: '0 0 240 80',
+      xmlns: 'http://www.w3.org/2000/svg',
+      children: {
+        type: 'text',
+        key: null,
+        ref: null,
+        props: {
+          x: '20',
+          y: '35',
+          children: {
+            type: '',
+            props: { nodeValue: 'fre' }
+          }
+        }
       }
     }
   })
