@@ -193,14 +193,15 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     }
     aHead++
   }
-  for (var i = bCh.length, prev = null; i >= 0; i--) {
+  for (var i = bCh.length - 1, prev = null; i >= 0; i--) {
     const child = bCh[i]
     child.parent = WIP
-    if (i > 0) {
-      prev.sibling = child
-    } else {
+    if (i === bCh.length-1) {
       if (WIP.lane & LANE.SVG) child.lane |= LANE.SVG
       WIP.child = child
+
+    } else {
+      prev.sibling = child
     }
     prev = child
   }
