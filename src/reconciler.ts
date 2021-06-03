@@ -164,26 +164,22 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
         c = bCh[bHead]
         clone(c, oldKid)
         c.lane = LANE.INSERT
-        c.after = aCh[aHead]
         ch[bHead] = c
         aCh[map.get(key)] = null
       } else {
         c = bCh[bHead]
         c.lane = LANE.INSERT
         c.node = null
-        c.after = aCh[aHead]
       }
       bHead++
     }
   }
 
-  const after = ch[bTail + 1]
 
   while (bHead <= bTail) {
     let c = bCh[bHead]
     if (c) {
       c.lane = LANE.INSERT
-      c.after = after
       c.node = null
     }
     bHead++
