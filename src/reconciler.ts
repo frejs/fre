@@ -128,8 +128,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     bHead = 0,
     aTail = aCh.length - 1,
     bTail = bCh.length - 1,
-    map = null,
-    ch = Array(bCh.length)
+    map = null
 
   while (aHead <= aTail && bHead <= bTail) {
     let c = null
@@ -141,14 +140,12 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       c = bCh[bHead]
       clone(c, aCh[aHead])
       c.lane |= LANE.UPDATE
-      ch[bHead] = c
       aHead++
       bHead++
     } else if (same(aCh[aTail], bCh[bTail])) {
       c = bCh[bTail]
       clone(c, aCh[aTail])
       c.lane |= LANE.UPDATE
-      ch[bTail] = c
       aTail--
       bTail--
     } else {
@@ -165,7 +162,6 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
         c = bCh[bHead]
         clone(c, oldKid)
         c.lane = LANE.INSERT
-        ch[bHead] = c
         aCh[map.get(key)] = null
       } else {
         c = bCh[bHead]
@@ -199,7 +195,6 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     if (i === bCh.length - 1) {
       if (WIP.lane & LANE.SVG) child.lane |= LANE.SVG
       WIP.child = child
-
     } else {
       prev.sibling = child
     }
@@ -219,8 +214,8 @@ const getKey = (vdom) => (vdom == null ? vdom : vdom.key)
 const getType = (vdom) => (isFn(vdom.type) ? vdom.type.name : vdom.type)
 
 const commitWork = (fiber: IFiber): void => {
-  commit2(fiber.parent ? fiber : fiber.child)
-  // deletes.forEach(commit)
+  commitFiber(fiber.parent ? fiber : fiber.child)
+  deletes.forEach(commit)
   fiber.done?.()
   deletes = []
   finish = null
@@ -261,7 +256,7 @@ function wireKid(fiber) {
   }
 }
 
-function commit2(fiber) {
+function commitFiber(fiber) {
   let root = fiber
   let node = fiber
   while (true) {
@@ -287,20 +282,19 @@ const commit = (fiber: IFiber, bool): void => {
     wireKid(fiber)
     return
   }
-  // if (lane & LANE.REMOVE) {
-  //   kidsRefer(fiber.kids)
-  //   parentNode.removeChild(fiber.node)
-  //   refer(ref, null)
-  //   fiber.lane = 0
-  //   return
-  // }
+  if (lane & LANE.REMOVE) {
+    kidsRefer(fiber.kids)
+    parentNode.removeChild(fiber.node)
+    refer(ref, null)
+    fiber.lane = 0
+    return
+  }
   if (lane & LANE.UPDATE) {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (lane & LANE.INSERT) {
     parentNode.insertBefore(fiber.node, bool ? domPoint : null)
     if (fiber.sibling) domPoint = fiber.node
-    
   }
   refer(ref, node)
 }
@@ -327,12 +321,6 @@ const side = (effects: IEffect[]): void => {
   effects.forEach((e) => e[2] && e[2]())
   effects.forEach((e) => (e[2] = e[0]()))
   effects.length = 0
-}
-
-const next = (fiber) => {
-  fiber.lane = 0
-  commit(fiber.child)
-  commit(fiber.sibling)
 }
 
 export const getCurrentFiber = () => currentFiber || null
