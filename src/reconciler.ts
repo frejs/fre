@@ -16,6 +16,7 @@ import { isArr, createText } from "./h"
 let currentFiber: IFiber
 let finish = null
 let deletes = []
+let domPoint = null
 
 export const enum LANE {
   UPDATE = 1 << 1,
@@ -175,7 +176,6 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     }
   }
 
-
   while (bHead <= bTail) {
     let c = bCh[bHead]
     if (c) {
@@ -196,7 +196,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
   for (var i = bCh.length - 1, prev = null; i >= 0; i--) {
     const child = bCh[i]
     child.parent = WIP
-    if (i === bCh.length-1) {
+    if (i === bCh.length - 1) {
       if (WIP.lane & LANE.SVG) child.lane |= LANE.SVG
       WIP.child = child
 
@@ -219,8 +219,8 @@ const getKey = (vdom) => (vdom == null ? vdom : vdom.key)
 const getType = (vdom) => (isFn(vdom.type) ? vdom.type.name : vdom.type)
 
 const commitWork = (fiber: IFiber): void => {
-  commit(fiber.parent ? fiber : fiber.child)
-  deletes.forEach(commit)
+  commit2(fiber.parent ? fiber : fiber.child)
+  // deletes.forEach(commit)
   fiber.done?.()
   deletes = []
   finish = null
@@ -261,6 +261,24 @@ function wireKid(fiber) {
   }
 }
 
+function commit2(fiber) {
+  let root = fiber
+  let node = fiber
+  while (true) {
+    commit(fiber)
+    if (node.child) {
+      node = node.child
+      continue
+    }
+    if (node === root) return
+    while (!node.sibling) {
+      if (!node.parent || node.parent === root) return
+      node = node.parent
+    }
+    node = node.sibling
+  }
+}
+
 const commit = (fiber: IFiber): void => {
   if (!fiber) return
   let { type, lane, parentNode, node, ref } = fiber
@@ -280,7 +298,9 @@ const commit = (fiber: IFiber): void => {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (lane & LANE.INSERT) {
-    parentNode.insertBefore(fiber.node, fiber.after ? fiber.after.node : null)
+
+    parentNode.insertBefore(fiber.node, fiber.sibling ? domPoint : null)
+    domPoint = fiber.node
   }
   refer(ref, node)
   next(fiber)
