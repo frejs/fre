@@ -193,7 +193,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     }
     aHead++
   }
-  for (var i = 0, prev = null; i < bCh.length; i++) {
+  for (var i = bCh.length, prev = null; i >= 0; i--) {
     const child = bCh[i]
     child.parent = WIP
     if (i > 0) {
@@ -218,7 +218,7 @@ const getKey = (vdom) => (vdom == null ? vdom : vdom.key)
 const getType = (vdom) => (isFn(vdom.type) ? vdom.type.name : vdom.type)
 
 const commitWork = (fiber: IFiber): void => {
-  commit(fiber.parent? fiber : fiber.child)
+  commit(fiber.parent ? fiber : fiber.child)
   deletes.forEach(commit)
   fiber.done?.()
   deletes = []
@@ -309,7 +309,7 @@ const side = (effects: IEffect[]): void => {
   effects.length = 0
 }
 
-const next = (fiber)=>{
+const next = (fiber) => {
   fiber.lane = 0
   commit(fiber.child)
   commit(fiber.sibling)
