@@ -265,9 +265,9 @@ function commit2(fiber) {
   let root = fiber
   let node = fiber
   while (true) {
-    commit(fiber)
     if (node.child) {
       node = node.child
+      commit(node, false)
       continue
     }
     if (node === root) return
@@ -276,34 +276,33 @@ function commit2(fiber) {
       node = node.parent
     }
     node = node.sibling
+    commit(node, true)
   }
 }
 
-const commit = (fiber: IFiber): void => {
-  if (!fiber) return
+const commit = (fiber: IFiber, bool): void => {
   let { type, lane, parentNode, node, ref } = fiber
   if (isFn(type)) {
     invokeHooks(fiber)
     wireKid(fiber)
-    return next(fiber)
-  }
-  if (lane & LANE.REMOVE) {
-    kidsRefer(fiber.kids)
-    parentNode.removeChild(fiber.node)
-    refer(ref, null)
-    fiber.lane = 0
     return
   }
+  // if (lane & LANE.REMOVE) {
+  //   kidsRefer(fiber.kids)
+  //   parentNode.removeChild(fiber.node)
+  //   refer(ref, null)
+  //   fiber.lane = 0
+  //   return
+  // }
   if (lane & LANE.UPDATE) {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (lane & LANE.INSERT) {
-
-    parentNode.insertBefore(fiber.node, fiber.sibling ? domPoint : null)
-    domPoint = fiber.node
+    parentNode.insertBefore(fiber.node, bool ? domPoint : null)
+    if (fiber.sibling) domPoint = fiber.node
+    
   }
   refer(ref, node)
-  next(fiber)
 }
 
 const same = (a, b) => {
