@@ -122,73 +122,55 @@ const updateHost = (WIP: IFiber): void => {
 }
 
 const reconcileChildren = (WIP: any, children: FreNode): void => {
+  if (!children) return
   let aCh = WIP.kids || [],
     bCh = (WIP.kids = arrayfy(children) as any),
-    aHead = 0,
-    bHead = 0,
-    aTail = aCh.length - 1,
-    bTail = bCh.length - 1,
+    start = 0,
+    aEnd = aCh.length - 1,
+    bEnd = bCh.length - 1,
+    end = bCh[bEnd],
     map = null
 
-  while (aHead <= aTail && bHead <= bTail) {
-    let c = null
-    if (aCh[aHead] == null) {
-      aHead++
-    } else if (aCh[aTail] == null) {
-      aTail--
-    } else if (same(aCh[aHead], bCh[bHead])) {
-      c = bCh[bHead]
-      clone(c, aCh[aHead])
-      c.lane |= LANE.UPDATE
-      aHead++
-      bHead++
-    } else if (same(aCh[aTail], bCh[bTail])) {
-      c = bCh[bTail]
-      clone(c, aCh[aTail])
-      c.lane |= LANE.UPDATE
-      aTail--
-      bTail--
-    } else {
-      if (!map) {
-        map = new Map()
-        for (let i = aHead; i <= aTail; i++) {
-          let k = getKey(aCh[i])
-          k && map.set(k, i)
-        }
-      }
-      const key = getKey(bCh[bHead])
-      if (map.has(key)) {
-        const oldKid = aCh[map.get(key)]
-        c = bCh[bHead]
-        clone(c, oldKid)
-        c.lane = LANE.INSERT
-        aCh[map.get(key)] = null
-      } else {
-        c = bCh[bHead]
-        c.lane = LANE.INSERT
-        c.node = null
-      }
-      bHead++
-    }
+  // step 1 pre-process common suffix/prefix
+  while (same(aCh[aEnd], end) && start <= aEnd && start <= bEnd--) {
+    clone(aCh[aEnd], end, LANE.UPDATE)
+    end = bCh[bEnd]
   }
 
-  while (bHead <= bTail) {
-    let c = bCh[bHead]
-    if (c) {
+  while (same(aCh[start], bCh[start]) && ++start <= aEnd && start <= bEnd) {
+    clone(aCh[start], bCh[start], LANE.UPDATE)
+  }
+
+  // step2 batch-process
+  if (start > aEnd) {
+    while (bEnd >= start) {
+      let c = bCh[bEnd--]
       c.lane = LANE.INSERT
-      c.node = null
     }
-    bHead++
+  } else if (start > bEnd) {
+    let i = start
+    do {
+      if ((end = aCh[i++]) !== null) end.lane = LANE.REMOVE
+    } while (i <= aEnd)
+  } else {
+    if (!map) {
+      map = {}
+      for (let i = start; i <= bEnd; i++) {
+        let k = aCh[i].key
+        if (k) map[k] = i
+      }
+    }
+    while (start <= bEnd--) {
+      let idx = map[end.key]
+      if (idx != null) {
+        clone(aCh[idx], end, LANE.INSERT)
+      } else {
+        end.lane = LANE.INSERT
+      }
+      end = bCh[bEnd]
+    }
   }
 
-  while (aHead <= aTail) {
-    let c = aCh[aHead]
-    if (c) {
-      c.lane = LANE.REMOVE
-      deletes.push(c)
-    }
-    aHead++
-  }
   for (var i = bCh.length - 1, prev = null; i >= 0; i--) {
     const child = bCh[i]
     child.parent = WIP
@@ -202,16 +184,14 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
   }
 }
 
-function clone(a, b) {
-  a.lastProps = b.props
-  a.node = b.node
-  a.kids = b.kids
-  a.hooks = b.hooks
-  a.ref = b.ref
+function clone(a, b, lane) {
+  b.lastProps = a.props
+  b.node = a.node
+  b.kids = a.kids
+  b.hooks = a.hooks
+  b.ref = a.ref
+  b.lane = lane
 }
-
-const getKey = (vdom) => (vdom == null ? vdom : vdom.key)
-const getType = (vdom) => (isFn(vdom.type) ? vdom.type.name : vdom.type)
 
 const commitWork = (fiber: IFiber): void => {
   commitFiber(fiber.parent ? fiber : fiber.child)
@@ -300,7 +280,7 @@ const commit = (fiber: IFiber, bool): void => {
 }
 
 const same = (a, b) => {
-  return getKey(a) === getKey(b) && getType(a) === getType(b)
+  return a && b && (a.key === b.key)
 }
 
 const arrayfy = (arr) => (!arr ? [] : isArr(arr) ? arr : [arr])
