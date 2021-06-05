@@ -15,7 +15,8 @@ import { isArr, createText } from "./h"
 
 let currentFiber: IFiber
 let finish = null
-let deletes = []
+let domPoint = null
+let next = null
 
 export const enum LANE {
   UPDATE = 1 << 1,
@@ -25,6 +26,7 @@ export const enum LANE {
   DIRTY = 1 << 5,
   Suspense = 1 << 6,
   Error = 1 << 7,
+  SIBLING = 1 << 8,
   Boundary = Suspense | Error,
 }
 export const render = (
@@ -44,6 +46,7 @@ export const dispatchUpdate = (fiber?: IFiber) => {
   if (fiber && !(fiber.lane & LANE.DIRTY)) {
     fiber.lane = LANE.UPDATE | LANE.DIRTY
     fiber.sibling = null
+    next = fiber
     scheduleWork(reconcileWork as any, fiber)
   }
 }
@@ -127,105 +130,88 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     bHead = 0,
     aTail = aCh.length - 1,
     bTail = bCh.length - 1,
-    map = null,
-    ch = Array(bCh.length)
+    keyed = null
 
   while (aHead <= aTail && bHead <= bTail) {
-    let c = null
-    if (aCh[aHead] == null) {
-      aHead++
-    } else if (aCh[aTail] == null) {
-      aTail--
-    } else if (same(aCh[aHead], bCh[bHead])) {
-      c = bCh[bHead]
-      clone(c, aCh[aHead])
-      c.lane |= LANE.UPDATE
-      ch[bHead] = c
-      aHead++
-      bHead++
-    } else if (same(aCh[aTail], bCh[bTail])) {
-      c = bCh[bTail]
-      clone(c, aCh[aTail])
-      c.lane |= LANE.UPDATE
-      ch[bTail] = c
-      aTail--
-      bTail--
-    } else {
-      if (!map) {
-        map = new Map()
-        for (let i = aHead; i <= aTail; i++) {
-          let k = getKey(aCh[i])
-          k && map.set(k, i)
-        }
-      }
-      const key = getKey(bCh[bHead])
-      if (map.has(key)) {
-        const oldKid = aCh[map.get(key)]
-        c = bCh[bHead]
-        clone(c, oldKid)
-        c.lane = LANE.INSERT
-        c.after = aCh[aHead]
-        ch[bHead] = c
-        aCh[map.get(key)] = null
-      } else {
-        c = bCh[bHead]
-        c.lane = LANE.INSERT
-        c.node = null
-        c.after = aCh[aHead]
-      }
-      bHead++
-    }
+    if (!same(aCh[aTail], bCh[bTail])) break
+    clone(aCh[aTail--], bCh[bTail--], LANE.UPDATE)
   }
 
-  const after = ch[bTail + 1]
+  while (aHead <= aTail && bHead <= bTail) {
+    if (!same(aCh[aHead], bCh[bHead])) break
+    clone(aCh[aHead++], bCh[bHead++], LANE.UPDATE)
+  }
 
-  while (bHead <= bTail) {
-    let c = bCh[bHead]
-    if (c) {
+  if (aHead > aTail) {
+    while (bHead <= bTail) {
+      let c = bCh[bTail--]
       c.lane = LANE.INSERT
-      c.after = after
-      c.node = null
     }
-    bHead++
+  } else if (bHead > bTail) {
+    while (aHead <= aTail) {
+      let c = aCh[aTail--]
+      c.lane = LANE.REMOVE
+      next.next = c
+      next = c
+    }
+  } else {
+    if (!keyed) {
+      keyed = {}
+      for (let i = aHead; i <= aTail; i++) {
+        let k = aCh[i].key
+        if (k) keyed[k] = i
+      }
+    }
+    while (bHead <= bTail) {
+      let c = bCh[bTail--]
+      let idx = keyed[c.key]
+      if (idx != null) {
+        clone(aCh[idx], c, LANE.INSERT)
+        delete keyed[c.key]
+      } else {
+        c.lane = LANE.INSERT
+      }
+    }
+    for (const k in keyed) {
+      let c = aCh[keyed[k]]
+      c.lane = LANE.REMOVE
+      next.next = c
+      next = c
+    }
   }
 
-  while (aHead <= aTail) {
-    let c = aCh[aHead]
-    if (c) {
-      c.lane = LANE.REMOVE
-      deletes.push(c)
-    }
-    aHead++
-  }
-  for (var i = 0, prev = null; i < bCh.length; i++) {
+  for (var i = bCh.length - 1, prev = null; i >= 0; i--) {
     const child = bCh[i]
+    next.next = child
+    next = child
     child.parent = WIP
-    if (i > 0) {
-      prev.sibling = child
-    } else {
+    if (i === bCh.length - 1) {
       if (WIP.lane & LANE.SVG) child.lane |= LANE.SVG
       WIP.child = child
+    } else {
+      child.lane |= LANE.SIBLING
+      prev.sibling = child
     }
     prev = child
   }
 }
 
-function clone(a, b) {
-  a.lastProps = b.props
-  a.node = b.node
-  a.kids = b.kids
-  a.hooks = b.hooks
-  a.ref = b.ref
+function clone(a, b, lane) {
+  b.lastProps = a.props
+  b.node = a.node
+  b.kids = a.kids
+  b.hooks = a.hooks
+  b.ref = a.ref
+  b.lane = lane
 }
 
-const getKey = (vdom) => (vdom == null ? vdom : vdom.key)
-const getType = (vdom) => (isFn(vdom.type) ? vdom.type.name : vdom.type)
-
 const commitWork = (fiber: IFiber): void => {
-  commit(fiber.parent? fiber : fiber.child)
-  deletes.forEach(commit)
+  let eff = fiber
+  while (eff) {
+    commit(eff)
+    eff = eff.next
+  }
   fiber.done?.()
-  deletes = []
   finish = null
 }
 
@@ -256,7 +242,6 @@ function wireKid(fiber) {
     kid.after = fiber.after || kid.after
     let s = kid.sibling
     while (s) {
-      // fragment
       s.after = kid.after
       s.lane = kid.lane
       s = s.sibling
@@ -265,12 +250,11 @@ function wireKid(fiber) {
 }
 
 const commit = (fiber: IFiber): void => {
-  if (!fiber) return
   let { type, lane, parentNode, node, ref } = fiber
   if (isFn(type)) {
     invokeHooks(fiber)
     wireKid(fiber)
-    return next(fiber)
+    return
   }
   if (lane & LANE.REMOVE) {
     kidsRefer(fiber.kids)
@@ -283,14 +267,14 @@ const commit = (fiber: IFiber): void => {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (lane & LANE.INSERT) {
-    parentNode.insertBefore(fiber.node, fiber.after ? fiber.after.node : null)
+    parentNode.insertBefore(fiber.node, fiber.lane & LANE.SIBLING ? domPoint : null)
+    if (fiber.sibling) domPoint = fiber.node
   }
   refer(ref, node)
-  next(fiber)
 }
 
 const same = (a, b) => {
-  return getKey(a) === getKey(b) && getType(a) === getType(b)
+  return a && b && (a.key === b.key) && (a.type === b.type)
 }
 
 const arrayfy = (arr) => (!arr ? [] : isArr(arr) ? arr : [arr])
@@ -311,12 +295,6 @@ const side = (effects: IEffect[]): void => {
   effects.forEach((e) => e[2] && e[2]())
   effects.forEach((e) => (e[2] = e[0]()))
   effects.length = 0
-}
-
-const next = (fiber)=>{
-  fiber.lane = 0
-  commit(fiber.child)
-  commit(fiber.sibling)
 }
 
 export const getCurrentFiber = () => currentFiber || null
