@@ -72,7 +72,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
 }
 
 const finishWork = (WIP) => {
-
+  // TODO: simlify this implemention
   let parent = WIP.parent
   if (parent) {
     if (!parent.first) {
@@ -91,7 +91,6 @@ const finishWork = (WIP) => {
     }
     parent.last = WIP
   }
-  return WIP
 }
 
 const updateHook = <P = Attributes>(WIP: IFiber): void => {
