@@ -24,8 +24,6 @@ export const enum LANE {
   DIRTY = 1 << 5,
   Suspense = 1 << 6,
   Error = 1 << 7,
-  SIBLING = 1 << 8,
-  POINT = 1 << 9,
   Boundary = Suspense | Error,
 }
 export const render = (
@@ -224,6 +222,7 @@ function clone(a, b, lane) {
 const commitWork = (fiber: IFiber): void => {
   let eff = fiber.first
   while (eff) {
+    console.log(eff)
     commit(eff)
     eff = eff.next
   }
@@ -250,9 +249,6 @@ function invokeHooks(fiber) {
 }
 
 function wireKid(fiber) {
-  if (fiber.sibling) {
-    fiber.lane |= LANE.POINT
-  }
   let kid = fiber.child
   if (fiber.lane & LANE.REMOVE) {
     kid.lane = LANE.REMOVE
