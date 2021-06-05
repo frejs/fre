@@ -57,6 +57,7 @@ export interface IFiber<P extends Attributes = any> {
   next: IFiber,
   first:IFiber,
   last:IFiber,
+  prev:IFiber,
   laziness: any[]
 }
 

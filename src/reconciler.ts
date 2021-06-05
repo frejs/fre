@@ -15,7 +15,6 @@ import { isArr, createText } from "./h"
 
 let currentFiber: IFiber
 let finish = null
-let domPoint = null
 
 export const enum LANE {
   UPDATE = 1 << 1,
@@ -208,7 +207,6 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       }
       WIP.child = child
     } else {
-      child.lane |= LANE.SIBLING
       prev.sibling = child
     }
     prev = child
@@ -227,7 +225,6 @@ function clone(a, b, lane) {
 const commitWork = (fiber: IFiber): void => {
   let eff = fiber.first
   while (eff) {
-    console.log(eff)
     commit(eff)
     eff = eff.next
   }
@@ -288,11 +285,9 @@ const commit = (fiber: IFiber): void => {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (lane & LANE.INSERT) {
-    let point = fiber.lane & LANE.SIBLING ? domPoint : null
-    parentNode.insertBefore(fiber.node, point)
-    if (fiber.sibling || fiber.lane & LANE.POINT) {
-      domPoint = fiber.node
-    }
+    let sibling = fiber.sibling
+    if (sibling) sibling.prev = fiber
+    parentNode.insertBefore(node, fiber.prev?.node)
   }
   refer(ref, node)
 }

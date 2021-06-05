@@ -80,19 +80,16 @@ export default function App() {
 
   return (
     <div>
-      <ul>
-        {state.map((item) => {
-          return <Li i={item} key={item}>{item}</Li>;
-        })}
-      </ul>
-
       <button
         onClick={() => {
-          setState([3,2,4,1,8]);
+          setState([3, 2, 4, 1, 8]);
         }}
       >
         set
       </button>
+      {state.map((item) => {
+        return <li i={item} key={item}>{item}</li>;
+      })}
     </div>
   );
 }
@@ -108,7 +105,7 @@ export default function App() {
 //   return [<li>{props.i}</li>, <li>{props.i}</li>]
 // }
 function Li(props) {
-  return  <li>{props.i}</li>
+  return <li>{props.i}</li>
 }
 
 render(<App />, document.getElementById("app"))
