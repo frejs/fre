@@ -16,7 +16,6 @@ import { isArr, createText } from "./h"
 let currentFiber: IFiber
 let finish = null
 let domPoint = null
-let next = null
 
 export const enum LANE {
   UPDATE = 1 << 1,
@@ -47,7 +46,6 @@ export const dispatchUpdate = (fiber?: IFiber) => {
   if (fiber && !(fiber.lane & LANE.DIRTY)) {
     fiber.lane = LANE.UPDATE | LANE.DIRTY
     fiber.sibling = null
-    next = fiber
     scheduleWork(reconcileWork as any, fiber)
   }
 }
@@ -63,35 +61,37 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
   isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
   while (WIP) {
-    const wip = finishWork(WIP)
-    if (wip == null) return wip
+    if (!finish && WIP.lane & LANE.DIRTY) {
+      finish = WIP
+      WIP.lane &= ~LANE.DIRTY
+      return null
+    }
+    finishWork(WIP)
     if (WIP.sibling) return WIP.sibling
     WIP = WIP.parent
   }
 }
 
 const finishWork = (WIP) => {
-  if (!finish && WIP.lane & LANE.DIRTY) {
-    finish = WIP
-    WIP.lane &= ~LANE.DIRTY
-    return null
-  }
+
   let parent = WIP.parent
-  if (!parent.first) {
-    parent.first = WIP.first
-  }
-  if (WIP.last) {
-    if (parent.last) {
-      parent.last.next = WIP.first
+  if (parent) {
+    if (!parent.first) {
+      parent.first = WIP.first
     }
-    parent.last = WIP.last
+    if (WIP.last) {
+      if (parent.last) {
+        parent.last.next = WIP.first
+      }
+      parent.last = WIP.last
+    }
+    if (parent.last) {
+      parent.last.next = WIP
+    } else {
+      parent.first = WIP
+    }
+    parent.last = WIP
   }
-  if (parent.last) {
-    parent.last.next = WIP
-  } else {
-    parent.first = WIP
-  }
-  parent.last = WIP
   return WIP
 }
 
@@ -174,8 +174,6 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     while (aHead <= aTail) {
       let c = aCh[aTail--]
       c.lane = LANE.REMOVE
-      next.next = c
-      next = c
     }
   } else {
     if (!keyed) {
@@ -198,16 +196,12 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     for (const k in keyed) {
       let c = aCh[keyed[k]]
       c.lane = LANE.REMOVE
-      next.next = c
-      next = c
     }
   }
 
   for (var i = bCh.length - 1, prev = null; i >= 0; i--) {
     const child = bCh[i]
     child.parent = WIP
-    next.next = child
-    next = child
     if (i === bCh.length - 1) {
       if (WIP.lane & LANE.SVG) {
         child.lane |= LANE.SVG
@@ -231,8 +225,9 @@ function clone(a, b, lane) {
 }
 
 const commitWork = (fiber: IFiber): void => {
-  let eff = fiber
+  let eff = fiber.first
   while (eff) {
+    console.log(eff)
     commit(eff)
     eff = eff.next
   }
