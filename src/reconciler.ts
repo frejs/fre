@@ -5,13 +5,13 @@ import {
   Attributes,
   HTMLElementEx,
   FreNode,
-  IRef,
   IEffect,
 } from "./type"
-import { createElement, updateElement } from "./dom"
+import { createElement } from "./dom"
 import { resetCursor } from "./hook"
 import { scheduleWork, shouldYield, schedule } from "./scheduler"
 import { isArr, createText } from "./h"
+import { commitWork } from './commit'
 
 let currentFiber: IFiber
 let finish = null
@@ -52,7 +52,10 @@ export const dispatchUpdate = (fiber?: IFiber) => {
 const reconcileWork = (WIP?: IFiber): boolean => {
   while (WIP && !shouldYield()) WIP = reconcile(WIP)
   if (WIP) return reconcileWork.bind(null, WIP)
-  if (finish) commitWork(finish)
+  if (finish) {
+    commitWork(finish)
+    finish = null
+  }
   return null
 }
 
@@ -72,10 +75,9 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
 }
 
 const finishWork = (WIP) => {
-  // TODO: simlify this implemention
   if (isFn(WIP.type)) {
     invokeHooks(WIP)
-    // return
+    // TOTO
   } else {
     effect.next = WIP
     effect = WIP
@@ -211,15 +213,6 @@ function clone(a, b, lane) {
   b.lane = lane
 }
 
-const commitWork = (fiber: IFiber): void => {
-  let eff = fiber
-  while (eff) {
-    commit(eff)
-    eff = eff.next
-  }
-  fiber.done?.()
-  finish = null
-}
 
 function invokeHooks(fiber) {
   const { hooks, lane, laziness } = fiber
@@ -239,44 +232,11 @@ function invokeHooks(fiber) {
   }
 }
 
-const commit = (fiber: IFiber): void => {
-  let { lane, parentNode, node, ref } = fiber
-  if (isFn(fiber.type)) return
-  if (lane & LANE.REMOVE) {
-    kidsRefer(fiber.kids)
-    parentNode.removeChild(fiber.node)
-    refer(ref, null)
-    fiber.lane = 0
-    return
-  }
-  if (lane & LANE.UPDATE) {
-    updateElement(node, fiber.lastProps || {}, fiber.props)
-  }
-  if (lane & LANE.INSERT) {
-    let sibling = fiber.sibling
-    if (sibling) sibling.prev = fiber
-    parentNode.insertBefore(node, fiber.prev?.node)
-  }
-  refer(ref, node)
-}
-
 const same = (a, b) => {
   return a && b && (a.key === b.key) && (a.type === b.type)
 }
 
 const arrayfy = (arr) => (!arr ? [] : isArr(arr) ? arr : [arr])
-
-const refer = (ref: IRef, dom?: HTMLElement): void => {
-  if (ref)
-    isFn(ref) ? ref(dom) : ((ref as { current?: HTMLElement })!.current = dom)
-}
-
-const kidsRefer = (kids: any): void => {
-  kids.forEach((kid) => {
-    kid.kids && kidsRefer(kid.kids)
-    refer(kid.ref, null)
-  })
-}
 
 const side = (effects: IEffect[]): void => {
   effects.forEach((e) => e[2] && e[2]())
