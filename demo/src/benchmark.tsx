@@ -1,4 +1,4 @@
-import { render, useReducer, useMemo, useEffect } from "../../src/index"
+import { render, useReducer, useMemo, useEffect, shouldYield } from "../../src/index"
 
 var startTime
 var lastMeasure
@@ -97,7 +97,7 @@ function listReducer(state, action) {
   const { data, selected } = state
   switch (action.type) {
     case "RUN":
-      return { data: buildData(1000), selected: 0 }
+      return { data: buildData(3), selected: 0 }
     case "RUN_LOTS":
       return { data: buildData(10000), selected: 0 }
     case "ADD":
@@ -132,10 +132,6 @@ function listReducer(state, action) {
   return state
 }
 
-const GlyphIcon = (
-  <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-)
-
 const Row = ({ selected, item, dispatch }) => (
   <tr className={selected ? "danger" : ""}>
     <td className="col-md-1">{item.id}</td>
@@ -144,12 +140,6 @@ const Row = ({ selected, item, dispatch }) => (
         {item.label}
       </a>
     </td>
-    <td className="col-md-1">
-      <a onClick={() => dispatch({ type: "REMOVE", id: item.id })}>
-        {GlyphIcon}
-      </a>
-    </td>
-    <td className="col-md-6"></td>
   </tr>
 )
 
@@ -176,7 +166,7 @@ const Jumbotron = ({ dispatch }) => (
   <div className="jumbotron">
     <div className="row">
       <div className="col-md-6">
-        <h1>React Hooks keyed</h1>
+        <h1>Fre Hooks keyed</h1>
       </div>
       <div className="col-md-6">
         <div className="row">
@@ -236,10 +226,6 @@ const Main = () => {
           ))}
         </tbody>
       </table>
-      <span
-        className="preloadicon glyphicon glyphicon-remove"
-        aria-hidden="true"
-      ></span>
     </div>
   )
 }

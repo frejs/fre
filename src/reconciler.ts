@@ -27,6 +27,7 @@ export const enum LANE {
   Suspense = 1 << 6,
   Error = 1 << 7,
   SIBLING = 1 << 8,
+  POINT = 1 << 9,
   Boundary = Suspense | Error,
 }
 export const render = (
@@ -60,6 +61,7 @@ const reconcileWork = (WIP?: IFiber): boolean => {
 
 const reconcile = (WIP: IFiber): IFiber | undefined => {
   isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
+  console.log(WIP)
   if (WIP.child) return WIP.child
   while (WIP) {
     if (!finish && WIP.lane & LANE.DIRTY) {
@@ -96,6 +98,16 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
   reconcileChildren(WIP, children)
 }
 
+const updateHost = (WIP: IFiber): void => {
+  WIP.parentNode = getParentNode(WIP) as any
+
+  if (!WIP.node) {
+    if (WIP.type === "svg") WIP.lane |= LANE.SVG
+    WIP.node = createElement(WIP) as HTMLElementEx
+  }
+  reconcileChildren(WIP, WIP.props.children)
+}
+
 const simpleVnode = (type: any, props?: any) =>
   isStr(type) ? createText(type as string) : isFn(type) ? type(props) : type
 
@@ -111,16 +123,6 @@ const getBoundary = (WIP: IFiber, then): IFiber | undefined => {
       return WIP
     }
   }
-}
-
-const updateHost = (WIP: IFiber): void => {
-  WIP.parentNode = getParentNode(WIP) as any
-
-  if (!WIP.node) {
-    if (WIP.type === "svg") WIP.lane |= LANE.SVG
-    WIP.node = createElement(WIP) as HTMLElementEx
-  }
-  reconcileChildren(WIP, WIP.props.children)
 }
 
 const reconcileChildren = (WIP: any, children: FreNode): void => {
@@ -182,11 +184,13 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
 
   for (var i = bCh.length - 1, prev = null; i >= 0; i--) {
     const child = bCh[i]
+    child.parent = WIP
     next.next = child
     next = child
-    child.parent = WIP
     if (i === bCh.length - 1) {
-      if (WIP.lane & LANE.SVG) child.lane |= LANE.SVG
+      if (WIP.lane & LANE.SVG) {
+        child.lane |= LANE.SVG
+      }
       WIP.child = child
     } else {
       child.lane |= LANE.SIBLING
@@ -234,15 +238,16 @@ function invokeHooks(fiber) {
 }
 
 function wireKid(fiber) {
+  if (fiber.sibling) {
+    fiber.lane |= LANE.POINT
+  }
   let kid = fiber.child
   if (fiber.lane & LANE.REMOVE) {
     kid.lane = LANE.REMOVE
   } else {
     kid.lane |= fiber.lane
-    kid.after = fiber.after || kid.after
     let s = kid.sibling
     while (s) {
-      s.after = kid.after
       s.lane = kid.lane
       s = s.sibling
     }
@@ -267,8 +272,11 @@ const commit = (fiber: IFiber): void => {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (lane & LANE.INSERT) {
-    parentNode.insertBefore(fiber.node, fiber.lane & LANE.SIBLING ? domPoint : null)
-    if (fiber.sibling) domPoint = fiber.node
+    let point = fiber.lane & LANE.SIBLING ? domPoint : null
+    parentNode.insertBefore(fiber.node, point)
+    if (fiber.sibling || fiber.lane & LANE.POINT) {
+      domPoint = fiber.node
+    }
   }
   refer(ref, node)
 }

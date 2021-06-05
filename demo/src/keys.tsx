@@ -82,13 +82,13 @@ export default function App() {
     <div>
       <ul>
         {state.map((item) => {
-          return <li key={item}>{item}</li>;
+          return <Li i={item} key={item}>{item}</Li>;
         })}
       </ul>
 
       <button
         onClick={() => {
-          setState([3,1,2,8,4]);
+          setState([3,2,4,1,8]);
         }}
       >
         set
@@ -98,11 +98,17 @@ export default function App() {
 }
 
 // function Li(props) {
-//   return <li>{props.i}</li>
+//   return <div>
+//     <li>{props.i}</li>
+//     <li>{props.i}</li>
+//   </div>
 // }
 
+// function Li(props) {
+//   return [<li>{props.i}</li>, <li>{props.i}</li>]
+// }
 function Li(props) {
-  return [<li>{props.i}</li>, <li>{props.i}</li>]
+  return  <li>{props.i}</li>
 }
 
 render(<App />, document.getElementById("app"))
