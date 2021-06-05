@@ -122,14 +122,13 @@ const updateHost = (WIP: IFiber): void => {
 }
 
 const reconcileChildren = (WIP: any, children: FreNode): void => {
-  if (!children) return
   let aCh = WIP.kids || [],
     bCh = (WIP.kids = arrayfy(children) as any),
     aHead = 0,
     bHead = 0,
     aTail = aCh.length - 1,
     bTail = bCh.length - 1,
-    map = null
+    keyed = null
 
   while (aHead <= aTail && bHead <= bTail) {
     if (!same(aCh[aTail], bCh[bTail])) break
@@ -150,24 +149,28 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     while (aHead <= aTail) {
       let c = aCh[aTail--]
       c.lane = LANE.REMOVE
-      deletes.push(c)
+      c.node.remove()
     }
   } else {
-    if (!map) {
-      map = {}
+    if (!keyed) {
+      keyed = {}
       for (let i = aHead; i <= aTail; i++) {
         let k = aCh[i].key
-        if (k) map[k] = i
+        if (k) keyed[k] = i
       }
     }
     while (bHead <= bTail) {
       let c = bCh[bTail--]
-      let idx = map[c.key]
+      let idx = keyed[c.key]
       if (idx != null) {
         clone(aCh[idx], c, LANE.INSERT)
+        delete keyed[c.key]
       } else {
         c.lane = LANE.INSERT
       }
+    }
+    for (var k in keyed) {
+      aCh[keyed[k]].node.remove()
     }
   }
 
@@ -280,7 +283,7 @@ const commit = (fiber: IFiber, bool): void => {
 }
 
 const same = (a, b) => {
-  return a && b && (a.key === b.key)
+  return a && b && (a.key === b.key) && (a.type === b.type)
 }
 
 const arrayfy = (arr) => (!arr ? [] : isArr(arr) ? arr : [arr])

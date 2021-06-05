@@ -76,17 +76,19 @@ import { render, useState } from "../../src/index"
 // }
 
 export default function App() {
-  const [state, setState] = useState( [1,2,3]);
+  const [state, setState] = useState([1, 2, 3]);
 
   return (
     <div>
-      {state.map((item) => {
-        return <li key={item}>{item}</li>;
-      })}
+      <ul>
+        {state.map((item) => {
+          return <li key={item}>{item}</li>;
+        })}
+      </ul>
 
       <button
         onClick={() => {
-          setState([1,3] );
+          setState([1, 3, 5]);
         }}
       >
         set
