@@ -149,7 +149,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     while (aHead <= aTail) {
       let c = aCh[aTail--]
       c.lane = LANE.REMOVE
-      c.node.remove()
+      deletes.push(c)
     }
   } else {
     if (!keyed) {
@@ -169,8 +169,10 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
         c.lane = LANE.INSERT
       }
     }
-    for (var k in keyed) {
-      aCh[keyed[k]].node.remove()
+    for (const k in keyed) {
+      let c = aCh[keyed[k]]
+      c.lane = LANE.REMOVE
+      deletes.push(c)
     }
   }
 
