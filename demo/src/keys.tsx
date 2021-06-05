@@ -88,7 +88,7 @@ export default function App() {
         set
       </button>
       {state.map((item) => {
-        return <li i={item} key={item}>{item}</li>;
+        return <Li i={item} key={item}>{item}</Li>;
       })}
     </div>
   );

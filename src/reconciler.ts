@@ -15,6 +15,7 @@ import { isArr, createText } from "./h"
 
 let currentFiber: IFiber
 let finish = null
+let effect = null
 
 export const enum LANE {
   UPDATE = 1 << 1,
@@ -43,6 +44,7 @@ export const dispatchUpdate = (fiber?: IFiber) => {
   if (fiber && !(fiber.lane & LANE.DIRTY)) {
     fiber.lane = LANE.UPDATE | LANE.DIRTY
     fiber.sibling = null
+    effect = fiber
     scheduleWork(reconcileWork as any, fiber)
   }
 }
@@ -71,24 +73,14 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
 
 const finishWork = (WIP) => {
   // TODO: simlify this implemention
-  let parent = WIP.parent
-  if (parent) {
-    if (!parent.first) {
-      parent.first = WIP.first
-    }
-    if (WIP.last) {
-      if (parent.last) {
-        parent.last.next = WIP.first
-      }
-      parent.last = WIP.last
-    }
-    if (parent.last) {
-      parent.last.next = WIP
-    } else {
-      parent.first = WIP
-    }
-    parent.last = WIP
+  if (isFn(WIP.type)) {
+    invokeHooks(WIP)
+    // return
+  } else {
+    effect.next = WIP
+    effect = WIP
   }
+
 }
 
 const updateHook = <P = Attributes>(WIP: IFiber): void => {
@@ -220,9 +212,8 @@ function clone(a, b, lane) {
 }
 
 const commitWork = (fiber: IFiber): void => {
-  let eff = fiber.first
+  let eff = fiber
   while (eff) {
-    console.log(eff)
     commit(eff)
     eff = eff.next
   }
@@ -248,27 +239,9 @@ function invokeHooks(fiber) {
   }
 }
 
-function wireKid(fiber) {
-  let kid = fiber.child
-  if (fiber.lane & LANE.REMOVE) {
-    kid.lane = LANE.REMOVE
-  } else {
-    kid.lane |= fiber.lane
-    let s = kid.sibling
-    while (s) {
-      s.lane = kid.lane
-      s = s.sibling
-    }
-  }
-}
-
 const commit = (fiber: IFiber): void => {
-  let { type, lane, parentNode, node, ref } = fiber
-  if (isFn(type)) {
-    invokeHooks(fiber)
-    wireKid(fiber)
-    return
-  }
+  let { lane, parentNode, node, ref } = fiber
+  if (isFn(fiber.type)) return
   if (lane & LANE.REMOVE) {
     kidsRefer(fiber.kids)
     parentNode.removeChild(fiber.node)
