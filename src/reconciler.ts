@@ -125,49 +125,49 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
   if (!children) return
   let aCh = WIP.kids || [],
     bCh = (WIP.kids = arrayfy(children) as any),
-    start = 0,
-    aEnd = aCh.length - 1,
-    bEnd = bCh.length - 1,
-    end = bCh[bEnd],
+    aHead = 0,
+    bHead = 0,
+    aTail = aCh.length - 1,
+    bTail = bCh.length - 1,
     map = null
 
-  // step 1 pre-process common suffix/prefix
-  while (same(aCh[aEnd], end) && start <= aEnd && start <= bEnd--) {
-    clone(aCh[aEnd], end, LANE.UPDATE)
-    end = bCh[bEnd]
+  while (aHead <= aTail && bHead <= bTail) {
+    if (!same(aCh[aTail], bCh[bTail])) break
+    clone(aCh[aTail--], bCh[bTail--], LANE.UPDATE)
   }
 
-  while (same(aCh[start], bCh[start]) && ++start <= aEnd && start <= bEnd) {
-    clone(aCh[start], bCh[start], LANE.UPDATE)
+  while (aHead <= aTail && bHead <= bTail) {
+    if (!same(aCh[aHead], bCh[bHead])) break
+    clone(aCh[aHead++], bCh[bHead++], LANE.UPDATE)
   }
 
-  // step2 batch-process
-  if (start > aEnd) {
-    while (bEnd >= start) {
-      let c = bCh[bEnd--]
+  if (aHead > aTail) {
+    while (bHead <= bTail) {
+      let c = bCh[bTail--]
       c.lane = LANE.INSERT
     }
-  } else if (start > bEnd) {
-    let i = start
-    do {
-      if ((end = aCh[i++]) !== null) end.lane = LANE.REMOVE
-    } while (i <= aEnd)
+  } else if (bHead > bTail) {
+    while (aHead <= aTail) {
+      let c = aCh[aTail--]
+      c.lane = LANE.REMOVE
+      deletes.push(c)
+    }
   } else {
     if (!map) {
       map = {}
-      for (let i = start; i <= bEnd; i++) {
+      for (let i = aHead; i <= aTail; i++) {
         let k = aCh[i].key
         if (k) map[k] = i
       }
     }
-    while (start <= bEnd--) {
-      let idx = map[end.key]
+    while (bHead <= bTail) {
+      let c = bCh[bTail--]
+      let idx = map[c.key]
       if (idx != null) {
-        clone(aCh[idx], end, LANE.INSERT)
+        clone(aCh[idx], c, LANE.INSERT)
       } else {
-        end.lane = LANE.INSERT
+        c.lane = LANE.INSERT
       }
-      end = bCh[bEnd]
     }
   }
 
