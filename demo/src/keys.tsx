@@ -86,7 +86,7 @@ export default function App() {
 
       <button
         onClick={() => {
-          setState([3,2,1] );
+          setState([1,3] );
         }}
       >
         set
