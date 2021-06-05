@@ -61,17 +61,38 @@ const reconcileWork = (WIP?: IFiber): boolean => {
 
 const reconcile = (WIP: IFiber): IFiber | undefined => {
   isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
-  console.log(WIP)
   if (WIP.child) return WIP.child
   while (WIP) {
-    if (!finish && WIP.lane & LANE.DIRTY) {
-      finish = WIP
-      WIP.lane &= ~LANE.DIRTY
-      return null
-    }
+    const wip = finishWork(WIP)
+    if (wip == null) return wip
     if (WIP.sibling) return WIP.sibling
     WIP = WIP.parent
   }
+}
+
+const finishWork = (WIP) => {
+  if (!finish && WIP.lane & LANE.DIRTY) {
+    finish = WIP
+    WIP.lane &= ~LANE.DIRTY
+    return null
+  }
+  let parent = WIP.parent
+  if (!parent.first) {
+    parent.first = WIP.first
+  }
+  if (WIP.last) {
+    if (parent.last) {
+      parent.last.next = WIP.first
+    }
+    parent.last = WIP.last
+  }
+  if (parent.last) {
+    parent.last.next = WIP
+  } else {
+    parent.first = WIP
+  }
+  parent.last = WIP
+  return WIP
 }
 
 const updateHook = <P = Attributes>(WIP: IFiber): void => {
