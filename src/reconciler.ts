@@ -15,8 +15,8 @@ import { isArr, createText } from "./h"
 
 let currentFiber: IFiber
 let finish = null
-let deletes = []
 let domPoint = null
+let next = null
 
 export const enum LANE {
   UPDATE = 1 << 1,
@@ -26,6 +26,7 @@ export const enum LANE {
   DIRTY = 1 << 5,
   Suspense = 1 << 6,
   Error = 1 << 7,
+  SIBLING = 1 << 8,
   Boundary = Suspense | Error,
 }
 export const render = (
@@ -45,6 +46,7 @@ export const dispatchUpdate = (fiber?: IFiber) => {
   if (fiber && !(fiber.lane & LANE.DIRTY)) {
     fiber.lane = LANE.UPDATE | LANE.DIRTY
     fiber.sibling = null
+    next = fiber
     scheduleWork(reconcileWork as any, fiber)
   }
 }
@@ -149,7 +151,8 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     while (aHead <= aTail) {
       let c = aCh[aTail--]
       c.lane = LANE.REMOVE
-      deletes.push(c)
+      next.next = c
+      next = c
     }
   } else {
     if (!keyed) {
@@ -172,17 +175,21 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     for (const k in keyed) {
       let c = aCh[keyed[k]]
       c.lane = LANE.REMOVE
-      deletes.push(c)
+      next.next = c
+      next = c
     }
   }
 
   for (var i = bCh.length - 1, prev = null; i >= 0; i--) {
     const child = bCh[i]
+    next.next = child
+    next = child
     child.parent = WIP
     if (i === bCh.length - 1) {
       if (WIP.lane & LANE.SVG) child.lane |= LANE.SVG
       WIP.child = child
     } else {
+      child.lane |= LANE.SIBLING
       prev.sibling = child
     }
     prev = child
@@ -199,10 +206,12 @@ function clone(a, b, lane) {
 }
 
 const commitWork = (fiber: IFiber): void => {
-  commitFiber(fiber.parent ? fiber : fiber.child)
-  deletes.forEach(commit)
+  let eff = fiber
+  while (eff) {
+    commit(eff)
+    eff = eff.next
+  }
   fiber.done?.()
-  deletes = []
   finish = null
 }
 
@@ -233,7 +242,6 @@ function wireKid(fiber) {
     kid.after = fiber.after || kid.after
     let s = kid.sibling
     while (s) {
-      // fragment
       s.after = kid.after
       s.lane = kid.lane
       s = s.sibling
@@ -241,26 +249,7 @@ function wireKid(fiber) {
   }
 }
 
-function commitFiber(fiber) {
-  let root = fiber
-  let node = fiber
-  while (true) {
-    if (node.child) {
-      node = node.child
-      commit(node, false)
-      continue
-    }
-    if (node === root) return
-    while (!node.sibling) {
-      if (!node.parent || node.parent === root) return
-      node = node.parent
-    }
-    node = node.sibling
-    commit(node, true)
-  }
-}
-
-const commit = (fiber: IFiber, bool): void => {
+const commit = (fiber: IFiber): void => {
   let { type, lane, parentNode, node, ref } = fiber
   if (isFn(type)) {
     invokeHooks(fiber)
@@ -278,7 +267,7 @@ const commit = (fiber: IFiber, bool): void => {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (lane & LANE.INSERT) {
-    parentNode.insertBefore(fiber.node, bool ? domPoint : null)
+    parentNode.insertBefore(fiber.node, fiber.lane & LANE.SIBLING ? domPoint : null)
     if (fiber.sibling) domPoint = fiber.node
   }
   refer(ref, node)
