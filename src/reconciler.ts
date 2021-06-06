@@ -16,6 +16,7 @@ import { commitWork } from './commit'
 let currentFiber: IFiber
 let finish = null
 let effect = null
+export let config = {} as any
 export let deletions = []
 
 export const enum LANE {
@@ -31,13 +32,13 @@ export const enum LANE {
 export const render = (
   vnode: FreElement,
   node: Node,
-  done?: () => void
+  con: any
 ): void => {
   const rootFiber = {
     node,
     props: { children: vnode },
-    done,
   } as IFiber
+  config = con
   dispatchUpdate(rootFiber)
 }
 

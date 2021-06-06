@@ -1,4 +1,4 @@
-import {h, render, useReducer, useMemo, useEffect, shouldYield } from "../../src/index"
+import { h, render, useReducer, useMemo, useEffect, shouldYield } from "../../src/index"
 // import { render } from 'react-dom'
 // import {useEffect,useReducer, useMemo,createElement as h } from 'react'
 
@@ -90,9 +90,8 @@ function buildData(count) {
   for (let i = 0; i < count; i++) {
     data[i] = {
       id: nextId++,
-      label: `${A[random(A.length)]} ${C[random(C.length)]} ${
-        N[random(N.length)]
-      }`,
+      label: `${A[random(A.length)]} ${C[random(C.length)]} ${N[random(N.length)]
+        }`,
     }
   }
   return data
@@ -119,14 +118,14 @@ function listReducer(state, action) {
     case "SWAP_ROWS":
       return data.length > 998
         ? {
-            data: [
-              data[0],
-              data[998],
-              ...data.slice(2, 998),
-              data[1],
-              data[999],
-            ],
-          }
+          data: [
+            data[0],
+            data[998],
+            ...data.slice(2, 998),
+            data[1],
+            data[999],
+          ],
+        }
         : state
     case "REMOVE":
       const idx = data.findIndex((d) => d.id === action.id)
@@ -235,4 +234,4 @@ const Main = () => {
   )
 }
 
-render(<Main />, document.getElementById("app"))
+render(<Main />, document.getElementById("app"), { sync: true })

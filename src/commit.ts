@@ -1,6 +1,6 @@
 import { IFiber, IRef, } from "./type"
 import { updateElement } from "./dom"
-import { isFn, LANE, deletions } from './reconciler'
+import { isFn, LANE, deletions, config } from './reconciler'
 
 export const commitWork = (fiber: IFiber): void => {
   let e = fiber.next
@@ -21,7 +21,7 @@ export const commitWork = (fiber: IFiber): void => {
     }
   })
   deletions.length = 0
-  fiber.done?.()
+  config.done && config.done()
 }
 
 const commit = (fiber: IFiber): void => {

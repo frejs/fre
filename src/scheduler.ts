@@ -1,4 +1,5 @@
 import { IFiber, ITask, ITaskCallback } from "./type"
+import { config } from './reconciler'
 
 const queue: ITask[] = []
 const threshold: number = 1000 / 60
@@ -44,6 +45,7 @@ const flushWork = (): void => {
 }
 
 export const shouldYield = (): boolean => {
+  if (config.sync) return false
   return (navigator as any)?.scheduling?.isInputPending() || getTime() >= deadline
 }
 
