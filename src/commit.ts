@@ -3,11 +3,15 @@ import { updateElement } from "./dom"
 import { isFn, LANE } from './reconciler'
 
 export const commitWork = (fiber: IFiber): void => {
-  let eff = fiber
-  while (eff) {
-    commit(eff)
-    eff = eff.next
-  }
+  let e = fiber.next
+  fiber.next = null
+  do {
+    const s = e.sibling
+    if (s && isFn(s.type)) {
+      e.sibling = s.child
+    }
+    commit(e)
+  } while (e = e.next)
   fiber.done?.()
 }
 

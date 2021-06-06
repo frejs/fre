@@ -63,12 +63,12 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
   isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
   while (WIP) {
+    finishWork(WIP)
     if (!finish && WIP.lane & LANE.DIRTY) {
       finish = WIP
       WIP.lane &= ~LANE.DIRTY
       return null
     }
-    finishWork(WIP)
     if (WIP.sibling) return WIP.sibling
     WIP = WIP.parent
   }
@@ -76,13 +76,14 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
 
 const finishWork = (WIP) => {
   if (isFn(WIP.type)) {
+    const kid = WIP.child
+    kid.sibling = WIP.sibling
+    kid.lane |= WIP.lane
     invokeHooks(WIP)
-    // TOTO
   } else {
     effect.next = WIP
     effect = WIP
   }
-
 }
 
 const updateHook = <P = Attributes>(WIP: IFiber): void => {
