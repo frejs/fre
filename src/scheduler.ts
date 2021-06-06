@@ -43,9 +43,9 @@ const flushWork = (): void => {
   job && schedule(flushWork)
 }
 
-export const shouldYield = (): boolean => {
+export const shouldYield = (close?: boolean): boolean => {
   return (
-    (navigator as any)?.scheduling?.isInputPending() || getTime() >= deadline
+    close != null ? close : (navigator as any)?.scheduling?.isInputPending() || getTime() >= deadline
   )
 }
 

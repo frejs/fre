@@ -1,9 +1,9 @@
-// import { render, useReducer, useMemo, useEffect, shouldYield } from "../../src/index"
+import {h, render, useReducer, useMemo, useEffect, shouldYield } from "../../src/index"
 // import { render } from 'react-dom'
 // import {useEffect,useReducer, useMemo,createElement as h } from 'react'
 
-import { render, createElement as h  } from 'preact'
-import {useEffect,useReducer, useMemo} from 'preact/hooks'
+// import { render, createElement as h  } from 'preact'
+// import {useEffect,useReducer, useMemo} from 'preact/hooks'
 
 var startTime
 var lastMeasure
