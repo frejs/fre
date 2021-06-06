@@ -76,13 +76,13 @@ import {h, render, useState } from "../../src/index"
 // }
 
 export default function App() {
-  const [state, setState] = useState([1, 2, 3]);
+  const [state, setState] = useState([1, 2, 3,4]);
 
   return (
     <div>
       <button
         onClick={() => {
-          setState([1,3]);
+          setState([1,3,2,4]);
         }}
       >
         set

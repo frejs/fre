@@ -34,12 +34,12 @@ const commit = (fiber: IFiber): void => {
     fiber.lane = 0
     return
   }
+  let s = fiber.sibling
+  if (s) s.prev = fiber
   if (lane & LANE.UPDATE) {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (lane & LANE.INSERT) {
-    let sibling = fiber.sibling
-    if (sibling) sibling.prev = fiber
     parentNode.insertBefore(node, fiber.prev?.node)
   }
   refer(ref, node)
