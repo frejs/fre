@@ -1,4 +1,9 @@
-import { render, useReducer, useMemo, useEffect, shouldYield } from "../../src/index"
+// import { render, useReducer, useMemo, useEffect, shouldYield } from "../../src/index"
+// import { render } from 'react-dom'
+// import {useEffect,useReducer, useMemo,createElement as h } from 'react'
+
+import { render, createElement as h  } from 'preact'
+import {useEffect,useReducer, useMemo} from 'preact/hooks'
 
 var startTime
 var lastMeasure
@@ -97,7 +102,7 @@ function listReducer(state, action) {
   const { data, selected } = state
   switch (action.type) {
     case "RUN":
-      return { data: buildData(3), selected: 0 }
+      return { data: buildData(1000), selected: 0 }
     case "RUN_LOTS":
       return { data: buildData(10000), selected: 0 }
     case "ADD":
@@ -213,12 +218,12 @@ const Main = () => {
   useEffect(stopMeasure)
   return (
     <div className="container">
-      <MemoJumbotton dispatch={dispatch} />
+      <Jumbotron dispatch={dispatch} />
       <table className="table table-hover table-striped test-data">
         <tbody>
           {state.data.map((item) => (
             <Row
-              key={item.id}
+              key={item.id + ''}
               item={item}
               selected={state.selected === item.id}
               dispatch={dispatch}
