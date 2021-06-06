@@ -5,6 +5,8 @@ import {h, render, useReducer, useMemo, useEffect, shouldYield } from "../../src
 // import { render, createElement as h  } from 'preact'
 // import {useEffect,useReducer, useMemo} from 'preact/hooks'
 
+shouldYield(false)
+
 var startTime
 var lastMeasure
 var startMeasure = function (name) {

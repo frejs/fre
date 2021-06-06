@@ -1,4 +1,4 @@
-import { render, useState } from "../../src/index"
+import {h, render, useState } from "../../src/index"
 
 // function App() {
 //   const [key, setKey] = useState([3,1,2])
@@ -82,7 +82,7 @@ export default function App() {
     <div>
       <button
         onClick={() => {
-          setState([3, 2, 4, 1, 8]);
+          setState([1,3]);
         }}
       >
         set

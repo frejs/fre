@@ -16,6 +16,7 @@ import { commitWork } from './commit'
 let currentFiber: IFiber
 let finish = null
 let effect = null
+export let deletions = []
 
 export const enum LANE {
   UPDATE = 1 << 1,
@@ -165,6 +166,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     while (aHead <= aTail) {
       let c = aCh[aTail--]
       c.lane = LANE.REMOVE
+      deletions.push(c)
     }
   } else {
     if (!keyed) {
@@ -187,6 +189,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     for (const k in keyed) {
       let c = aCh[keyed[k]]
       c.lane = LANE.REMOVE
+      deletions.push(c)
     }
   }
 
@@ -234,7 +237,8 @@ function invokeHooks(fiber) {
 }
 
 const same = (a, b) => {
-  return a && b && (a.key === b.key) && (a.type === b.type)
+  const type = (c) => isFn(c.type) ? c.type.name : c.type
+  return a && b && (a.key === b.key) && (type(a) === type(b))
 }
 
 const arrayfy = (arr) => (!arr ? [] : isArr(arr) ? arr : [arr])

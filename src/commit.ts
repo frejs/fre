@@ -1,6 +1,6 @@
 import { IFiber, IRef, } from "./type"
 import { updateElement } from "./dom"
-import { isFn, LANE } from './reconciler'
+import { isFn, LANE, deletions } from './reconciler'
 
 export const commitWork = (fiber: IFiber): void => {
   let e = fiber.next
@@ -12,6 +12,15 @@ export const commitWork = (fiber: IFiber): void => {
     }
     commit(e)
   } while (e = e.next)
+  deletions.forEach(e => {
+    if (isFn(e.type)) {
+      e.child.lane = LANE.REMOVE
+      commit(e.child)
+    } else {
+      commit(e)
+    }
+  })
+  deletions.length = 0
   fiber.done?.()
 }
 
