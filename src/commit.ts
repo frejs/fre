@@ -26,7 +26,6 @@ export const commitWork = (fiber: IFiber): void => {
 
 const commit = (fiber: IFiber): void => {
   let { lane, parentNode, node, ref } = fiber
-  if (isFn(fiber.type)) return
   if (lane & LANE.REMOVE) {
     kidsRefer(fiber.kids)
     parentNode.removeChild(fiber.node)
