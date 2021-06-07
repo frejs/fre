@@ -1,6 +1,6 @@
-import { h, render, useReducer, useMemo, useEffect, shouldYield } from "../../src/index"
-// import { render } from 'react-dom'
-// import {useEffect,useReducer, useMemo,createElement as h } from 'react'
+// import { h, render, useReducer, useMemo, useEffect, shouldYield } from "../../src/index"
+import { render } from 'react-dom'
+import { useEffect, useReducer, useMemo, createElement as h } from 'react'
 
 // import { render, createElement as h  } from 'preact'
 // import {useEffect,useReducer, useMemo} from 'preact/hooks'
@@ -15,11 +15,9 @@ var startMeasure = function (name) {
 var stopMeasure = function () {
   var last = lastMeasure
   if (lastMeasure) {
-    window.setTimeout(function () {
-      lastMeasure = null
-      var stop = performance.now()
-      console.log(last + " took " + (stop - startTime))
-    }, 0)
+    lastMeasure = null
+    var stop = performance.now()
+    console.log('fre offscreen ' + last + " took " + (stop - startTime))
   }
 }
 
@@ -234,4 +232,4 @@ const Main = () => {
   )
 }
 
-render(<Main />, document.getElementById("app"), { sync: true })
+render(<Main />, document.body, { sync: true })

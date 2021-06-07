@@ -108,4 +108,4 @@ function Li(props) {
   return <li>{props.i}</li>
 }
 
-render(<App />, document.getElementById("app"))
+render(<App />, document.getElementById("app"),{sync:true})
