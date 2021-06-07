@@ -9,11 +9,13 @@
 <a href="https://bundlephobia.com/result?p=fre"><img src="http://img.badgesize.io/https://unpkg.com/fre/dist/fre.js?compression=brotli&label=brotli" alt="brotli"></a>
 </p>
 
-- **Concurrent with Fiber** — This is an amazing idea, which implements the coroutine scheduler in JavaScript, and the rendering is asynchronous, which supports Time slicing and Suspense.
+- **Concurrent Mode** — This is an amazing idea, which implements the coroutine scheduler in JavaScript, and the rendering is asynchronous with **Time slicing**.
 
-- **Highly-optimized algorithm** — Fre has a better reconciliation algorithm, which traverses from right to left with pre-processing, and supports keyed.
+- **Offscreen rendering** — Another idea which operate DOM in memory and paint them all to the screen at one time.
 
-- **Do more with less** — After tree shaking, project of hello world is only 2KB, but it has most features, virtual DOM, hooks API, Fragment, ErrorBoundary and more.
+- **Highly-optimized algorithm** — Fre has a better reconciliation algorithm, It supported keyed, pre-process.
+
+- **Do more with less** — After tree shaking, project of hello world is only 2KB, but it has most features, virtual DOM, hooks API, Fragment, Suspense and more.
 
 ### Use
 
