@@ -83,7 +83,6 @@ const finishWork = (WIP) => {
     kid.lane |= WIP.lane
     invokeHooks(WIP)
   } else {
-    // console.log(WIP.parent)
     effect.next = WIP
     effect = WIP
   }
@@ -151,7 +150,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
 
   while (aHead <= aTail && bHead <= bTail) {
     if (!same(aCh[aTail], bCh[bTail])) break
-    clone(aCh[aTail--], bCh[bTail--], WIP)
+    clone(aCh[aTail--], bCh[bTail--], LANE.UPDATE)
   }
 
   while (aHead <= aTail && bHead <= bTail) {
@@ -163,7 +162,6 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     while (bHead <= bTail) {
       let c = bCh[bTail--]
       c.lane = LANE.INSERT
-      linke(WIP, c)
     }
   } else if (bHead > bTail) {
     while (aHead <= aTail) {
@@ -183,11 +181,10 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       let c = bCh[bTail--]
       let idx = keyed[c.key]
       if (idx != null) {
-        clone(aCh[idx], c, WIP)
+        clone(aCh[idx], c, LANE.INSERT)
         delete keyed[c.key]
       } else {
         c.lane = LANE.INSERT
-        linke(WIP, c)
       }
     }
     for (const k in keyed) {
@@ -198,16 +195,14 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
   }
 
   while (bHead-- > 0) {
-    clone(aCh[bHead], bCh[bHead], WIP)
+    clone(aCh[bHead], bCh[bHead], LANE.UPDATE)
   }
 
   for (var i = bCh.length - 1, prev = null; i >= 0; i--) {
     const child = bCh[i]
     child.parent = WIP
     if (i === bCh.length - 1) {
-      if (WIP.lane & LANE.SVG) {
-        child.lane |= LANE.SVG
-      }
+      if (WIP.lane & LANE.SVG) child.lane |= LANE.SVG
       WIP.child = child
     } else {
       prev.sibling = child
@@ -216,24 +211,13 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
   }
 }
 
-function clone(a, b, WIP) {
+function clone(a, b, lane) {
   b.lastProps = a.props
   b.node = a.node
   b.kids = a.kids
   b.hooks = a.hooks
   b.ref = a.ref
-  b.lane = WIP.lane
-  linke(WIP, b)
-}
-
-function linke(WIP, kid) {
-  if (WIP.effect) {
-    console.log(111)
-    WIP.effect.n = kid
-    WIP.effect = kid
-  } else {
-    WIP.effect = kid
-  }
+  b.lane = lane
 }
 
 

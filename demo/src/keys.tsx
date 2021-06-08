@@ -1,4 +1,4 @@
-import { h, render, useState } from "../../src/index"
+import {h, render, useState } from "../../src/index"
 
 // function App() {
 //   const [key, setKey] = useState([3,1,2])
@@ -76,20 +76,14 @@ import { h, render, useState } from "../../src/index"
 // }
 
 export default function App() {
-  const [state, setState] = useState([1, 2, 5]);
-
-  const swap = () => {
-    let a = state[1],b = state[2]
-    let arr = state
-    arr[1] = b
-    arr[2] = a
-    setState([1,5,2])
-  }
+  const [state, setState] = useState([1, 5,2]);
 
   return (
     <div>
       <button
-        onClick={swap}
+        onClick={() => {
+          setState([1,2,4]);
+        }}
       >
         set
       </button>
@@ -114,4 +108,4 @@ function Li(props) {
   return <li>{props.i}</li>
 }
 
-render(<App />, document.getElementById("app"), { sync: true })
+render(<App />, document.getElementById("app"),{sync:true})
