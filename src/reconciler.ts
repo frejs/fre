@@ -155,7 +155,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
 
   while (aHead <= aTail && bHead <= bTail) {
     if (!same(aCh[aHead], bCh[bHead])) break
-    clone(aCh[aHead++], bCh[bHead++], LANE.UPDATE)
+    aHead++; bHead++
   }
 
   if (aHead > aTail) {
@@ -194,13 +194,15 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     }
   }
 
+  while (bHead-- > 0) {
+    clone(aCh[bHead], bCh[bHead], LANE.UPDATE)
+  }
+
   for (var i = bCh.length - 1, prev = null; i >= 0; i--) {
     const child = bCh[i]
     child.parent = WIP
     if (i === bCh.length - 1) {
-      if (WIP.lane & LANE.SVG) {
-        child.lane |= LANE.SVG
-      }
+      if (WIP.lane & LANE.SVG) child.lane |= LANE.SVG
       WIP.child = child
     } else {
       prev.sibling = child
