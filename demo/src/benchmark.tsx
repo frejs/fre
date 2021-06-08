@@ -1,6 +1,6 @@
-// import { h, render, useReducer, useMemo, useEffect, shouldYield } from "../../src/index"
-import { render } from 'react-dom'
-import { useEffect, useReducer, useMemo, createElement as h } from 'react'
+import { h, render, useReducer, useMemo, useEffect, shouldYield } from "../../src/index"
+// import { render } from 'react-dom'
+// import { useEffect, useReducer, useMemo, createElement as h } from 'react'
 
 var startTime
 var lastMeasure
