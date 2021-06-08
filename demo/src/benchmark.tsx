@@ -2,9 +2,6 @@
 import { render } from 'react-dom'
 import { useEffect, useReducer, useMemo, createElement as h } from 'react'
 
-// import { render, createElement as h  } from 'preact'
-// import {useEffect,useReducer, useMemo} from 'preact/hooks'
-
 var startTime
 var lastMeasure
 var startMeasure = function (name) {

@@ -154,8 +154,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
   }
 
   while (aHead <= aTail && bHead <= bTail) {
-    if (!same(aCh[aHead], bCh[bHead])) break
-    clone(aCh[aHead++], bCh[bHead++], LANE.UPDATE)
+    if (!same(aCh[aHead++], bCh[bHead++])) break
   }
 
   if (aHead > aTail) {
@@ -192,6 +191,10 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       c.lane = LANE.REMOVE
       deletions.push(c)
     }
+  }
+
+  while (bHead > 0) {
+    clone(aCh[aHead--], bCh[bHead--], LANE.UPDATE)
   }
 
   for (var i = bCh.length - 1, prev = null; i >= 0; i--) {
