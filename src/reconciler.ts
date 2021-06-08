@@ -83,6 +83,7 @@ const finishWork = (WIP) => {
     kid.lane |= WIP.lane
     invokeHooks(WIP)
   } else {
+    // console.log(WIP.parent)
     effect.next = WIP
     effect = WIP
   }
@@ -169,7 +170,6 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       let c = aCh[aTail--]
       c.lane = LANE.REMOVE
       deletions.push(c)
-      linke(WIP, c)
     }
   } else {
     if (!keyed) {
@@ -183,7 +183,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       let c = bCh[bTail--]
       let idx = keyed[c.key]
       if (idx != null) {
-        clone(aCh[idx], c, LANE.INSERT)
+        clone(aCh[idx], c, WIP)
         delete keyed[c.key]
       } else {
         c.lane = LANE.INSERT
@@ -194,7 +194,6 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       let c = aCh[keyed[k]]
       c.lane = LANE.REMOVE
       deletions.push(c)
-      linke(WIP, c)
     }
   }
 
@@ -229,7 +228,8 @@ function clone(a, b, WIP) {
 
 function linke(WIP, kid) {
   if (WIP.effect) {
-    WIP.effect.next = kid
+    console.log(111)
+    WIP.effect.n = kid
     WIP.effect = kid
   } else {
     WIP.effect = kid

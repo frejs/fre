@@ -76,14 +76,14 @@ import { h, render, useState } from "../../src/index"
 // }
 
 export default function App() {
-  const [state, setState] = useState([1, 2, 5, 3, 4]);
+  const [state, setState] = useState([1, 2, 5]);
 
   const swap = () => {
-    let a = state[1],b = state[3]
+    let a = state[1],b = state[2]
     let arr = state
     arr[1] = b
-    arr[3] = a
-    setState(arr)
+    arr[2] = a
+    setState([1,5,2])
   }
 
   return (
