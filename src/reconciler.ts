@@ -154,8 +154,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
   }
 
   while (aHead <= aTail && bHead <= bTail) {
-    if (!same(aCh[aHead], bCh[bHead])) break
-    aHead++; bHead++
+    if (!same(aCh[aHead++], bCh[bHead++])) break
   }
 
   if (aHead > aTail) {
