@@ -10,6 +10,6 @@ export {
   useLayout,
   useLayout as useLayoutEffect,
 } from "./hook"
-export { shouldYield } from "./scheduler"
+export { shouldYield, startTransition } from "./scheduler"
 export { lazy, Suspense, ErrorBoundary } from "./boundary"
 export * from "./type"

@@ -9,7 +9,7 @@ import {
 } from "./type"
 import { createElement } from "./dom"
 import { resetCursor } from "./hook"
-import { scheduleWork, shouldYield, schedule } from "./scheduler"
+import { scheduleWork, shouldYield, startTransition } from "./scheduler"
 import { isArr, createText } from "./h"
 import { commitWork } from './commit'
 
@@ -234,7 +234,7 @@ function invokeHooks(fiber) {
       hooks.list.forEach((e) => e[2] && e[2]())
     } else {
       side(hooks.layout)
-      schedule(() => side(hooks.effect))
+      startTransition(() => side(hooks.effect))
     }
   }
 }
