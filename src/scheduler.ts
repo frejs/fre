@@ -3,10 +3,10 @@ import { config } from './reconciler'
 
 const queue: ITask[] = []
 const threshold: number = 1000 / 60
-const unit = []
+const transitions = []
 let deadline: number = 0
 
-export const schedule = (cb) => unit.push(cb) === 1 && postMessage()
+export const startTransition = (cb) => transitions.push(cb) === 1 && postMessage()
 
 export const scheduleWork = (callback: ITaskCallback, fiber: IFiber): void => {
   const job = {
@@ -14,11 +14,11 @@ export const scheduleWork = (callback: ITaskCallback, fiber: IFiber): void => {
     fiber,
   }
   queue.push(job)
-  schedule(flushWork)
+  startTransition(flushWork)
 }
 
 const postMessage = (() => {
-  const cb = () => unit.splice(0, unit.length).forEach((c) => c())
+  const cb = () => transitions.splice(0, transitions.length).forEach((c) => c())
   if (typeof MessageChannel !== "undefined") {
     const { port1, port2 } = new MessageChannel()
     port1.onmessage = cb
@@ -41,7 +41,7 @@ const flushWork = (): void => {
     }
     job = peek(queue)
   }
-  job && schedule(flushWork)
+  job && startTransition(flushWork)
 }
 
 export const shouldYield = (): boolean => {
