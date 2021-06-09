@@ -25,11 +25,6 @@ function App() {
   )
 }
 
-function B({i}){
-  console.log('子组件',i)
-  return 111
-}
-
 // const root = createRoot(document.getElementById("app"))
 
 // root.render(<App />)
