@@ -82,7 +82,7 @@ export default function App() {
     <div>
       <button
         onClick={() => {
-          setState([1,2,5]);
+          setState([1]);
         }}
       >
         set

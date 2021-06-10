@@ -16,7 +16,7 @@ import { commit } from './commit'
 let currentFiber: IFiber
 let finish = null
 let effect = null
-export let deletions = []
+let detach = null
 
 export const enum LANE {
   UPDATE = 1 << 1,
@@ -31,7 +31,8 @@ export const enum LANE {
 
 export function createRoot(root) {
   return {
-    render: (vnode) => render(vnode, root)
+    render: (vnode) => render(vnode, root),
+    mixin
   }
 }
 
@@ -51,6 +52,7 @@ export const update = (fiber?: IFiber) => {
     fiber.lane = LANE.UPDATE | LANE.DIRTY
     fiber.sibling = null
     effect = fiber
+    detach = fiber
     schedule(reconcile.bind(null, fiber) as any)
   }
 }
@@ -87,7 +89,7 @@ const bubble = (WIP) => {
     kid.lane |= WIP.lane
     invokeHooks(WIP)
   } else {
-    effect.next = WIP
+    effect.e = WIP
     effect = WIP
   }
 }
@@ -171,7 +173,8 @@ const diffKids = (WIP: any, children: FreNode): void => {
     while (aHead <= aTail) {
       let c = aCh[aTail--]
       c.lane = LANE.REMOVE
-      deletions.push(c)
+      detach.d = c
+      detach = c
     }
   } else {
     if (!keyed) {
@@ -195,14 +198,15 @@ const diffKids = (WIP: any, children: FreNode): void => {
     for (const k in keyed) {
       let c = aCh[keyed[k]]
       c.lane = LANE.REMOVE
-      deletions.push(c)
+      detach.d = c
+      detach = c
+
     }
   }
 
   while (bHead-- > 0) {
     clone(aCh[bHead], bCh[bHead], LANE.UPDATE, WIP, bHead)
   }
-
 }
 
 function linke(kid, WIP, i) {
@@ -244,6 +248,10 @@ function invokeHooks(fiber) {
       startTransition(() => side(hooks.effect))
     }
   }
+}
+
+function mixin(...mixins){
+  console.log(mixins)
 }
 
 const same = (a, b) => {

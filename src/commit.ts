@@ -1,26 +1,25 @@
 import { IFiber, IRef, } from "./type"
 import { updateElement } from "./dom"
-import { isFn, LANE, deletions } from './reconcile'
+import { isFn, LANE } from './reconcile'
 
 export const commit = (fiber: IFiber): void => {
-  let e = fiber.next
-  fiber.next = null
+  let d = fiber
+  let e = d.e
+  d.e = null
   do {
     const s = e.sibling
-    if (s && isFn(s.type)) {
-      e.sibling = s.child
-    }
+    if (s && isFn(s.type)) e.sibling = s.child
     paint(e)
-  } while (e = e.next)
-  deletions.forEach(e => {
-    if (isFn(e.type)) {
-      e.child.lane = LANE.REMOVE
-      paint(e.child)
+  } while (e = e.e)
+
+  while (d = d.d) {
+    if (isFn(d.type)) {
+      d.child.lane = LANE.REMOVE
+      paint(d.child)
     } else {
-      paint(e)
+      paint(d)
     }
-  })
-  deletions.length = 0
+  }
 }
 
 const paint = (fiber: IFiber): void => {

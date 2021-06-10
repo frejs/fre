@@ -54,10 +54,11 @@ export interface IFiber<P extends Attributes = any> {
   props: P
   lane: number
   time: number
-  next: IFiber,
+  e: IFiber,
   first:IFiber,
   last:IFiber,
   prev:IFiber,
+  d:IFiber,
   laziness: any[]
 }
 
