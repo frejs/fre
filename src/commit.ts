@@ -1,6 +1,6 @@
 import { IFiber, IRef, } from "./type"
 import { updateElement } from "./dom"
-import { isFn, LANE, deletions, config } from './reconciler'
+import { isFn, LANE, deletions, config } from './reconcile'
 
 export const commit = (fiber: IFiber): void => {
   let e = fiber.next

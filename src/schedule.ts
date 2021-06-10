@@ -1,5 +1,5 @@
 import { IFiber, ITask, ITaskCallback } from "./type"
-import { config } from "./reconciler"
+import { config } from "./reconcile"
 
 const queue: ITask[] = []
 const threshold: number = 1000 / 60

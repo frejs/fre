@@ -1,5 +1,5 @@
 import { h } from './h'
-import { LANE } from "./reconciler"
+import { LANE } from "./reconcile"
 
 // TODO: The lazy function has nothing to do with the core. 
 // It just throw a promise . We will move it out of the core in the future.

@@ -9,7 +9,7 @@ import {
 } from "./type"
 import { createElement } from "./dom"
 import { resetCursor } from "./hook"
-import { scheduleWork, shouldYield, startTransition } from "./scheduler"
+import { scheduleWork, shouldYield, startTransition } from "./schedule"
 import { isArr, createText } from "./h"
 import { commit } from './commit'
 
@@ -225,6 +225,8 @@ function clone(a, b, lane, WIP) {
 function linke(kid, WIP) {
   if(!WIP.prev){
     WIP.prev = kid
+  }else{
+    
   }
 }
 

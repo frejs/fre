@@ -1,5 +1,5 @@
 import { Attributes, DOM, IFiber } from "./type"
-import { isStr, LANE } from "./reconciler"
+import { isStr, LANE } from "./reconcile"
 
 export const updateElement = <P extends Attributes>(
   dom: DOM,
