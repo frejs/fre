@@ -1,24 +1,20 @@
 import { IFiber, ITask, ITaskCallback } from "./type"
-import { config } from './reconciler'
+import { config } from "./reconciler"
 
 const queue: ITask[] = []
 const threshold: number = 1000 / 60
-const unit = []
+const transitions = []
 let deadline: number = 0
 
-export const schedule = (cb) => unit.push(cb) === 1 && postMessage()
-
-export const scheduleWork = (callback: ITaskCallback, fiber: IFiber): void => {
-  const job = {
-    callback,
-    fiber,
-  }
-  queue.push(job)
-  schedule(flushWork)
+export const startTransition = (cb) => {
+  transitions.push(cb) === 1 && postMessage()
 }
 
+export const scheduleWork = (callback: ITaskCallback): void => queue.push({callback}) && startTransition(flushWork)
+
 const postMessage = (() => {
-  const cb = () => unit.splice(0, unit.length).forEach((c) => c())
+  const cb = () => transitions.splice(0, 1).forEach((c) => c())
+
   if (typeof MessageChannel !== "undefined") {
     const { port1, port2 } = new MessageChannel()
     port1.onmessage = cb
@@ -27,13 +23,13 @@ const postMessage = (() => {
   return () => setTimeout(cb)
 })()
 
-const flushWork = (): void => {
+const flush = (): void => {
   deadline = getTime() + threshold
   let job = peek(queue)
   while (job && !shouldYield()) {
-    const { callback, fiber } = job as any
+    const { callback } = job as any
     job.callback = null
-    const next = callback(fiber)
+    const next = callback()
     if (next) {
       job.callback = next as any
     } else {
@@ -41,12 +37,14 @@ const flushWork = (): void => {
     }
     job = peek(queue)
   }
-  job && schedule(flushWork)
+  job && startTransition(flush)
 }
 
 export const shouldYield = (): boolean => {
-  if (config.sync) return false
-  return (navigator as any)?.scheduling?.isInputPending() || getTime() >= deadline
+  if (config && config.sync) return false
+  return (
+    (navigator as any)?.scheduling?.isInputPending() || getTime() >= deadline
+  )
 }
 
 export const getTime = () => performance.now()

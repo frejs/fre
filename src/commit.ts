@@ -21,7 +21,7 @@ export const commitWork = (fiber: IFiber): void => {
     }
   })
   deletions.length = 0
-  config.done && config.done()
+  config && config.done()
 }
 
 const commit = (fiber: IFiber): void => {

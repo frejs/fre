@@ -1,7 +1,7 @@
 // import { h, render, useState, useEffect } from 'fre'
 // import { h, render } from 'preact'
 // import {useState, useEffect } from 'preact/hooks'
-import { render, useState, useEffect } from '../../src/index'
+import { render, useState, useEffect,h, startTransition } from '../../src/index'
 
 const UPDATE_EVERY = 500
 const BLOCK_FOR = 5
@@ -14,12 +14,17 @@ const App = () => {
     setTimeout(() => setCount(count + 1), UPDATE_EVERY)
   })
 
+  useEffect(() => {
+    startTransition(()=>{
+      console.log(123)
+    })
+  })
+
   const values = []
 
   for (let i = count; i < count + NUM_COMPONENTS; i++) {
     values.push(i)
   }
-
   return (
     <div className="wraper">
       <h1>Count: {count}</h1>
