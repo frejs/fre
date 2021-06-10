@@ -22,7 +22,7 @@ const consume = function (queue, timeout) {
 }
 
 const transit = function () {
-  const timeout = performance.now() + (1 << 4) * ~~(frame++ >> 3)
+  const timeout = performance.now() + (1 << 4) * (frame++ >> 3)
   consume(lightQueue, timeout)
   consume(deferQueue, timeout)
   if (lightQueue.length > 0) {
