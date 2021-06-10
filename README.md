@@ -248,7 +248,7 @@ export function enableTimeSlicing(fiber) {
             return false
          }
       },
-      diving(fiber) {
+      capturing(fiber) {
           console.log(fiber)
       },
       bubbling(fiber) {
