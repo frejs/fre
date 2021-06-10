@@ -14,12 +14,6 @@ const App = () => {
     setTimeout(() => setCount(count + 1), UPDATE_EVERY)
   })
 
-  useEffect(() => {
-    startTransition(()=>{
-      console.log(123)
-    })
-  })
-
   const values = []
 
   for (let i = count; i < count + NUM_COMPONENTS; i++) {
@@ -48,6 +42,7 @@ div.innerHTML = `<style>
 body {
   background: #010911;
   font-family: sans-serif;
+  overflow: hidden
 }
 
 h1 {
