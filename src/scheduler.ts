@@ -21,7 +21,7 @@ const consume = function (queue, timeout) {
     queue.splice(0, i)
   }
 }
-const flush = function () {
+const transit = function () {
   frame++
   const timeout = performance.now() + (1 << 4) * ~~(frame >> 3)
   consume(lightQueue, timeout)
@@ -31,14 +31,14 @@ const flush = function () {
     lightQueue.length = 0
   }
   if (lightQueue.length + deferQueue.length > 0) {
-    startTransition(flush)
+    startTransition(transit)
   } else {
     frame = 0
   }
 }
 
 
-export const startTransition = (cb) => transitions.push(cb) === 1 && postMessage()
+export const startTransition = (cb) => lightQueue.push(cb) === 1 && postMessage()
 
 export const scheduleWork = (callback: ITaskCallback, fiber: IFiber): void => {
   const job = {
@@ -50,7 +50,7 @@ export const scheduleWork = (callback: ITaskCallback, fiber: IFiber): void => {
 }
 
 const postMessage = (() => {
-  const cb = () => transitions.splice(0, transitions.length).forEach((c) => c())
+  const cb = () => transit
   if (typeof MessageChannel !== "undefined") {
     const { port1, port2 } = new MessageChannel()
     port1.onmessage = cb
