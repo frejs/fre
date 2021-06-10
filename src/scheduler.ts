@@ -22,8 +22,7 @@ const consume = function (queue, timeout) {
 }
 
 const transit = function () {
-  frame++
-  const timeout = performance.now() + (1 << 4) * ~~(frame >> 3)
+  const timeout = performance.now() + (1 << 4) * ~~(frame++ >> 3)
   consume(lightQueue, timeout)
   consume(deferQueue, timeout)
   if (lightQueue.length > 0) {
@@ -46,7 +45,7 @@ export const scheduleWork = (callback: ITaskCallback, fiber: IFiber): void => {
     fiber,
   }
   queue.push(job)
-  startTransition(flushWork)
+  startTransition(flush)
 }
 
 const postMessage = (() => {
@@ -58,7 +57,7 @@ const postMessage = (() => {
   return () => setTimeout(transit)
 })()
 
-const flushWork = (): void => {
+const flush = (): void => {
   deadline = getTime() + threshold
   let job = peek(queue)
   while (job && !shouldYield()) {
@@ -72,7 +71,7 @@ const flushWork = (): void => {
     }
     job = peek(queue)
   }
-  job && startTransition(flushWork)
+  job && startTransition(flush)
 }
 
 export const shouldYield = (): boolean => {
