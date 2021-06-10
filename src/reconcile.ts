@@ -17,7 +17,6 @@ let currentFiber: IFiber
 let finish = null
 let effect = null
 export let deletions = []
-let bbb = null
 
 export const enum LANE {
   UPDATE = 1 << 1,
@@ -37,10 +36,10 @@ export const render = (
     node,
     props: { children: vnode },
   } as IFiber
-  dispatchUpdate(rootFiber)
+  update(rootFiber)
 }
 
-export const dispatchUpdate = (fiber?: IFiber) => {
+export const update = (fiber?: IFiber) => {
   if (fiber && !(fiber.lane & LANE.DIRTY)) {
     fiber.lane = LANE.UPDATE | LANE.DIRTY
     fiber.sibling = null
@@ -202,12 +201,14 @@ const diffKids = (WIP: any, children: FreNode): void => {
 function linke(kid, WIP, i) {
   kid.parent = WIP
   if (i === WIP.kids.length - 1) {
-    if (WIP.lane & LANE.SVG) kid.lane |= LANE.SVG
+    if (WIP.lane & LANE.SVG) {
+      kid.lane |= LANE.SVG
+    }
     WIP.child = kid
   } else {
-    WIP.p.sibling = kid
+    WIP._prev.sibling = kid
   }
-  WIP.p = kid
+  WIP._prev = kid
 }
 
 function clone(a, b, lane, WIP, i) {
@@ -225,7 +226,7 @@ function invokeHooks(fiber) {
   if (laziness) {
     Promise.all(laziness).then(() => {
       fiber.laziness = null
-      dispatchUpdate(fiber)
+      update(fiber)
     })
   }
   if (hooks) {

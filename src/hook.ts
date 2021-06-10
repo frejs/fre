@@ -1,4 +1,4 @@
-import { dispatchUpdate, isFn, getCurrentFiber } from "./reconcile"
+import { update, isFn, getCurrentFiber } from "./reconcile"
 import {
   DependencyList,
   Reducer,
@@ -33,7 +33,7 @@ export const useReducer = <S, A>(
         : isFn(value)
         ? value(hook[0])
         : value
-      dispatchUpdate(current)
+      update(current)
     },
   ]
 }
