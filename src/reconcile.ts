@@ -17,6 +17,7 @@ let currentFiber: IFiber
 let finish = null
 let effect = null
 export let deletions = []
+let bbb = null
 
 export const enum LANE {
   UPDATE = 1 << 1,
@@ -147,19 +148,18 @@ const diffKids = (WIP: any, children: FreNode): void => {
 
   while (aHead <= aTail && bHead <= bTail) {
     if (!same(aCh[aTail], bCh[bTail])) break
-    clone(aCh[aTail--], bCh[bTail--], LANE.UPDATE, WIP)
+    clone(aCh[aTail--], bCh[bTail], LANE.UPDATE, WIP, bTail--)
   }
 
   while (aHead <= aTail && bHead <= bTail) {
-    if (!same(aCh[aHead], bCh[bHead])) break
-    aHead++; bHead++
+    if (!same(aCh[aHead++], bCh[bHead++])) break
   }
 
   if (aHead > aTail) {
     while (bHead <= bTail) {
-      let c = bCh[bTail--]
+      let c = bCh[bTail]
       c.lane = LANE.INSERT
-      linke(c, WIP)
+      linke(c, WIP, bTail--)
     }
   } else if (bHead > bTail) {
     while (aHead <= aTail) {
@@ -176,14 +176,14 @@ const diffKids = (WIP: any, children: FreNode): void => {
       }
     }
     while (bHead <= bTail) {
-      let c = bCh[bTail--]
+      let c = bCh[bTail]
       let idx = keyed[c.key]
       if (idx != null) {
-        clone(aCh[idx], c, LANE.INSERT, WIP)
+        clone(aCh[idx], c, LANE.INSERT, WIP, bTail--)
         delete keyed[c.key]
       } else {
         c.lane = LANE.INSERT
-        linke(c, WIP)
+        linke(c, WIP, bTail--)
       }
     }
     for (const k in keyed) {
@@ -194,46 +194,30 @@ const diffKids = (WIP: any, children: FreNode): void => {
   }
 
   while (bHead-- > 0) {
-    clone(aCh[bHead], bCh[bHead], LANE.UPDATE, WIP)
+    clone(aCh[bHead], bCh[bHead], LANE.UPDATE, WIP, bHead)
   }
 
-  for (var i = bCh.length - 1, prev = null; i >= 0; i--) {
-    const child = bCh[i]
-    child.parent = WIP
-    if (i === bCh.length - 1) {
-      if (WIP.lane & LANE.SVG) child.lane |= LANE.SVG
-      WIP.child = child
-    } else {
-      prev.sibling = child
-    }
-    prev = child
-  }
 }
 
-function clone(a, b, lane, WIP) {
+function linke(kid, WIP, i) {
+  kid.parent = WIP
+  if (i === WIP.kids.length - 1) {
+    if (WIP.lane & LANE.SVG) kid.lane |= LANE.SVG
+    WIP.child = kid
+  } else {
+    WIP.p.sibling = kid
+  }
+  WIP.p = kid
+}
+
+function clone(a, b, lane, WIP, i) {
   b.lastProps = a.props
   b.node = a.node
   b.kids = a.kids
   b.hooks = a.hooks
   b.ref = a.ref
   b.lane = lane
-  linke(b, WIP)
-}
-
-let aaa = null
-let index = 0
-
-function linke(kid, WIP) {
-  if (!aaa) {
-    aaa = kid
-  } else {
-    aaa.aaa = kid
-    aaa = kid
-  }
-  if (WIP.kids.length === index++) {
-    WIP.aaa = kid
-    index = 0
-  }
+  linke(b, WIP, i)
 }
 
 function invokeHooks(fiber) {
