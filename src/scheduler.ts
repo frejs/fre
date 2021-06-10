@@ -6,6 +6,38 @@ const threshold: number = 1000 / 60
 const transitions = []
 let deadline: number = 0
 
+let frame = 0
+let lightQueue = []
+let deferQueue = []
+
+const consume = function (queue, timeout) {
+  let i = 0, ts = 0
+  while (i < queue.length && (ts = performance.now()) < timeout) {
+    queue[i++](ts)
+  }
+  if (i === queue.length) {
+    queue.length = 0
+  } else if (i !== 0) {
+    queue.splice(0, i)
+  }
+}
+const flush = function () {
+  frame++
+  const timeout = performance.now() + (1 << 4) * ~~(frame >> 3)
+  consume(lightQueue, timeout)
+  consume(deferQueue, timeout)
+  if (lightQueue.length > 0) {
+    deferQueue.push(...lightQueue)
+    lightQueue.length = 0
+  }
+  if (lightQueue.length + deferQueue.length > 0) {
+    startTransition(flush)
+  } else {
+    frame = 0
+  }
+}
+
+
 export const startTransition = (cb) => transitions.push(cb) === 1 && postMessage()
 
 export const scheduleWork = (callback: ITaskCallback, fiber: IFiber): void => {
