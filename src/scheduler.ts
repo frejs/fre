@@ -10,13 +10,7 @@ export const startTransition = (cb) => {
   transitions.push(cb) === 1 && postMessage()
 }
 
-export const scheduleWork = (callback: ITaskCallback): void => {
-  const job = {
-    callback,
-  }
-  queue.push(job as any)
-  startTransition(flushWork)
-}
+export const scheduleWork = (callback: ITaskCallback): void => queue.push({callback}) && startTransition(flushWork)
 
 const postMessage = (() => {
   const cb = () => transitions.splice(0, 1).forEach((c) => c())
@@ -29,7 +23,7 @@ const postMessage = (() => {
   return () => setTimeout(cb)
 })()
 
-const flushWork = (): void => {
+const flush = (): void => {
   deadline = getTime() + threshold
   let job = peek(queue)
   while (job && !shouldYield()) {
@@ -43,7 +37,7 @@ const flushWork = (): void => {
     }
     job = peek(queue)
   }
-  job && startTransition(flushWork)
+  job && startTransition(flush)
 }
 
 export const shouldYield = (): boolean => {
