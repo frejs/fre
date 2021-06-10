@@ -34,7 +34,7 @@ function App() {
     </>
 }
 
-render(<App />, document.body)
+createRoot(document.body).render(<App/>)
 ```
 
 ### Hooks API
@@ -226,6 +226,29 @@ function ErrorComponent(){
 }
 ```
 
+### Mixins
+
+This is an unstable API and is not recommended until the last minute.
+
+```js
+const root = createRoot(document.body)
+root.mixin(suspense, lazy)
+root.render(<App/>)
+```
+Here is a mixin to disable time slicing:
+
+```js
+export function enableTimeSlicing(fiber) {
+   fiber.sync = ture
+   return {
+      shouldYeild() {
+         if (fiber.sync === true) {
+            return false
+         }
+      }
+   }
+}
+```
 
 ### jsx2
 
