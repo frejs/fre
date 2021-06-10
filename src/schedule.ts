@@ -1,5 +1,4 @@
 import { IFiber, ITask, ITaskCallback } from "./type"
-import { config } from "./reconcile"
 
 const queue: ITask[] = []
 const threshold: number = 1000 / 60
@@ -10,7 +9,7 @@ export const startTransition = (cb) => {
   transitions.push(cb) === 1 && postMessage()
 }
 
-export const scheduleWork = (callback): void => queue.push({callback} as any) && startTransition(flush)
+export const scheduleWork = (callback: ITaskCallback): void => queue.push({callback} as any) && startTransition(flush)
 
 const postMessage = (() => {
   const cb = () => transitions.splice(0, 1).forEach((c) => c())
@@ -41,7 +40,6 @@ const flush = (): void => {
 }
 
 export const shouldYield = (): boolean => {
-  if (config && config.sync) return false
   return (
     (navigator as any)?.scheduling?.isInputPending() || getTime() >= deadline
   )

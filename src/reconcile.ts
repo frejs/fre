@@ -11,12 +11,11 @@ import { createElement } from "./dom"
 import { resetCursor } from "./hook"
 import { scheduleWork, shouldYield, startTransition } from "./schedule"
 import { isArr, createText } from "./h"
-import { commit } from './commit'
+import { commitWork } from './commit'
 
 let currentFiber: IFiber
 let finish = null
 let effect = null
-export let config = {} as any
 export let deletions = []
 
 export const enum LANE {
@@ -32,13 +31,11 @@ export const enum LANE {
 export const render = (
   vnode: FreElement,
   node: Node,
-  con: any
 ): void => {
   const rootFiber = {
     node,
     props: { children: vnode },
   } as IFiber
-  config = con
   dispatchUpdate(rootFiber)
 }
 
@@ -47,25 +44,25 @@ export const dispatchUpdate = (fiber?: IFiber) => {
     fiber.lane = LANE.UPDATE | LANE.DIRTY
     fiber.sibling = null
     effect = fiber
-    scheduleWork(reconcile.bind(null,fiber) as any)
+    scheduleWork(reconcileWork.bind(null,fiber) as any)
   }
 }
 
-const reconcile = (WIP?: IFiber): boolean => {
-  while (WIP && !shouldYield()) WIP = capture(WIP)
-  if (WIP) return reconcile.bind(null, WIP)
+const reconcileWork = (WIP?: IFiber): boolean => {
+  while (WIP && !shouldYield()) WIP = reconcile(WIP)
+  if (WIP) return reconcileWork.bind(null, WIP)
   if (finish) {
-    commit(finish)
+    commitWork(finish)
     finish = null
   }
   return null
 }
 
-const capture = (WIP: IFiber): IFiber | undefined => {
+const reconcile = (WIP: IFiber): IFiber | undefined => {
   isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
   while (WIP) {
-    bubble(WIP)
+    finishWork(WIP)
     if (!finish && WIP.lane & LANE.DIRTY) {
       finish = WIP
       WIP.lane &= ~LANE.DIRTY
@@ -76,7 +73,7 @@ const capture = (WIP: IFiber): IFiber | undefined => {
   }
 }
 
-const bubble = (WIP) => {
+const finishWork = (WIP) => {
   if (isFn(WIP.type)) {
     const kid = WIP.child
     kid.sibling = WIP.sibling
@@ -150,18 +147,18 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
 
   while (aHead <= aTail && bHead <= bTail) {
     if (!same(aCh[aTail], bCh[bTail])) break
-    clone(aCh[aTail--], bCh[bTail--], LANE.UPDATE, WIP)
+    clone(aCh[aTail--], bCh[bTail--], LANE.UPDATE)
   }
 
   while (aHead <= aTail && bHead <= bTail) {
-    if (!same(aCh[aHead++], bCh[bHead++])) break
+    if (!same(aCh[aHead], bCh[bHead])) break
+    aHead++; bHead++
   }
 
   if (aHead > aTail) {
     while (bHead <= bTail) {
       let c = bCh[bTail--]
       c.lane = LANE.INSERT
-      linke(c, WIP)
     }
   } else if (bHead > bTail) {
     while (aHead <= aTail) {
@@ -181,11 +178,10 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       let c = bCh[bTail--]
       let idx = keyed[c.key]
       if (idx != null) {
-        clone(aCh[idx], c, LANE.INSERT, WIP)
+        clone(aCh[idx], c, LANE.INSERT)
         delete keyed[c.key]
       } else {
         c.lane = LANE.INSERT
-        linke(c, WIP)
       }
     }
     for (const k in keyed) {
@@ -196,7 +192,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
   }
 
   while (bHead-- > 0) {
-    clone(aCh[bHead], bCh[bHead], LANE.UPDATE, WIP)
+    clone(aCh[bHead], bCh[bHead], LANE.UPDATE)
   }
 
   for (var i = bCh.length - 1, prev = null; i >= 0; i--) {
@@ -212,22 +208,13 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
   }
 }
 
-function clone(a, b, lane, WIP) {
+function clone(a, b, lane) {
   b.lastProps = a.props
   b.node = a.node
   b.kids = a.kids
   b.hooks = a.hooks
   b.ref = a.ref
   b.lane = lane
-  linke(b, WIP)
-}
-
-function linke(kid, WIP) {
-  if(!WIP.prev){
-    WIP.prev = kid
-  }else{
-    
-  }
 }
 
 
