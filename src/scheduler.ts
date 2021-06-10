@@ -1,5 +1,5 @@
 import { IFiber, ITask, ITaskCallback } from "./type"
-import { config } from './reconciler'
+import { config } from "./reconciler"
 
 const queue: ITask[] = []
 const threshold: number = 1000 / 60
@@ -10,9 +10,10 @@ let lightQueue = []
 let deferQueue = []
 
 const consume = function (queue, timeout) {
-  let i = 0, ts = 0
+  let i = 0,
+    ts = 0
   while (i < queue.length && (ts = performance.now()) < timeout) {
-    queue[i++](ts)
+    queue[i++]()
   }
   if (i === queue.length) {
     queue.length = 0
@@ -22,8 +23,7 @@ const consume = function (queue, timeout) {
 }
 
 const transit = function () {
-  frame++
-  const timeout = performance.now() + (1 << 4) * ~~(frame >> 3)
+  const timeout = performance.now() + (1 << 4) * (frame++ >> 3)
   consume(lightQueue, timeout)
   consume(deferQueue, timeout)
   if (lightQueue.length > 0) {
@@ -37,15 +37,12 @@ const transit = function () {
   }
 }
 
+export const startTransition = (cb) =>
+  lightQueue.push(cb) === 1 && postMessage()
 
-export const startTransition = (cb) => lightQueue.push(cb) === 1 && postMessage()
-
-export const scheduleWork = (callback: ITaskCallback, fiber: IFiber): void => {
-  const job = {
-    callback,
-    fiber,
-  }
-  queue.push(job)
+export const scheduleWork = (callback: ITaskCallback): void => {
+  const job = { callback }
+  queue.push(job as any)
   startTransition(flushWork)
 }
 
@@ -62,9 +59,9 @@ const flushWork = (): void => {
   deadline = getTime() + threshold
   let job = peek(queue)
   while (job && !shouldYield()) {
-    const { callback, fiber } = job as any
+    const { callback } = job as any
     job.callback = null
-    const next = callback(fiber)
+    const next = callback()
     if (next) {
       job.callback = next as any
     } else {
@@ -76,8 +73,10 @@ const flushWork = (): void => {
 }
 
 export const shouldYield = (): boolean => {
-  if (config.sync) return false
-  return (navigator as any)?.scheduling?.isInputPending() || getTime() >= deadline
+  if (config && config.sync) return false
+  return (
+    (navigator as any)?.scheduling?.isInputPending() || getTime() >= deadline
+  )
 }
 
 export const getTime = () => performance.now()
