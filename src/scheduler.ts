@@ -3,9 +3,8 @@ import { config } from './reconciler'
 
 const queue: ITask[] = []
 const threshold: number = 1000 / 60
-const transitions = []
 let deadline: number = 0
-
+// for transtion queue
 let frame = 0
 let lightQueue = []
 let deferQueue = []
@@ -21,6 +20,7 @@ const consume = function (queue, timeout) {
     queue.splice(0, i)
   }
 }
+
 const transit = function () {
   frame++
   const timeout = performance.now() + (1 << 4) * ~~(frame >> 3)
@@ -31,7 +31,7 @@ const transit = function () {
     lightQueue.length = 0
   }
   if (lightQueue.length + deferQueue.length > 0) {
-    startTransition(transit)
+    postMessage()
   } else {
     frame = 0
   }
