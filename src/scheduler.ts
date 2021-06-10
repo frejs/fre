@@ -3,10 +3,42 @@ import { config } from './reconciler'
 
 const queue: ITask[] = []
 const threshold: number = 1000 / 60
-const transitions = []
 let deadline: number = 0
+// for transtion queue
+let frame = 0
+let lightQueue = []
+let deferQueue = []
 
-export const startTransition = (cb) => transitions.push(cb) === 1 && postMessage()
+const consume = function (queue, timeout) {
+  let i = 0, ts = 0
+  while (i < queue.length && (ts = performance.now()) < timeout) {
+    queue[i++](ts)
+  }
+  if (i === queue.length) {
+    queue.length = 0
+  } else if (i !== 0) {
+    queue.splice(0, i)
+  }
+}
+
+const transit = function () {
+  frame++
+  const timeout = performance.now() + (1 << 4) * ~~(frame >> 3)
+  consume(lightQueue, timeout)
+  consume(deferQueue, timeout)
+  if (lightQueue.length > 0) {
+    deferQueue.push(...lightQueue)
+    lightQueue.length = 0
+  }
+  if (lightQueue.length + deferQueue.length > 0) {
+    postMessage()
+  } else {
+    frame = 0
+  }
+}
+
+
+export const startTransition = (cb) => lightQueue.push(cb) === 1 && postMessage()
 
 export const scheduleWork = (callback: ITaskCallback, fiber: IFiber): void => {
   const job = {
@@ -18,13 +50,12 @@ export const scheduleWork = (callback: ITaskCallback, fiber: IFiber): void => {
 }
 
 const postMessage = (() => {
-  const cb = () => transitions.splice(0, transitions.length).forEach((c) => c())
   if (typeof MessageChannel !== "undefined") {
     const { port1, port2 } = new MessageChannel()
-    port1.onmessage = cb
+    port1.onmessage = transit
     return () => port2.postMessage(null)
   }
-  return () => setTimeout(cb)
+  return () => setTimeout(transit)
 })()
 
 const flushWork = (): void => {
