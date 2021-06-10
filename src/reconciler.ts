@@ -150,7 +150,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
 
   while (aHead <= aTail && bHead <= bTail) {
     if (!same(aCh[aTail], bCh[bTail])) break
-    clone(aCh[aTail--], bCh[bTail--], LANE.UPDATE)
+    clone(aCh[aTail--], bCh[bTail--], LANE.UPDATE, WIP)
   }
 
   while (aHead <= aTail && bHead <= bTail) {
@@ -161,6 +161,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
     while (bHead <= bTail) {
       let c = bCh[bTail--]
       c.lane = LANE.INSERT
+      linke(c, WIP)
     }
   } else if (bHead > bTail) {
     while (aHead <= aTail) {
@@ -180,10 +181,11 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
       let c = bCh[bTail--]
       let idx = keyed[c.key]
       if (idx != null) {
-        clone(aCh[idx], c, LANE.INSERT)
+        clone(aCh[idx], c, LANE.INSERT, WIP)
         delete keyed[c.key]
       } else {
         c.lane = LANE.INSERT
+        linke(c, WIP)
       }
     }
     for (const k in keyed) {
@@ -194,7 +196,7 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
   }
 
   while (bHead-- > 0) {
-    clone(aCh[bHead], bCh[bHead], LANE.UPDATE)
+    clone(aCh[bHead], bCh[bHead], LANE.UPDATE, WIP)
   }
 
   for (var i = bCh.length - 1, prev = null; i >= 0; i--) {
@@ -210,13 +212,20 @@ const reconcileChildren = (WIP: any, children: FreNode): void => {
   }
 }
 
-function clone(a, b, lane) {
+function clone(a, b, lane, WIP) {
   b.lastProps = a.props
   b.node = a.node
   b.kids = a.kids
   b.hooks = a.hooks
   b.ref = a.ref
   b.lane = lane
+  linke(b, WIP)
+}
+
+function linke(kid, WIP) {
+  if(!WIP.prev){
+    WIP.prev = kid
+  }
 }
 
 
