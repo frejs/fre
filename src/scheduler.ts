@@ -50,13 +50,12 @@ export const scheduleWork = (callback: ITaskCallback, fiber: IFiber): void => {
 }
 
 const postMessage = (() => {
-  const cb = () => transit
   if (typeof MessageChannel !== "undefined") {
     const { port1, port2 } = new MessageChannel()
-    port1.onmessage = cb
+    port1.onmessage = transit
     return () => port2.postMessage(null)
   }
-  return () => setTimeout(cb)
+  return () => setTimeout(transit)
 })()
 
 const flushWork = (): void => {
