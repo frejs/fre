@@ -243,10 +243,19 @@ Here is a mixin to disable time slicing:
 export function enableTimeSlicing(fiber) {
    fiber.sync = ture
    return {
-      shouldYeild() {
+      yield() {
          if (fiber.sync === true) {
             return false
          }
+      },
+      diving(fiber) {
+          console.log(fiber)
+      },
+      bubbling(fiber) {
+          console.log(fiber)
+      },
+      commit(fiber){
+          console.log(fiber)
       }
    }
 }
