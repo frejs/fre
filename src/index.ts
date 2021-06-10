@@ -1,5 +1,5 @@
 export { h, Fragment, h as createElement } from "./h"
-export { render } from "./reconcile"
+export { render, createRoot } from "./reconcile"
 export {
   useState,
   useReducer,

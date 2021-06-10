@@ -28,6 +28,13 @@ export const enum LANE {
   Error = 1 << 7,
   Boundary = Suspense | Error,
 }
+
+export function createRoot(root) {
+  return {
+    render: (vnode) => render(vnode, root)
+  }
+}
+
 export const render = (
   vnode: FreElement,
   node: Node,

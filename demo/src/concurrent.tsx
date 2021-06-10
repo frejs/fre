@@ -1,7 +1,7 @@
 // import { h, render, useState, useEffect } from 'fre'
 // import { h, render } from 'preact'
 // import {useState, useEffect } from 'preact/hooks'
-import { render, useState, useEffect,h, startTransition } from '../../src/index'
+import { render, useState, useEffect,h, createRoot } from '../../src/index'
 
 const UPDATE_EVERY = 500
 const BLOCK_FOR = 5
@@ -297,6 +297,5 @@ ul.solarsystem li.jupiter {
 </div>`
 
 document.body.insertBefore(div, app)
-render(<App />, app)
-// const app = createapp(document.getElementById('app'))
-// app.render(<App />)
+// render(<App />, app)
+createRoot(document.getElementById('app')).render(<App />)
