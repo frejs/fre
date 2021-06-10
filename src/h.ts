@@ -6,7 +6,7 @@ export const h = (type, props:any, ...kids) => {
   props = props || {}
   kids = flat(props.children || kids)
   if (kids.length) props.children = kids.length === 1 ? kids[0] : kids
-  let key = String(props.key) || null, ref = props.ref || null
+  let key = props.key + '', ref = props.ref || null
   delete props.key
   delete props.ref
   return createVnode(type, props, key, ref)
