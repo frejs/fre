@@ -47,7 +47,7 @@ export const dispatchUpdate = (fiber?: IFiber) => {
     fiber.lane = LANE.UPDATE | LANE.DIRTY
     fiber.sibling = null
     effect = fiber
-    scheduleWork(reconcileWork.bind(null,fiber))
+    scheduleWork(reconcileWork.bind(null,fiber) as any)
   }
 }
 
