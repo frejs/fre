@@ -9,7 +9,7 @@ export const startTransition = (cb) => {
   transitions.push(cb) === 1 && postMessage()
 }
 
-export const scheduleWork = (callback: ITaskCallback): void => queue.push({callback} as any) && startTransition(flush)
+export const schedule = (callback: ITaskCallback): void => queue.push({callback} as any) && startTransition(flush)
 
 const postMessage = (() => {
   const cb = () => transitions.splice(0, 1).forEach((c) => c())

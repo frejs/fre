@@ -9,7 +9,7 @@ import {
 } from "./type"
 import { createElement } from "./dom"
 import { resetCursor } from "./hook"
-import { scheduleWork, shouldYield, startTransition } from "./schedule"
+import { schedule, shouldYield, startTransition } from "./schedule"
 import { isArr, createText } from "./h"
 import { commit } from './commit'
 
@@ -44,7 +44,7 @@ export const dispatchUpdate = (fiber?: IFiber) => {
     fiber.lane = LANE.UPDATE | LANE.DIRTY
     fiber.sibling = null
     effect = fiber
-    scheduleWork(reconcile.bind(null,fiber) as any)
+    schedule(reconcile.bind(null, fiber) as any)
   }
 }
 
@@ -147,7 +147,7 @@ const diffKids = (WIP: any, children: FreNode): void => {
 
   while (aHead <= aTail && bHead <= bTail) {
     if (!same(aCh[aTail], bCh[bTail])) break
-    clone(aCh[aTail--], bCh[bTail--], LANE.UPDATE)
+    clone(aCh[aTail--], bCh[bTail--], LANE.UPDATE, WIP)
   }
 
   while (aHead <= aTail && bHead <= bTail) {
@@ -159,6 +159,7 @@ const diffKids = (WIP: any, children: FreNode): void => {
     while (bHead <= bTail) {
       let c = bCh[bTail--]
       c.lane = LANE.INSERT
+      linke(c, WIP)
     }
   } else if (bHead > bTail) {
     while (aHead <= aTail) {
@@ -178,10 +179,11 @@ const diffKids = (WIP: any, children: FreNode): void => {
       let c = bCh[bTail--]
       let idx = keyed[c.key]
       if (idx != null) {
-        clone(aCh[idx], c, LANE.INSERT)
+        clone(aCh[idx], c, LANE.INSERT, WIP)
         delete keyed[c.key]
       } else {
         c.lane = LANE.INSERT
+        linke(c, WIP)
       }
     }
     for (const k in keyed) {
@@ -192,7 +194,7 @@ const diffKids = (WIP: any, children: FreNode): void => {
   }
 
   while (bHead-- > 0) {
-    clone(aCh[bHead], bCh[bHead], LANE.UPDATE)
+    clone(aCh[bHead], bCh[bHead], LANE.UPDATE, WIP)
   }
 
   for (var i = bCh.length - 1, prev = null; i >= 0; i--) {
@@ -208,15 +210,31 @@ const diffKids = (WIP: any, children: FreNode): void => {
   }
 }
 
-function clone(a, b, lane) {
+function clone(a, b, lane, WIP) {
   b.lastProps = a.props
   b.node = a.node
   b.kids = a.kids
   b.hooks = a.hooks
   b.ref = a.ref
   b.lane = lane
+  linke(b, WIP)
 }
 
+let aaa = null
+let index = 0
+
+function linke(kid, WIP) {
+  if (!aaa) {
+    aaa = kid
+  } else {
+    aaa.aaa = kid
+    aaa = kid
+  }
+  if (WIP.kids.length === index++) {
+    WIP.aaa = kid
+    index = 0
+  }
+}
 
 function invokeHooks(fiber) {
   const { hooks, lane, laziness } = fiber
