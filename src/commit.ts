@@ -2,7 +2,7 @@ import { IFiber, IRef, } from "./type"
 import { updateElement } from "./dom"
 import { isFn, LANE, deletions } from './reconcile'
 
-export const commitWork = (fiber: IFiber): void => {
+export const commit = (fiber: IFiber): void => {
   let e = fiber.next
   fiber.next = null
   do {
@@ -10,20 +10,20 @@ export const commitWork = (fiber: IFiber): void => {
     if (s && isFn(s.type)) {
       e.sibling = s.child
     }
-    commit(e)
+    paint(e)
   } while (e = e.next)
   deletions.forEach(e => {
     if (isFn(e.type)) {
       e.child.lane = LANE.REMOVE
-      commit(e.child)
+      paint(e.child)
     } else {
-      commit(e)
+      paint(e)
     }
   })
   deletions.length = 0
 }
 
-const commit = (fiber: IFiber): void => {
+const paint = (fiber: IFiber): void => {
   let { lane, parentNode, node, ref } = fiber
   if (lane & LANE.REMOVE) {
     kidsRefer(fiber.kids)
