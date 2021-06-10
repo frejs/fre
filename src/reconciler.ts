@@ -11,7 +11,7 @@ import { createElement } from "./dom"
 import { resetCursor } from "./hook"
 import { scheduleWork, shouldYield, startTransition } from "./scheduler"
 import { isArr, createText } from "./h"
-import { commitWork } from './commit'
+import { commit } from './commit'
 
 let currentFiber: IFiber
 let finish = null
@@ -47,25 +47,25 @@ export const dispatchUpdate = (fiber?: IFiber) => {
     fiber.lane = LANE.UPDATE | LANE.DIRTY
     fiber.sibling = null
     effect = fiber
-    scheduleWork(reconcileWork.bind(null,fiber) as any)
+    scheduleWork(reconcile.bind(null,fiber) as any)
   }
 }
 
-const reconcileWork = (WIP?: IFiber): boolean => {
-  while (WIP && !shouldYield()) WIP = reconcile(WIP)
-  if (WIP) return reconcileWork.bind(null, WIP)
+const reconcile = (WIP?: IFiber): boolean => {
+  while (WIP && !shouldYield()) WIP = capture(WIP)
+  if (WIP) return reconcile.bind(null, WIP)
   if (finish) {
-    commitWork(finish)
+    commit(finish)
     finish = null
   }
   return null
 }
 
-const reconcile = (WIP: IFiber): IFiber | undefined => {
+const capture = (WIP: IFiber): IFiber | undefined => {
   isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
   while (WIP) {
-    finishWork(WIP)
+    bubble(WIP)
     if (!finish && WIP.lane & LANE.DIRTY) {
       finish = WIP
       WIP.lane &= ~LANE.DIRTY
@@ -76,7 +76,7 @@ const reconcile = (WIP: IFiber): IFiber | undefined => {
   }
 }
 
-const finishWork = (WIP) => {
+const bubble = (WIP) => {
   if (isFn(WIP.type)) {
     const kid = WIP.child
     kid.sibling = WIP.sibling
