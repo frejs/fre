@@ -222,7 +222,7 @@ const same = (a, b) => {
   return a && b && a.key === b.key && type(a) === type(b)
 }
 
-const arrayfy = (arr) =>
+export const arrayfy = (arr) =>
   !arr ? [] : isArr(arr) ? arr.filter((a) => a != null) : [arr]
 
 const side = (effects: IEffect[]): void => {
