@@ -182,7 +182,6 @@ const diffKids = (WIP: any, children: FreNode): void => {
 }
 
 function linke(kid, WIP, i) {
-  console.log(kid, i, WIP.kids)
   kid.parent = WIP
   if (i === WIP.kids.length - 1) {
     if (WIP.lane & LANE.SVG) {
