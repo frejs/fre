@@ -76,20 +76,18 @@ import {h, render, useState } from "../../src/index"
 // }
 
 export default function App() {
-  const [state, setState] = useState([1, 5,2]);
+  const [state, setState] = useState(true);
 
   return (
     <div>
       <button
         onClick={() => {
-          setState([1]);
+          setState(false);
         }}
       >
         set
       </button>
-      {state.map((item) => {
-        return <Li i={item} key={item}>{item}</Li>;
-      })}
+      {state?<li>111</li>:null}
     </div>
   );
 }

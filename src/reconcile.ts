@@ -11,7 +11,7 @@ import { createElement } from "./dom"
 import { resetCursor } from "./hook"
 import { schedule, shouldYield, startTransition } from "./schedule"
 import { isArr, createText } from "./h"
-import { commit } from './commit'
+import { commit } from "./commit"
 
 let currentFiber: IFiber
 let finish = null
@@ -32,14 +32,10 @@ export const enum LANE {
 export function createRoot(root) {
   return {
     render: (vnode) => render(vnode, root),
-    mixin
   }
 }
 
-export const render = (
-  vnode: FreElement,
-  node: Node,
-): void => {
+export const render = (vnode: FreElement, node: Node): void => {
   const rootFiber = {
     node,
     props: { children: vnode },
@@ -97,23 +93,7 @@ const bubble = (WIP) => {
 const updateHook = <P = Attributes>(WIP: IFiber): void => {
   currentFiber = WIP
   resetCursor()
-  try {
-    var children = (WIP.type as FC<P>)(WIP.props)
-  } catch (e) {
-    const then = typeof e?.then === "function",
-      p = getBoundary(WIP, then),
-      fb = simpleVnode(p.props.fallback, e)
-    if (!p || !fb) throw e
-    if (then) {
-      if (!p.laziness) {
-        p.laziness = []
-        p.child = children = fb
-      }
-      p.laziness.push(e)
-    } else {
-      children = fb
-    }
-  }
+  let children = (WIP.type as FC<P>)(WIP.props)
   isStr(children) && (children = simpleVnode(children))
   diffKids(WIP, children)
 }
@@ -134,14 +114,6 @@ const simpleVnode = (type: any, props?: any) =>
 const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
   while ((WIP = WIP.parent)) {
     if (!isFn(WIP.type)) return WIP.node
-  }
-}
-
-const getBoundary = (WIP: IFiber, then): IFiber | undefined => {
-  while ((WIP = WIP.parent)) {
-    if ((WIP.type as any).lane & (then ? LANE.Suspense : LANE.Error)) {
-      return WIP
-    }
   }
 }
 
@@ -200,16 +172,17 @@ const diffKids = (WIP: any, children: FreNode): void => {
       c.lane = LANE.REMOVE
       detach.d = c
       detach = c
-
     }
   }
 
-  while (bHead-- > 0) {
-    clone(aCh[bHead], bCh[bHead], LANE.UPDATE, WIP, bHead)
+  let b = bHead - 1
+  while (b-- > 0) {
+    clone(aCh[b], bCh[b], LANE.UPDATE, WIP, b)
   }
 }
 
 function linke(kid, WIP, i) {
+  console.log(kid, i, WIP.kids)
   kid.parent = WIP
   if (i === WIP.kids.length - 1) {
     if (WIP.lane & LANE.SVG) {
@@ -233,13 +206,7 @@ function clone(a, b, lane, WIP, i) {
 }
 
 function invokeHooks(fiber) {
-  const { hooks, lane, laziness } = fiber
-  if (laziness) {
-    Promise.all(laziness).then(() => {
-      fiber.laziness = null
-      update(fiber)
-    })
-  }
+  const { hooks, lane } = fiber
   if (hooks) {
     if (lane & LANE.REMOVE) {
       hooks.list.forEach((e) => e[2] && e[2]())
@@ -250,16 +217,13 @@ function invokeHooks(fiber) {
   }
 }
 
-function mixin(...mixins){
-  console.log(mixins)
-}
-
 const same = (a, b) => {
-  const type = (c) => isFn(c.type) ? c.type.name : c.type
-  return a && b && (a.key === b.key) && (type(a) === type(b))
+  const type = (c) => (isFn(c.type) ? c.type.name : c.type)
+  return a && b && a.key === b.key && type(a) === type(b)
 }
 
-const arrayfy = (arr) => (!arr ? [] : isArr(arr) ? arr : [arr])
+const arrayfy = (arr) =>
+  !arr ? [] : isArr(arr) ? arr.filter((a) => a != null) : [arr]
 
 const side = (effects: IEffect[]): void => {
   effects.forEach((e) => e[2] && e[2]())
