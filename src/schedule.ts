@@ -6,10 +6,13 @@ const transitions = []
 let deadline: number = 0
 
 export const startTransition = (cb) => {
-  transitions.push(cb) === 1 && postMessage()
+  transitions.push(cb) && postMessage()
 }
 
-export const schedule = (callback: ITaskCallback): void => queue.push({callback} as any) && startTransition(flush)
+export const schedule = (callback: any): void => {
+  queue.push({ callback })
+  startTransition(flush)
+}
 
 const postMessage = (() => {
   const cb = () => transitions.splice(0, 1).forEach((c) => c())

@@ -8,7 +8,9 @@ export const commit = (fiber: IFiber): void => {
   d.e = null
   do {
     const s = e.sibling
-    if (s && isFn(s.type)) e.sibling = s.child
+    if (s && isFn(s.type)) {
+      e.sibling = s.child
+    }
     paint(e)
   } while (e = e.e)
 

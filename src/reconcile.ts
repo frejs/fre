@@ -45,11 +45,14 @@ export const render = (vnode: FreElement, node: Node): void => {
 
 export const update = (fiber?: IFiber) => {
   if (fiber && !(fiber.lane & LANE.DIRTY)) {
-    fiber.lane = LANE.UPDATE | LANE.DIRTY
-    fiber.sibling = null
-    effect = fiber
-    detach = fiber
-    schedule(reconcile.bind(null, fiber) as any)
+    const callback = () => {
+      fiber.lane = LANE.UPDATE | LANE.DIRTY
+      fiber.sibling = null
+      effect = fiber
+      detach = fiber
+      reconcile(fiber)
+    }
+    schedule(callback)
   }
 }
 
@@ -91,8 +94,8 @@ const bubble = (WIP) => {
 }
 
 const updateHook = <P = Attributes>(WIP: IFiber): void => {
-  currentFiber = WIP
   resetCursor()
+  currentFiber = WIP
   let children = (WIP.type as FC<P>)(WIP.props)
   isStr(children) && (children = simpleVnode(children))
   diffKids(WIP, children)
