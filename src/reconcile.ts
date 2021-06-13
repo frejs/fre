@@ -175,9 +175,8 @@ const diffKids = (WIP: any, children: FreNode): void => {
     }
   }
 
-  let b = bHead - 1
-  while (b-- > 0) {
-    clone(aCh[b], bCh[b], LANE.UPDATE, WIP, b)
+  while (bHead-- > 0) {
+    clone(aCh[bHead], bCh[bHead], LANE.UPDATE, WIP, bHead)
   }
 }
 

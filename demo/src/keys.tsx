@@ -24,17 +24,17 @@ import {h, render, useState } from "../../src/index"
 //   ]
 // }
 
-// function App() {
-//   const [key, setKey] = useState(['a', 'b', 'c'])
-//   return [
-//     <button onClick={() => setKey(['c', 'b','a'])}>x</button>,
-//     <ul>
-//       {key.map((i) => (
-//         <li key={i}>{i}</li>
-//       ))}
-//     </ul>,
-//   ]
-// }
+function App() {
+  const [key, setKey] = useState(['a', 'b', 'c'])
+  return <div>
+    <button onClick={() => setKey(['c', 'b','a'])}>x</button>,
+    <ul>
+      {key.map((i) => (
+        <li key={i}>{i}</li>
+      ))}
+    </ul>,
+  </div>
+}
 
 // function App() {
 //   const [key, setKey] = useState([1, 2, 3])
@@ -75,22 +75,22 @@ import {h, render, useState } from "../../src/index"
 //   )
 // }
 
-export default function App() {
-  const [state, setState] = useState(true);
+// export default function App() {
+//   const [state, setState] = useState(true);
 
-  return (
-    <div>
-      <button
-        onClick={() => {
-          setState(false);
-        }}
-      >
-        set
-      </button>
-      {state?<li>111</li>:null}
-    </div>
-  );
-}
+//   return (
+//     <div>
+//       <button
+//         onClick={() => {
+//           setState(false);
+//         }}
+//       >
+//         set
+//       </button>
+//       {state?<li>111</li>:null}
+//     </div>
+//   );
+// }
 
 // function Li(props) {
 //   return <div>
