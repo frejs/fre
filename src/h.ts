@@ -5,7 +5,7 @@ import { FreElement } from "./type"
 export const h = (type, props: any, ...kids) => {
   props = props || {}
   const c = arrayfy(props.children || kids)
-  kids = flat(c)
+  kids = flat(c).filter((i) => i != null)
   if (kids.length) props.children = kids.length === 1 ? kids[0] : kids
   let key = props.key + "",
     ref = props.ref || null

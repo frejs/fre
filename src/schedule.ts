@@ -10,7 +10,7 @@ export const startTransition = (cb) => {
 }
 
 export const schedule = (callback: any): void => {
-  queue.push({ callback })
+  queue.push({ callback } as any)
   startTransition(flush)
 }
 
