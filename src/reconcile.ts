@@ -223,8 +223,8 @@ const same = (a, b) => {
 export const arrayfy = (arr) => (!arr ? [] : isArr(arr) ? arr : [arr])
 
 const side = (effects: IEffect[]): void => {
-  effects.forEach((e) => e[2] && e[2]())
-  effects.forEach((e) => (e[2] = e[0]()))
+  effects.forEach((e) => e[2] && e[2](currentFiber))
+  effects.forEach((e) => (e[2] = e[0](currentFiber)))
   effects.length = 0
 }
 
