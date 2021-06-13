@@ -11,5 +11,4 @@ export {
   useLayout as useLayoutEffect,
 } from "./hook"
 export { shouldYield, startTransition } from "./schedule"
-export { lazy, Suspense, ErrorBoundary } from "./boundary"
 export * from "./type"

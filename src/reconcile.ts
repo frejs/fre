@@ -24,9 +24,6 @@ export const enum LANE {
   REMOVE = 1 << 3,
   SVG = 1 << 4,
   DIRTY = 1 << 5,
-  Suspense = 1 << 6,
-  Error = 1 << 7,
-  Boundary = Suspense | Error,
 }
 
 export function createRoot(root) {
