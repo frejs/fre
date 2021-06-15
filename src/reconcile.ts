@@ -81,8 +81,10 @@ const capture = (WIP: IFiber): IFiber | undefined => {
 const bubble = (WIP) => {
   if (isFn(WIP.type)) {
     const kid = WIP.child
-    kid.sibling = WIP.sibling
-    kid.lane |= WIP.lane
+    if (kid) {
+      kid.sibling = WIP.sibling
+      kid.lane |= WIP.lane
+    }
     invokeHooks(WIP)
   } else {
     effect.e = WIP
