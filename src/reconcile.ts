@@ -80,7 +80,10 @@ const capture = (WIP: IFiber): IFiber | undefined => {
 
 const bubble = (WIP) => {
   if (isFn(WIP.type)) {
-    const kid = WIP.child
+    let kid = WIP.child
+    while (isFn(kid.type)) {
+      kid = kid.child
+    }
     if (kid) {
       kid.sibling = WIP.sibling
       kid.lane |= WIP.lane

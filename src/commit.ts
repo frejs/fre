@@ -25,6 +25,7 @@ export const commit = (fiber: IFiber): void => {
 }
 
 const paint = (fiber: IFiber): void => {
+  // console.log(fiber)
   let { lane, parentNode, node, ref } = fiber
   if (lane & LANE.REMOVE) {
     kidsRefer(fiber.kids)

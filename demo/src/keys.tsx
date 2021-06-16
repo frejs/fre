@@ -27,13 +27,17 @@ import {h, render, useState } from "../../src/index"
 function App() {
   const [key, setKey] = useState(['a', 'b', 'c'])
   return <div>
-    <button onClick={() => setKey(['c', 'b','a'])}>x</button>,
-    <ul>
-      {key.map((i) => (
-        <li key={i}>{i}</li>
-      ))}
-    </ul>,
+    <button onClick={() => setKey(['c', 'b','a'])}>x</button>
+    <Button></Button>
   </div>
+}
+
+function Button(){
+  return <A/>
+}
+
+function A(props){
+  return <button>111</button>
 }
 
 // function App() {
