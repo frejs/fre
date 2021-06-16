@@ -7,10 +7,11 @@ export const commit = (fiber: IFiber): void => {
   let e = d.e
   d.e = null
   do {
-    const s = e.sibling
-    if (s && isFn(s.type)) {
-      e.sibling = s.child
+    let s = e.s
+    while (s && isFn(s.type)) {
+      s = s.child
     }
+    e.s = s
     paint(e)
   } while (e = e.e)
 
@@ -25,7 +26,6 @@ export const commit = (fiber: IFiber): void => {
 }
 
 const paint = (fiber: IFiber): void => {
-  // console.log(fiber)
   let { lane, parentNode, node, ref } = fiber
   if (lane & LANE.REMOVE) {
     kidsRefer(fiber.kids)
@@ -34,7 +34,7 @@ const paint = (fiber: IFiber): void => {
     fiber.lane = 0
     return
   }
-  let s = fiber.sibling
+  let s = fiber.s
   if (s) s.prev = fiber
   if (lane & LANE.UPDATE) {
     updateElement(node, fiber.lastProps || {}, fiber.props)

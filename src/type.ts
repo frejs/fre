@@ -59,7 +59,8 @@ export interface IFiber<P extends Attributes = any> {
   last:IFiber,
   prev:IFiber,
   d:IFiber,
-  laziness: any[]
+  s:any,
+  laziness: any[],
 }
 
 export type HTMLElementEx = HTMLElement & { last: IFiber | null }

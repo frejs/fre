@@ -27,7 +27,8 @@ import {h, render, useState } from "../../src/index"
 function App() {
   const [key, setKey] = useState(['a', 'b', 'c'])
   return <div>
-    <button onClick={() => setKey(['c', 'b','a'])}>x</button>
+    <div>111</div>
+    <Button></Button>
     <Button></Button>
   </div>
 }

@@ -84,8 +84,8 @@ const bubble = (WIP) => {
     while (isFn(kid.type)) {
       kid = kid.child
     }
-    if (kid) {
-      kid.sibling = WIP.sibling
+    if (kid && WIP.sibling) {
+      kid.s = WIP.sibling
       kid.lane |= WIP.lane
     }
     invokeHooks(WIP)
