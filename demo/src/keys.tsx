@@ -26,19 +26,18 @@ import {h, render, useState } from "../../src/index"
 
 function App() {
   const [key, setKey] = useState(['a', 'b', 'c'])
-  return <div>
-    <div>111</div>
-    <Button></Button>
-    <Button></Button>
-  </div>
+  return h(A, null, 222, " items left")
 }
+
+
 
 function Button(){
   return <A/>
 }
 
 function A(props){
-  return <button>111</button>
+  console.log(props)
+  return props.children
 }
 
 // function App() {
