@@ -12,32 +12,35 @@ export const commit = (fiber: IFiber): void => {
       s = s.child
     }
     e.s = s
-    insert(e)
+    paint(e)
   } while (e = e.e)
 
-  while (d = d.d) remove(d)
-}
-
-const remove = (fiber) => {
-  if (isFn(fiber.type)) {
-    fiber.child.lane = LANE.REMOVE
-    remove(fiber.child)
-  } else {
-    kidsRefer(fiber.kids)
-    fiber.parentNode.removeChild(fiber.node)
-    refer(fiber.ref, null)
-    fiber.lane = 0
+  while (d = d.d) {
+    if (isFn(d.type)) {
+      d.child.lane = LANE.REMOVE
+      paint(d.child)
+    } else {
+      paint(d)
+    }
   }
 }
 
-const insert = (fiber: IFiber): void => {
+const paint = (fiber: IFiber): void => {
   let { lane, parentNode, node, ref } = fiber
-  let s = fiber.s
+  if (lane & LANE.REMOVE) {
+    kidsRefer(fiber.kids)
+    parentNode.removeChild(fiber.node)
+    refer(ref, null)
+    fiber.lane = 0
+    return
+  }
+  let s = fiber.s || fiber.sibling
   if (s) s.prev = fiber
   if (lane & LANE.UPDATE) {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (lane & LANE.INSERT) {
+    console.log(node)
     parentNode.insertBefore(node, fiber.prev?.node)
   }
   refer(ref, node)
@@ -49,9 +52,8 @@ const refer = (ref: IRef, dom?: HTMLElement): void => {
 }
 
 const kidsRefer = (kids: any): void => {
-  for (let i = kids.length; i >= 0; i--) {
-    const kid = kids[i]
+  kids.forEach((kid) => {
     kid.kids && kidsRefer(kid.kids)
     refer(kid.ref, null)
-  }
+  })
 }
