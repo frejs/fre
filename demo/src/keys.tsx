@@ -12,17 +12,17 @@ import {h, render, useState } from "../../src/index"
 //   ]
 // }
 
-function App() {
-  const [key, setKey] = useState([1,2, 3])
-  return [
-    <button onClick={() => setKey([1,3,2])}>x</button>,
-    <ul>
-      {key.map((i) => (
-        <li key={i}>{i}</li>
-      ))}
-    </ul>,
-  ]
-}
+// function App() {
+//   const [key, setKey] = useState([1,2,6, 3])
+//   return [
+//     <button onClick={() => setKey([1,3,5,2,4])}>x</button>,
+//     <ul>
+//       {key.map((i) => (
+//         <li key={i}>{i}</li>
+//       ))}
+//     </ul>,
+//   ]
+// }
 
 // function App() {
 //   const [key, setKey] = useState(['a', 'b', 'c'])

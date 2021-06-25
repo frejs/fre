@@ -34,14 +34,14 @@ const paint = (fiber: IFiber): void => {
     fiber.lane = 0
     return
   }
-  let s = fiber.s || fiber.sibling
+  let s = fiber.s
   if (s) s.prev = fiber
   if (lane & LANE.UPDATE) {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (lane & LANE.INSERT) {
-    console.log(node)
-    parentNode.insertBefore(node, fiber.prev?.node)
+    const after = fiber.prev?.node
+    parentNode.insertBefore(node, after)
   }
   refer(ref, node)
 }

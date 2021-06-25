@@ -90,6 +90,7 @@ const bubble = (WIP) => {
     }
     invokeHooks(WIP)
   } else {
+    WIP.s = WIP.sibling
     effect.e = WIP
     effect = WIP
   }
@@ -137,7 +138,8 @@ const diffKids = (WIP: any, children: FreNode): void => {
   }
 
   while (aHead <= aTail && bHead <= bTail) {
-    if (!same(aCh[aHead++], bCh[bHead++])) break
+    if (!same(aCh[aHead], bCh[bHead])) break
+    aHead++; bHead++
   }
 
   if (aHead > aTail) {
