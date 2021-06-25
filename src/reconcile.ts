@@ -27,7 +27,7 @@ export const enum LANE {
   DIRTY = 1 << 5,
 }
 
-export const render = (vnode: FreElement, node: Node, config): void => {
+export const render = (vnode: FreElement, node: Node, config?: any): void => {
   const rootFiber = {
     node,
     props: { children: vnode },
