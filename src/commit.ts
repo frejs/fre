@@ -40,7 +40,6 @@ const paint = (fiber: IFiber): void => {
     updateElement(node, fiber.lastProps || {}, fiber.props)
   }
   if (lane & LANE.INSERT) {
-    console.log(node)
     parentNode.insertBefore(node, fiber.prev?.node)
   }
   refer(ref, node)
