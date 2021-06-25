@@ -1,4 +1,5 @@
 import { IFiber, ITask, ITaskCallback } from "./type"
+import { options } from "./reconcile"
 
 const queue: ITask[] = []
 const threshold: number = 1000 / 60
@@ -43,6 +44,7 @@ const flush = (): void => {
 }
 
 export const shouldYield = (): boolean => {
+  if (options.sync) return false
   return (
     (navigator as any)?.scheduling?.isInputPending() || getTime() >= deadline
   )

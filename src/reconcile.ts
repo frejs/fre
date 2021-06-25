@@ -17,6 +17,7 @@ let currentFiber: IFiber
 let finish = null
 let effect = null
 let detach = null
+export let options: any = {}
 
 export const enum LANE {
   UPDATE = 1 << 1,
@@ -26,30 +27,24 @@ export const enum LANE {
   DIRTY = 1 << 5,
 }
 
-export function createRoot(root) {
-  return {
-    render: (vnode) => render(vnode, root),
-  }
-}
-
-export const render = (vnode: FreElement, node: Node): void => {
+export const render = (vnode: FreElement, node: Node, config): void => {
   const rootFiber = {
     node,
     props: { children: vnode },
   } as IFiber
+  if (config) options = config
   update(rootFiber)
 }
 
 export const update = (fiber?: IFiber) => {
   if (fiber && !(fiber.lane & LANE.DIRTY)) {
-    const callback = () => {
+    schedule(() => {
       fiber.lane = LANE.UPDATE | LANE.DIRTY
       fiber.sibling = null
       effect = fiber
       detach = fiber
       reconcile(fiber)
-    }
-    schedule(callback)
+    })
   }
 }
 
