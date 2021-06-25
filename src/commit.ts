@@ -46,7 +46,6 @@ const kidsRefer = (kids: any): void => {
 
 const remove = (d) => {
   if (isFn(d.type)) {
-    d.child.lane = LANE.REMOVE
     remove(d.child)
   } else {
     kidsRefer(d.kids)
