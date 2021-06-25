@@ -1,4 +1,4 @@
-import {render, useState, useEffect } from '../../src'
+import {render, useState, useEffect ,h} from '../../src'
 // import { render } from "react-dom"
 // import { createElement as h, useState, useEffect,useRef } from "react"
 // import { h, render } from 'preact'

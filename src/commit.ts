@@ -5,7 +5,7 @@ import { getKid, isFn, LANE } from './reconcile'
 export const commit = (fiber: IFiber): void => {
   let d = fiber
   let e = d.e
-  d.e = null
+  fiber.e = null
   do {
     let s = e.s
     while (s && isFn(s.type)) {
@@ -16,6 +16,7 @@ export const commit = (fiber: IFiber): void => {
   } while (e = e.e)
 
   while (d = d.d) remove(d)
+  fiber.d = null
 }
 
 const insert = (fiber: IFiber): void => {
@@ -51,6 +52,5 @@ const remove = (d) => {
     kidsRefer(d.kids)
     d.parentNode.removeChild(d.node)
     refer(d.ref, null)
-    d.lane = 0
   }
 }
