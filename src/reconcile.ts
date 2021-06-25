@@ -221,8 +221,7 @@ function invokeHooks(fiber) {
 }
 
 const same = (a, b) => {
-  const type = (c) => (isFn(c.type) ? c.type.name : c.type)
-  return a && b && a.key === b.key && type(a) === type(b)
+  return a && b && a.key === b.key && a.type === b.type
 }
 
 export const arrayfy = (arr) => (!arr ? [] : isArr(arr) ? arr : [arr])
