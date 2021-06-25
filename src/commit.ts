@@ -1,6 +1,6 @@
 import { IFiber, IRef, } from "./type"
 import { updateElement } from "./dom"
-import { isFn, LANE } from './reconcile'
+import { getKid, isFn, LANE } from './reconcile'
 
 export const commit = (fiber: IFiber): void => {
   let d = fiber
@@ -9,7 +9,7 @@ export const commit = (fiber: IFiber): void => {
   do {
     let s = e.s
     while (s && isFn(s.type)) {
-      s = s.child
+      s = getKid(s)
     }
     e.s = s
     insert(e)

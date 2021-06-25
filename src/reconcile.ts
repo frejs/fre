@@ -123,6 +123,12 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
   }
 }
 
+export const getKid = (WIP: IFiber) => {
+  while ((WIP = WIP.child)) {
+    if (!isFn(WIP.type)) return WIP
+  }
+}
+
 const diffKids = (WIP: any, children: FreNode): void => {
   let aCh = WIP.kids || [],
     bCh = (WIP.kids = arrayfy(children) as any),
