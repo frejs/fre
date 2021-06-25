@@ -32,8 +32,7 @@ const remove = (fiber) => {
 
 const insert = (fiber: IFiber): void => {
   let { lane, parentNode, node, ref } = fiber
-
-  let s = fiber.s || fiber.sibling
+  let s = fiber.s
   if (s) s.prev = fiber
   if (lane & LANE.UPDATE) {
     updateElement(node, fiber.lastProps || {}, fiber.props)
@@ -50,8 +49,9 @@ const refer = (ref: IRef, dom?: HTMLElement): void => {
 }
 
 const kidsRefer = (kids: any): void => {
-  kids.forEach((kid) => {
+  for (let i = kids.length; i >= 0; i--) {
+    const kid = kids[i]
     kid.kids && kidsRefer(kid.kids)
     refer(kid.ref, null)
-  })
+  }
 }
