@@ -20,17 +20,16 @@ export const commit = (fiber: IFiber): void => {
 }
 
 const insert = (fiber: IFiber): void => {
-  let { lane, parentNode, node, ref } = fiber
   let s = fiber.s
   if (s) s.prev = fiber
-  if (lane & LANE.UPDATE) {
-    updateElement(node, fiber.lastProps || {}, fiber.props)
+  if (fiber.lane & LANE.UPDATE) {
+    updateElement(fiber.node, fiber.oldProps || {}, fiber.props)
   }
-  if (lane & LANE.INSERT) {
+  if (fiber.lane & LANE.INSERT) {
     const after = fiber.prev?.node
-    parentNode.insertBefore(node, after)
+    fiber.parentNode.insertBefore(fiber.node, after)
   }
-  refer(ref, node)
+  refer(fiber.ref, fiber.node)
 }
 
 const refer = (ref: IRef, dom?: HTMLElement): void => {

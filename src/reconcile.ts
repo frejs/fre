@@ -202,7 +202,7 @@ function linke(kid, WIP, i) {
 }
 
 function clone(a, b, lane, WIP, i) {
-  b.lastProps = a.props
+  b.oldProps = a.props
   b.node = a.node
   b.kids = a.kids
   b.hooks = a.hooks
