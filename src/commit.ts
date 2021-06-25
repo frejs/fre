@@ -7,11 +7,9 @@ export const commit = (fiber: IFiber): void => {
   let e = d.e
   fiber.e = null
   do {
-    let s = e.s
-    while (s && isFn(s.type)) {
-      s = getKid(s)
+    while (e.s && isFn(e.s.type)) {
+      e.s = getKid(e.s)
     }
-    e.s = s
     insert(e)
   } while (e = e.e)
 
