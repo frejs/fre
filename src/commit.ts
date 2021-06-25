@@ -12,28 +12,14 @@ export const commit = (fiber: IFiber): void => {
       s = s.child
     }
     e.s = s
-    paint(e)
+    insert(e)
   } while (e = e.e)
 
-  while (d = d.d) {
-    if (isFn(d.type)) {
-      d.child.lane = LANE.REMOVE
-      paint(d.child)
-    } else {
-      paint(d)
-    }
-  }
+  while (d = d.d) remove(d)
 }
 
-const paint = (fiber: IFiber): void => {
+const insert = (fiber: IFiber): void => {
   let { lane, parentNode, node, ref } = fiber
-  if (lane & LANE.REMOVE) {
-    kidsRefer(fiber.kids)
-    parentNode.removeChild(fiber.node)
-    refer(ref, null)
-    fiber.lane = 0
-    return
-  }
   let s = fiber.s
   if (s) s.prev = fiber
   if (lane & LANE.UPDATE) {
@@ -56,4 +42,16 @@ const kidsRefer = (kids: any): void => {
     kid.kids && kidsRefer(kid.kids)
     refer(kid.ref, null)
   })
+}
+
+const remove = (d) => {
+  if (isFn(d.type)) {
+    d.child.lane = LANE.REMOVE
+    remove(d.child)
+  } else {
+    kidsRefer(d.kids)
+    d.parentNode.removeChild(d.node)
+    refer(d.ref, null)
+    d.lane = 0
+  }
 }
