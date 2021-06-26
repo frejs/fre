@@ -24,7 +24,7 @@
     "jsx-runtime.js"
   ],
   "scripts": {
-    "test": "pw-test test/*.spec.tsx --runner zora --extensions tsx",
+    "test": "pw-test test/*.spec.tsx --runner zora --extensions tsx --debug",
     "build": "rollup -c && gzip-size dist/fre.js",
     "dev": "rollup -c --watch",
     "prepublishOnly": "yarn build"

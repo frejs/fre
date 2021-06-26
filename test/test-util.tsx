@@ -3,7 +3,6 @@ import { h, render, useEffect, useState } from '../src/index'
 export const testRender = jsx =>
   new Promise(resolve => {
     document.body.innerHTML = ''
-    console.log(jsx)
     render(jsx, document.body, {
       done: () => resolve([...document.body.childNodes])
     })
@@ -22,18 +21,18 @@ export const testUpdates = async updates => {
     return content
   }
 
-  const run = index => {
-    updates[index].test([...document.body.childNodes])
+  const run = (index, body) => {
+    updates[index].test(body)
   }
 
-  await testRender(<Component />)
+  const body = await testRender(<Component />)
 
-  await run(0)
+  await run(0, body)
 
   for (let i = 1; i < updates.length; i++) {
     await new Promise(resolve => {
       effect = () => {
-        run(i)
+        run(i, body)
         resolve('')
       }
 
