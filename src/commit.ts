@@ -12,7 +12,6 @@ export const commit = (fiber: IFiber): void => {
     }
     insert(e)
   } while (e = e.e)
-
   while (d = d.d) remove(d)
   fiber.d = null
 }

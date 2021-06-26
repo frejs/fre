@@ -21,18 +21,18 @@ export const testUpdates = async updates => {
     return content
   }
 
-  const run = (index, body) => {
-    updates[index].test(body)
+  const run = index => {
+    updates[index].test([...document.body.childNodes])
   }
 
-  const body = await testRender(<Component />)
+  await testRender(<Component />)
 
-  await run(0, body)
+  await run(0)
 
   for (let i = 1; i < updates.length; i++) {
     await new Promise(resolve => {
       effect = () => {
-        run(i, body)
+        run(i)
         resolve('')
       }
 

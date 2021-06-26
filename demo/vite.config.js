@@ -5,5 +5,8 @@ export default {
     jsxFragment: 'Fragment',
     target: 'es2020',
     format: 'esm'
+  },
+  server: {
+    port: 8080
   }
 }

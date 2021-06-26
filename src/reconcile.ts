@@ -161,7 +161,7 @@ const diffKids = (WIP: any, children: FreNode): void => {
     if (!keyed) {
       keyed = {}
       for (let i = aHead; i <= aTail; i++) {
-        let k = aCh[i].key
+        let k = aCh[i].key || '.' + i
         if (k) keyed[k] = i
       }
     }
@@ -176,6 +176,7 @@ const diffKids = (WIP: any, children: FreNode): void => {
         linke(c, WIP, bTail--)
       }
     }
+
     for (const k in keyed) {
       let c = aCh[keyed[k]]
       c.lane = LANE.REMOVE
