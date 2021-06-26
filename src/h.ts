@@ -7,7 +7,7 @@ export const h = (type, props: any, ...kids) => {
   const c = arrayfy(props.children || kids)
   kids = flat(c).filter((i) => i != null)
   if (kids.length) props.children = kids.length === 1 ? kids[0] : kids
-  let key = props.key + "",
+  let key = props.key || null,
     ref = props.ref || null
   delete props.key
   delete props.ref
