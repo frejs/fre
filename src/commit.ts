@@ -12,7 +12,6 @@ export const commit = (fiber: IFiber): void => {
     }
     insert(e)
   } while (e = e.e)
-
   while (d = d.d) remove(d)
   fiber.d = null
 }
@@ -44,12 +43,13 @@ const kidsRefer = (kids: any): void => {
 
 const remove = (d) => {
   if (isFn(d.type)) {
+    if (d.lane & LANE.REMOVE) {
+      if (d.hooks) {
+        d.hooks.list.forEach((e) => e[2] && e[2]())
+      }
+    }
     remove(d.child)
   } else {
-    if (d.lane & LANE.REMOVE) {
-      console.log(d)
-      d.hooks.list.forEach((e) => e[2] && e[2]())
-    }
     kidsRefer(d.kids)
     d.parentNode.removeChild(d.node)
     refer(d.ref, null)

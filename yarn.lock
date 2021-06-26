@@ -5523,3 +5523,8 @@ yazl@^2.5.1:
   integrity sha512-phENi2PLiHnHb6QBVot+dJnaAZ0xosj7p3fWl+znIjBDlnMI2PsZCJZ306BPTFOaHf5qdDEI8x5qFrSOBN5vrw==
   dependencies:
     buffer-crc32 "~0.2.3"
+
+zora@4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/zora/-/zora-4.0.2.tgz#5f525a0127d08170c41efc26bfd1ee66e14a0185"
+  integrity sha512-dSJlPNzWOVJxLcgItXSAPPszatQ7SJctQQthuFfkRxyrhciMzH5GIdTYJYwpw/vx9DMbwRKocVJgoyj8UX2NUw==

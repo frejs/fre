@@ -1,8 +1,7 @@
-/** @jsx h */
-import { h, useState } from '../src/index'
+import { h } from '../src/index'
 import { testUpdates } from './test-util'
 
-test('reorder and reuse elements during key-based reconciliation of child-nodes', async () => {
+export const diff = async t => {
   const states = [
     [1, 2, 3],
     [3, 1, 2], // shift right
@@ -31,15 +30,14 @@ test('reorder and reuse elements during key-based reconciliation of child-nodes'
       ),
       test: (elements) => {
         const children = [...elements[0].children]
-        expect(children.map((el) => el.textContent)).toEqual(state.map((value) => '' + value))
+        t.eq(children.map((el) => el.textContent), state.map((value) => '' + value), `diff => [${state}]`)
 
         if (stateNumber > 1) {
           const lastState = states[stateNumber - 1]
           state.forEach((value, index) => {
             const lastIndex = lastState.indexOf(value)
             if (lastIndex !== -1) {
-              // console.log(`item ${value} position ${lastIndex} -> ${index}`)
-              expect(children[index]).toStrictEqual(lastChildren[lastIndex])
+              t.eq(children[index], lastChildren[lastIndex], `${lastIndex} <= ${index}`)
             }
           })
         }
@@ -48,4 +46,4 @@ test('reorder and reuse elements during key-based reconciliation of child-nodes'
       },
     }))
   )
-})
+}

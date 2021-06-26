@@ -1,6 +1,6 @@
 {
   "name": "fre",
-  "version": "2.1.0-beta2",
+  "version": "2.1.0-beta3",
   "type": "module",
   "main": "dist/fre.js",
   "unpkg": "dist/fre.umd.js",
@@ -24,10 +24,9 @@
     "jsx-runtime.js"
   ],
   "scripts": {
-    "test": "jest --coverage",
+    "test": "pw-test test/*.spec.tsx --runner zora --extensions tsx",
     "build": "rollup -c && gzip-size dist/fre.js",
     "dev": "rollup -c --watch",
-    "key": "jest ./test/reconcilation.test.tsx",
     "prepublishOnly": "yarn build"
   },
   "description": "Tiny Concurrent UI library with Fiber.",
@@ -45,33 +44,21 @@
   "license": "MIT",
   "devDependencies": {
     "@skypack/package-check": "^0.2.2",
-    "@types/jest": "^24.0.15",
     "codecov": "^3.6.1",
     "cross-env": "^5.2.0",
     "gzip-size-cli": "^3.0.0",
-    "jest": "^26.4.2",
     "playwright-test": "^5.0.0",
     "rollup": "^2.11.2",
     "rollup-plugin-terser": "^5.1.2",
     "rollup-plugin-typescript2": "^0.27.0",
     "terser": "^4.1.2",
-    "ts-jest": "^26.1.0",
     "typescript": "^4.0.2",
-    "yarpm": "^0.2.1"
+    "yarpm": "^0.2.1",
+    "zora": "4.0.2"
   },
   "repository": "yisar/fre",
   "homepage": "https://fre.js.org",
-  "jest": {
-    "coveragePathIgnorePatterns": [
-      "<rootDir>/test/test-util.tsx"
-    ],
-    "transform": {
-      ".(ts|tsx)": "ts-jest"
-    },
-    "moduleFileExtensions": [
-      "js",
-      "ts",
-      "tsx"
-    ]
+  "dependencies": {
+    
   }
 }

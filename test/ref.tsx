@@ -1,8 +1,7 @@
-/** @jsx h */
 import { h, useRef } from '../src/index'
 import { testUpdates } from './test-util'
 
-test('persist reference to any value', async () => {
+export const ref = async t => {
   const Component = () => {
     const ref = useRef('')
 
@@ -15,19 +14,19 @@ test('persist reference to any value', async () => {
     {
       content: <Component />,
       test: ([p]) => {
-        expect(p.textContent).toBe('x')
+        t.eq(p.textContent, 'x')
       },
     },
     {
       content: <Component />,
       test: ([p]) => {
-        expect(p.textContent).toBe('xx')
+        t.eq(p.textContent, 'xx')
       },
     },
   ])
-})
+}
 
-test('refs with callback and clenups', async () => {
+export const refer = async t => {
   let refs = []
   const Component = () => {
     const p = (dom) => {
@@ -55,15 +54,15 @@ test('refs with callback and clenups', async () => {
     {
       content: <Component />,
       test: () => {
-        expect(refs).toEqual(['ref', 'ref2'])
-        refs = [] // next time the Component will not rerender, we need clean here
+        t.eq(refs, ['ref2', 'ref'])
+        refs = [] // The reverse order is right here
       },
     },
     {
       content: <div>removed</div>,
       test: () => {
-        expect(refs).toEqual(['cleanup2', 'cleanup'])
+        t.eq(refs, ['cleanup2', 'cleanup'])
       },
     },
   ])
-})
+}

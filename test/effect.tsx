@@ -1,8 +1,7 @@
-/** @jsx h */
 import { h, useLayout } from '../src/index'
 import { testUpdates } from './test-util'
 
-test('useLayout(f, [x]) should run on changes to x', async () => {
+export const change = async t => {
   let effects = []
 
   const effect = value => {
@@ -24,32 +23,31 @@ test('useLayout(f, [x]) should run on changes to x', async () => {
     {
       content: <Component deps={[0]} />,
       test: () => {
-        expect(effects).toEqual(['effect 0'])
+        t.eq(effects, ['effect 0'])
       }
     },
     {
       content: <Component deps={[1]} />,
       test: () => {
-        expect(effects).toEqual(['cleanUp 0', 'effect 1'])
+        t.eq(effects, ['cleanUp 0', 'effect 1'])
       }
     },
     {
       content: <Component deps={[1]} />,
       test: () => {
-        expect(effects).toEqual([])
+        t.eq(effects, [])
       }
     },
     {
       content: <div>removed</div>,
       test: () => {
-        expect(effects).toEqual(['cleanUp 1'])
+        t.eq(effects, ['cleanUp 1'])
       }
     }
   ])
-})
+}
 
-test('useEffect(f, []) should run only once', async () => {
-  console.log(456)
+export const once = async (t) => {
   let effects = []
 
   const effect = () => {
@@ -71,26 +69,25 @@ test('useEffect(f, []) should run only once', async () => {
     {
       content: <Component />,
       test: () => {
-        expect(effects).toEqual(['effect'])
+        t.eq(effects, ['effect'])
       }
     },
     {
       content: <Component count={0} />,
       test: () => {
-        expect(effects).toEqual([])
+        t.eq(effects, [])
       }
     },
     {
       content: <div>removed</div>,
       test: () => {
-        expect(effects).toEqual(['cleanUp'])
+        t.eq(effects, ['cleanUp'])
       }
     }
   ])
-})
+}
 
-test('useLayout(f) should run every time', async () => {
-  console.log(789)
+export const every = async t => {
   let effects = []
 
   const effect = value => {
@@ -112,27 +109,27 @@ test('useLayout(f) should run every time', async () => {
     {
       content: <Component value={0} />,
       test: () => {
-        expect(effects).toEqual(['effect 0'])
+        t.eq(effects, ['effect 0'])
       }
     },
     {
       content: <Component value={1} />,
       test: () => {
-        expect(effects).toEqual(['cleanUp 0', 'effect 1'])
+        t.eq(effects, ['cleanUp 0', 'effect 1'])
       }
     },
     {
       content: <Component value={2} />,
       test: () => {
-        expect(effects).toEqual(['cleanUp 1', 'effect 2'])
+        t.eq(effects, ['cleanUp 1', 'effect 2'])
         effects = [] // next time the Component will not rerender, we need clean here
       }
     },
     {
       content: <div>removed</div>,
       test: () => {
-        expect(effects).toEqual(['cleanUp 2'])
+        t.eq(effects, ['cleanUp 2'])
       }
     }
   ])
-})
+}
