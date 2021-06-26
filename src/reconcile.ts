@@ -54,6 +54,7 @@ const reconcile = (WIP?: IFiber): boolean => {
   if (finish) {
     commit(finish)
     finish = null
+    options.done && options.done()
   }
   return null
 }
