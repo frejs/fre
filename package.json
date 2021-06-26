@@ -50,6 +50,7 @@
     "cross-env": "^5.2.0",
     "gzip-size-cli": "^3.0.0",
     "jest": "^26.4.2",
+    "playwright-test": "^5.0.0",
     "rollup": "^2.11.2",
     "rollup-plugin-terser": "^5.1.2",
     "rollup-plugin-typescript2": "^0.27.0",

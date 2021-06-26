@@ -167,7 +167,7 @@ const diffKids = (WIP: any, children: FreNode): void => {
     while (bHead <= bTail) {
       let c = bCh[bTail]
       let idx = keyed[c.key]
-      if (idx != null) {
+      if (idx != null && same(c, aCh[idx])) {
         clone(aCh[idx], c, LANE.INSERT, WIP, bTail--)
         delete keyed[c.key]
       } else {
@@ -212,14 +212,10 @@ function clone(a, b, lane, WIP, i) {
 }
 
 function invokeHooks(fiber) {
-  const { hooks, lane } = fiber
+  const { hooks } = fiber
   if (hooks) {
-    if (lane & LANE.REMOVE) {
-      hooks.list.forEach((e) => e[2] && e[2]())
-    } else {
-      side(hooks.layout)
-      startTransition(() => side(hooks.effect))
-    }
+    side(hooks.layout)
+    startTransition(() => side(hooks.effect))
   }
 }
 
