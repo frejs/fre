@@ -1,4 +1,5 @@
 export default {
+  port: '8000',
   esbuild: {
     jsxFactory: 'h',
     jsxFragment: 'Fragment',

@@ -66,7 +66,7 @@ const capture = (WIP: IFiber): IFiber | undefined => {
     bubble(WIP)
     if (!finish && WIP.lane & LANE.DIRTY) {
       finish = WIP
-      // WIP.lane &= ~LANE.DIRTY
+      WIP.lane &= ~LANE.DIRTY
       return null
     }
     if (WIP.sibling) return WIP.sibling

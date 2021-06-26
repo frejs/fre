@@ -4,6 +4,7 @@ import { render, useState, h } from "../../src/index"
 
 function App() {
   const [count, setCount] = useState(0)
+  console.log(111)
   const update = () => {
     for (let i = 0; i <= 10; i++) {
       setCount(i)
