@@ -216,9 +216,6 @@ function clone(a, b, lane, WIP, i) {
 function invokeHooks(fiber) {
   const { hooks } = fiber
   if (hooks) {
-    if (fiber.lane & LANE.REMOVE) {
-      hooks.list.forEach((e) => e[2] && e[2]())
-    }
     side(hooks.layout)
     startTransition(() => side(hooks.effect))
   }

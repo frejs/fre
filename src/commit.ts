@@ -43,6 +43,11 @@ const kidsRefer = (kids: any): void => {
 
 const remove = (d) => {
   if (isFn(d.type)) {
+    if (d.lane & LANE.REMOVE) {
+      if (d.hooks) {
+        d.hooks.list.forEach((e) => e[2] && e[2]())
+      }
+    }
     remove(d.child)
   } else {
     kidsRefer(d.kids)
