@@ -9,7 +9,7 @@ test('create JSX node', t => {
     key: null,
     ref: null,
     props: {}
-  })
+  }, 'h => div')
   t.eq(input, {
     type: "input",
     key: "foo",
@@ -18,7 +18,7 @@ test('create JSX node', t => {
       name: "foo",
       value: "bar"
     }
-  })
+  }, 'h => input')
   const svg = (
     <svg viewBox="0 0 240 80" xmlns="http://www.w3.org/2000/svg">
       <text x="20" y="35">fre</text>
@@ -46,7 +46,7 @@ test('create JSX node', t => {
         }
       }
     }
-  })
+  }, 'h => svg')
 })
 
 test('create JSX node with children', t => {
@@ -77,7 +77,7 @@ test('create JSX node with children', t => {
         }
       }
     }
-  })
+  }, 'h => divs')
 })
 
 test('emit JSX component nodes', t => {
@@ -96,5 +96,5 @@ test('emit JSX component nodes', t => {
         props: { nodeValue: "bar" }
       }
     }
-  })
+  }, 'h => Component')
 })
