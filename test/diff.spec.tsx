@@ -38,7 +38,7 @@ test('reorder and reuse elements during key-based reconciliation of child-nodes'
           state.forEach((value, index) => {
             const lastIndex = lastState.indexOf(value)
             if (lastIndex !== -1) {
-              // t.eq(children[index], lastChildren[lastIndex], `${lastIndex} <= ${index}`)
+              t.eq(children[index], lastChildren[lastIndex], `${lastIndex} <= ${index}`)
             }
           })
         }

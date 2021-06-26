@@ -38,8 +38,8 @@ export const render = (vnode: FreElement, node: Node, config?: any): void => {
 
 export const update = (fiber?: IFiber) => {
   if (fiber && !(fiber.lane & LANE.DIRTY)) {
+    fiber.lane = LANE.UPDATE | LANE.DIRTY
     schedule(() => {
-      fiber.lane = LANE.UPDATE | LANE.DIRTY
       fiber.sibling = null
       effect = fiber
       detach = fiber
@@ -66,7 +66,7 @@ const capture = (WIP: IFiber): IFiber | undefined => {
     bubble(WIP)
     if (!finish && WIP.lane & LANE.DIRTY) {
       finish = WIP
-      WIP.lane &= ~LANE.DIRTY
+      // WIP.lane &= ~LANE.DIRTY
       return null
     }
     if (WIP.sibling) return WIP.sibling

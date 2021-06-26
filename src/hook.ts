@@ -25,6 +25,7 @@ export const useReducer = <S, A>(
   initState?: S
 ): [S, Dispatch<A>] => {
   const [hook, current]: [any, IFiber] = getHook<S>(cursor++)
+
   return [
     hook.length === 0 ? (hook[0] = initState) : hook[0],
     (value: A | Dispatch<A>) => {

@@ -31,7 +31,7 @@ export const testUpdates = async updates => {
     await new Promise(resolve => {
       effect = () => {
         run(i)
-        resolve()
+        resolve(111)
       }
 
       setContent(updates[i].content)
