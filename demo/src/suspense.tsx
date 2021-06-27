@@ -1,4 +1,4 @@
-import { render, lazy, Suspense } from '../../src/index'
+import { render, lazy, Suspense,h } from '../../src/index'
 
 const Lazy = lazy(() => {
   return new Promise(resolve =>
