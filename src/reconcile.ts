@@ -118,7 +118,7 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
 }
 
 function updateLazy(WIP, children) {
-  children.forEach(c => {
+  arrayfy(children).forEach(c => {
     try {
       c.type(c.props)
     } catch (e) {
@@ -126,7 +126,10 @@ function updateLazy(WIP, children) {
         WIP.laziness.push(e)
       }
     }
-  });
+    if (c.props.children) {
+      updateLazy(WIP, c.props.children)
+    }
+  })
 }
 
 const updateHost = (WIP: IFiber): void => {
@@ -251,6 +254,7 @@ function invokeHooks(fiber) {
   }
   if (laziness.length > 0) {
     if (isSuspense(fiber)) {
+      console.log(fiber)
       fiber.lane |= LANE.SUSPEND
       Promise.all(laziness).then(() => update(fiber))
     }

@@ -18,7 +18,10 @@ function App() {
       <h1>
         <Lazy />
       </h1>
-      <Lazy />
+      <Suspense fallback={'loading'}>
+        <Lazy />
+      </Suspense>
+
       <div>222</div>
       <Lazy />
       <div>111</div>
