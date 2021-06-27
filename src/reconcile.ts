@@ -92,8 +92,7 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
   resetCursor()
   currentFiber = WIP
   let children = (WIP.type as FC<P>)(WIP.props)
-  isStr(children) && (children = simpleVnode(children))
-  diffKids(WIP, children)
+  diffKids(WIP, simpleVnode(children))
 }
 
 const updateHost = (WIP: IFiber): void => {
