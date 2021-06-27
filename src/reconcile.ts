@@ -97,7 +97,6 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
 
 const updateHost = (WIP: IFiber): void => {
   WIP.parentNode = getParentNode(WIP) as any
-
   if (!WIP.node) {
     if (WIP.type === "svg") WIP.lane |= LANE.SVG
     WIP.node = createElement(WIP) as HTMLElementEx
