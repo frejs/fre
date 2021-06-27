@@ -1,7 +1,7 @@
 import { test } from 'zora'
 import { h } from '../src/index'
 
-test('create JSX node', t => {
+test('h', t => {
   const div = <div />
   const input = <input key="foo" name="foo" value="bar" />
   t.eq(div, {
@@ -9,7 +9,7 @@ test('create JSX node', t => {
     key: null,
     ref: null,
     props: {}
-  }, 'h => div')
+  })
   t.eq(input, {
     type: "input",
     key: "foo",
@@ -18,7 +18,7 @@ test('create JSX node', t => {
       name: "foo",
       value: "bar"
     }
-  }, 'h => input')
+  })
   const svg = (
     <svg viewBox="0 0 240 80" xmlns="http://www.w3.org/2000/svg">
       <text x="20" y="35">fre</text>
@@ -46,10 +46,10 @@ test('create JSX node', t => {
         }
       }
     }
-  }, 'h => svg')
+  })
 })
 
-test('create JSX node with children', t => {
+test('h2', t => {
   const divs = (
     <div key="a">
       <div key="b">
@@ -77,10 +77,10 @@ test('create JSX node with children', t => {
         }
       }
     }
-  }, 'h => divs')
+  })
 })
 
-test('emit JSX component nodes', t => {
+test('h3', t => {
   const Component = ({ value }) => <input value={value} />
 
   const div = <Component value={"foo"}>bar</Component>
@@ -96,5 +96,5 @@ test('emit JSX component nodes', t => {
         props: { nodeValue: "bar" }
       }
     }
-  }, 'h => Component')
+  })
 })

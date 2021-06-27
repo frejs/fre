@@ -24,7 +24,7 @@
     "jsx-runtime.js"
   ],
   "scripts": {
-    "test": "pw-test test/*.spec.tsx --runner zora --extensions tsx",
+    "test": "cross-env pw-test test/*.spec.tsx --runner zora --extensions tsx",
     "build": "rollup -c && gzip-size dist/fre.js",
     "dev": "rollup -c --watch",
     "prepublishOnly": "yarn build"
@@ -44,9 +44,11 @@
   "license": "MIT",
   "devDependencies": {
     "@skypack/package-check": "^0.2.2",
-    "codecov": "^3.6.1",
+    "codecov": "^3.8.2",
+    "coveralls": "^3.1.0",
     "cross-env": "^5.2.0",
     "gzip-size-cli": "^3.0.0",
+    "nyc": "^15.1.0",
     "playwright-test": "^5.0.0",
     "rollup": "^2.11.2",
     "rollup-plugin-terser": "^5.1.2",
@@ -58,7 +60,5 @@
   },
   "repository": "yisar/fre",
   "homepage": "https://fre.js.org",
-  "dependencies": {
-    
-  }
+  "dependencies": {}
 }
