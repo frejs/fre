@@ -30,14 +30,14 @@ export const diff = async t => {
       ),
       test: (elements) => {
         const children = [...elements[0].children]
-        t.eq(children.map((el) => el.textContent), state.map((value) => '' + value), `diff => [${state}]`)
+        t.eq(children.map((el) => el.textContent), state.map((value) => '' + value))
 
         if (stateNumber > 1) {
           const lastState = states[stateNumber - 1]
           state.forEach((value, index) => {
             const lastIndex = lastState.indexOf(value)
             if (lastIndex !== -1) {
-              t.eq(children[index], lastChildren[lastIndex], `${lastIndex} <= ${index}`)
+              t.eq(children[index], lastChildren[lastIndex])
             }
           })
         }
