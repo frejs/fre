@@ -1,4 +1,4 @@
-import { isStr, arrayfy } from "./reconcile"
+import { isStr, arrayfy, isFn } from "./reconcile"
 import { FreElement } from "./type"
 
 // for jsx2
@@ -25,7 +25,7 @@ export const createVnode = (type, props, key, ref) => ({
   type,
   props,
   key,
-  ref,
+  ref
 })
 
 export const createText = (vnode: any) =>

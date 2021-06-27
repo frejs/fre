@@ -55,13 +55,14 @@ export interface IFiber<P extends Attributes = any> {
   lane: number
   time: number
   e: IFiber,
-  first:IFiber,
-  last:IFiber,
-  prev:IFiber,
-  d:IFiber,
-  s:any,
+  first: IFiber,
+  last: IFiber,
+  prev: IFiber,
+  d: IFiber,
+  s: any,
   laziness: any[],
-  dirty:boolean
+  dirty: boolean,
+  isComp: boolean
 }
 
 export type HTMLElementEx = HTMLElement & { last: IFiber | null }

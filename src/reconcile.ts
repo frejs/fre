@@ -60,7 +60,8 @@ const reconcile = (WIP?: IFiber): boolean => {
 }
 
 const capture = (WIP: IFiber): IFiber | undefined => {
-  isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
+  WIP.isComp = isFn(WIP.type)
+  WIP.isComp ? updateHook(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
   while (WIP) {
     bubble(WIP)
@@ -75,7 +76,7 @@ const capture = (WIP: IFiber): IFiber | undefined => {
 }
 
 const bubble = (WIP) => {
-  if (isFn(WIP.type)) {
+  if (WIP.isComp) {
     let kid = getKid(WIP)
     if (kid) {
       kid.s = WIP.sibling
@@ -107,18 +108,18 @@ const updateHost = (WIP: IFiber): void => {
   diffKids(WIP, WIP.props.children)
 }
 
-const simpleVnode = (type: any, props?: any) =>
-  isStr(type) ? createText(type as string) : isFn(type) ? type(props) : type
+const simpleVnode = (type: any) =>
+  isStr(type) ? createText(type as string) : type
 
 const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
   while ((WIP = WIP.parent)) {
-    if (!isFn(WIP.type)) return WIP.node
+    if (!WIP.isComp) return WIP.node
   }
 }
 
 export const getKid = (WIP: IFiber) => {
   while ((WIP = WIP.child)) {
-    if (!isFn(WIP.type)) return WIP
+    if (!WIP.isComp) return WIP
   }
 }
 
