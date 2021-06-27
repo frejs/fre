@@ -14,7 +14,7 @@ export const commit = (fiber: IFiber): void => {
 const insert = (fiber: IFiber): void => {
   let s = fiber.s
   if (s) {
-    if (isFn(s.type)) {
+    if (s.isComp) {
       s = getKid(s)
     }
     s.prev = fiber
@@ -42,7 +42,7 @@ const kidsRefer = (kids: any): void => {
 }
 
 const remove = (d) => {
-  if (isFn(d.type)) {
+  if (d.isComp) {
     if (d.lane & LANE.REMOVE) {
       if (d.hooks) {
         d.hooks.list.forEach((e) => e[2] && e[2]())

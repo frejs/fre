@@ -1,4 +1,4 @@
-import { isStr, arrayfy, isFn } from "./reconcile"
+import { isStr, arrayfy } from "./reconcile"
 import { FreElement } from "./type"
 
 // for jsx2
