@@ -39,6 +39,7 @@ export const render = (vnode: FreElement, node: Node, config?: any): void => {
 export const update = (fiber?: IFiber) => {
   if (fiber && !(fiber.lane & LANE.DIRTY)) {
     fiber.lane = LANE.UPDATE | LANE.DIRTY
+    fiber.laziness = []
     schedule(() => {
       fiber.sibling = null
       effect = fiber
@@ -60,6 +61,7 @@ const reconcile = (WIP?: IFiber): boolean => {
 }
 
 const capture = (WIP: IFiber): IFiber | undefined => {
+  WIP.laziness = []
   isFn(WIP.type) ? updateHook(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
   while (WIP) {
@@ -76,16 +78,22 @@ const capture = (WIP: IFiber): IFiber | undefined => {
 
 const bubble = (WIP) => {
   if (isFn(WIP.type)) {
-    let kid = WIP.child
-    while (isFn(kid.type)) {
-      kid = kid.child
+    if (WIP.parent) {
+      WIP.parent.laziness = WIP.parent.laziness.concat(WIP.laziness)
     }
+    let kid = getKid(WIP)
     if (kid && WIP.sibling) {
       kid.s = WIP.sibling
       kid.lane |= WIP.lane
     }
+    if(WIP.type.name === 'Suspense'){
+      console.log(WIP,kid)
+    }
     invokeHooks(WIP)
   } else {
+    if(WIP.type === 'h2'){
+      console.log(WIP)
+    }
     WIP.s = WIP.sibling
     effect.e = WIP
     effect = WIP
@@ -95,9 +103,17 @@ const bubble = (WIP) => {
 const updateHook = <P = Attributes>(WIP: IFiber): void => {
   resetCursor()
   currentFiber = WIP
-  let children = (WIP.type as FC<P>)(WIP.props)
-  isStr(children) && (children = simpleVnode(children))
-  diffKids(WIP, children)
+  try {
+    var children = (WIP.type as FC<P>)(WIP.props)
+    isStr(children) && (children = simpleVnode(children))
+    diffKids(WIP, children)
+  } catch (e) {
+    if (e && isFn(e.then)) {
+      if (WIP.laziness.length === 0) {
+        WIP.laziness.push(e)
+      }
+    }
+  }
 }
 
 const updateHost = (WIP: IFiber): void => {
@@ -213,11 +229,17 @@ function clone(a, b, lane, WIP, i) {
   linke(b, WIP, i)
 }
 
+
 function invokeHooks(fiber) {
-  const { hooks } = fiber
+  const { hooks, laziness } = fiber
   if (hooks) {
     side(hooks.layout)
     startTransition(() => side(hooks.effect))
+  }
+  if (laziness.length > 0) {
+    if (fiber.type.name === 'Suspense') {
+      Promise.all(laziness).then(() => update(fiber))
+    }
   }
 }
 

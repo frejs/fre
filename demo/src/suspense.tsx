@@ -16,9 +16,9 @@ function App() {
   return <div>
     <Suspense fallback={'loading'}>
       <Lazy />
-      <div>111</div>
+      <h1>222</h1>
       <Lazy />
-      <div>111</div>
+      <h2>111</h2>
     </Suspense>
   </div>
 }
