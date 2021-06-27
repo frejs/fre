@@ -9,13 +9,13 @@
 <a href="https://bundlephobia.com/result?p=fre"><img src="http://img.badgesize.io/https://unpkg.com/fre/dist/fre.js?compression=brotli&label=brotli" alt="brotli"></a>
 </p>
 
-- **Concurrent Mode** — This is an amazing idea, which implements the coroutine scheduler in JavaScript, and the rendering is asynchronous with **Time slicing**.
+- **Concurrent Mode** — This is an amazing idea, which implements the coroutine scheduler in JavaScript, it also called **Time slicing**.
 
-- **Offscreen rendering** — Another idea which operate DOM in memory and paint them all to the screen at one time.
+- **Offscreen rendering** — Another amazing idea which operate DOM in memory and paint them all to the screen once.
 
 - **Highly-optimized algorithm** — Fre has a better reconciliation algorithm, It supported keyed, pre-process.
 
-- **Do more with less** — After tree shaking, project of hello world is only 2KB, but it has most features, virtual DOM, hooks API, Fragment, Suspense and more.
+- **Do more with less** — After tree shaking, project of hello world is only 1KB, but it has most features, virtual DOM, hooks API and so on.
 
 ### Use
 
@@ -28,10 +28,10 @@ import { render, useState } from 'fre'
 
 function App() {
   const [count, setCount] = useState(0)
-  return <>
+  return <div>
       <h1>{count}</h1>
       <button onClick={() => setCount(count + 1)}>+</button>
-    </>
+    </div>
 }
 
 createRoot(document.body).render(<App/>)
@@ -64,12 +64,12 @@ function App() {
   const [up, setUp] = useState(0)
   const [down, setDown] = useState(0)
   return (
-    <>
+    <div>
       <h1>{up}</h1>
       <button onClick={() => setUp(up + 1)}>+</button>
       <h1>{down}</h1>
       <button onClick={() => setDown(down - 1)}>-</button>
-    </>
+    </div>
   )
 }
 ```
@@ -91,11 +91,11 @@ function reducer(state, action) {
 function App() {
   const [state, dispatch] = useReducer(reducer, { count: 1 })
   return (
-    <>
+    <div>
       {state.count}
       <button onClick={() => dispatch({ type: 'up' })}>+</button>
       <button onClick={() => dispatch({ type: 'down' })}>-</button>
-    </>
+    </div>
   )
 }
 ```
@@ -117,10 +117,10 @@ function App({ flag }) {
     document.title = 'count is ' + count
   }, [flag])
   return (
-    <>
+    <div>
       <h1>{count}</h1>
       <button onClick={() => setCount(count + 1)}>+</button>
-    </>
+    </div>
   )
 }
 ```
@@ -223,41 +223,6 @@ function App() {
 }
 function ErrorComponent(){
   throw 'err'
-}
-```
-
-### Mixins
-
-This is an unstable API and is not recommended until the last minute.
-
-```js
-import {suspense, lazy, portal} from 'fre/mixins'
-
-const root = createRoot(document.body)
-root.mixin(suspense, lazy, portal)
-root.render(<App/>)
-```
-Here is a mixin to disable time slicing:
-
-```js
-export function enableTimeSlicing(fiber) {
-   fiber.sync = ture
-   return {
-      yield() {
-         if (fiber.sync === true) {
-            return false
-         }
-      },
-      capturing(fiber) {
-          console.log(fiber)
-      },
-      bubbling(fiber) {
-          console.log(fiber)
-      },
-      commit(fiber){
-          console.log(fiber)
-      }
-   }
 }
 ```
 
