@@ -6,19 +6,19 @@ export const commit = (fiber: IFiber): void => {
   let d = fiber
   let e = d.e
   fiber.e = null
-  do {
-    while (e.s && isFn(e.s.type)) {
-      e.s = getKid(e.s)
-    }
-    insert(e)
-  } while (e = e.e)
+  do { insert(e) } while (e = e.e)
   while (d = d.d) remove(d)
   fiber.d = null
 }
 
 const insert = (fiber: IFiber): void => {
   let s = fiber.s
-  if (s) s.prev = fiber
+  if (s) {
+    if (isFn(s.type)) {
+      s = getKid(s)
+    }
+    s.prev = fiber
+  }
   if (fiber.lane & LANE.UPDATE) {
     updateElement(fiber.node, fiber.oldProps || {}, fiber.props)
   }
