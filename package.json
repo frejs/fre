@@ -45,7 +45,6 @@
   "devDependencies": {
     "@skypack/package-check": "^0.2.2",
     "codecov": "^3.8.2",
-    "coveralls": "^3.1.0",
     "cross-env": "^5.2.0",
     "gzip-size-cli": "^3.0.0",
     "nyc": "^15.1.0",
