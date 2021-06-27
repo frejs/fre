@@ -167,7 +167,7 @@ const diffKids = (WIP: any, children: FreNode): void => {
     }
     while (bHead <= bTail) {
       let c = bCh[bTail]
-      let idx = keyed[c.key]
+      let idx = keyed[c.key || '.' + bTail]
       if (idx != null && same(c, aCh[idx])) {
         clone(aCh[idx], c, LANE.INSERT, WIP, bTail--)
         delete keyed[c.key]
