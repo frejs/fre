@@ -40,9 +40,7 @@ export const update = (fiber?: IFiber) => {
   if (fiber && !(fiber.lane & LANE.DIRTY)) {
     fiber.lane = LANE.UPDATE | LANE.DIRTY
     schedule(() => {
-      fiber.sibling = null
-      effect = fiber
-      detach = fiber
+      effect = detach = fiber
       reconcile(fiber)
     })
   }
