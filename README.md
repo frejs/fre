@@ -256,12 +256,12 @@ To some extent, vue and preact are similar. They have similar synchronous render
 
 The reconciliation algorithm of fre is similar to vue, but the biggest difference is that vue/preact do not support concurrent mode, this means that the roadmap is totally different.
 
-| framework | concurrent | reconcilation algorithm | bundle size |
-| --------- | ---------- | ----------------------- | ----------- |
-| fre2      | √          | ★★★★★                    | 2kb         |
-| react18   | √          | ★★★                      | 43kb        |
-| vue3      | ×          | ★★★★★                   | 31kb        |
-| preactX   | ×          | ★★★★                    | 4kb         |
+| framework | concurrent | offscreen | reconcilation algorithm | bundle size |
+| --------- | ---------- | --------- | ----------------------- | ----------- |
+| fre2      | √          | √         | ★★★★                 | 2kb         |
+| react18   | √          | √         | ★★                    | 43kb        |
+| vue3      | ×          | x         | ★★★★★               | 31kb        |
+| preactX   | ×          | x         | ★★★                  | 4kb         |
 
 #### License
 
