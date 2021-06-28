@@ -10,15 +10,15 @@ export const testRender = jsx =>
 
 export const testUpdates = async updates => {
   let effect = () => { }
-  let setContent
+  let setVdom
 
   const Component = () => {
-    const [content, _setContent] = useState(updates[0].content)
+    const [vdom, setVdom] = useState(updates[0].content)
 
-    setContent = _setContent
+    setVdom = setVdom
 
     useEffect(effect)
-    return content
+    return vdom
   }
 
   const run = index => {
@@ -33,10 +33,10 @@ export const testUpdates = async updates => {
     await new Promise(resolve => {
       effect = () => {
         run(i)
-        resolve('')
+        resolve(null)
       }
 
-      setContent(updates[i].content)
+      setVdom(updates[i].content)
     })
   }
 
