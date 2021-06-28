@@ -34,7 +34,7 @@ function App() {
     </div>
 }
 
-createRoot(document.body).render(<App/>)
+render(<App/>, document.body)
 ```
 
 ### Hooks API
