@@ -6,6 +6,8 @@ const threshold: number = 1000 / 60
 const transitions = []
 let deadline: number = 0
 
+let lastHandleMessage = null
+
 export const startTransition = (cb) => {
   transitions.push(cb) && postMessage()
 }
@@ -22,8 +24,18 @@ const postMessage = (() => {
     const { port1, port2 } = new MessageChannel()
     port1.onmessage = cb
     return () => port2.postMessage(null)
+  } else {
+    lastHandleMessage &&
+      window.removeEventListener("message", lastHandleMessage)
+    const handleMessage = (event) => {
+      if (event.data == "zero-timeout-message") {
+        cb()
+      }
+    }
+    lastHandleMessage = handleMessage
+    window.addEventListener("message", handleMessage)
+    return () => window.postMessage("zero-timeout-message", "*")
   }
-  return () => setTimeout(cb)
 })()
 
 const flush = (): void => {
