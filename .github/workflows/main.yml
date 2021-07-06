@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: test
-        run: yarn && yarn build && yarn test
+        run: yarn && yarn build && yarn test && yarn report
       - name: report
         uses: codecov/codecov-action@v1.0.6
         env:

@@ -24,7 +24,8 @@
     "jsx-runtime.js"
   ],
   "scripts": {
-    "test": "cross-env pw-test test/*.spec.tsx --runner zora --extensions tsx",
+    "test": "cross-env pw-test test/*.spec.tsx --runner zora --extensions tsx --cov",
+    "report": "npx nyc report",
     "build": "rollup -c && gzip-size dist/fre.js",
     "dev": "cd demo && yarn dev",
     "prepublishOnly": "yarn build"

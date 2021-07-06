@@ -1,10 +1,9 @@
 /node_modules/
 /.idea/
 /.cache/
-/coverage/
+/.nyc_output/
 yarn-error.log
 demo/**/node_modules/
-demo/**/.cache/
 demo/**/dist/
 /dist/
 /**/node_modules/
