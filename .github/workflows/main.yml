@@ -13,5 +13,7 @@ jobs:
         run: yarn && yarn build && yarn test && yarn report
       - name: report
         uses: codecov/codecov-action@v1.0.6
+        with:
+          files: .nyc_output/coverage-pw.json
         env:
           CI: true
