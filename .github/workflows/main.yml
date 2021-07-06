@@ -12,7 +12,7 @@ jobs:
       - name: test
         run: yarn && yarn build && yarn test && yarn report
       - name: report
-        uses: codecov/codecov-action@v1.0.6
+        uses: codecov/codecov-action@v1
         with:
           file: .nyc_output/coverage-pw.json
         env:
