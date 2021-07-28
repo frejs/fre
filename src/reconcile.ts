@@ -186,10 +186,10 @@ const diffKids = (WIP: any, children: FreNode): void => {
 
 function linke(kid, WIP, i) {
   kid.parent = WIP
+  if (WIP.lane & LANE.SVG) {
+    kid.lane |= LANE.SVG
+  }
   if (i === WIP.kids.length - 1) {
-    if (WIP.lane & LANE.SVG) {
-      kid.lane |= LANE.SVG
-    }
     WIP.child = kid
   } else {
     WIP._prev.sibling = kid
