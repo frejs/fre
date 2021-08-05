@@ -1,26 +1,23 @@
-import { render, Fragment, h, useState } from '../../src/index'
+import { render, Fragment, h, useState } from '../../src/index'
 
-
-
-function App() {
-  const [key, setKey] = useState([1, 2])
-  return (
-    <div>
-      {key.map((i) => (
-        <Li i={i} key={i} />
-        // <li key={i} >{i}</li>
-      ))}
-      <button onClick={() => setKey([5, 3, 4])}>x</button>
-    </div>
-  )
+function View() {
+  const [key, setKey] = useState([])
+  const modifyList = () => {
+    const array = []
+    for (let i = 0; i <10000; i++) {
+      array.push(1)
+    }
+    setKey(array)
+  }
+  return (
+    <div className="row-view">
+      <div onClick={modifyList}>Modify List {key.length}</div>
+      <ul>
+        {key.map((item, index) => {
+          return <li key={index}>{item}</li>
+        })}
+      </ul>
+    </div>
+  )
 }
-// function Li(props) {
-//   return <>
-//     <li>{props.i}</li>
-//     <li>{props.i}</li>
-//   </>
-// }
-function Li(props) {
-  return <li>{props.i}</li>
-}
-render(<App />, document.getElementById('app'))
+render(<View />, document.getElementById('app'))

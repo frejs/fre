@@ -32,7 +32,9 @@ export const render = (vnode: FreElement, node: Node, config?: any): void => {
     node,
     props: { children: vnode },
   } as IFiber
-  if (config) options = config
+  if (config) {
+    options = config
+  }
   update(rootFiber)
 }
 
@@ -41,7 +43,7 @@ export const update = (fiber?: IFiber) => {
     fiber.lane = LANE.UPDATE | LANE.DIRTY
     schedule(() => {
       effect = detach = fiber
-      reconcile(fiber)
+      return reconcile(fiber)
     })
   }
 }
@@ -63,7 +65,7 @@ const capture = (WIP: IFiber): IFiber | undefined => {
   if (WIP.child) return WIP.child
   while (WIP) {
     bubble(WIP)
-    if (!finish && WIP.lane & LANE.DIRTY) {
+    if (!finish && (WIP.lane & LANE.DIRTY)) {
       finish = WIP
       WIP.lane &= ~LANE.DIRTY
       return null
