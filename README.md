@@ -260,7 +260,7 @@ The reconciliation algorithm of fre is similar to vue, but the biggest differenc
 | --------- | ---------- | --------- | ----------------------- | ----------- |
 | fre2      | √          | √         | ★★★★                 | 2kb         |
 | react18   | √          | √         | ★★                    | 43kb        |
-| vue3      | ×          | x         | ★★★★★               | 32kb        |
+| vue3      | ×          | x         | ★★★★★               | 33kb        |
 | preactX   | ×          | x         | ★★★                  | 4kb         |
 
 #### License
