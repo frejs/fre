@@ -5,7 +5,7 @@ import { FreElement } from "./type"
 export const h = (type, props: any, ...kids) => {
   props = props || {}
   const c = arrayfy(props.children || kids)
-  kids = flat(c).filter((i) => i != null)
+  kids = flat(c).filter(some)
   if (kids.length) props.children = kids.length === 1 ? kids[0] : kids
   let key = props.key || null,
     ref = props.ref || null
@@ -13,6 +13,8 @@ export const h = (type, props: any, ...kids) => {
   delete props.ref
   return createVnode(type, props, key, ref)
 }
+
+const some = (x: unknown) => x != null && x!== true && x !== false
 
 const flat = (arr) =>
   [].concat(
