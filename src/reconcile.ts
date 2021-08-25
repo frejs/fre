@@ -98,7 +98,8 @@ const updateHost = (WIP: IFiber): void => {
     WIP.node = createElement(WIP) as HTMLElementEx
   }
   WIP.after = WIP.parentNode['prev']
-  WIP.parentNode['prev'] = WIP.node
+  WIP.parentNode['prev'] = (WIP.lane & LANE.INSERT) === 0 ? null : WIP.node
+  WIP.node['prev'] = null
 
   diffKids(WIP, WIP.props.children)
 }
