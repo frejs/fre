@@ -25,7 +25,6 @@ export const enum LANE {
   REMOVE = 1 << 3,
   SVG = 1 << 4,
   DIRTY = 1 << 5,
-  EFFECT = 1 << 6,
 }
 
 export const render = (vnode: FreElement, node: Node, config?: any): void => {
@@ -62,7 +61,6 @@ const reconcile = (WIP?: IFiber): boolean => {
 
 const capture = (WIP: IFiber): IFiber | undefined => {
   WIP.isComp = isFn(WIP.type)
-  WIP.lane &= ~LANE.EFFECT
   WIP.isComp ? updateHook(WIP) : updateHost(WIP)
   if (WIP.child) return WIP.child
   while (WIP) {
@@ -83,12 +81,9 @@ const bubble = (WIP) => {
     node = getKid(WIP)
     node.lane |= LANE.INSERT
     invokeHooks(WIP)
-  }
-
-  if ((node.lane & LANE.EFFECT) === 0) {
+  } else {
     effect.e = WIP
     effect = WIP
-    node.lane |= LANE.EFFECT
   }
 }
 
@@ -105,7 +100,7 @@ const updateHost = (WIP: IFiber): void => {
     if (WIP.type === "svg") WIP.lane |= LANE.SVG
     WIP.node = createElement(WIP) as HTMLElementEx
   }
-  WIP.s = WIP.parentNode['prev']
+  WIP.after = WIP.parentNode['prev']
   WIP.parentNode['prev'] = WIP.node
 
   diffKids(WIP, WIP.props.children)

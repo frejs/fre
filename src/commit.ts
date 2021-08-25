@@ -16,7 +16,7 @@ const insert = (fiber: IFiber): void => {
     updateElement(fiber.node, fiber.oldProps || {}, fiber.props)
   }
   if (fiber.lane & LANE.INSERT) {
-    fiber.parentNode.insertBefore(fiber.node, fiber.s)
+    fiber.parentNode.insertBefore(fiber.node, fiber.after || null)
   }
   refer(fiber.ref, fiber.node)
 }
