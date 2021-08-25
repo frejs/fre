@@ -25,6 +25,7 @@ export const enum LANE {
   REMOVE = 1 << 3,
   SVG = 1 << 4,
   DIRTY = 1 << 5,
+  HEAD=1<<6
 }
 
 export const render = (vnode: FreElement, node: Node, config?: any): void => {
@@ -98,7 +99,7 @@ const updateHost = (WIP: IFiber): void => {
     WIP.node = createElement(WIP) as HTMLElementEx
   }
   WIP.after = WIP.parentNode['prev']
-  WIP.parentNode['prev'] = (WIP.lane & LANE.INSERT) === 0 ? null : WIP.node
+  WIP.parentNode['prev'] = WIP.lane & LANE.HEAD ? null : WIP.node
   WIP.node['prev'] = null
 
   diffKids(WIP, WIP.props.children)
@@ -129,6 +130,7 @@ const diffKids = (WIP: any, children: FreNode): void => {
 
   while (aHead <= aTail && bHead <= bTail) {
     if (!same(aCh[aHead], bCh[bHead])) break
+    bCh[bHead].lane |= LANE.HEAD
     aHead++; bHead++
   }
 
