@@ -98,3 +98,19 @@ test('h3', t => {
     }
   })
 })
+
+test('h4', t => {
+  const div = <div>{true}{false}{"bar"}{null}</div>
+
+  t.eq(div, {
+    type: 'div',
+    key: null,
+    ref: null,
+    props: {
+      children: {
+        type: "",
+        props: { nodeValue: "bar" }
+      }
+    }
+  })
+})
