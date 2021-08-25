@@ -81,6 +81,7 @@ const bubble = (WIP) => {
   let node = WIP
   if (WIP.isComp) {
     node = getKid(WIP)
+    node.lane |= LANE.INSERT
     invokeHooks(WIP)
   }
 
