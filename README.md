@@ -15,7 +15,7 @@
 
 - **Highly-optimized algorithm** — Fre has a better reconciliation algorithm, It supported keyed, pre-process.
 
-- **Do more with less** — After tree shaking, project of hello world is only 1KB, but it has most features, virtual DOM, hooks API and so on.
+- **Do more with less** — After tree shaking, project of hello world is only 1KB, but it has most features, virtual DOM, hooks API, Fragments and so on.
 
 ### Use
 
@@ -28,10 +28,10 @@ import { render, useState } from 'fre'
 
 function App() {
   const [count, setCount] = useState(0)
-  return <div>
+  return <>
       <h1>{count}</h1>
       <button onClick={() => setCount(count + 1)}>+</button>
-    </div>
+    </>
 }
 
 render(<App/>, document.body)
@@ -64,12 +64,12 @@ function App() {
   const [up, setUp] = useState(0)
   const [down, setDown] = useState(0)
   return (
-    <div>
+    <>
       <h1>{up}</h1>
       <button onClick={() => setUp(up + 1)}>+</button>
       <h1>{down}</h1>
       <button onClick={() => setDown(down - 1)}>-</button>
-    </div>
+    </>
   )
 }
 ```
@@ -91,11 +91,11 @@ function reducer(state, action) {
 function App() {
   const [state, dispatch] = useReducer(reducer, { count: 1 })
   return (
-    <div>
+    <>
       {state.count}
       <button onClick={() => dispatch({ type: 'up' })}>+</button>
       <button onClick={() => dispatch({ type: 'down' })}>-</button>
-    </div>
+    </>
   )
 }
 ```
@@ -117,10 +117,10 @@ function App({ flag }) {
     document.title = 'count is ' + count
   }, [flag])
   return (
-    <div>
+    <>
       <h1>{count}</h1>
       <button onClick={() => setCount(count + 1)}>+</button>
-    </div>
+    </>
   )
 }
 ```
@@ -192,39 +192,19 @@ function App() {
   return flag && <span ref={t}>I will removed</span>
 }
 ```
-
-### Suspense
-
-This is another feature of concurrent rendering, which can achieve asynchronous refresh without the aid of state.
+### Fragments
 
 ```js
-const LazyComponent = lazy(Component)
-
+// fragment
 function App() {
-  return <Suspense fallback={<div>Loading...</div>}>
-    <LazyComponent/>
-  </Suspense>
+  return <>{something}</>
+}
+// render array
+function App() {
+  return [a, b, c]
 }
 ```
 
-### ErrorBoundary
-
-Similar to Suspense is ErrorBoundary, where rendering can fallback when errors are caught.
-
-```js
-
-function App() {
-  return <ErrorBoundary fallback={(e)=>{
-    console.error(e)
-    return e
-  }}>
-    <ErrorComponent/>
-  </ErrorBoundary>
-}
-function ErrorComponent(){
-  throw 'err'
-}
-```
 
 ### jsx2
 
