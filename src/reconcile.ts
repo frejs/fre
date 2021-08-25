@@ -76,10 +76,7 @@ const capture = (WIP: IFiber): IFiber | undefined => {
 }
 
 const bubble = (WIP) => {
-  let node = WIP
   if (WIP.isComp) {
-    node = getKid(WIP)
-    node.lane |= LANE.INSERT
     invokeHooks(WIP)
   } else {
     effect.e = WIP
@@ -112,12 +109,6 @@ const simpleVnode = (type: any) =>
 const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
   while ((WIP = WIP.parent)) {
     if (!WIP.isComp) return WIP.node
-  }
-}
-
-export const getKid = (WIP: IFiber) => {
-  while ((WIP = WIP.child)) {
-    if (!WIP.isComp) return WIP
   }
 }
 
@@ -190,6 +181,9 @@ function linke(kid, WIP, i) {
   kid.parent = WIP
   if (WIP.lane & LANE.SVG) {
     kid.lane |= LANE.SVG
+  }
+  if (WIP.isComp && (WIP.lane & LANE.INSERT)) {
+    kid.lane |= LANE.INSERT
   }
   if (i === WIP.kids.length - 1) {
     WIP.child = kid
