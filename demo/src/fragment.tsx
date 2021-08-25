@@ -1,23 +1,20 @@
 import { render, Fragment, h, useState } from '../../src/index'
 
-function View() {
-  const [key, setKey] = useState([])
-  const modifyList = () => {
-    const array = []
-    for (let i = 0; i <10000; i++) {
-      array.push(1)
-    }
-    setKey(array)
-  }
-  return (
-    <div className="row-view">
-      <div onClick={modifyList}>Modify List {key.length}</div>
-      <ul>
-        {key.map((item, index) => {
-          return <li key={index}>{item}</li>
-        })}
-      </ul>
-    </div>
-  )
+const App = () => {
+	const [count1, setCount1] = useState(0)
+	const [status, setStatus] = useState(false)
+	const setCountAction1 = () => {
+		setCount1(state => {
+			return state + 1
+		})
+		setStatus(!status)
+	}
+	return (
+		<div>
+			<article onClick={setCountAction1}>
+				{count1} - {status}
+			</article>
+		</div>
+	)
 }
-render(<View />, document.getElementById('app'))
+render(<App />, document.getElementById('app'))
