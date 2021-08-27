@@ -78,7 +78,10 @@ const capture = (WIP: IFiber): IFiber | undefined => {
 
 const bubble = (WIP) => {
   if (WIP.isComp) {
-    invokeHooks(WIP)
+    if (WIP.hooks) {
+      side(WIP.hooks.layout)
+      startTransition(() => side(WIP.hooks.effect))
+    }
   } else {
     effect.e = WIP
     effect = WIP
@@ -204,14 +207,6 @@ function clone(a, b, lane, WIP, i) {
   b.ref = a.ref
   b.lane = lane
   linke(b, WIP, i)
-}
-
-function invokeHooks(fiber) {
-  const { hooks } = fiber
-  if (hooks) {
-    side(hooks.layout)
-    startTransition(() => side(hooks.effect))
-  }
 }
 
 const same = (a, b) => {
