@@ -46,8 +46,8 @@ function App() {
     <button onClick={() => setKey([1,5,3,4,2,6])}>x</button>
     <ul>
       {key.map((i) => (
-        // <Li i={i} key={i} />
-        <li key={'#'+i}>{i}</li>
+        <Li i={i} key={i} />
+        // <li key={'#'+i}>{i}</li>
       ))}
     </ul>
   </div>
@@ -103,9 +103,9 @@ function App() {
 //   </div>
 // }
 
-// function Li(props) {
-//   return [<li>{props.i}</li>, <li>{props.i}</li>]
-// }
+function Li(props) {
+  return [<li>{props.i}</li>, <li>{props.i}</li>]
+}
 // function Li(props) {
 //   return <li>{props.i}</li>
 // }
