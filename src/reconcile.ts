@@ -25,7 +25,7 @@ export const enum LANE {
   REMOVE = 1 << 3,
   SVG = 1 << 4,
   DIRTY = 1 << 5,
-  HEAD=1<<6
+  HEAD = 1 << 6
 }
 
 export const render = (vnode: FreElement, node: Node, config?: any): void => {
@@ -124,7 +124,8 @@ const diffKids = (WIP: any, children: FreNode): void => {
     bHead = 0,
     aTail = aCh.length - 1,
     bTail = bCh.length - 1,
-    keyed = null
+    I = null,
+    P = null
 
   while (aHead <= aTail && bHead <= bTail) {
     if (!same(aCh[aTail], bCh[bTail])) break
@@ -151,27 +152,36 @@ const diffKids = (WIP: any, children: FreNode): void => {
       detach = c
     }
   } else {
-    if (!keyed) {
-      keyed = {}
+    if (!I && !P) {
+      // [1,2,3,4,5]
+      // [1,4,3,2,5]
+      // [0,3,2,1,4]
+      I = {}
+      P = []
       for (let i = aHead; i <= aTail; i++) {
         let k = aCh[i].key || '.' + i
-        if (k) keyed[k] = i
+        I[k] = i
       }
+      for (let i = bHead; i <= bTail; i++) {
+        let k = bCh[i].key || '.' + i
+        P[I[k]] = i
+      }
+      var lis = findLis(P, bHead)
     }
     while (bHead <= bTail) {
       let c = bCh[bTail]
-      let idx = keyed[c.key || '.' + bTail]
+      let idx = I[c.key || '.' + bTail]
       if (idx != null && same(c, aCh[idx])) {
-        clone(aCh[idx], c, LANE.INSERT, WIP, bTail--)
-        delete keyed[c.key]
+        clone(aCh[idx], c, lis.indexOf(idx) > -1 ? LANE.UPDATE : LANE.INSERT, WIP, bTail--)
+        delete I[c.key]
       } else {
         c.lane = LANE.INSERT
         linke(c, WIP, bTail--)
       }
     }
 
-    for (const k in keyed) {
-      let c = aCh[keyed[k]]
+    for (const k in I) {
+      let c = aCh[I[k]]
       c.lane = LANE.REMOVE
       detach.d = c
       detach = c
@@ -219,6 +229,51 @@ const side = (effects: IEffect[]): void => {
   effects.forEach((e) => e[2] && e[2]())
   effects.forEach((e) => (e[2] = e[0]()))
   effects.length = 0
+}
+
+const findLis = (ns, start) => {
+  let seq = [],
+    is = [],
+    l = -1,
+    pre = new Array(ns.length)
+
+  for (var i = start, len = ns.length; i < len; i++) {
+    let n = ns[i]
+    if (n < 0) continue
+    let j = leq(seq, n)
+    if (j !== -1) pre[i] = is[j]
+    if (j === l) {
+      l++;
+      seq[l] = n
+      is[l] = i
+    } else if (n < seq[j + 1]) {
+      seq[j + 1] = n
+      is[j + 1] = i
+    }
+  }
+
+  for (i = is[l]; l >= 0; i = pre[i], l--) {
+    seq[l] = i
+  }
+
+  return seq
+}
+
+const leq = (seq, n) => {
+  let lo = -1,
+    hi = seq.length
+
+  if (hi > 0 && seq[hi - 1] <= n) return hi - 1
+
+  while (hi - lo > 1) {
+    let mid = (lo + hi) >>> 1
+    if (seq[mid] > n) {
+      hi = mid
+    } else {
+      lo = mid
+    }
+  }
+  return lo
 }
 
 export const getCurrentFiber = () => currentFiber || null
