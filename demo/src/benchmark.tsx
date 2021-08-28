@@ -133,13 +133,17 @@ function listReducer(state, action) {
 
 const Row = ({ selected, item, dispatch }) => (
   <tr className={selected ? "danger" : ""}>
-    <td className="col-md-1">{item.id}</td>
-    <td className="col-md-4">
-      <a onClick={() => dispatch({ type: "SELECT", id: item.id })}>
-        {item.label}
-      </a>
-    </td>
-  </tr>
+  <td className="col-md-1">{item.id}</td>
+  <td className="col-md-4">
+    <a onClick={() => dispatch({ type: 'SELECT', id: item.id })}>{item.label}</a>
+  </td>
+  <td className="col-md-1">
+    <a onClick={() => dispatch({ type: 'REMOVE', id: item.id })}>
+      <span className="glyphicon glyphicon-remove" aria-hidden="true" />
+    </a>
+  </td>
+  <td className="col-md-6" />
+</tr>
 )
 
 const Button = ({ id, cb, title }) => {
