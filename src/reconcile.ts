@@ -240,7 +240,7 @@ const findLis = (ns, start) => {
   for (var i = start, len = ns.length; i < len; i++) {
     let n = ns[i]
     if (n < 0) continue
-    let j = leq(seq, n)
+    let j = bs(seq, n)
     if (j !== -1) pre[i] = is[j]
     if (j === l) {
       l++;
@@ -259,7 +259,7 @@ const findLis = (ns, start) => {
   return seq
 }
 
-const leq = (seq, n) => {
+const bs = (seq, n) => {
   let lo = -1,
     hi = seq.length
 
