@@ -124,7 +124,8 @@ const diffKids = (WIP: any, children: FreNode): void => {
     bHead = 0,
     aTail = aCh.length - 1,
     bTail = bCh.length - 1,
-    keyed = null
+    I = null,
+    P = null
 
   while (aHead <= aTail && bHead <= bTail) {
     if (!same(aCh[aTail], bCh[bTail])) break
@@ -151,27 +152,36 @@ const diffKids = (WIP: any, children: FreNode): void => {
       detach = c
     }
   } else {
-    if (!keyed) {
-      keyed = {}
+    if (!I && !P) {
+      // [1,2,3,4,5]
+      // [1,4,3,2,5]
+      // [0,3,2,1,4]
+      I = {}
+      P = []
       for (let i = aHead; i <= aTail; i++) {
         let k = aCh[i].key || '.' + i
-        if (k) keyed[k] = i
+        I[k] = i
       }
+      for (let i = bHead; i <= bTail; i++) {
+        let k = bCh[i].key || '.' + i
+        P[I[k]] = i
+      }
+      var lis = findLis(P, bHead)
     }
     while (bHead <= bTail) {
       let c = bCh[bTail]
-      let idx = keyed[c.key || '.' + bTail]
+      let idx = I[c.key || '.' + bTail]
       if (idx != null && same(c, aCh[idx])) {
-        clone(aCh[idx], c, LANE.INSERT, WIP, bTail--)
-        delete keyed[c.key]
+        clone(aCh[idx], c, lis.indexOf(idx) > -1 ? LANE.UPDATE : LANE.INSERT, WIP, bTail--)
+        delete I[c.key]
       } else {
         c.lane = LANE.INSERT
         linke(c, WIP, bTail--)
       }
     }
 
-    for (const k in keyed) {
-      let c = aCh[keyed[k]]
+    for (const k in I) {
+      let c = aCh[I[k]]
       c.lane = LANE.REMOVE
       detach.d = c
       detach = c
@@ -221,7 +231,7 @@ const side = (effects: IEffect[]): void => {
   effects.length = 0
 }
 
-const lis = (ns, start) => {
+const findLis = (ns, start) => {
   let seq = [],
     is = [],
     l = -1,

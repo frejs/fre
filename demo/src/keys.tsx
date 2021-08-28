@@ -41,13 +41,13 @@ function A(props){
 }
 
 function App() {
-  const [key, setKey] = useState([1,3,2])
+  const [key, setKey] = useState([1,2,3,4,5,6])
   return <div>
-    <button onClick={() => setKey([1, 2,3])}>x</button>
+    <button onClick={() => setKey([1,5,3,4,2,6])}>x</button>
     <ul>
       {key.map((i) => (
         // <Li i={i} key={i} />
-        <li key={i}>{i}</li>
+        <li key={'#'+i}>{i}</li>
       ))}
     </ul>
   </div>
