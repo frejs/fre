@@ -171,7 +171,10 @@ const diffKids = (WIP: any, children: FreNode): void => {
       let c = bCh[bTail]
       let idx = I[c.key || '.' + bTail]
       if (idx != null && same(c, aCh[idx])) {
-        if (idx === lis[li]) c.lane = LANE.UPDATE; li--
+        if (idx === lis[li]) {
+          c.lane = LANE.UPDATE
+          li--
+        }
         clone(aCh[idx], c, c.lane || LANE.INSERT, WIP, bTail--)
         delete I[c.key]
       } else {
