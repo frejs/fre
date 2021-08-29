@@ -159,20 +159,23 @@ const diffKids = (WIP: any, children: FreNode): void => {
       I = {}
       P = []
       for (let i = aHead; i <= aTail; i++) {
-        let k = aCh[i].key || '.' + i
-        I[k] = i
-      }
-      for (let i = bHead; i <= bTail; i++) {
-        let k = bCh[i].key || '.' + i
-        P[I[k]] = i
+        I[aCh[i].key || '.' + i] = i
+        P[I[bCh[i].key || '.' + i]] = i
       }
       var lis = findLis(P, bHead)
     }
+    let li = lis.length - 1
     while (bHead <= bTail) {
       let c = bCh[bTail]
+
+      if (lis[li] === bTail) {
+        c.lane = LANE.UPDATE; li--
+      }
+
       let idx = I[c.key || '.' + bTail]
+
       if (idx != null && same(c, aCh[idx])) {
-        clone(aCh[idx], c, lis.indexOf(idx) > -1 ? LANE.UPDATE : LANE.INSERT, WIP, bTail--)
+        clone(aCh[idx], c, c.lane || LANE.INSERT, WIP, bTail--)
         delete I[c.key]
       } else {
         c.lane = LANE.INSERT
