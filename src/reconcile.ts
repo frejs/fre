@@ -267,7 +267,7 @@ const bs = (seq, n) => {
   if (hi > 0 && seq[hi - 1] <= n) return hi - 1
 
   while (hi - lo > 1) {
-    let mid = (lo + hi) >>> 1
+    let mid = (lo + hi) >> 1
     if (seq[mid] > n) {
       hi = mid
     } else {
