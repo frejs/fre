@@ -156,15 +156,18 @@ const diffKids = (WIP: any, children: FreNode): void => {
       // [1,2,3,4,5]
       // [1,4,3,2,5]
       // [0,3,2,1,4]
-      I = {}
-      P = []
+      I = {}, P = []
       for (let i = aHead; i <= aTail; i++) {
         I[aCh[i].key || '.' + i] = i
+      }
+      for (let i = bHead; i <= bTail; i++) {
         P[I[bCh[i].key || '.' + i]] = i
       }
       var lis = findLis(P, bHead)
     }
+
     let li = lis.length - 1
+    
     while (bHead <= bTail) {
       let c = bCh[bTail]
 
