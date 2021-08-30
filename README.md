@@ -17,6 +17,23 @@
 
 - **Do more with less** — After tree shaking, project of hello world is only 1KB, but it has most features, virtual DOM, hooks API, Fragments and so on.
 
+### Sponsors
+
+<table>
+  <tbody>
+    <tr>
+      <td><a target="_blank" href="https://github.com/apprat/wcd"><img width="60px" src="https://avatars.githubusercontent.com/u/42712641?v=4"></a></td>
+      <td><a target="_blank" href="https://github.com/ChelesteWang"><img width="60px" src="https://avatars.githubusercontent.com/u/40495740?v=4"></a></td>
+    </tr>
+  </tbody>
+</table>
+
+### Contributors
+
+<a href="https://github.com/yisar/fre/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=yisar/fre" />
+</a>
+
 ### Use
 
 ```shell
