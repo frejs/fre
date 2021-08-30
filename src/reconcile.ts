@@ -124,9 +124,7 @@ const diffKids = (WIP: any, children: FreNode): void => {
     aHead = 0,
     bHead = 0,
     aTail = aCh.length - 1,
-    bTail = bCh.length - 1,
-    I = null,
-    P = null
+    bTail = bCh.length - 1
 
   while (aHead <= aTail && bHead <= bTail) {
     if (!same(aCh[aTail], bCh[bTail])) break
@@ -154,30 +152,26 @@ const diffKids = (WIP: any, children: FreNode): void => {
       detach = c
     }
   } else {
-    if (!I && !P) {
-      // [1,2,3]
-      // [3,1]
-      // [2,0]
-      ;(I = {}), (P = [])
-      for (let i = bHead; i <= bTail; i++) {
-        I[bCh[i].key || '.' + 1] = i
-        P[i] = -1
-      }
-      for (let i = aHead; i <= aTail; i++) {
-        let idx = I[aCh[i].key || '.' + i]
-        if (idx != null) {
-          P[idx] = i
-        } else {
-          let c = aCh[i]
-          c.lane = LANE.REMOVE
-          detach.d = c
-          detach = c
-        }
-      }
-      var lis = findLis(P, bHead)
+    let I = {},
+      P = []
+    for (let i = bHead; i <= bTail; i++) {
+      I[bCh[i].key || '.' + 1] = i
+      P[i] = -1
     }
+    for (let i = aHead; i <= aTail; i++) {
+      let idx = I[aCh[i].key || '.' + i]
+      if (idx != null) {
+        P[idx] = i
+      } else {
+        let c = aCh[i]
+        c.lane = LANE.REMOVE
+        detach.d = c
+        detach = c
+      }
+    }
+    let lis = findLis(P, bHead),
+      li = lis.length - 1
 
-    let li = lis.length - 1
     while (bHead <= bTail) {
       let c = bCh[bTail]
       if (bTail === lis[li]) {
