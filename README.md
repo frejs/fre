@@ -13,7 +13,7 @@
 
 - **Offscreen rendering** — Another amazing idea which operate DOM in memory and paint them all to the screen once.
 
-- **Highly-optimized algorithm** — Fre has a better reconciliation algorithm, It supported keyed, pre-process.
+- **O(ND) reconcilation algorithm** — Fre has a minimal longest-increasing-subsequence algorithm, It supported keyed, pre-process.
 
 - **Do more with less** — After tree shaking, project of hello world is only 1KB, but it has most features, virtual DOM, hooks API, Fragments and so on.
 
