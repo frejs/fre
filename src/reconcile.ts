@@ -159,9 +159,9 @@ const diffKids = (WIP: any, children: FreNode): void => {
       P[i] = -1
     }
     for (let i = aHead; i <= aTail; i++) {
-      let idx = I[aCh[i].key || '.' + i]
-      if (idx != null) {
-        P[idx] = i
+      let j = I[aCh[i].key || '.' + i]
+      if (j != null) {
+        P[j] = i
       } else {
         let c = aCh[i]
         c.lane = LANE.REMOVE
@@ -174,7 +174,7 @@ const diffKids = (WIP: any, children: FreNode): void => {
 
     while (bHead <= bTail) {
       let c = bCh[bTail]
-      if (bTail === lis[li]) {
+      if (bTail === lis[i]) {
         clone(aCh[P[bTail]], c, LANE.UPDATE, WIP, bTail--)
         i--
       } else {
