@@ -26,6 +26,7 @@ export const enum LANE {
   SVG = 1 << 4,
   DIRTY = 1 << 5,
   HEAD = 1 << 6,
+  NOWORK = 1 << 7,
 }
 
 export const render = (vnode: FreElement, node: Node, config?: any): void => {
@@ -154,19 +155,23 @@ const diffKids = (WIP: any, children: FreNode): void => {
     }
   } else {
     if (!I && !P) {
-      // [1,2,3,4,5]
-      // [1,4,3,2,5]
-      // [0,3,2,1,4]
+      // [1,2,3]
+      // [3,1]
+      // [2,0]
       ;(I = {}), (P = [])
-      for (let i = aHead; i <= aTail; i++) {
-        I[aCh[i].key || '.' + i] = i
-      }
       for (let i = bHead; i <= bTail; i++) {
-        let k = I[bCh[i].key || '.' + i]
-        if (k != null) {
-          P[k] = i
+        I[bCh[i].key] = i
+        P[i] = -1
+      }
+      for (let i = aHead; i <= aTail; i++) {
+        let idx = I[aCh[i].key]
+        if (idx != null) {
+          P[idx] = i
         } else {
-          P[k] = -1
+          let c = aCh[i]
+          c.lane = LANE.REMOVE
+          detach.d = c
+          detach = c
         }
       }
       var lis = findLis(P, bHead)
@@ -174,16 +179,16 @@ const diffKids = (WIP: any, children: FreNode): void => {
 
     let li = lis.length - 1
     while (bHead <= bTail) {
-      let c = bCh[P[bTail]]
+      let c = bCh[bTail]
       if (bTail === lis[li]) {
-        clone(aCh[bTail], c, LANE.UPDATE, WIP, bTail--)
+        clone(aCh[P[bTail]], c, LANE.NOWORK, WIP, bTail--)
         li--
       } else {
         if (P[bTail] === -1) {
           c.lane = LANE.INSERT
           linke(c, WIP, bTail--)
         } else {
-          clone(aCh[bTail], c, LANE.INSERT, WIP, bTail--)
+          clone(aCh[P[bTail]], c, LANE.INSERT, WIP, bTail--)
         }
       }
     }
