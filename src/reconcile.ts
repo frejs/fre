@@ -236,7 +236,7 @@ const findLis = (ns, start) => {
     is = [],
     l = -1,
     pre = new Array(ns.length)
-
+  
   for (var i = start, len = ns.length; i < len; i++) {
     let n = ns[i]
     if (n < 0) continue
@@ -251,20 +251,18 @@ const findLis = (ns, start) => {
       is[j + 1] = i
     }
   }
-
   for (i = is[l]; l >= 0; i = pre[i], l--) {
     seq[l] = i
   }
-
   return seq
 }
 
 const bs = (seq, n) => {
   let lo = -1,
     hi = seq.length
-
-  if (hi > 0 && seq[hi - 1] <= n) return hi - 1
-
+  if (hi > 0 && seq[hi - 1] <= n) {
+    return hi - 1
+  }
   while (hi - lo > 1) {
     let mid = (lo + hi) >> 1
     if (seq[mid] > n) {
