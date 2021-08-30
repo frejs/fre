@@ -170,13 +170,13 @@ const diffKids = (WIP: any, children: FreNode): void => {
       }
     }
     let lis = findLis(P, bHead),
-      li = lis.length - 1
+      i = lis.length - 1
 
     while (bHead <= bTail) {
       let c = bCh[bTail]
       if (bTail === lis[li]) {
         clone(aCh[P[bTail]], c, LANE.UPDATE, WIP, bTail--)
-        li--
+        i--
       } else {
         if (P[bTail] === -1) {
           c.lane = LANE.INSERT
