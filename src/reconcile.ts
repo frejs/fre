@@ -160,11 +160,11 @@ const diffKids = (WIP: any, children: FreNode): void => {
       // [2,0]
       ;(I = {}), (P = [])
       for (let i = bHead; i <= bTail; i++) {
-        I[bCh[i].key] = i
+        I[bCh[i].key || '.' + 1] = i
         P[i] = -1
       }
       for (let i = aHead; i <= aTail; i++) {
-        let idx = I[aCh[i].key]
+        let idx = I[aCh[i].key || '.' + i]
         if (idx != null) {
           P[idx] = i
         } else {
@@ -181,7 +181,7 @@ const diffKids = (WIP: any, children: FreNode): void => {
     while (bHead <= bTail) {
       let c = bCh[bTail]
       if (bTail === lis[li]) {
-        clone(aCh[P[bTail]], c, LANE.NOWORK, WIP, bTail--)
+        clone(aCh[P[bTail]], c, LANE.UPDATE, WIP, bTail--)
         li--
       } else {
         if (P[bTail] === -1) {
