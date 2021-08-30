@@ -6,12 +6,12 @@ import {
   HTMLElementEx,
   FreNode,
   IEffect,
-} from "./type"
-import { createElement } from "./dom"
-import { resetCursor } from "./hook"
-import { schedule, shouldYield, startTransition } from "./schedule"
-import { isArr, createText } from "./h"
-import { commit } from "./commit"
+} from './type'
+import { createElement } from './dom'
+import { resetCursor } from './hook'
+import { schedule, shouldYield, startTransition } from './schedule'
+import { isArr, createText } from './h'
+import { commit } from './commit'
 
 let currentFiber: IFiber
 let finish = null
@@ -25,7 +25,7 @@ export const enum LANE {
   REMOVE = 1 << 3,
   SVG = 1 << 4,
   DIRTY = 1 << 5,
-  HEAD = 1 << 6
+  HEAD = 1 << 6,
 }
 
 export const render = (vnode: FreElement, node: Node, config?: any): void => {
@@ -66,7 +66,7 @@ const capture = (WIP: IFiber): IFiber | undefined => {
   if (WIP.child) return WIP.child
   while (WIP) {
     bubble(WIP)
-    if (!finish && (WIP.lane & LANE.DIRTY)) {
+    if (!finish && WIP.lane & LANE.DIRTY) {
       finish = WIP
       WIP.lane &= ~LANE.DIRTY
       return null
@@ -76,7 +76,7 @@ const capture = (WIP: IFiber): IFiber | undefined => {
   }
 }
 
-const bubble = (WIP) => {
+const bubble = WIP => {
   if (WIP.isComp) {
     if (WIP.hooks) {
       side(WIP.hooks.layout)
@@ -96,13 +96,13 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
 }
 
 const updateHost = (WIP: IFiber): void => {
-  WIP.parentNode = getParentNode(WIP) as any || {}
+  WIP.parentNode = (getParentNode(WIP) as any) || {}
   if (!WIP.node) {
-    if (WIP.type === "svg") WIP.lane |= LANE.SVG
+    if (WIP.type === 'svg') WIP.lane |= LANE.SVG
     WIP.node = createElement(WIP) as HTMLElementEx
   }
   WIP.after = WIP.parentNode['prev']
-  WIP.parentNode['prev'] = WIP.lane & LANE.HEAD ? null : WIP.node
+  WIP.parentNode['prev'] = WIP.node
   WIP.node['prev'] = null
 
   diffKids(WIP, WIP.props.children)
@@ -135,7 +135,8 @@ const diffKids = (WIP: any, children: FreNode): void => {
   while (aHead <= aTail && bHead <= bTail) {
     if (!same(aCh[aHead], bCh[bHead])) break
     bCh[bHead].lane |= LANE.HEAD
-    aHead++; bHead++
+    aHead++
+    bHead++
   }
 
   if (aHead > aTail) {
@@ -156,38 +157,35 @@ const diffKids = (WIP: any, children: FreNode): void => {
       // [1,2,3,4,5]
       // [1,4,3,2,5]
       // [0,3,2,1,4]
-      I = {}, P = []
+      ;(I = {}), (P = [])
       for (let i = aHead; i <= aTail; i++) {
         I[aCh[i].key || '.' + i] = i
       }
       for (let i = bHead; i <= bTail; i++) {
-        P[I[bCh[i].key || '.' + i]] = i
+        let k = I[bCh[i].key || '.' + i]
+        if (k != null) {
+          P[k] = i
+        } else {
+          P[k] = -1
+        }
       }
       var lis = findLis(P, bHead)
     }
 
     let li = lis.length - 1
     while (bHead <= bTail) {
-      let c = bCh[bTail]
-      let idx = I[c.key || '.' + bTail]
-      if (idx != null && same(c, aCh[idx])) {
-        if (idx === lis[li]) {
-          c.lane = LANE.UPDATE
-          li--
-        }
-        clone(aCh[idx], c, c.lane || LANE.INSERT, WIP, bTail--)
-        delete I[c.key]
+      let c = bCh[P[bTail]]
+      if (bTail === lis[li]) {
+        clone(aCh[bTail], c, LANE.UPDATE, WIP, bTail--)
+        li--
       } else {
-        c.lane = LANE.INSERT
-        linke(c, WIP, bTail--)
+        if (P[bTail] === -1) {
+          c.lane = LANE.INSERT
+          linke(c, WIP, bTail--)
+        } else {
+          clone(aCh[bTail], c, LANE.INSERT, WIP, bTail--)
+        }
       }
-    }
-
-    for (const k in I) {
-      let c = aCh[I[k]]
-      c.lane = LANE.REMOVE
-      detach.d = c
-      detach = c
     }
   }
 
@@ -196,13 +194,12 @@ const diffKids = (WIP: any, children: FreNode): void => {
   }
 }
 
-
 function linke(kid, WIP, i) {
   kid.parent = WIP
   if (WIP.lane & LANE.SVG) {
     kid.lane |= LANE.SVG
   }
-  if (WIP.isComp && (WIP.lane & LANE.INSERT)) {
+  if (WIP.isComp && WIP.lane & LANE.INSERT) {
     kid.lane |= LANE.INSERT
   }
   if (i === WIP.kids.length - 1) {
@@ -227,11 +224,11 @@ const same = (a, b) => {
   return a && b && a.key === b.key && a.type === b.type
 }
 
-export const arrayfy = (arr) => (!arr ? [] : isArr(arr) ? arr : [arr])
+export const arrayfy = arr => (!arr ? [] : isArr(arr) ? arr : [arr])
 
 const side = (effects: IEffect[]): void => {
-  effects.forEach((e) => e[2] && e[2]())
-  effects.forEach((e) => (e[2] = e[0]()))
+  effects.forEach(e => e[2] && e[2]())
+  effects.forEach(e => (e[2] = e[0]()))
   effects.length = 0
 }
 
@@ -247,7 +244,7 @@ const findLis = (ns, start) => {
     let j = bs(seq, n)
     if (j !== -1) pre[i] = is[j]
     if (j === l) {
-      l++;
+      l++
       seq[l] = n
       is[l] = i
     } else if (n < seq[j + 1]) {
@@ -281,6 +278,6 @@ const bs = (seq, n) => {
 }
 
 export const getCurrentFiber = () => currentFiber || null
-export const isFn = (x: any): x is Function => typeof x === "function"
+export const isFn = (x: any): x is Function => typeof x === 'function'
 export const isStr = (s: any): s is number | string =>
-  typeof s === "number" || typeof s === "string"
+  typeof s === 'number' || typeof s === 'string'
