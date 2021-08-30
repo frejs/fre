@@ -1,13 +1,15 @@
-import { IFiber, IRef, } from "./type"
-import { updateElement } from "./dom"
+import { IFiber, IRef } from './type'
+import { updateElement } from './dom'
 import { isFn, LANE } from './reconcile'
 
 export const commit = (fiber: IFiber): void => {
   let d = fiber
   let e = d.e
   fiber.e = null
-  do { insert(e) } while (e = e.e)
-  while (d = d.d) remove(d)
+  do {
+    insert(e)
+  } while ((e = e.e))
+  while ((d = d.d)) remove(d)
   fiber.d = null
 }
 
@@ -27,20 +29,20 @@ const refer = (ref: IRef, dom?: HTMLElement): void => {
 }
 
 const kidsRefer = (kids: any): void => {
-  kids.forEach((kid) => {
+  kids.forEach(kid => {
     kid.kids && kidsRefer(kid.kids)
     refer(kid.ref, null)
   })
 }
 
-const remove = (d) => {
+const remove = d => {
   if (d.isComp) {
     if (d.lane & LANE.REMOVE) {
       if (d.hooks) {
-        d.hooks.list.forEach((e) => e[2] && e[2]())
+        d.hooks.list.forEach(e => e[2] && e[2]())
       }
     }
-    remove(d.child)
+    d.kids.forEach(remove)
   } else {
     kidsRefer(d.kids)
     d.parentNode.removeChild(d.node)

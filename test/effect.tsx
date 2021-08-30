@@ -97,7 +97,7 @@ export const every = async t => {
       effects.push(`cleanUp ${value}`)
     }
   }
-
+    
   const Component = ({ value }) => {
     effects = []
     useLayout(() => effect(value))
@@ -122,7 +122,7 @@ export const every = async t => {
       content: <Component value={2} />,
       test: () => {
         t.eq(effects, ['cleanUp 1', 'effect 2'])
-        effects = [] // next time the Component will not rerender, we need clean here
+        effects = []
       }
     },
     {
