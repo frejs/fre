@@ -11,8 +11,6 @@
 
 - **Concurrent Mode** — This is an amazing idea, which implements the coroutine scheduler in JavaScript, it also called **Time slicing**.
 
-- **Offscreen rendering** — Another amazing idea which operate DOM in memory and paint them all to the screen once.
-
 - **O(ND) reconcilation algorithm** — Fre has a minimal longest-increasing-subsequence algorithm, It supported keyed, pre-process.
 
 - **Do more with less** — After tree shaking, project of hello world is only 1KB, but it has most features, virtual DOM, hooks API, Fragments and so on.
