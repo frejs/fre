@@ -177,13 +177,11 @@ const diffKids = (WIP: any, children: FreNode): void => {
       if (bTail === lis[i]) {
         clone(aCh[P[bTail]], c, LANE.UPDATE, WIP, bTail--)
         i--
+      } else if (P[bTail] === -1) {
+        c.lane = LANE.INSERT
+        linke(c, WIP, bTail--)
       } else {
-        if (P[bTail] === -1) {
-          c.lane = LANE.INSERT
-          linke(c, WIP, bTail--)
-        } else {
-          clone(aCh[P[bTail]], c, LANE.INSERT, WIP, bTail--)
-        }
+        clone(aCh[P[bTail]], c, LANE.INSERT, WIP, bTail--)
       }
     }
   }
