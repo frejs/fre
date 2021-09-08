@@ -26,7 +26,7 @@
   "scripts": {
     "test": "cross-env pw-test test/*.spec.tsx --runner zora --extensions tsx --cov",
     "report": "npx nyc report",
-    "build": "rollup -c && gzip-size dist/fre.js",
+    "build": "rollup -c",
     "dev": "cd demo && yarn dev",
     "prepublishOnly": "yarn build"
   },
@@ -47,12 +47,12 @@
     "@skypack/package-check": "^0.2.2",
     "codecov": "^3.8.2",
     "cross-env": "^5.2.0",
-    "gzip-size-cli": "^3.0.0",
     "nyc": "^15.1.0",
     "playwright-test": "^5.0.0",
     "rollup": "^2.11.2",
     "rollup-plugin-terser": "^5.1.2",
     "rollup-plugin-typescript2": "^0.27.0",
+    "rollup-plugin-size": "^0.2.2",
     "terser": "^4.1.2",
     "typescript": "^4.0.2",
     "yarpm": "^0.2.1",
