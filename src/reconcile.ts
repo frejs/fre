@@ -208,10 +208,13 @@ function linke(kid, WIP, i) {
 }
 
 function clone(a, b, lane, WIP, i) {
-  b.oldProps = a.props
-  b.node = a.node
+  if (same(a, b)) {
+    b.hooks = a.hooks
+    b.ref = a.ref
+    b.node = a.node
+    b.oldProps = a.props
+  }
   b.kids = a.kids
-  b.ref = a.ref
   b.lane = lane
   linke(b, WIP, i)
 }
@@ -233,7 +236,7 @@ const findLis = (ns, start) => {
     is = [],
     l = -1,
     pre = new Array(ns.length)
-  
+
   for (var i = start, len = ns.length; i < len; i++) {
     let n = ns[i]
     if (n < 0) continue
