@@ -38,9 +38,7 @@ const kidsRefer = (kids: any): void => {
 const remove = d => {
   if (d.isComp) {
     if (d.lane & LANE.REMOVE) {
-      if (d.hooks) {
-        d.hooks.list.forEach(e => e[2] && e[2]())
-      }
+      d.hooks && d.hooks.list.forEach(e => e[2] && e[2]())
     }
     d.kids.forEach(remove)
   } else {

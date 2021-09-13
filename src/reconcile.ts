@@ -159,9 +159,9 @@ const diffKids = (WIP: any, children: FreNode): void => {
       P[i] = -1
     }
     for (let i = aHead; i <= aTail; i++) {
-      let idx = I[aCh[i].key || '.' + i]
-      if (idx != null) {
-        P[idx] = i
+      let j = I[aCh[i].key || '.' + i]
+      if (j != null) {
+        P[j] = i
       } else {
         let c = aCh[i]
         c.lane = LANE.REMOVE
@@ -170,20 +170,18 @@ const diffKids = (WIP: any, children: FreNode): void => {
       }
     }
     let lis = findLis(P, bHead),
-      li = lis.length - 1
+      i = lis.length - 1
 
     while (bHead <= bTail) {
       let c = bCh[bTail]
-      if (bTail === lis[li]) {
+      if (bTail === lis[i]) {
         clone(aCh[P[bTail]], c, LANE.UPDATE, WIP, bTail--)
-        li--
+        i--
+      } else if (P[bTail] === -1) {
+        c.lane = LANE.INSERT
+        linke(c, WIP, bTail--)
       } else {
-        if (P[bTail] === -1) {
-          c.lane = LANE.INSERT
-          linke(c, WIP, bTail--)
-        } else {
-          clone(aCh[P[bTail]], c, LANE.INSERT, WIP, bTail--)
-        }
+        clone(aCh[P[bTail]], c, LANE.INSERT, WIP, bTail--)
       }
     }
   }
@@ -235,7 +233,7 @@ const findLis = (ns, start) => {
     is = [],
     l = -1,
     pre = new Array(ns.length)
-
+  
   for (var i = start, len = ns.length; i < len; i++) {
     let n = ns[i]
     if (n < 0) continue
@@ -250,20 +248,18 @@ const findLis = (ns, start) => {
       is[j + 1] = i
     }
   }
-
   for (i = is[l]; l >= 0; i = pre[i], l--) {
     seq[l] = i
   }
-
   return seq
 }
 
 const bs = (seq, n) => {
   let lo = -1,
     hi = seq.length
-
-  if (hi > 0 && seq[hi - 1] <= n) return hi - 1
-
+  if (hi > 0 && seq[hi - 1] <= n) {
+    return hi - 1
+  }
   while (hi - lo > 1) {
     let mid = (lo + hi) >> 1
     if (seq[mid] > n) {

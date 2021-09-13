@@ -1,5 +1,6 @@
 import { terser } from 'rollup-plugin-terser'
 import typescript from 'rollup-plugin-typescript2'
+import size from 'rollup-plugin-size'
 
 const plugins = [
   typescript({
@@ -10,6 +11,7 @@ const plugins = [
   terser({
     include: ['fre.js'],
   }),
+  size()
 ]
 
 export default {
