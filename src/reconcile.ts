@@ -213,7 +213,6 @@ function clone(a, b, lane, WIP, i) {
   b.oldProps = a.props
   b.node = a.node
   b.kids = a.kids
-  b.hooks = a.hooks
   b.ref = a.ref
   b.lane = lane
   linke(b, WIP, i)
