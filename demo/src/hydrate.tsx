@@ -37,7 +37,7 @@ function morph(src, tar) {
   })
 }
 
-function hydrate(vnode, node, config={}) {
+function hydrate(vnode, node, config = {}) {
   let hydrated = false
   config.done = () => {
     morph(clone, node)
@@ -46,8 +46,7 @@ function hydrate(vnode, node, config={}) {
     }
     hydrated = true
   }
-  const clone = node.cloneNode(false)
-  render(vnode, clone, config)
+  render(vnode, node.cloneNode(false), config)
 }
 
 hydrate(<App />, document.getElementById('app'))
