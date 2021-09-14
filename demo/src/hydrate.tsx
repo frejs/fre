@@ -1,5 +1,7 @@
 import { render, useState, h, Fragment } from '../../src/index'
 
+const nextTick = fn => Promise.resolve().then(fn)
+
 function App() {
   const [count, setCount] = useState(0)
   return (
@@ -30,7 +32,7 @@ function morph(src, tar) {
       // TODO more things
 
       if (document.activeElement === t) {
-        requestAnimationFrame(() => c.focus())
+        nextTick(() => c.focus())
       }
     }
     return true
@@ -39,6 +41,7 @@ function morph(src, tar) {
 
 function hydrate(vnode, node, config = {}) {
   let hydrated = false
+  const clone = node.cloneNode(false)
   config.done = () => {
     morph(clone, node)
     if (!hydrated) {
@@ -46,10 +49,9 @@ function hydrate(vnode, node, config = {}) {
     }
     hydrated = true
   }
-  render(vnode, node.cloneNode(false), config)
+  render(vnode, clone, config)
 }
 
 hydrate(<App />, document.getElementById('app'))
 
 document.querySelector('#focus').focus()
-
