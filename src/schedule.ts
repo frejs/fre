@@ -56,8 +56,7 @@ const flush = (): void => {
 }
 
 export const shouldYield = (): boolean => {
-  const isInputPending =
-    (navigator as any)?.scheduling?.isInputPending() || getTime() >= deadline
+  const isInputPending = getTime() >= deadline
   runTransition = isInputPending ? runTransitionAsTask : runTransitionAsMicroTask
   return isInputPending
 }
