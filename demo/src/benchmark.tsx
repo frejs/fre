@@ -233,4 +233,4 @@ const Main = () => {
   )
 }
 
-render(<Main />, document.body, { sync: true })
+render(<Main />, document.body)
