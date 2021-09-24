@@ -5,8 +5,8 @@ const threshold: number = 5
 
 let deadline: number = 0
 
-export const schedule = (job: any): void => {
-  queue.push(job) && postTask()
+export const schedule = (task: any): void => {
+  queue.push(task) && postTask()
 }
 
 const task = (pending: boolean) => {
@@ -25,10 +25,10 @@ const task = (pending: boolean) => {
 let postTask = task(false)
 
 const flush = (): void => {
-  let job, next
+  let task, next
   deadline = getTime() + threshold // TODO: heuristic algorithm
-  while ((job = queue.pop()) && !shouldYield()) {
-    ;(next = job()) && queue.push(next) && schedule(next)
+  while ((task = queue.pop()) && !shouldYield()) {
+    ;(next = task()) && queue.push(next) && schedule(next)
   }
 }
 
