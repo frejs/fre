@@ -9,7 +9,7 @@ import {
 } from './type'
 import { createElement } from './dom'
 import { resetCursor } from './hook'
-import { schedule, shouldYield, startTransition } from './schedule'
+import { schedule, shouldYield } from './schedule'
 import { isArr, createText } from './h'
 import { commit } from './commit'
 
@@ -81,7 +81,7 @@ const bubble = WIP => {
   if (WIP.isComp) {
     if (WIP.hooks) {
       side(WIP.hooks.layout)
-      startTransition(() => side(WIP.hooks.effect))
+      schedule(() => side(WIP.hooks.effect))
     }
   } else {
     effect.e = WIP
