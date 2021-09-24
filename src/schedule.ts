@@ -1,42 +1,29 @@
-import { IFiber, ITask, ITaskCallback } from "./type"
+import { ITask } from './type'
 
 const queue: ITask[] = []
-const threshold: number = 1000 / 60
-const transitions = []
-let deadline: number = 0
+const threshold: number = 5
 
-export const startTransition = (cb) => {
-  transitions.push(cb) && runTransition()
-}
+let deadline: number = 0
 
 export const schedule = (callback: any): void => {
   queue.push({ callback } as any)
-  startTransition(flush)
+  postTask()
 }
 
-const transitionRunnerFactory = (useMicrotasks: boolean) => {
-  const cb = () => transitions.splice(0, 1).forEach((c) => c())
-
-  if (useMicrotasks) {
-    if (typeof queueMicrotask !== "undefined") {
-      return () => queueMicrotask(cb)
-    }
-    const resolvedPromise = Promise.resolve()
-    return () => resolvedPromise.then(cb)
- }
-
-  if (typeof MessageChannel !== "undefined") {
+const task = (pending: boolean) => {
+  if (!pending && typeof Promise !== 'undefined') {
+    // TODO: queueMicrotask
+    return () => queueMicrotask(flush)
+  }
+  if (typeof MessageChannel !== 'undefined') {
     const { port1, port2 } = new MessageChannel()
-    port1.onmessage = cb
+    port1.onmessage = flush
     return () => port2.postMessage(null)
   }
-  return () => setTimeout(cb)
+  return () => setTimeout(flush)
 }
 
-const runTransitionAsTask = transitionRunnerFactory(false)
-const runTransitionAsMicroTask = transitionRunnerFactory(true)
-
-let runTransition = runTransitionAsMicroTask
+let postTask = task(false)
 
 const flush = (): void => {
   deadline = getTime() + threshold
@@ -52,13 +39,13 @@ const flush = (): void => {
     }
     job = peek(queue)
   }
-  job && startTransition(flush)
+  job && postTask()
 }
 
 export const shouldYield = (): boolean => {
-  const isInputPending = getTime() >= deadline
-  runTransition = isInputPending ? runTransitionAsTask : runTransitionAsMicroTask
-  return isInputPending
+  const pending = getTime() >= deadline
+  postTask = task(pending)
+  return pending
 }
 
 export const getTime = () => performance.now()
