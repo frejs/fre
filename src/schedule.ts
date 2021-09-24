@@ -13,7 +13,7 @@ export const schedule = (callback: any): void => {
 const task = (pending: boolean) => {
   if (!pending && typeof Promise !== 'undefined') {
     // TODO: queueMicrotask
-    return () => queueMicrotask(flush)
+    return () => Promise.resolve().then(flush)
   }
   if (typeof MessageChannel !== 'undefined') {
     const { port1, port2 } = new MessageChannel()
