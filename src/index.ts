@@ -10,5 +10,5 @@ export {
   useLayout,
   useLayout as useLayoutEffect,
 } from "./hook"
-export { shouldYield, startTransition } from "./schedule"
+export { shouldYield, schedule as startTranstion } from "./schedule"
 export * from "./type"

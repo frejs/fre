@@ -1,35 +1,29 @@
-import { IFiber, ITask, ITaskCallback } from './type'
+import { ITask } from './type'
 
 const queue: ITask[] = []
 const threshold: number = 5
-const transitions = []
-let deadline: number = 0
 
-export const startTransition = cb => {
-  console.log(translate)
-  transitions.push(cb) && translate()
-}
+let deadline: number = 0
 
 export const schedule = (callback: any): void => {
   queue.push({ callback } as any)
-  startTransition(flush)
+  postTask()
 }
 
 const task = (pending: boolean) => {
-  const cb = () => transitions.splice(0, 1).forEach(c => c())
   if (!pending && typeof Promise !== 'undefined') {
-    // Todo queueMicrotask
-    return () => queueMicrotask(cb)
+    // TODO: queueMicrotask
+    return () => queueMicrotask(flush)
   }
   if (typeof MessageChannel !== 'undefined') {
     const { port1, port2 } = new MessageChannel()
-    port1.onmessage = cb
+    port1.onmessage = flush
     return () => port2.postMessage(null)
   }
-  return () => setTimeout(cb)
+  return () => setTimeout(flush)
 }
 
-let translate = task(false)
+let postTask = task(false)
 
 const flush = (): void => {
   deadline = getTime() + threshold
@@ -45,12 +39,12 @@ const flush = (): void => {
     }
     job = peek(queue)
   }
-  job && startTransition(flush)
+  job && postTask()
 }
 
 export const shouldYield = (): boolean => {
   const pending = getTime() >= deadline
-  translate = task(pending)
+  postTask = task(pending)
   return pending
 }
 
