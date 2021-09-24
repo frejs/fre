@@ -1,12 +1,13 @@
-import { IFiber, ITask, ITaskCallback } from "./type"
+import { IFiber, ITask, ITaskCallback } from './type'
 
 const queue: ITask[] = []
-const threshold: number = 1000 / 60
+const threshold: number = 5
 const transitions = []
 let deadline: number = 0
 
-export const startTransition = (cb) => {
-  transitions.push(cb) && runTransition()
+export const startTransition = cb => {
+  console.log(translate)
+  transitions.push(cb) && translate()
 }
 
 export const schedule = (callback: any): void => {
@@ -14,18 +15,13 @@ export const schedule = (callback: any): void => {
   startTransition(flush)
 }
 
-const transitionRunnerFactory = (useMicrotasks: boolean) => {
-  const cb = () => transitions.splice(0, 1).forEach((c) => c())
-
-  if (useMicrotasks) {
-    if (typeof queueMicrotask !== "undefined") {
-      return () => queueMicrotask(cb)
-    }
-    const resolvedPromise = Promise.resolve()
-    return () => resolvedPromise.then(cb)
- }
-
-  if (typeof MessageChannel !== "undefined") {
+const task = (pending: boolean) => {
+  const cb = () => transitions.splice(0, 1).forEach(c => c())
+  if (!pending && typeof Promise !== 'undefined') {
+    // Todo queueMicrotask
+    return () => queueMicrotask(cb)
+  }
+  if (typeof MessageChannel !== 'undefined') {
     const { port1, port2 } = new MessageChannel()
     port1.onmessage = cb
     return () => port2.postMessage(null)
@@ -33,10 +29,7 @@ const transitionRunnerFactory = (useMicrotasks: boolean) => {
   return () => setTimeout(cb)
 }
 
-const runTransitionAsTask = transitionRunnerFactory(false)
-const runTransitionAsMicroTask = transitionRunnerFactory(true)
-
-let runTransition = runTransitionAsMicroTask
+let translate = task(false)
 
 const flush = (): void => {
   deadline = getTime() + threshold
@@ -56,9 +49,9 @@ const flush = (): void => {
 }
 
 export const shouldYield = (): boolean => {
-  const isInputPending = getTime() >= deadline
-  runTransition = isInputPending ? runTransitionAsTask : runTransitionAsMicroTask
-  return isInputPending
+  const pending = getTime() >= deadline
+  translate = task(pending)
+  return pending
 }
 
 export const getTime = () => performance.now()
