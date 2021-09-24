@@ -1,11 +1,12 @@
 import { IFiber, ITask, ITaskCallback } from "./type"
 
 const queue: ITask[] = []
-const threshold: number = 1000 / 60
+const threshold: number = 5
 const transitions = []
 let deadline: number = 0
 
 export const startTransition = (cb) => {
+  console.log(runTransition)
   transitions.push(cb) && runTransition()
 }
 
