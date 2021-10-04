@@ -7,12 +7,13 @@ import {render, useState, useEffect ,h} from '../../src'
 function Counter({ id, remove }) {
   const [count, setCount] = useState(0)
 
-  // useEffect(() => {
-  //   console.log(`111`)
-  //   return () => {
-  //     console.log(`222`)
-  //   }
-  // })
+  useEffect(() => {
+      console.log(count);
+      // console.log(`111`)
+    // return () => {
+    //   console.log(`222`)
+    // }
+  }, [NaN])
 
   return (
     <div>
