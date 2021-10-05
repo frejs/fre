@@ -1,6 +1,6 @@
 import { render, useState, h } from "../../src/index"
 
-function App() {
+export function App() {
   console.log('父组件')
   const [count, setCount] = useState(0)
   return (

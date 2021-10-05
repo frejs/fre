@@ -12,11 +12,17 @@ import { resetCursor } from './hook'
 import { schedule, shouldYield } from './schedule'
 import { isArr, createText } from './h'
 import { commit } from './commit'
+import {createServerElement} from "./server";
+import {ServerElement} from "./server/dom";
 
 let currentFiber: IFiber
 let finish = null
 let effect = null
 let detach = null
+let ssr = false
+let ssrString = ''
+let rootFiber = null
+
 export let options: any = {}
 
 export const enum LANE {
@@ -29,32 +35,95 @@ export const enum LANE {
   NOWORK = 1 << 7,
 }
 
+function walker(node) {
+  return document.createTreeWalker(node, NodeFilter.SHOW_ELEMENT, {
+    acceptNode: () => NodeFilter.FILTER_ACCEPT,
+  })
+}
+
+function morph(src, tar) {
+  const sw = walker(src)
+  const tw = walker(tar)
+  const walk = fn => sw.nextNode() && tw.nextNode() && fn() && walk(fn)
+
+  walk(() => {
+    const c = sw.currentNode
+    const t = tw.currentNode
+
+    if (c.tagName === t.tagName) {
+      // TODO more things
+
+      if (document.activeElement === t) {
+        nextTick(() => c.focus())
+      }
+    }
+    return true
+  })
+}
+
+export const hydrate = (vnode, node, config = {}) => {
+  let hydrated = false
+  const clone = node.cloneNode(false)
+  config.done = () => {
+    morph(clone, node)
+    if (!hydrated) {
+      node.parentNode.replaceChild(clone, node)
+    }
+    hydrated = true
+  }
+  render(vnode, clone, config)
+}
+
 export const render = (vnode: FreElement, node: Node, config?: any): void => {
-  const rootFiber = {
+  rootFiber = {
     node,
     props: { children: vnode },
-  } as IFiber
+  } as IFiber;
   if (config) {
     options = config
   }
   update(rootFiber)
 }
 
+export const renderToString = (vnode: FreElement): void => {
+  ssr = true;
+  render(vnode, ServerElement.createElement(null))
+  ssr = false;
+  rootFiber = null;
+  const domString = ssrString;
+  ssrString = null;
+  return domString;
+};
+
 export const update = (fiber?: IFiber) => {
+  if (ssr && fiber !== rootFiber) {
+    return;
+  }
+
   if (fiber && !(fiber.lane & LANE.DIRTY)) {
     fiber.lane = LANE.UPDATE | LANE.DIRTY
-    schedule(() => {
-      effect = detach = fiber
+    const task = () => {
+      effect = detach = fiber;
       return reconcile(fiber)
-    })
+    };
+    if (!ssr) {
+      schedule(task)
+    } else if (ssr && fiber === rootFiber) {
+      task()
+    }
   }
 }
 
 const reconcile = (WIP?: IFiber): boolean => {
-  while (WIP && !shouldYield()) WIP = capture(WIP)
+  while (WIP && (ssr || !shouldYield())) {
+    WIP = capture(WIP)
+  }
   if (WIP) return reconcile.bind(null, WIP)
   if (finish) {
     commit(finish)
+    if (ssr) {
+      ssrString = rootFiber.node.genString();
+    }
     finish = null
     options.done && options.done()
   }
@@ -81,7 +150,7 @@ const bubble = WIP => {
   if (WIP.isComp) {
     if (WIP.hooks) {
       side(WIP.hooks.layout)
-      schedule(() => side(WIP.hooks.effect))
+      ssr ? side(WIP.hooks.effect) : schedule(() => side(WIP.hooks.effect))
     }
   } else {
     effect.e = WIP
@@ -99,8 +168,9 @@ const updateHook = <P = Attributes>(WIP: IFiber): void => {
 const updateHost = (WIP: IFiber): void => {
   WIP.parentNode = (getParentNode(WIP) as any) || {}
   if (!WIP.node) {
-    if (WIP.type === 'svg') WIP.lane |= LANE.SVG
-    WIP.node = createElement(WIP) as HTMLElementEx
+    if (WIP.type === 'svg') WIP.lane |= LANE.SVG;
+    // @ts-ignore
+    WIP.node = ssr ? createServerElement(WIP) : createElement(WIP)
   }
   WIP.after = WIP.parentNode['prev']
   WIP.parentNode['prev'] = WIP.node
