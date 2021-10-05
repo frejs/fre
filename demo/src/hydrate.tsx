@@ -1,7 +1,5 @@
 import { render, useState, h, Fragment, hydrate } from '../../src/index'
 
-const nextTick = fn => Promise.resolve().then(fn)
-
 function App() {
   const [count, setCount] = useState(0)
   return (

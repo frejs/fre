@@ -41,6 +41,8 @@ function walker(node) {
   })
 }
 
+const nextTick = fn => Promise.resolve().then(fn)
+
 function morph(src, tar) {
   const sw = walker(src)
   const tw = walker(tar)
