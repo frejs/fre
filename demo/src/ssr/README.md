@@ -19,3 +19,8 @@ npm run ssr-serve
 ```shell script
 npm run dev
 ```
+
+### 5. 看下效果
+```shell script
+http://localhost:8080/ssr
+```
