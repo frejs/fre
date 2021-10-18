@@ -5,6 +5,7 @@ import { update, handler, style, dom } from './update'
 import { ref, refer } from './ref'
 import { once, change, every } from './effect'
 import { svg } from './svg'
+import { fragment } from './fragment'
 
 test('render', async (t) => {
     await diff(t)
@@ -18,4 +19,5 @@ test('render', async (t) => {
     await once(t)
     await every(t)
     await svg(t)
+    await fragment(t)
 })
