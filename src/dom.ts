@@ -1,22 +1,40 @@
 import { Attributes, DOM, IFiber } from "./type"
 import { isStr, LANE } from "./reconcile"
 
+const hasOwnProperty = Object.prototype.hasOwnProperty;
+
+const defaultObj = {} as const;
+
+const jointIter = <P extends Attributes>(
+  aProps = defaultObj as P,
+  bProps = defaultObj as P,
+  callback: (name: string, a: any, b: any) => void
+) => {
+  for (const name in aProps) {
+    if (hasOwnProperty.call(aProps, name)) {
+      callback(name, aProps[name], bProps[name]);
+    }
+  }
+  for (const name in bProps) {
+    if (hasOwnProperty.call(bProps, name) && !hasOwnProperty.call(aProps, name)) {
+      callback(name, undefined, bProps[name]);
+    }
+  }
+}
+
 export const updateElement = <P extends Attributes>(
   dom: DOM,
   aProps: P,
   bProps: P
 ) => {
-  for (let name in { ...aProps, ...bProps }) {
-    let a = aProps[name]
-    let b = bProps[name]
-
+  jointIter(aProps, bProps, (name, a, b) => {
     if (a === b || name === "children") {
     } else if (name === "style" && !isStr(b)) {
-      for (const k in { ...a, ...b }) {
-        if (!(a && b && a[k] === b[k])) {
-          ; (dom as any)[name][k] = b?.[k] || ""
+      jointIter(a, b, (styleKey, aStyle, bStyle) => {
+        if (aStyle !== bStyle) {
+          ; (dom as any)[name][styleKey] = bStyle || ""
         }
-      }
+      })
     } else if (name[0] === "o" && name[1] === "n") {
       name = name.slice(2).toLowerCase() as Extract<keyof P, string>
       if (a) dom.removeEventListener(name, a)
@@ -28,7 +46,7 @@ export const updateElement = <P extends Attributes>(
     } else {
       dom.setAttribute(name, b)
     }
-  }
+  })
 }
 
 export const createElement = <P = Attributes>(fiber: IFiber) => {
