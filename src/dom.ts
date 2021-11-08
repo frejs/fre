@@ -10,7 +10,7 @@ const jointIter = <P extends Attributes>(
 ) => {
   if (!aProps || !bProps) return
   Object.keys(aProps).forEach(k => callback(k, aProps[k], bProps[k]))
-  Object.keys(bProps).forEach(k => callback(k, undefined, bProps[k]))
+  Object.keys(bProps).forEach(k => !aProps.hasOwnProperty(k) && callback(k,undefined, bProps[k]))
 }
 
 export const updateElement = <P extends Attributes>(
