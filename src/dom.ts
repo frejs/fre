@@ -1,25 +1,16 @@
-import { Attributes, DOM, IFiber } from "./type"
-import { isStr, LANE } from "./reconcile"
+import { Attributes, DOM, IFiber } from './type'
+import { isStr, LANE } from './reconcile'
 
-const hasOwnProperty = Object.prototype.hasOwnProperty;
-
-const defaultObj = {} as const;
+const defaultObj = {} as const
 
 const jointIter = <P extends Attributes>(
   aProps = defaultObj as P,
   bProps = defaultObj as P,
   callback: (name: string, a: any, b: any) => void
 ) => {
-  for (const name in aProps) {
-    if (hasOwnProperty.call(aProps, name)) {
-      callback(name, aProps[name], bProps[name]);
-    }
-  }
-  for (const name in bProps) {
-    if (hasOwnProperty.call(bProps, name) && !hasOwnProperty.call(aProps, name)) {
-      callback(name, undefined, bProps[name]);
-    }
-  }
+  if (!aProps || !bProps) return
+  Object.keys(aProps).forEach(k => callback(k, aProps[k], bProps[k]))
+  Object.keys(bProps).forEach(k => callback(k, undefined, bProps[k]))
 }
 
 export const updateElement = <P extends Attributes>(
@@ -28,19 +19,19 @@ export const updateElement = <P extends Attributes>(
   bProps: P
 ) => {
   jointIter(aProps, bProps, (name, a, b) => {
-    if (a === b || name === "children") {
-    } else if (name === "style" && !isStr(b)) {
+    if (a === b || name === 'children') {
+    } else if (name === 'style' && !isStr(b)) {
       jointIter(a, b, (styleKey, aStyle, bStyle) => {
         if (aStyle !== bStyle) {
-          ; (dom as any)[name][styleKey] = bStyle || ""
+          ;(dom as any)[name][styleKey] = bStyle || ''
         }
       })
-    } else if (name[0] === "o" && name[1] === "n") {
+    } else if (name[0] === 'o' && name[1] === 'n') {
       name = name.slice(2).toLowerCase() as Extract<keyof P, string>
       if (a) dom.removeEventListener(name, a)
       dom.addEventListener(name, b)
     } else if (name in dom && !(dom instanceof SVGElement)) {
-      ; (dom as any)[name] = b || ''
+      ;(dom as any)[name] = b || ''
     } else if (b == null || b === false) {
       dom.removeAttribute(name)
     } else {
@@ -51,14 +42,14 @@ export const updateElement = <P extends Attributes>(
 
 export const createElement = <P = Attributes>(fiber: IFiber) => {
   const dom =
-    fiber.type === ""
-      ? document.createTextNode("")
+    fiber.type === ''
+      ? document.createTextNode('')
       : fiber.lane & LANE.SVG
-        ? document.createElementNS(
-          "http://www.w3.org/2000/svg",
+      ? document.createElementNS(
+          'http://www.w3.org/2000/svg',
           fiber.type as string
         )
-        : document.createElement(fiber.type as string)
+      : document.createElement(fiber.type as string)
   updateElement(dom as DOM, {} as P, fiber.props as P)
   return dom
 }
