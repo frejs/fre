@@ -4,13 +4,14 @@ import { isStr, LANE } from './reconcile'
 const defaultObj = {} as const
 
 const jointIter = <P extends Attributes>(
-  aProps = defaultObj as P,
-  bProps = defaultObj as P,
+  aProps: P,
+  bProps: P,
   callback: (name: string, a: any, b: any) => void
 ) => {
-  if (!aProps || !bProps) return
-  Object.keys(aProps).forEach(k => callback(k, aProps[k], bProps[k]))
-  Object.keys(bProps).forEach(k => !aProps.hasOwnProperty(k) && callback(k,undefined, bProps[k]))
+  aProps = aProps || defaultObj as P
+  bProps = bProps || defaultObj as P
+  Object.keys(aProps).forEach(k => callback(k, aProps[k], bProps[k])) 
+  Object.keys(bProps).forEach(k => !aProps.hasOwnProperty(k) && callback(k,undefined, bProps[k])) 
 }
 
 export const updateElement = <P extends Attributes>(
