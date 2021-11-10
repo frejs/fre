@@ -21,13 +21,9 @@ const some = (x: unknown) => x != null && x !== true && x !== false
 
 const flat = (arr: any[], target = []) => {
   arr.forEach(v => {
-    if (isArr(v)) {
-      flat(v, target)
-    } else {
-      if (some(v)) {
-        target.push(isStr(v) ? createText(v) : v)
-      }
-    }
+    isArr(v)
+      ? flat(v, target)
+      : some(v) && target.push(isStr(v) ? createText(v) : v)
   })
   return target
 }
