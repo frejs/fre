@@ -1,5 +1,5 @@
-import { isStr, arrayfy } from "./reconcile"
-import { FreElement } from "./type"
+import { isStr, arrayfy } from './reconcile'
+import { FreElement } from './type'
 
 // for jsx2
 export const h = (type, props: any, ...kids) => {
@@ -11,16 +11,16 @@ export const h = (type, props: any, ...kids) => {
   const key = props.key || null
   const ref = props.ref || null
 
-  if (key) props.key = undefined
-  if (ref) props.ref = undefined
+  if (key) props.key = null
+  if (ref) props.ref = null
 
   return createVnode(type, props, key, ref)
 }
 
-const some = (x: unknown) => x != null && x!== true && x !== false
+const some = (x: unknown) => x != null && x !== true && x !== false
 
 const flat = (arr: any[], target = []) => {
-  arr.forEach((v) => {
+  arr.forEach(v => {
     if (isArr(v)) {
       flat(v, target)
     } else {
@@ -29,18 +29,18 @@ const flat = (arr: any[], target = []) => {
       }
     }
   })
-  return target;
+  return target
 }
 
 export const createVnode = (type, props, key, ref) => ({
   type,
   props,
   key,
-  ref
+  ref,
 })
 
 export const createText = (vnode: any) =>
-  ({ type: "", props: { nodeValue: vnode + "" } } as FreElement)
+  ({ type: '', props: { nodeValue: vnode + '' } } as FreElement)
 
 export function Fragment(props) {
   return props.children
