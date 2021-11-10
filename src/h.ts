@@ -11,8 +11,8 @@ export const h = (type, props: any, ...kids) => {
   const key = props.key || null
   const ref = props.ref || null
 
-  if (key) props.key = null
-  if (ref) props.ref = null
+  if (key) props.key = undefined
+  if (ref) props.ref = undefined
 
   return createVnode(type, props, key, ref)
 }

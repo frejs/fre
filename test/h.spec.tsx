@@ -17,7 +17,7 @@ test('h', t => {
     props: {
       name: 'foo',
       value: 'bar',
-      key: null,
+      key: undefined,
     },
   })
   const svg = (
@@ -76,13 +76,13 @@ test('h2', t => {
             key: 'c',
             ref: null,
             props: {
-              key: null,
+              key: undefined,
             },
           },
-          key: null,
+          key: undefined,
         },
       },
-      key: null,
+      key: undefined,
     },
   })
 })
