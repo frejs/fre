@@ -4,20 +4,16 @@ import {
   useEffect,
   useLayoutEffect,
   h,
-  Fragment 
+  Fragment,
 } from '../../src/index'
 
 function App() {
   const [count, setCount] = useState(0)
   return (
     <>
-      {count < 5 ? (
-        <>
-          <A count={count} />
-          <h1>{count}</h1>
-          <button onClick={() => setCount(count + 1)}>+</button>
-        </>
-      ) : <div>removed</div>}
+      <h1>{count}</h1>
+      <button onClick={() => setCount(count + 1)}>+</button>
+      {count < 5 ? <A count={count} /> : <div>removed</div>}
     </>
   )
 }

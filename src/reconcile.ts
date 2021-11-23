@@ -207,17 +207,21 @@ function linke(kid, WIP, i) {
 }
 
 function clone(a, b, lane, WIP, i) {
-  if (same(a, b)) {
-    b.hooks = a.hooks
-    b.ref = a.ref
-    b.node = a.node
-    b.oldProps = a.props
-    b.kids = a.kids
-    b.lane = lane
-    linke(b, WIP, i)
-  } else {
-    //todo...
+  b.hooks = a.hooks
+  b.ref = a.ref
+  b.node = a.node
+  b.oldProps = a.props
+  b.kids = a.kids
+  b.lane = lane
+  if (!same(a, b)) {
+    // remove a first, insert b second.
+    a.lane = LANE.REMOVE
+    a.kids = []
+    detach.d = a
+    detach = a
+    b.lane = LANE.INSERT
   }
+  linke(b, WIP, i)
 }
 
 const same = (a, b) => {
