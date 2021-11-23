@@ -1,20 +1,24 @@
-import { render, Fragment, h, useState } from '../../src/index'
+import {render, h, Fragment, useState, useEffect} from '../../src/index'
 
-const App = () => {
-	const [count1, setCount1] = useState(0)
-	const [status, setStatus] = useState(false)
-	const setCountAction1 = () => {
-		setCount1(state => {
-			return state + 1
-		})
-		setStatus(!status)
-	}
-	return (
-		<div>
-			<article onClick={setCountAction1}>
-				{count1} - {status}
-			</article>
-		</div>
-	)
+function fk({i = 0}) {
+	const [c, s] = useState(i);
+	return h('button', {
+		onClick() {
+			s(c + 1);
+		}
+	}, c);
 }
-render(<App />, document.getElementById('app'))
+
+function test() {
+	const [c, s] = useState(true);
+	return h(Fragment, {}, h('button', {
+		onClick() {
+			s(!c);
+		}
+	}, 'change'), c ? h(fk) : 'none');
+}
+
+render(
+	h(test),
+	document.getElementById('app')
+);

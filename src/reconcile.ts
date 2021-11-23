@@ -104,7 +104,6 @@ const updateHost = (WIP: IFiber): void => {
   }
   WIP.after = WIP.parentNode['prev']
   WIP.parentNode['prev'] = WIP.node
-  WIP.node['prev'] = null
 
   diffKids(WIP, WIP.props.children)
 }
@@ -155,11 +154,11 @@ const diffKids = (WIP: any, children: FreNode): void => {
     let I = {},
       P = []
     for (let i = bHead; i <= bTail; i++) {
-      I[bCh[i].key || '.' + 1] = i
+      I[bCh[i].key] = i
       P[i] = -1
     }
     for (let i = aHead; i <= aTail; i++) {
-      let j = I[aCh[i].key || '.' + i]
+      let j = I[aCh[i].key]
       if (j != null) {
         P[j] = i
       } else {
@@ -213,10 +212,12 @@ function clone(a, b, lane, WIP, i) {
     b.ref = a.ref
     b.node = a.node
     b.oldProps = a.props
+    b.kids = a.kids
+    b.lane = lane
+    linke(b, WIP, i)
+  } else {
+    //todo...
   }
-  b.kids = a.kids
-  b.lane = lane
-  linke(b, WIP, i)
 }
 
 const same = (a, b) => {

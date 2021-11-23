@@ -20,6 +20,7 @@ const insert = (fiber: IFiber): void => {
   if (fiber.lane & LANE.INSERT) {
     fiber.parentNode.insertBefore(fiber.node, fiber.after)
   }
+  fiber.parentNode['prev'] = fiber.node['prev'] = null
   refer(fiber.ref, fiber.node)
 }
 
