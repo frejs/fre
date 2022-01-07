@@ -6,7 +6,6 @@ const transitions = []
 let deadline: number = 0
 
 export const startTransition = cb => {
-  console.log(translate)
   transitions.push(cb) && translate()
 }
 

@@ -5,13 +5,6 @@ function App() {
 
     const [state, setState] = useState(0)
 
-    useEffect(
-      () => {
-        setState(100)
-      },
-      [setState]
-    )
-
     function increment() {
       setState(v => {
         console.log('increment to', v + 1)

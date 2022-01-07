@@ -25,18 +25,18 @@ export const useReducer = <S, A>(
   initState?: S
 ): [S, Dispatch<A>] => {
   const [hook, current]: [any, IFiber] = getHook<S>(cursor++)
-
-  return [
-    hook.length === 0 ? (hook[0] = initState) : hook[0],
-    (value: A | Dispatch<A>) => {
+  if (hook.length === 0) {
+    hook[0] = initState
+    hook[1] = (value: A | Dispatch<A>) => {
       hook[0] = reducer
         ? reducer(hook[0], value as any)
         : isFn(value)
-        ? value(hook[0])
-        : value
+          ? value(hook[0])
+          : value
       update(current)
-    },
-  ]
+    }
+  }
+  return hook
 }
 
 export const useEffect = (cb: EffectCallback, deps?: DependencyList): void => {

@@ -1,4 +1,4 @@
-<p align="center"><img src="https://p.pstatp.com/origin/13896000169f1061c64b8" alt="fre logo" width="130"></p>
+<p align="center"><img src="https://user-images.githubusercontent.com/44045911/147237798-174728c9-7399-4b47-be39-78ef69198a0d.png" alt="fre logo" width="130"></p>
 <h1 align="center">Fre</h1>
 <p align="center">👻 Tiny Concurrent UI library with Fiber.</p>
 <p align="center">
