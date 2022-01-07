@@ -1,41 +1,59 @@
-import { ITask } from './type'
+import { IFiber, ITask, ITaskCallback } from './type'
 
 const queue: ITask[] = []
 const threshold: number = 5
-
+const transitions = []
 let deadline: number = 0
 
-export const schedule = (task: any): void => {
-  queue.push(task) && postTask()
+export const startTransition = cb => {
+  console.log(translate)
+  transitions.push(cb) && translate()
+}
+
+export const schedule = (callback: any): void => {
+  queue.push({ callback } as any)
+  startTransition(flush)
 }
 
 const task = (pending: boolean) => {
+  const cb = () => transitions.splice(0, 1).forEach(c => c())
   if (!pending && typeof Promise !== 'undefined') {
-    // TODO: queueMicrotask
-    return () => Promise.resolve().then(flush)
+    // Todo queueMicrotask
+    return () => queueMicrotask(cb)
   }
   if (typeof MessageChannel !== 'undefined') {
     const { port1, port2 } = new MessageChannel()
-    port1.onmessage = flush
+    port1.onmessage = cb
     return () => port2.postMessage(null)
   }
-  return () => setTimeout(flush)
+  return () => setTimeout(cb)
 }
 
-let postTask = task(false)
+let translate = task(false)
 
 const flush = (): void => {
-  let task, next
-  deadline = getTime() + threshold // TODO: heuristic algorithm
-  while ((task = queue.pop()) && !shouldYield()) {
-    ;(next = task()) && queue.push(next) && schedule(next)
+  deadline = getTime() + threshold
+  let job = peek(queue)
+  while (job && !shouldYield()) {
+    const { callback } = job as any
+    job.callback = null
+    const next = callback()
+    if (next) {
+      job.callback = next as any
+    } else {
+      queue.shift()
+    }
+    job = peek(queue)
   }
+  job && startTransition(flush)
 }
 
 export const shouldYield = (): boolean => {
   const pending = getTime() >= deadline
-  postTask = task(pending)
+  translate = task(pending)
   return pending
 }
 
 export const getTime = () => performance.now()
+
+const peek = (queue: ITask[]) => queue[0]

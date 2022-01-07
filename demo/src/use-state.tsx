@@ -1,16 +1,30 @@
-import { render, useState, h } from "../../src/index"
+import { render, useState, h, useEffect } from "../../src/index"
 
 function App() {
-  console.log('父组件')
-  const [count, setCount] = useState(0)
-  return (
-    <div>
-      <B i={1}/>
-      <B i={2}/>
-      <h1>{count}</h1>
-      <button onClick={() => setCount(count + 1)}>+</button>
-    </div>
-  )
+  console.log('function component is rendering')
+
+    const [state, setState] = useState(0)
+
+    useEffect(
+      () => {
+        setState(100)
+      },
+      [setState]
+    )
+
+    function increment() {
+      setState(v => {
+        console.log('increment to', v + 1)
+        return v + 1
+      })
+    }
+
+    return (
+      h('div', {}, [
+        h('p', {}, `State: ${state}`),
+        h('button', { onClick: increment }, '+')
+      ])
+    )
 }
 
 function B({i}){
