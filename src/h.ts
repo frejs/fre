@@ -42,4 +42,9 @@ export function Fragment(props) {
   return props.children
 }
 
+export function memo(fn){
+  fn.memo = true
+  return fn
+}
+
 export const isArr = Array.isArray
