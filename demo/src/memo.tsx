@@ -23,9 +23,4 @@ function B(props) {
   return <button onClick={() => setState(state + 1)}>{state}</button>
 }
 
-function C() {
-  console.log(333)
-  return <div>{333}</div>
-}
-
 render(<App />, document.body)
