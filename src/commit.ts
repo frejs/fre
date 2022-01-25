@@ -9,18 +9,19 @@ export const commit = (fiber: IFiber): void => {
   do {
     insert(e)
   } while ((e = e.e))
-  while ((d = d.d)) remove(d)
-  fiber.d = null
 }
 
 const insert = (fiber: IFiber): void => {
+  if (fiber.lane === LANE.REMOVE) {
+    remove(fiber)
+    return
+  }
   if (fiber.lane & LANE.UPDATE) {
     updateElement(fiber.node, fiber.oldProps || {}, fiber.props)
   }
   if (fiber.lane & LANE.INSERT) {
     fiber.parentNode.insertBefore(fiber.node, fiber.after)
   }
-  fiber.parentNode['prev'] = fiber.node['prev'] = null
   refer(fiber.ref, fiber.node)
 }
 
