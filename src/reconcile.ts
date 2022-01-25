@@ -149,7 +149,6 @@ const diffKids = (WIP: any, children: FreNode): void => {
     if (op === LANE.UPDATE) {
       if(!same(aCh[aIndex], bCh[bIndex])){
         bCh[bIndex].lane = LANE.INSERT
-        bCh[bIndex].after = null
         aCh[aIndex].lane = LANE.REMOVE
         effect.e = aCh[aIndex]
         effect = aCh[aIndex]
