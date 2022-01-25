@@ -16,7 +16,6 @@ import { commit } from './commit'
 let currentFiber: IFiber
 let finish = null
 let effect = null
-let detach = null
 export let options: any = {}
 
 export const enum LANE {
@@ -44,7 +43,7 @@ export const update = (fiber?: IFiber) => {
   if (fiber && !(fiber.lane & LANE.DIRTY)) {
     fiber.lane = LANE.UPDATE | LANE.DIRTY
     schedule(() => {
-      effect = detach = fiber
+      effect = fiber
       return reconcile(fiber)
     })
   }
@@ -95,9 +94,9 @@ const shouldUpdate = (a, b) => {
 }
 
 const updateHook = <P = Attributes>(WIP: IFiber): any => {
-  if ((WIP.type as any).memo && !shouldUpdate(WIP.oldProps, WIP.props)) {
-    return
-  }
+  // if ((WIP.type as any).memo && !shouldUpdate(WIP.oldProps, WIP.props)) {
+  //   return
+  // }
   resetCursor()
   currentFiber = WIP
   let children = (WIP.type as FC<P>)(WIP.props)
@@ -110,9 +109,7 @@ const updateHost = (WIP: IFiber): void => {
     if (WIP.type === 'svg') WIP.lane |= LANE.SVG
     WIP.node = createElement(WIP) as HTMLElementEx
   }
-  WIP.after = WIP.parentNode['prev']
-  WIP.parentNode['prev'] = WIP.node
-
+  WIP.childNodes = Array.from(WIP.node.childNodes || [])
   diffKids(WIP, WIP.props.children)
 }
 
@@ -134,105 +131,91 @@ const diffKids = (WIP: any, children: FreNode): void => {
     bTail = bCh.length - 1
 
   while (aHead <= aTail && bHead <= bTail) {
-    if (!same(aCh[aTail], bCh[bTail])) break
-    clone(aCh[aTail--], bCh[bTail], LANE.UPDATE, WIP, bTail--)
+    if (!same(aCh[aHead], bCh[bHead])) break
+    clone(aCh[aHead++], bCh[bHead++], LANE.UPDATE)
   }
 
   while (aHead <= aTail && bHead <= bTail) {
-    if (!same(aCh[aHead], bCh[bHead])) break
-    bCh[bHead].lane |= LANE.HEAD
-    aHead++
-    bHead++
+    if (!same(aCh[aTail], bCh[bTail])) break
+    clone(aCh[aTail--], bCh[bTail--], LANE.UPDATE)
   }
 
-  if (aHead > aTail) {
-    while (bHead <= bTail) {
-      let c = bCh[bTail]
-      c.lane = LANE.INSERT
-      linke(c, WIP, bTail--)
-    }
-  } else if (bHead > bTail) {
-    while (aHead <= aTail) {
-      let c = aCh[aTail--]
-      c.lane = LANE.REMOVE
-      detach.d = c
-      detach = c
-    }
-  } else {
-    let I = {},
-      P = []
-    for (let i = bHead; i <= bTail; i++) {
-      I[bCh[i].key] = i
-      P[i] = -1
-    }
-    for (let i = aHead; i <= aTail; i++) {
-      let j = I[aCh[i].key]
-      if (j != null) {
-        P[j] = i
-      } else {
-        let c = aCh[i]
-        c.lane = LANE.REMOVE
-        detach.d = c
-        detach = c
-      }
-    }
-    let lis = findLis(P, bHead),
-      i = lis.length - 1
+  // LCS
+  const { diff, keymap } = lcs(bCh, aCh, bHead, bTail, aHead, aTail)
 
-    while (bHead <= bTail) {
-      let c = bCh[bTail]
-      if (bTail === lis[i]) {
-        clone(aCh[P[bTail]], c, LANE.UPDATE, WIP, bTail--)
-        i--
-      } else if (P[bTail] === -1) {
+  for (
+    let i = 0, aIndex = aHead, bIndex = bHead, mIndex;
+    i < diff.length;
+    i++
+  ) {
+    const op = diff[i]
+    if (op === LANE.UPDATE) {
+      if(!same(aCh[aIndex], bCh[bIndex])){
+        bCh[bIndex].lane = LANE.INSERT
+        bCh[bIndex].after = null
+        aCh[aIndex].lane = LANE.REMOVE
+        effect.e = aCh[aIndex]
+        effect = aCh[aIndex]
+      }else{
+        clone(aCh[aIndex], bCh[bIndex], LANE.UPDATE)
+      }
+      
+      aIndex++
+      bIndex++
+    } else if (op === LANE.INSERT) {
+      let c = bCh[bIndex]
+      mIndex = c.key != null ? keymap[c.key] : null
+      if (mIndex != null) {
+        clone(aCh[mIndex], c, LANE.INSERT)
+        c.after = WIP.childNodes[aIndex]
+        aCh[mIndex] = undefined
+      } else {
+        c.after = WIP.childNodes ? WIP.childNodes[aIndex] : null
         c.lane = LANE.INSERT
-        linke(c, WIP, bTail--)
-      } else {
-        clone(aCh[P[bTail]], c, LANE.INSERT, WIP, bTail--)
       }
+      bIndex++
+    } else if (op === LANE.REMOVE) {
+      aIndex++
     }
   }
 
-  while (bHead-- > 0) {
-    clone(aCh[bHead], bCh[bHead], LANE.UPDATE, WIP, bHead)
+  for (let i = 0, aIndex = aHead; i < diff.length; i++) {
+    let op = diff[i]
+    if (op === LANE.UPDATE) {
+      aIndex++
+    } else if (op === LANE.REMOVE) {
+      let c = aCh[aIndex]
+      if (c !== undefined) {
+        c.lane = LANE.REMOVE
+        effect.e = c
+        effect = c
+      }
+      aIndex++
+    }
+  }
+
+  for (var i = 0, prev = null; i < bCh.length; i++) {
+    const child = bCh[i]
+    if (WIP.lane & LANE.SVG) {
+      child.lane |= LANE.SVG
+    }
+    child.parent = WIP
+    if (i > 0) {
+      prev.sibling = child
+    } else {
+      WIP.child = child
+    }
+    prev = child
   }
 }
 
-function linke(kid, WIP, i) {
-  kid.parent = WIP
-  if (WIP.lane & LANE.SVG) {
-    kid.lane |= LANE.SVG
-  }
-  if (WIP.isComp && WIP.lane & LANE.INSERT) {
-    kid.lane |= LANE.INSERT
-  }
-  if (i === WIP.kids.length - 1) {
-    WIP.child = kid
-  } else {
-    WIP._prev.sibling = kid
-  }
-  WIP._prev = kid
-}
-
-function clone(a, b, lane, WIP, i) {
-  if (!same(a, b)) {
-    // remove a first, insert b second.
-    b.lane = LANE.INSERT
-    b.kids = a.kids
-    a.lane = LANE.REMOVE
-    a.kids = []
-    detach.d = a
-    detach = a
-    linke(b, WIP, i)
-  } else {
-    b.hooks = a.hooks
-    b.ref = a.ref
-    b.node = a.node
-    b.oldProps = a.props
-    b.lane = lane
-    b.kids = a.kids
-    linke(b, WIP, i)
-  }
+function clone(a, b, lane) {
+  b.hooks = a.hooks
+  b.ref = a.ref
+  b.node = a.node
+  b.oldProps = a.props
+  b.lane = lane
+  b.kids = a.kids
 }
 
 const same = (a, b) => {
@@ -247,45 +230,100 @@ const side = (effects: IEffect[]): void => {
   effects.length = 0
 }
 
-const findLis = (ns, start) => {
-  let seq = [],
-    is = [],
-    l = -1,
-    pre = new Array(ns.length)
+function lcs(
+  bArr,
+  aArr,
+  bHead = 0,
+  bTail = bArr.length - 1,
+  aHead = 0,
+  aTail = aArr.length - 1
+) {
+  var keymap = {},
+    unkeyed = [],
+    idxUnkeyed = 0,
+    ch,
+    item,
+    k,
+    idxInOld,
+    key
 
-  for (var i = start, len = ns.length; i < len; i++) {
-    let n = ns[i]
-    if (n < 0) continue
-    let j = bs(seq, n)
-    if (j !== -1) pre[i] = is[j]
-    if (j === l) {
-      l++
-      seq[l] = n
-      is[l] = i
-    } else if (n < seq[j + 1]) {
-      seq[j + 1] = n
-      is[j + 1] = i
+  var newLen = bArr.length
+  var oldLen = aArr.length
+  var minLen = Math.min(newLen, oldLen)
+  var tresh = Array(minLen + 1)
+  tresh[0] = -1
+
+  for (var i = 1; i < tresh.length; i++) {
+    tresh[i] = aTail + 1
+  }
+  var link = Array(minLen)
+
+  for (i = aHead; i <= aTail; i++) {
+    item = aArr[i]
+    key = item.key
+    if (key != null) {
+      keymap[key] = i
+    } else {
+      unkeyed.push(i)
     }
   }
-  for (i = is[l]; l >= 0; i = pre[i], l--) {
-    seq[l] = i
+
+  for (i = bHead; i <= bTail; i++) {
+    ch = bArr[i]
+    idxInOld = ch.key == null ? unkeyed[idxUnkeyed++] : keymap[ch.key]
+    if (idxInOld != null) {
+      k = bs(tresh, idxInOld)
+      if (k >= 0) {
+        tresh[k] = idxInOld
+        link[k] = { newi: i, oldi: idxInOld, prev: link[k - 1] }
+      }
+    }
   }
-  return seq
+
+  k = tresh.length - 1
+  while (tresh[k] > aTail) k--
+
+  var ptr = link[k]
+  var diff = Array(oldLen + newLen - k)
+  var curNewi = bTail,
+    curOldi = aTail
+  var d = diff.length - 1
+  while (ptr) {
+    const { newi, oldi } = ptr
+    while (curNewi > newi) {
+      diff[d--] = LANE.INSERT
+      curNewi--
+    }
+    while (curOldi > oldi) {
+      diff[d--] = LANE.REMOVE
+      curOldi--
+    }
+    diff[d--] = LANE.UPDATE
+    curNewi--
+    curOldi--
+    ptr = ptr.prev
+  }
+  while (curNewi >= bHead) {
+    diff[d--] = LANE.INSERT
+    curNewi--
+  }
+  while (curOldi >= aHead) {
+    diff[d--] = LANE.REMOVE
+    curOldi--
+  }
+  return {
+    diff,
+    keymap,
+  }
 }
 
-const bs = (seq, n) => {
-  let lo = -1,
-    hi = seq.length
-  if (hi > 0 && seq[hi - 1] <= n) {
-    return hi - 1
-  }
-  while (hi - lo > 1) {
-    let mid = (lo + hi) >> 1
-    if (seq[mid] > n) {
-      hi = mid
-    } else {
-      lo = mid
-    }
+function bs(ktr, j) {
+  var lo = 1
+  var hi = ktr.length - 1
+  while (lo <= hi) {
+    var mid = (lo + hi) >>> 1
+    if (j < ktr[mid]) hi = mid - 1
+    else lo = mid + 1
   }
   return lo
 }

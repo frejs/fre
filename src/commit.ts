@@ -3,24 +3,24 @@ import { updateElement } from './dom'
 import { isFn, LANE } from './reconcile'
 
 export const commit = (fiber: IFiber): void => {
-  let d = fiber
-  let e = d.e
+  let e = fiber.e
   fiber.e = null
   do {
     insert(e)
   } while ((e = e.e))
-  while ((d = d.d)) remove(d)
-  fiber.d = null
 }
 
 const insert = (fiber: IFiber): void => {
+  if (fiber.lane === LANE.REMOVE) {
+    remove(fiber)
+    return
+  }
   if (fiber.lane & LANE.UPDATE) {
     updateElement(fiber.node, fiber.oldProps || {}, fiber.props)
   }
   if (fiber.lane & LANE.INSERT) {
     fiber.parentNode.insertBefore(fiber.node, fiber.after)
   }
-  fiber.parentNode['prev'] = fiber.node['prev'] = null
   refer(fiber.ref, fiber.node)
 }
 
@@ -38,9 +38,7 @@ const kidsRefer = (kids: any): void => {
 
 const remove = d => {
   if (d.isComp) {
-    if (d.lane & LANE.REMOVE) {
-      d.hooks && d.hooks.list.forEach(e => e[2] && e[2]())
-    }
+    d.hooks && d.hooks.list.forEach(e => e[2] && e[2]())
     d.kids.forEach(remove)
   } else {
     kidsRefer(d.kids)

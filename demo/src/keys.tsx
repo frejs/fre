@@ -1,4 +1,5 @@
 import {h, render, useState } from "../../src/index"
+// import {h, render} from '../../.ignore/eee'
 
 // function App() {
 //   const [key, setKey] = useState([3,1,2])
@@ -40,31 +41,31 @@ function A(props){
   return props.children
 }
 
-function App() {
-  const [key, setKey] = useState([1,2,3])
-  return <div>
-    <button onClick={() => setKey([3,1])}>x</button>
-    <ul>
-      {key.map((i) => (
-        <Li i={i} key={i} />
-        // <li key={'#'+i}>{i}</li>
-      ))}
-    </ul>
-  </div>
-}
-
 // function App() {
-//   const [key, setKey] = useState([1, 2, 3])
+//   const [key, setKey] = useState([1,2,3])
 //   return <div>
-//     <button onClick={() => setKey([3, 2, 1])}>x</button>,
+//     <button onClick={() => setKey([3,1])}>x</button>
 //     <ul>
 //       {key.map((i) => (
-//         // <Li i={i} key={i} />
-//         <li key={i} >{i}</li>
+//         <Li i={i} key={i} />
+//         // <li key={'#'+i}>{i}</li>
 //       ))}
 //     </ul>
 //   </div>
 // }
+
+function App() {
+  const [key, setKey] = useState([1,3])
+  return <div>
+    <button onClick={() => setKey([1,2,3])}>x</button>
+    <ul>
+      {key.map((i) => (
+        // <Li i={i} key={i} />
+        <li key={i} >{i}</li>
+      ))}
+    </ul>
+  </div>
+}
 
 // function App() {
 //   const [key, setKey] = useState([1,2,3,4,5])
@@ -109,5 +110,11 @@ function Li(props) {
 // function Li(props) {
 //   return <li>{props.i}</li>
 // }
+
+// const parentNode = document.getElementById("app");
+
+// render(<div><li key={1}>1</li><li key={2}>2</li><li key={3}>3</li></div>, parentNode);
+
+// render(<div><li key={3}>3</li><li key={2}>2</li><li key={1}>1</li></div>, parentNode);
 
 render(<App />, document.getElementById("app"))
