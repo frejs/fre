@@ -95,9 +95,9 @@ const shouldUpdate = (a, b) => {
 }
 
 const updateHook = <P = Attributes>(WIP: IFiber): any => {
-  if ((WIP.type as any).memo && !shouldUpdate(WIP.oldProps, WIP.props)) {
-    return
-  }
+  // if ((WIP.type as any).memo && !shouldUpdate(WIP.oldProps, WIP.props)) {
+  //   return
+  // }
   resetCursor()
   currentFiber = WIP
   let children = (WIP.type as FC<P>)(WIP.props)
@@ -157,7 +157,7 @@ const diffKids = (WIP: any, children: FreNode): void => {
       mIndex = c.key != null ? keymap[c.key] : null
       if (mIndex != null) {
         clone(aCh[mIndex], c, LANE.INSERT)
-        c.after = WIP.childNodes[aHead]
+        c.after = WIP.childNodes[aIndex]
         aCh[mIndex] = undefined
       } else {
         c.lane = LANE.INSERT
@@ -173,9 +173,11 @@ const diffKids = (WIP: any, children: FreNode): void => {
     if (op === LANE.UPDATE) {
       aIndex++
     } else if (op === LANE.REMOVE) {
-      if (aCh[aIndex] !== undefined) {
-        effect.d = aCh[aIndex]
-        effect = aCh[aIndex]
+      let c = aCh[aIndex]
+      if (c !== undefined) {
+        c.lane = LANE.REMOVE
+        effect.e = c
+        effect = c
       }
       aIndex++
     }
@@ -295,7 +297,6 @@ function lcs(
     diff[d--] = LANE.REMOVE
     curOldi--
   }
-
   return {
     diff,
     keymap,
