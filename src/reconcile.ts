@@ -152,10 +152,11 @@ const diffKids = (WIP: any, children: FreNode): void => {
 
   // LCS
   const { diff, keymap } = lcs(bCh, aCh, bHead, bTail, aHead, aTail)
+  let len = diff.length // 减少每次循环获取length的查询次数
 
   for (
     let i = 0, aIndex = aHead, bIndex = bHead, mIndex;
-    i < diff.length;
+    i < len;
     i++
   ) {
     const op = diff[i]
@@ -188,7 +189,7 @@ const diffKids = (WIP: any, children: FreNode): void => {
     }
   }
 
-  for (let i = 0, aIndex = aHead; i < diff.length; i++) {
+  for (let i = 0, aIndex = aHead; i < len; i++) {
     let op = diff[i]
     if (op === LANE.UPDATE) {
       aIndex++
@@ -203,7 +204,8 @@ const diffKids = (WIP: any, children: FreNode): void => {
     }
   }
 
-  for (let i = 0, prev = null; i < bCh.length; i++) {
+  len = bCh.length
+  for (let i = 0, prev = null; i < len; i++) {
     const child = bCh[i]
     if (WIP.lane & LANE.SVG) {
       child.lane |= LANE.SVG
