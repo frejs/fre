@@ -16,7 +16,6 @@ import { commit } from './commit'
 let currentFiber: IFiber
 let finish = null
 let effect = null
-let detach = null
 export let options: any = {}
 
 export const enum LANE {
@@ -44,7 +43,7 @@ export const update = (fiber?: IFiber) => {
   if (fiber && !(fiber.lane & LANE.DIRTY)) {
     fiber.lane = LANE.UPDATE | LANE.DIRTY
     schedule(() => {
-      effect = detach = fiber
+      effect = fiber
       return reconcile(fiber)
     })
   }
@@ -160,6 +159,7 @@ const diffKids = (WIP: any, children: FreNode): void => {
         c.after = WIP.childNodes[aIndex]
         aCh[mIndex] = undefined
       } else {
+        c.after = WIP.childNodes ? WIP.childNodes[aIndex] : null
         c.lane = LANE.INSERT
       }
       bIndex++
@@ -185,6 +185,9 @@ const diffKids = (WIP: any, children: FreNode): void => {
 
   for (var i = 0, prev = null; i < bCh.length; i++) {
     const child = bCh[i]
+    if (WIP.lane & LANE.SVG) {
+      child.lane |= LANE.SVG
+    }
     child.parent = WIP
     if (i > 0) {
       prev.sibling = child
