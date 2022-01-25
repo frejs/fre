@@ -150,7 +150,18 @@ const diffKids = (WIP: any, children: FreNode): void => {
   ) {
     const op = diff[i]
     if (op === LANE.UPDATE) {
-      clone(aCh[aIndex++], bCh[bIndex++], LANE.UPDATE)
+      if(!same(aCh[aIndex], bCh[bIndex])){
+        bCh[bIndex].lane = LANE.INSERT
+        bCh[bIndex].after = null
+        aCh[aIndex].lane = LANE.REMOVE
+        effect.e = aCh[aIndex]
+        effect = aCh[aIndex]
+      }else{
+        clone(aCh[aIndex], bCh[bIndex], LANE.UPDATE)
+      }
+      
+      aIndex++
+      bIndex++
     } else if (op === LANE.INSERT) {
       let c = bCh[bIndex]
       mIndex = c.key != null ? keymap[c.key] : null
