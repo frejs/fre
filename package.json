@@ -48,7 +48,7 @@
     "codecov": "^3.8.2",
     "cross-env": "^5.2.0",
     "nyc": "^15.1.0",
-    "playwright-test": "^5.0.0",
+    "playwright-test": "^7.2.2",
     "rollup": "^2.11.2",
     "rollup-plugin-size": "^0.2.2",
     "rollup-plugin-terser": "^5.1.2",
