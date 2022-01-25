@@ -191,7 +191,7 @@ const diffKids = (WIP: any, children: FreNode): void => {
     }
   }
 
-  for (var i = 0, prev = null; i < bCh.length; i++) {
+  for (let i = 0, prev = null; i < bCh.length; i++) {
     const child = bCh[i]
     if (WIP.lane & LANE.SVG) {
       child.lane |= LANE.SVG
@@ -235,7 +235,7 @@ function lcs(
   aHead = 0,
   aTail = aArr.length - 1
 ) {
-  var keymap = {},
+  let keymap = {},
     unkeyed = [],
     idxUnkeyed = 0,
     ch,
@@ -244,16 +244,16 @@ function lcs(
     idxInOld,
     key
 
-  var newLen = bArr.length
-  var oldLen = aArr.length
-  var minLen = Math.min(newLen, oldLen)
-  var tresh = Array(minLen + 1)
+  let newLen = bArr.length
+  let oldLen = aArr.length
+  let minLen = Math.min(newLen, oldLen)
+  let tresh = Array(minLen + 1)
   tresh[0] = -1
 
   for (var i = 1; i < tresh.length; i++) {
     tresh[i] = aTail + 1
   }
-  var link = Array(minLen)
+  let link = Array(minLen)
 
   for (i = aHead; i <= aTail; i++) {
     item = aArr[i]
@@ -280,11 +280,11 @@ function lcs(
   k = tresh.length - 1
   while (tresh[k] > aTail) k--
 
-  var ptr = link[k]
-  var diff = Array(oldLen + newLen - k)
-  var curNewi = bTail,
+  let ptr = link[k]
+  let diff = Array(oldLen + newLen - k)
+  let curNewi = bTail,
     curOldi = aTail
-  var d = diff.length - 1
+  let d = diff.length - 1
   while (ptr) {
     const { newi, oldi } = ptr
     while (curNewi > newi) {
@@ -315,10 +315,10 @@ function lcs(
 }
 
 function bs(ktr, j) {
-  var lo = 1
-  var hi = ktr.length - 1
+  let lo = 1
+  let hi = ktr.length - 1
   while (lo <= hi) {
-    var mid = (lo + hi) >>> 1
+    let mid = (lo + hi) >>> 1
     if (j < ktr[mid]) hi = mid - 1
     else lo = mid + 1
   }
