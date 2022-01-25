@@ -94,9 +94,6 @@ const shouldUpdate = (a, b) => {
 }
 
 const updateHook = <P = Attributes>(WIP: IFiber): any => {
-  // if ((WIP.type as any).memo && !shouldUpdate(WIP.oldProps, WIP.props)) {
-  //   return
-  // }
   resetCursor()
   currentFiber = WIP
   let children = (WIP.type as FC<P>)(WIP.props)
