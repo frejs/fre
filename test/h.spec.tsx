@@ -43,7 +43,7 @@ test('h', t => {
           x: '20',
           y: '35',
           children: {
-            type: '',
+            type: '#text',
             props: { nodeValue: 'fre' },
           },
         },
@@ -99,7 +99,7 @@ test('h3', t => {
     props: {
       value: 'foo',
       children: {
-        type: '',
+        type: '#text',
         props: { nodeValue: 'bar' },
       },
     },
@@ -122,7 +122,7 @@ test('h4', t => {
     ref: null,
     props: {
       children: {
-        type: '',
+        type: '#text',
         props: { nodeValue: 'bar' },
       },
     },

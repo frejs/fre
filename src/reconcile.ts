@@ -10,12 +10,15 @@ import {
 import { createElement } from './dom'
 import { resetCursor } from './hook'
 import { schedule, shouldYield } from './schedule'
-import { isArr, createText } from './h'
+import { isArr, createText, createVnode } from './h'
 import { commit } from './commit'
 
 let currentFiber: IFiber
 let finish = null
 let effect = null
+let walker = null
+let currentNode = null
+let removeNodes = []
 export let options: any = {}
 
 export const enum LANE {
@@ -36,6 +39,12 @@ export const render = (vnode: FreElement, node: Node, config?: any): void => {
   if (config) {
     options = config
   }
+  walker = document.createTreeWalker(node, NodeFilter.SHOW_ALL, {
+    acceptNode(node) {
+      return NodeFilter.FILTER_ACCEPT
+    },
+  })
+  currentNode = walker.currentNode
   update(rootFiber)
 }
 
@@ -53,6 +62,7 @@ const reconcile = (WIP?: IFiber): boolean => {
   while (WIP && !shouldYield()) WIP = capture(WIP)
   if (WIP) return reconcile.bind(null, WIP)
   if (finish) {
+    removeNodes.forEach(d => d.remove())
     commit(finish)
     finish = null
     options.done && options.done()
@@ -88,11 +98,6 @@ const bubble = WIP => {
   }
 }
 
-const shouldUpdate = (a, b) => {
-  for (let i in a) if (!(i in b)) return true
-  for (let i in b) if (a[i] !== b[i]) return true
-}
-
 const updateHook = <P = Attributes>(WIP: IFiber): any => {
   resetCursor()
   currentFiber = WIP
@@ -102,10 +107,18 @@ const updateHook = <P = Attributes>(WIP: IFiber): any => {
 
 const updateHost = (WIP: IFiber): void => {
   WIP.parentNode = (getParentNode(WIP) as any) || {}
+  if (WIP.type === 'svg') WIP.lane |= LANE.SVG
   if (!WIP.node) {
-    if (WIP.type === 'svg') WIP.lane |= LANE.SVG
-    WIP.node = createElement(WIP) as HTMLElementEx
+    if (WIP.type === currentNode?.nodeName.toLowerCase()) {
+      WIP.lane |= LANE.UPDATE
+      WIP.node = currentNode
+    } else {
+      // WIP.parentNode.removeChild(currentNode)
+      removeNodes.push(currentNode)
+      WIP.node = createElement(WIP) as HTMLElementEx
+    }
   }
+  currentNode = walker.nextNode()
   WIP.childNodes = Array.from(WIP.node.childNodes || [])
   diffKids(WIP, WIP.props.children)
 }
@@ -147,15 +160,15 @@ const diffKids = (WIP: any, children: FreNode): void => {
   ) {
     const op = diff[i]
     if (op === LANE.UPDATE) {
-      if(!same(aCh[aIndex], bCh[bIndex])){
+      if (!same(aCh[aIndex], bCh[bIndex])) {
         bCh[bIndex].lane = LANE.INSERT
         aCh[aIndex].lane = LANE.REMOVE
         effect.e = aCh[aIndex]
         effect = aCh[aIndex]
-      }else{
+      } else {
         clone(aCh[aIndex], bCh[bIndex], LANE.UPDATE)
       }
-      
+
       aIndex++
       bIndex++
     } else if (op === LANE.INSERT) {

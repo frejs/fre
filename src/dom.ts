@@ -43,7 +43,7 @@ export const updateElement = <P extends Attributes>(
 
 export const createElement = <P = Attributes>(fiber: IFiber) => {
   const dom =
-    fiber.type === ''
+    fiber.type === '#text'
       ? document.createTextNode('')
       : fiber.lane & LANE.SVG
       ? document.createElementNS(

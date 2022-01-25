@@ -35,13 +35,15 @@ export interface IHook {
   effect: IEffect[]
 }
 
-export type IRef = (e: HTMLElement | undefined) => void | { current?: HTMLElement }
+export type IRef = (
+  e: HTMLElement | undefined
+) => void | { current?: HTMLElement }
 
 export interface IFiber<P extends Attributes = any> {
   key?: string
   type: string | FC<P>
-  parentNode: HTMLElementEx,
-  childNodes:any,
+  parentNode: HTMLElementEx
+  childNodes: any
   node: HTMLElementEx
   kids?: any
   parent?: IFiber<P>
@@ -55,19 +57,26 @@ export interface IFiber<P extends Attributes = any> {
   props: P
   lane: number
   time: number
-  e: IFiber,
-  prev: IFiber,
-  d: IFiber,
-  laziness: any[],
-  dirty: boolean,
-  isComp: boolean,
+  e: IFiber
+  prev: IFiber
+  d: IFiber
+  laziness: any[]
+  dirty: boolean
+  isComp: boolean
+  walker: any
 }
 
 export type HTMLElementEx = HTMLElement & { last: IFiber | null }
 export type IEffect = [Function?, number?, Function?]
 
 export type FreText = string | number
-export type FreNode = FreText | FreElement | FreNode[] | boolean | null | undefined
+export type FreNode =
+  | FreText
+  | FreElement
+  | FreNode[]
+  | boolean
+  | null
+  | undefined
 export type SetStateAction<S> = S | ((prevState: S) => S)
 export type Dispatch<A> = (value: A, resume?: boolean) => void
 export type Reducer<S, A> = (prevState: S, action: A) => S
