@@ -110,7 +110,7 @@ const updateHost = (WIP: IFiber): void => {
     if (WIP.type === 'svg') WIP.lane |= LANE.SVG
     WIP.node = createElement(WIP) as HTMLElementEx
   }
-
+  WIP.childNodes = Array.from(WIP.node.childNodes || [])
   diffKids(WIP, WIP.props.children)
 }
 
@@ -142,7 +142,6 @@ const diffKids = (WIP: any, children: FreNode): void => {
   }
 
   // LCS
-
   const { diff, keymap } = lcs(bCh, aCh, bHead, bTail, aHead, aTail)
 
   for (
@@ -152,15 +151,13 @@ const diffKids = (WIP: any, children: FreNode): void => {
   ) {
     const op = diff[i]
     if (op === LANE.UPDATE) {
-      clone(aCh[aIndex], bCh[bIndex], LANE.UPDATE)
-      aIndex++
-      bIndex++
+      clone(aCh[aIndex++], bCh[bIndex++], LANE.UPDATE)
     } else if (op === LANE.INSERT) {
       let c = bCh[bIndex]
       mIndex = c.key != null ? keymap[c.key] : null
-
       if (mIndex != null) {
-        clone(c, aCh[mIndex], LANE.INSERT)
+        clone(aCh[mIndex], c, LANE.INSERT)
+        c.after = WIP.childNodes[aHead]
         aCh[mIndex] = undefined
       } else {
         c.lane = LANE.INSERT
