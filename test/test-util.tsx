@@ -1,12 +1,17 @@
 import { h, render, useEffect, useState } from '../src/index'
 
-export const testRender = jsx =>
-  new Promise(resolve => {
+export const testRender = jsx => {
+  return new Promise(resolve => {
+    const Wrapper = () => {
+      useEffect(() => {
+        resolve([...document.body.childNodes])
+      }, [])
+      return jsx
+    }
     document.body.innerHTML = ''
-    render(jsx, document.body, {
-      done: () => resolve([...document.body.childNodes])
-    })
+    render(<Wrapper />, document.body)
   })
+}
 
 export const testUpdates = async updates => {
   let effect = () => { }

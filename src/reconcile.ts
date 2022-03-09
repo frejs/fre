@@ -16,7 +16,6 @@ import { commit } from './commit'
 let currentFiber: IFiber
 let finish = null
 let effect = null
-export let options: any = {}
 
 export const enum LANE {
   UPDATE = 1 << 1,
@@ -28,14 +27,11 @@ export const enum LANE {
   NOWORK = 1 << 7,
 }
 
-export const render = (vnode: FreElement, node: Node, config?: any): void => {
+export const render = (vnode: FreElement, node: Node): void => {
   const rootFiber = {
     node,
     props: { children: vnode },
   } as IFiber
-  if (config) {
-    options = config
-  }
   update(rootFiber)
 }
 
@@ -55,7 +51,6 @@ const reconcile = (WIP?: IFiber): boolean => {
   if (finish) {
     commit(finish)
     finish = null
-    options.done && options.done()
   }
   return null
 }
