@@ -44,13 +44,11 @@ const flush = (): void => {
     }
     job = peek(queue)
   }
-  job && startTransition(flush)
+  job && (translate = task(shouldYield())) && startTransition(flush)
 }
 
 export const shouldYield = (): boolean => {
-  const pending = getTime() >= deadline
-  translate = task(pending)
-  return pending
+  return getTime() >= deadline
 }
 
 export const getTime = () => performance.now()
