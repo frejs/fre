@@ -1,5 +1,5 @@
 import { isStr, arrayfy } from './reconcile'
-import { FreElement } from './type'
+import { FC, FreElement } from './type'
 
 // for jsx2
 export const h = (type, props: any, ...kids) => {
@@ -42,8 +42,9 @@ export function Fragment(props) {
   return props.children
 }
 
-export function memo(fn){
+export function memo<T extends object>(fn: FC<T>, compare?: FC<T>['compare']) {
   fn.memo = true
+  fn.compare = compare
   return fn
 }
 

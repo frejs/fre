@@ -21,4 +21,5 @@ test('render', async t => {
   await every(t)
   await svg(t)
   await fragment(t)
+  await memor(t)
 })

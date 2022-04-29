@@ -7,20 +7,27 @@ function App() {
     <div>
       {state}
       <A />
-      <B />
+      <B state={state} />
+      <C />
       <button onClick={() => setState(state + 1)}>+</button>
     </div>
   )
 }
 
-const A = memo(function A(props) {
+const A = memo(function A() {
   console.log('a')
-  return <div>222</div>
+  return <div>a: </div>
 })
-function B(props) {
+const B = memo(function B({ state }: { state: number }) {
   console.log('b')
+  return <div>b: {state}</div>
+}, (prevProps, nextProps) =>  nextProps.state % 2 === 0)
+
+function C(props) {
+  console.log('c')
   const [state, setState] = useState(0)
-  return <button onClick={() => setState(state + 1)}>{state}</button>
+  return <div><button onClick={() => setState(state + 1)}>c:{state}</button></div>
 }
+
 
 render(<App />, document.body)
