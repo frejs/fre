@@ -21,7 +21,10 @@
     "dist/*.js",
     "dist/*.map",
     "dist/types",
-    "jsx-runtime.js"
+    "jsx-runtime.js",
+    "jsx-runtime.d.js",
+    "jsx-dev-runtime.js",
+    "jsx-dev-runtime.d.ts"
   ],
   "scripts": {
     "test": "cross-env pw-test test/*.spec.tsx --runner zora --extensions tsx --cov",
