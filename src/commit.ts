@@ -9,7 +9,21 @@ export const commit = (fiber: IFiber): void => {
     insert(e)
   } while ((e = e.e))
 }
-
+/**
+ * A hack: When rendering a component list, the fiber lost it's `after` node data.
+ * There should be a good way to prevent that lost.
+ * @param fiber 
+ * @returns HTMLElement
+ */
+const findAfterNode = function(fiber: IFiber) {
+  if (isFn(fiber.type) && !isFn(fiber.parent.type)) {
+    return fiber.after;
+  }
+  if (!isFn(fiber.type) && !isFn(fiber.parent.type)) {
+    return fiber.after;
+  }
+  return findAfterNode(fiber.parent);
+}
 const insert = (fiber: IFiber): void => {
   if (fiber.lane === LANE.REMOVE) {
     remove(fiber)
@@ -19,7 +33,7 @@ const insert = (fiber: IFiber): void => {
     updateElement(fiber.node, fiber.oldProps || {}, fiber.props)
   }
   if (fiber.lane & LANE.INSERT) {
-    fiber.parentNode.insertBefore(fiber.node, fiber.after)
+    fiber.parentNode.insertBefore(fiber.node,  findAfterNode(fiber))
   }
   refer(fiber.ref, fiber.node)
 }
