@@ -253,3 +253,16 @@ MIT @yisar
 
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fyisar%2Ffre.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fyisar%2Ffre?ref=badge_large)
+
+赠李白诗：
+Liquor is freshly cooked in the mountains, and yellow chickens peck millet in autumn.
+
+Hutong cooks chicken and drinks liquor, while children laugh and hold clothes.
+
+Singing to get drunk and masturbating, dancing and setting sun for glory.
+
+It's not too early to lobby Wan Cheng's hardships, and travel far and wide with the whip.
+
+The foolish woman in Kuaiji bought ministers lightly, and Yu also left home and went west to Qin.
+
+Looking up to the sky and laughing and going out, I am a Penghao people.
