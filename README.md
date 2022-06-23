@@ -21,7 +21,7 @@
   <img src="https://contrib.rocks/image?repo=yisar/fre" />
 </a>
 
-### Use
+### Usage
 
 ```shell
 yarn add fre
