@@ -20,7 +20,7 @@ export interface FC<P extends Attributes = {}> {
   tag?: number
   type?: string
   memo?: boolean
-  compare?: (newProps: P, oldProps: P) => boolean
+  shouldUpdate?: (newProps: P, oldProps: P) => boolean
 }
 
 export interface FreElement<P extends Attributes = any, T = string> {

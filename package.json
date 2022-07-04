@@ -51,19 +51,19 @@
     "codecov": "^3.8.2",
     "cross-env": "^5.2.0",
     "nyc": "^15.1.0",
-    "playwright-test": "^7.2.2",
     "rollup": "^2.11.2",
     "rollup-plugin-size": "^0.2.2",
     "rollup-plugin-terser": "^5.1.2",
     "rollup-plugin-typescript2": "^0.27.0",
     "terser": "^4.1.2",
     "typescript": "^4.0.2",
+    "vite": "^2.7.13",
     "yarpm": "^0.2.1",
-    "zora": "4.0.2",
-    "vite": "^2.7.13"
+    "zora": "4.0.2"
   },
   "repository": "yisar/fre",
   "homepage": "https://fre.js.org",
   "dependencies": {
+    "playwright-test": "7.2.2"
   }
 }

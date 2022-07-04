@@ -42,9 +42,9 @@ export function Fragment(props) {
   return props.children
 }
 
-export function memo<T extends object>(fn: FC<T>, compare?: FC<T>['compare']) {
+export function memo<T extends object>(fn: FC<T>, compare?: FC<T>['shouldUpdate']) {
   fn.memo = true
-  fn.compare = compare
+  fn.shouldUpdate = compare
   return fn
 }
 

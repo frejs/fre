@@ -59,8 +59,8 @@ const capture = (WIP: IFiber): IFiber | undefined => {
   WIP.isComp = isFn(WIP.type)
   if(WIP.isComp) {
     if((WIP.type as FC).memo && WIP.oldProps) {
-      let compare = (WIP.type as FC).compare || shallowEqual
-      if(compare(WIP.props, WIP.oldProps)) { 
+      let scu = (WIP.type as FC).shouldUpdate || shouldUpdate
+      if(!scu(WIP.props, WIP.oldProps)) { 
         return WIP.sibling
       }
     }
@@ -330,21 +330,3 @@ export const getCurrentFiber = () => currentFiber || null
 export const isFn = (x: any): x is Function => typeof x === 'function'
 export const isStr = (s: any): s is number | string =>
   typeof s === 'number' || typeof s === 'string'
-
-export const shallowEqual = (a: object, b: object) => {
-  if (Object.is(a, b)) return true
-  if (a == null || b == null) return false
-  const keysA = Object.keys(a)
-  const keysB = Object.keys(b)
-  if (keysA.length !== keysB.length) return false
-  for (let i = 0; i < keysA.length; i++) {
-    const currentKey = keysA[i]
-    if (
-      !Object.hasOwnProperty.call(b, currentKey) ||
-      !Object.is(a[currentKey], b[currentKey])
-    ) {
-      return false;
-    }
-  }
-  return true
-}
