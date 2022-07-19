@@ -60,7 +60,7 @@ const capture = (WIP: IFiber): IFiber | undefined => {
   if(WIP.isComp) {
     if((WIP.type as FC).memo && WIP.oldProps) {
       let scu = (WIP.type as FC).shouldUpdate || shouldUpdate
-      if (!scu(WIP.props, WIP.oldProps) && WIP.sibling) { 
+      if (!scu(WIP.props, WIP.oldProps) && WIP.sibling && (WIP.lane === LANE.UPDATE)) { // fast-fix
         return WIP.sibling
       }
     }
@@ -86,6 +86,9 @@ const bubble = WIP => {
     if (WIP.hooks) {
       side(WIP.hooks.layout)
       schedule(() => side(WIP.hooks.effect))
+    }
+    if (WIP.lane > 2){ // fast-fix
+      WIP.child.lane |= WIP.lane
     }
   } else {
     effect.e = WIP
