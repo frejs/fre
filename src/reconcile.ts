@@ -60,7 +60,7 @@ const capture = (WIP: IFiber): IFiber | undefined => {
   if(WIP.isComp) {
     if((WIP.type as FC).memo && WIP.oldProps) {
       let scu = (WIP.type as FC).shouldUpdate || shouldUpdate
-      if(!scu(WIP.props, WIP.oldProps)) { 
+      if (!scu(WIP.props, WIP.oldProps) && WIP.sibling) { 
         return WIP.sibling
       }
     }
