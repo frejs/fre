@@ -60,8 +60,12 @@ const capture = (WIP: IFiber): IFiber | undefined => {
   if(WIP.isComp) {
     if((WIP.type as FC).memo && WIP.oldProps) {
       let scu = (WIP.type as FC).shouldUpdate || shouldUpdate
-      if (!scu(WIP.props, WIP.oldProps) && WIP.sibling && (WIP.lane === LANE.UPDATE)) { // fast-fix
-        return WIP.sibling
+      if (!scu(WIP.props, WIP.oldProps) && (WIP.lane === LANE.UPDATE)) { // fast-fix
+        while (WIP) {
+          if (WIP.sibling)
+              return WIP.sibling
+          WIP = WIP.parent
+      }
       }
     }
     updateHook(WIP)
