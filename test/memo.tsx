@@ -10,15 +10,15 @@ export const memor = async t => {
 
   await testUpdates([
     {
-      content: <Component />,
+      content: <Component a={0}/>,
       test: ([p]) => {
-        t.eq(update, 0)
+        t.eq(update, 1)
       },
     },
     {
-      content: <Component />,
+      content: <Component a={1}/>,
       test: ([p]) => {
-        t.eq(update, 0)
+        t.eq(update, 2)
       },
     },
   ])
