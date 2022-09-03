@@ -9,6 +9,8 @@ export {
   useRef,
   useLayout,
   useLayout as useLayoutEffect,
+  useContext,
+  createContext,
 } from './hook'
 export { shouldYield, schedule as startTranstion } from './schedule'
 export * from './type'

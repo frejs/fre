@@ -9,7 +9,11 @@ import {
   HookTypes,
   RefObject,
   IEffect,
+  FreNode,
 } from "./type"
+
+const EMPTY_ARR = []
+
 let cursor = 0
 
 export const resetCursor = () => {
@@ -93,6 +97,55 @@ export const getHook = <S = Function | undefined, Dependency = any>(
     hooks.list.push([] as IEffect)
   }
   return [(hooks.list[cursor] as unknown) as [S, Dependency], current]
+}
+
+export type ContextType<T> = {
+  ({ value, children }: { value: T, children: FreNode }): FreNode;
+  initialValue: T;
+}
+
+type SubscriberCb = () => void;
+
+export const createContext = <T>(initialValue: T): ContextType<T> => {
+  const contextComponent: ContextType<T> = ({ value, children }) => {
+    const valueRef = useRef(value)
+    const subscribers = useMemo(() => new Set<SubscriberCb>(), EMPTY_ARR)
+
+    if (valueRef.current !== value) {
+      valueRef.current = value;
+      subscribers.forEach((subscriber) => subscriber())
+    }
+
+    return children
+  }
+  contextComponent.initialValue = initialValue;
+  return contextComponent;
+}
+
+export const useContext = <T>(contextType: ContextType<T>): T => {
+  let subscribersSet: Set<Function>
+
+  const triggerUpdate = useReducer(null, null)[1] as SubscriberCb
+
+  useEffect(() => {
+    return () => subscribersSet && subscribersSet.delete(triggerUpdate)
+  }, EMPTY_ARR);
+
+  let contextFiber = getCurrentFiber().parent
+  while (contextFiber && contextFiber.type !== contextType) {
+    contextFiber = contextFiber.parent
+  }
+
+  if (contextFiber) {
+    const hooks = contextFiber.hooks.list as unknown as [[RefObject<T>], [Set<SubscriberCb>]]
+    const [[value], [subscribers]] = hooks;
+
+    subscribersSet = subscribers.add(triggerUpdate)
+
+    return value.current
+  } else {
+    return contextType.initialValue
+  }
 }
 
 export const isChanged = (a: DependencyList, b: DependencyList) => {
