@@ -44,7 +44,7 @@ const refer = (ref: IRef, dom?: HTMLElement): void => {
 }
 
 const kidsRefer = (kids: any): void => {
-  kids.forEach(kid => {
+  kids && kids.forEach(kid => {
     kid.kids && kidsRefer(kid.kids)
     refer(kid.ref, null)
   })

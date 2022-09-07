@@ -44,7 +44,8 @@ export type IRef = (
 export interface IFiber<P extends Attributes = any> {
   key?: string
   type: string | FC<P>
-  parentNode: HTMLElementEx
+  parentNode: HTMLElementEx,
+  tree:any,
   childNodes: any
   node: HTMLElementEx
   kids?: any

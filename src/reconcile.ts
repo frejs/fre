@@ -12,6 +12,8 @@ import { resetCursor } from './hook'
 import { schedule, shouldYield } from './schedule'
 import { isArr, createText } from './h'
 import { commit } from './commit'
+import { walker, walk } from './resume'
+import { h } from './h'
 
 let currentFiber: IFiber
 let finish = null
@@ -28,9 +30,11 @@ export const enum LANE {
 }
 
 export const render = (vnode: FreElement, node: Node): void => {
+  let tree = walker(node)
   const rootFiber = {
     node,
     props: { children: vnode },
+    tree,
   } as IFiber
   update(rootFiber)
 }
@@ -46,7 +50,13 @@ export const update = (fiber?: IFiber) => {
 }
 
 const reconcile = (WIP?: IFiber): boolean => {
-  while (WIP && !shouldYield()) WIP = capture(WIP)
+  let root = WIP.tree
+  let current = root.currentNode
+  while (WIP && !shouldYield()) {
+    WIP.node = current
+    WIP = capture(WIP)
+    current = root.nextNode()
+  }
   if (WIP) return reconcile.bind(null, WIP)
   if (finish) {
     commit(finish)
@@ -57,15 +67,15 @@ const reconcile = (WIP?: IFiber): boolean => {
 
 const capture = (WIP: IFiber): IFiber | undefined => {
   WIP.isComp = isFn(WIP.type)
-  if(WIP.isComp) {
-    if((WIP.type as FC).memo && WIP.oldProps) {
+  if (WIP.isComp) {
+    if ((WIP.type as FC).memo && WIP.oldProps) {
       let scu = (WIP.type as FC).shouldUpdate || shouldUpdate
-      if (!scu(WIP.props, WIP.oldProps) && (WIP.lane === LANE.UPDATE)) { // fast-fix
+      if (!scu(WIP.props, WIP.oldProps) && WIP.lane === LANE.UPDATE) {
+        // fast-fix
         while (WIP) {
-          if (WIP.sibling)
-              return WIP.sibling
+          if (WIP.sibling) return WIP.sibling
           WIP = WIP.parent
-      }
+        }
       }
     }
     updateHook(WIP)
@@ -85,13 +95,14 @@ const capture = (WIP: IFiber): IFiber | undefined => {
   }
 }
 
-const bubble = WIP => {
+const bubble = (WIP) => {
   if (WIP.isComp) {
     if (WIP.hooks) {
       side(WIP.hooks.layout)
       schedule(() => side(WIP.hooks.effect))
     }
-    if (WIP.lane > 2){ // fast-fix
+    if (WIP.lane > 2) {
+      // fast-fix
       WIP.child.lane |= WIP.lane
     }
   } else {
@@ -108,7 +119,7 @@ const shouldUpdate = (a, b) => {
 const updateHook = <P = Attributes>(WIP: IFiber): any => {
   resetCursor()
   currentFiber = WIP
-  let children = (WIP.type as FC<P>)(WIP.props) 
+  let children = (WIP.type as FC<P>)(WIP.props)
   diffKids(WIP, simpleVnode(children))
 }
 
@@ -116,11 +127,21 @@ const updateHost = (WIP: IFiber): void => {
   WIP.parentNode = (getParentNode(WIP) as any) || {}
   if (!WIP.node) {
     if (WIP.type === 'svg') WIP.lane |= LANE.SVG
-    WIP.node = createElement(WIP) as HTMLElementEx
+    WIP.node = WIP.node || (createElement(WIP) as HTMLElementEx)
   }
   WIP.childNodes = Array.from(WIP.node.childNodes || [])
+  WIP.kids = recycleNode(WIP.node) || []
   diffKids(WIP, WIP.props.children)
 }
+
+const recycleNode = (node) =>
+  node.nodeType === 3
+    ? createText(node.nodeValue)
+    : h(
+        node.nodeName.toLowerCase(),
+        {},
+        [].map.call(node.childNodes, recycleNode)
+      )
 
 const simpleVnode = (type: any) =>
   isStr(type) ? createText(type as string) : type
@@ -132,12 +153,13 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
 }
 
 const diffKids = (WIP: any, children: FreNode): void => {
-  let aCh = WIP.kids || [],
+  let aCh = arrayfy(WIP.kids) || [],
     bCh = (WIP.kids = arrayfy(children) as any),
     aHead = 0,
     bHead = 0,
     aTail = aCh.length - 1,
     bTail = bCh.length - 1
+  // console.log(aCh, bCh)
 
   while (aHead <= aTail && bHead <= bTail) {
     if (!same(aCh[aHead], bCh[bHead])) break
@@ -227,11 +249,11 @@ const same = (a, b) => {
   return a && b && a.key === b.key && a.type === b.type
 }
 
-export const arrayfy = arr => (!arr ? [] : isArr(arr) ? arr : [arr])
+export const arrayfy = (arr) => (!arr ? [] : isArr(arr) ? arr : [arr])
 
 const side = (effects: IEffect[]): void => {
-  effects.forEach(e => e[2] && e[2]())
-  effects.forEach(e => (e[2] = e[0]()))
+  effects.forEach((e) => e[2] && e[2]())
+  effects.forEach((e) => (e[2] = e[0]()))
   effects.length = 0
 }
 
