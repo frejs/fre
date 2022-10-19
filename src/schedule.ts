@@ -15,7 +15,10 @@ export const schedule = (callback: any): void => {
 }
 
 const task = (pending: boolean) => {
-  const cb = () => transitions.splice(0, 1).forEach(c => c())
+  const cb = () => {
+    const ts = transitions.shift()
+    ts&&ts();
+  }
   if (!pending && typeof Promise !== 'undefined') {
     // Todo queueMicrotask
     return () => queueMicrotask(cb)
