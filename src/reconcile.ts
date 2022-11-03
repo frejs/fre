@@ -16,6 +16,7 @@ import { commit } from './commit'
 let currentFiber: IFiber
 let finish = null
 let effect = null
+let actions = []
 
 export const enum LANE {
   UPDATE = 1 << 1,
@@ -135,25 +136,45 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
 const diffKids = (WIP: any, children: FreNode): void => {
   let aCh = WIP.kids || [],
     bCh = (WIP.kids = arrayfy(children) as any)
+  let aIdx = {},
+    bIdx = {}
 
-  for (var i = 0, prev = null; i < bCh.length; i++) {
-    let newFiber = bCh[i]
-    const oldFiber = aCh[i]
+  for (i = 0; i < aCh.length; i++) {
+    aIdx[key(aCh[i])] = i
+  }
+  for (i = 0; i < bCh.length; i++) {
+    bIdx[key(bCh[i])] = i
+  }
 
-    if (!same(oldFiber, newFiber)) {
-      if (oldFiber) {
-        newFiber.lane === LANE.REMOVE
-        effect.next = newFiber
-        effect = effect.next
-      }
-      if (newFiber) {
-        newFiber.lane === LANE.INSERT
-        effect.next = newFiber
-        effect = effect.next
-      }
+  for (var i = 0, j = 0, prev = null; i < aCh.length || j < bCh.length; ) {
+    let newFiber = bCh[j],
+      oldFiber = aCh[i]
+    if (oldFiber === null) {
+      i++
+    } else if (bCh.length <= j) {
+      remove(i)
+      i++
+    } else if (aCh.length <= i) {
+      add(newFiber, i)
+      j++
+    } else if (key(oldFiber) === key(newFiber)) {
+      i++
+      j++
     } else {
-      // diff
-      newFiber = oldFiber
+      let currentNew = bIdx[key(oldFiber)]
+      let wantedElmInOld = aIdx[key(newFiber)]
+
+      if (currentNew === undefined) {
+        remove(i)
+        i++
+      } else if (wantedElmInOld === undefined) {
+        add(newFiber, i)
+        j++
+      } else {
+        move(wantedElmInOld, i)
+        aCh[wantedElmInOld] = null
+        j++
+      }
     }
 
     if (WIP.lane & LANE.SVG) {
@@ -169,6 +190,16 @@ const diffKids = (WIP: any, children: FreNode): void => {
   }
 }
 
+const move = function (from, to) {
+  actions.push({ type: 'move', elm: a[from], before: a[to] })
+}
+const add = function (elm, i) {
+  actions.push({ type: 'add', elm: elm, before: a[i] })
+}
+const remove = function (i) {
+  actions.push({ type: 'remove', elm: a[i], before: a[i + 1] })
+}
+
 const same = (a, b) => {
   return a && b && a.key === b.key && a.type === b.type
 }
@@ -180,6 +211,8 @@ const side = (effects: IEffect[]): void => {
   effects.forEach((e) => (e[2] = e[0]()))
   effects.length = 0
 }
+
+const key = (vnode) => (vnode.key == null ? vnode : vnode.key)
 
 export const getCurrentFiber = () => currentFiber || null
 export const isFn = (x: any): x is Function => typeof x === 'function'

@@ -14,6 +14,7 @@ const diff = function (opts) {
     bIdx[key(b[i])] = i;
   }
   for (i = j = 0; i !== a.length || j !== b.length; ) {
+    console.log(i)
     var aElm = a[i],
       bElm = b[j];
     if (aElm === null) {
