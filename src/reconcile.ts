@@ -120,7 +120,6 @@ const updateHost = (WIP: IFiber): void => {
     if (WIP.type === 'svg') WIP.lane |= LANE.SVG
     WIP.node = createElement(WIP) as HTMLElementEx
   }
-  WIP.childNodes = Array.from(WIP.node.childNodes || [])
   diffKids(WIP, WIP.props.children)
 }
 
@@ -197,13 +196,13 @@ const diffKids = (WIP: any, children: FreNode): void => {
 }
 
 const move = function (from, to) {
-  actions.push({ type: 'move', elm: a[from], before: a[to] })
+  actions.push({ type: 'move', from, to })
 }
-const add = function (elm, i) {
-  actions.push({ type: 'add', elm: elm, before: a[i] })
+const add = function (elm, to) {
+  actions.push({ type: 'add', elm: elm, to })
 }
-const remove = function (i) {
-  actions.push({ type: 'remove', elm: a[i], before: a[i + 1] })
+const remove = function (from) {
+  actions.push({ type: 'remove', elm: from, before: from + 1 })
 }
 
 const same = (a, b) => {
