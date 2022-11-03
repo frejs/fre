@@ -147,28 +147,34 @@ const diffKids = (WIP: any, children: FreNode): void => {
   }
 
   for (var i = 0, j = 0, prev = null; i < aCh.length || j < bCh.length; ) {
-    let newFiber = bCh[j],
-      oldFiber = aCh[i]
-    if (oldFiber === null) {
+    let b = bCh[j],
+      a = aCh[i]
+
+    if (a.type !== b.type) {
+      add(b, i)
+      remove(i)
+      i++
+      j++
+    } else if (a === null) {
       i++
     } else if (bCh.length <= j) {
       remove(i)
       i++
     } else if (aCh.length <= i) {
-      add(newFiber, i)
+      add(b, i)
       j++
-    } else if (key(oldFiber) === key(newFiber)) {
+    } else if (key(a) === key(b)) {
       i++
       j++
     } else {
-      let currentNew = bIdx[key(oldFiber)]
-      let wantedElmInOld = aIdx[key(newFiber)]
+      let currentNew = bIdx[key(a)]
+      let wantedElmInOld = aIdx[key(b)]
 
       if (currentNew === undefined) {
         remove(i)
         i++
       } else if (wantedElmInOld === undefined) {
-        add(newFiber, i)
+        add(b, i)
         j++
       } else {
         move(wantedElmInOld, i)
@@ -178,15 +184,15 @@ const diffKids = (WIP: any, children: FreNode): void => {
     }
 
     if (WIP.lane & LANE.SVG) {
-      newFiber.lane |= LANE.SVG
+      b.lane |= LANE.SVG
     }
-    newFiber.parent = WIP
+    b.parent = WIP
     if (i > 0) {
-      prev.sibling = newFiber
+      prev.sibling = b
     } else {
-      WIP.child = newFiber
+      WIP.child = b
     }
-    prev = newFiber
+    prev = b
   }
 }
 
