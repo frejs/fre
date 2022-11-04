@@ -9,33 +9,35 @@ export const commit = (fiber: IFiber): void => {
     insert(e)
   } while ((e = e.e))
 }
-/**
- * A hack: When rendering a component list, the fiber lost it's `after` node data.
- * There should be a good way to prevent that lost.
- * @param fiber 
- * @returns HTMLElement
- */
-const findAfterNode = function(fiber: IFiber) {
-  if (isFn(fiber.type) && !isFn(fiber.parent.type)) {
-    return fiber.after;
-  }
-  if (!isFn(fiber.type) && !isFn(fiber.parent.type)) {
-    return fiber.after;
-  }
-  return findAfterNode(fiber.parent);
-}
+
 const insert = (fiber: IFiber): void => {
   if (fiber.lane === LANE.REMOVE) {
     remove(fiber)
     return
   }
   if (fiber.lane & LANE.UPDATE) {
-    updateElement(fiber.node, fiber.oldProps || {}, fiber.props)
+    _update(fiber)
   }
   if (fiber.lane & LANE.INSERT) {
-    fiber.parentNode.insertBefore(fiber.node,  findAfterNode(fiber))
+    _insert(fiber)
   }
   refer(fiber.ref, fiber.node)
+}
+
+function _insert(fiber) {
+  if (fiber.isComp) {
+    _insert(fiber.child)
+  } else {
+    fiber.parentNode.insertBefore(fiber.node, fiber.after)
+  }
+}
+
+function _update(fiber) {
+  if (fiber.isComp) {
+    _update(fiber.child)
+  } else {
+    updateElement(fiber.node, fiber.oldProps || {}, fiber.props)
+  }
 }
 
 const refer = (ref: IRef, dom?: HTMLElement): void => {
@@ -44,15 +46,15 @@ const refer = (ref: IRef, dom?: HTMLElement): void => {
 }
 
 const kidsRefer = (kids: any): void => {
-  kids.forEach(kid => {
+  kids.forEach((kid) => {
     kid.kids && kidsRefer(kid.kids)
     refer(kid.ref, null)
   })
 }
 
-const remove = d => {
+const remove = (d) => {
   if (d.isComp) {
-    d.hooks && d.hooks.list.forEach(e => e[2] && e[2]())
+    d.hooks && d.hooks.list.forEach((e) => e[2] && e[2]())
     d.kids.forEach(remove)
   } else {
     kidsRefer(d.kids)
