@@ -57,15 +57,15 @@ const reconcile = (WIP?: IFiber): boolean => {
 
 const capture = (WIP: IFiber): IFiber | undefined => {
   WIP.isComp = isFn(WIP.type)
-  if (WIP.isComp) {
-    if ((WIP.type as FC).memo && WIP.oldProps) {
+  if(WIP.isComp) {
+    if((WIP.type as FC).memo && WIP.oldProps) {
       let scu = (WIP.type as FC).shouldUpdate || shouldUpdate
-      if (!scu(WIP.props, WIP.oldProps) && WIP.lane === LANE.UPDATE) {
-        // fast-fix
+      if (!scu(WIP.props, WIP.oldProps) && (WIP.lane === LANE.UPDATE)) { // fast-fix
         while (WIP) {
-          if (WIP.sibling) return WIP.sibling
+          if (WIP.sibling)
+              return WIP.sibling
           WIP = WIP.parent
-        }
+      }
       }
     }
     updateHook(WIP)
@@ -85,16 +85,19 @@ const capture = (WIP: IFiber): IFiber | undefined => {
   }
 }
 
-const bubble = (WIP) => {
+const bubble = WIP => {
   if (WIP.isComp) {
     if (WIP.hooks) {
       side(WIP.hooks.layout)
       schedule(() => side(WIP.hooks.effect))
     }
+    if (WIP.lane > 2){ // fast-fix
+      WIP.child.lane |= WIP.lane
+    }
+  } else {
+    effect.e = WIP
+    effect = WIP
   }
-
-  effect.e = WIP
-  effect = WIP
 }
 
 const shouldUpdate = (a, b) => {
@@ -105,7 +108,7 @@ const shouldUpdate = (a, b) => {
 const updateHook = <P = Attributes>(WIP: IFiber): any => {
   resetCursor()
   currentFiber = WIP
-  let children = (WIP.type as FC<P>)(WIP.props)
+  let children = (WIP.type as FC<P>)(WIP.props) 
   diffKids(WIP, simpleVnode(children))
 }
 
@@ -115,6 +118,7 @@ const updateHost = (WIP: IFiber): void => {
     if (WIP.type === 'svg') WIP.lane |= LANE.SVG
     WIP.node = createElement(WIP) as HTMLElementEx
   }
+  WIP.childNodes = Array.from(WIP.node.childNodes || [])
   diffKids(WIP, WIP.props.children)
 }
 
@@ -160,6 +164,7 @@ const diffKids = (WIP: any, children: FreNode): void => {
       } else {
         clone(aCh[aIndex], bCh[bIndex], LANE.UPDATE)
       }
+
       aIndex++
       bIndex++
     } else if (op === LANE.INSERT) {
@@ -167,10 +172,10 @@ const diffKids = (WIP: any, children: FreNode): void => {
       mIndex = c.key != null ? keymap[c.key] : null
       if (mIndex != null) {
         clone(aCh[mIndex], c, LANE.INSERT)
-        c.after = aCh[aIndex]
+        c.after = WIP.childNodes[aIndex]
         aCh[mIndex] = undefined
       } else {
-        c.after = aCh[aIndex] ? aCh[aIndex] : null
+        c.after = WIP.childNodes ? WIP.childNodes[aIndex] : null
         c.lane = LANE.INSERT
       }
       bIndex++
@@ -222,11 +227,11 @@ const same = (a, b) => {
   return a && b && a.key === b.key && a.type === b.type
 }
 
-export const arrayfy = (arr) => (!arr ? [] : isArr(arr) ? arr : [arr])
+export const arrayfy = arr => (!arr ? [] : isArr(arr) ? arr : [arr])
 
 const side = (effects: IEffect[]): void => {
-  effects.forEach((e) => e[2] && e[2]())
-  effects.forEach((e) => (e[2] = e[0]()))
+  effects.forEach(e => e[2] && e[2]())
+  effects.forEach(e => (e[2] = e[0]()))
   effects.length = 0
 }
 

@@ -9,41 +9,31 @@ export const commit = (fiber: IFiber): void => {
     insert(e)
   } while ((e = e.e))
 }
-
-const getChildNode = (WIP: IFiber): HTMLElement | undefined => {
-  // find next
-  while (WIP ) {
-    if (!WIP.isComp) return WIP.node
-    WIP = WIP.child
+/**
+ * A hack: When rendering a component list, the fiber lost it's `after` node data.
+ * There should be a good way to prevent that lost.
+ * @param fiber 
+ * @returns HTMLElement
+ */
+const findAfterNode = function(fiber: IFiber) {
+  if (isFn(fiber.type) && !isFn(fiber.parent.type)) {
+    return fiber.after;
   }
-}
-function _update(fiber) {
-  if (fiber.isComp) {
-    _update(fiber.child)
-  } else {
-    updateElement(fiber.node, fiber.oldProps || {}, fiber.props)
+  if (!isFn(fiber.type) && !isFn(fiber.parent.type)) {
+    return fiber.after;
   }
+  return findAfterNode(fiber.parent);
 }
-
-
-function _insert(fiber, after) {
-  if (fiber.isComp) {
-    _insert(fiber.child, getChildNode(after))
-  } else {
-    fiber.parentNode.insertBefore(fiber.node, after)
-  }
-}
-
 const insert = (fiber: IFiber): void => {
   if (fiber.lane === LANE.REMOVE) {
     remove(fiber)
     return
   }
   if (fiber.lane & LANE.UPDATE) {
-    _update(fiber)
+    updateElement(fiber.node, fiber.oldProps || {}, fiber.props)
   }
   if (fiber.lane & LANE.INSERT) {
-    _insert(fiber, fiber.after)
+    fiber.parentNode.insertBefore(fiber.node,  findAfterNode(fiber))
   }
   refer(fiber.ref, fiber.node)
 }
