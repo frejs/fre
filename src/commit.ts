@@ -10,6 +10,30 @@ export const commit = (fiber: IFiber): void => {
   } while ((e = e.e))
 }
 
+const getChildNode = (WIP: IFiber): HTMLElement | undefined => {
+  // find next
+  while (WIP ) {
+    if (!WIP.isComp) return WIP.node
+    WIP = WIP.child
+  }
+}
+function _update(fiber) {
+  if (fiber.isComp) {
+    _update(fiber.child)
+  } else {
+    updateElement(fiber.node, fiber.oldProps || {}, fiber.props)
+  }
+}
+
+
+function _insert(fiber, after) {
+  if (fiber.isComp) {
+    _insert(fiber.child, getChildNode(after))
+  } else {
+    fiber.parentNode.insertBefore(fiber.node, after)
+  }
+}
+
 const insert = (fiber: IFiber): void => {
   if (fiber.lane === LANE.REMOVE) {
     remove(fiber)
@@ -19,25 +43,9 @@ const insert = (fiber: IFiber): void => {
     _update(fiber)
   }
   if (fiber.lane & LANE.INSERT) {
-    _insert(fiber)
+    _insert(fiber, fiber.after)
   }
   refer(fiber.ref, fiber.node)
-}
-
-function _insert(fiber) {
-  if (fiber.isComp) {
-    _insert(fiber.child)
-  } else {
-    fiber.parentNode.insertBefore(fiber.node, fiber.after)
-  }
-}
-
-function _update(fiber) {
-  if (fiber.isComp) {
-    _update(fiber.child)
-  } else {
-    updateElement(fiber.node, fiber.oldProps || {}, fiber.props)
-  }
 }
 
 const refer = (ref: IRef, dom?: HTMLElement): void => {
@@ -46,15 +54,15 @@ const refer = (ref: IRef, dom?: HTMLElement): void => {
 }
 
 const kidsRefer = (kids: any): void => {
-  kids.forEach((kid) => {
+  kids.forEach(kid => {
     kid.kids && kidsRefer(kid.kids)
     refer(kid.ref, null)
   })
 }
 
-const remove = (d) => {
+const remove = d => {
   if (d.isComp) {
-    d.hooks && d.hooks.list.forEach((e) => e[2] && e[2]())
+    d.hooks && d.hooks.list.forEach(e => e[2] && e[2]())
     d.kids.forEach(remove)
   } else {
     kidsRefer(d.kids)
