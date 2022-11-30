@@ -43,57 +43,57 @@ export const update = (fiber?: IFiber) => {
   }
 }
 
-const reconcile = (wip?: IFiber): boolean => {
-  while (wip && !shouldYield()) wip = capture(wip)
-  if (wip) return reconcile.bind(null, wip)
+const reconcile = (fiber?: IFiber): boolean => {
+  while (fiber && !shouldYield()) fiber = capture(fiber)
+  if (fiber) return reconcile.bind(null, fiber)
   return null
 }
 
-const memo = (wip) => {
-  if ((wip.type as FC).memo && wip.oldProps) {
-    let scu = (wip.type as FC).shouldUpdate || shouldUpdate
-    if (!scu(wip.props, wip.oldProps)) { // fast-fix
-      return getSibling(wip)
+const memo = (fiber) => {
+  if ((fiber.type as FC).memo && fiber.oldProps) {
+    let scu = (fiber.type as FC).shouldUpdate || shouldUpdate
+    if (!scu(fiber.props, fiber.oldProps)) { // fast-fix
+      return getSibling(fiber)
     }
   }
   return null
 }
 
-const capture = (wip: IFiber): IFiber | undefined => {
-  wip.isComp = isFn(wip.type)
-  if (wip.isComp) {
-    const memoFiber = memo(wip)
+const capture = (fiber: IFiber): IFiber | undefined => {
+  fiber.isComp = isFn(fiber.type)
+  if (fiber.isComp) {
+    const memoFiber = memo(fiber)
     if (memoFiber) {
       return memoFiber
     }
-    updateHook(wip)
+    updateHook(fiber)
   } else {
-    updateHost(wip)
+    updateHost(fiber)
   }
-  if (wip.child) return wip.child
-  const sibling = getSibling(wip)
+  if (fiber.child) return fiber.child
+  const sibling = getSibling(fiber)
   return sibling
 }
 
-const getSibling = (wip) => {
-  while (wip) {
-    bubble(wip)
-    if (wip.lane & TAG.DIRTY) {
-      wip.lane &= ~TAG.DIRTY
-      commit(wip)
+const getSibling = (fiber) => {
+  while (fiber) {
+    bubble(fiber)
+    if (fiber.lane & TAG.DIRTY) {
+      fiber.lane &= ~TAG.DIRTY
+      commit(fiber)
       return null
     }
-    if (wip.sibling) return wip.sibling
-    wip = wip.parent
+    if (fiber.sibling) return fiber.sibling
+    fiber = fiber.parent
   }
   return null
 }
 
-const bubble = wip => {
-  if (wip.isComp) {
-    if (wip.hooks) {
-      side(wip.hooks.layout)
-      schedule(() => side(wip.hooks.effect))
+const bubble = fiber => {
+  if (fiber.isComp) {
+    if (fiber.hooks) {
+      side(fiber.hooks.layout)
+      schedule(() => side(fiber.hooks.effect))
     }
   }
 }
@@ -108,36 +108,36 @@ const shouldUpdate = (a, b) => {
   for (let i in b) if (a[i] !== b[i]) return true
 }
 
-const updateHook = <P = Attributes>(wip: IFiber): any => {
+const updateHook = <P = Attributes>(fiber: IFiber): any => {
   resetCursor()
-  currentFiber = wip
-  let children = (wip.type as FC<P>)(wip.props)
-  diffKids(wip, simpleVnode(children))
+  currentFiber = fiber
+  let children = (fiber.type as FC<P>)(fiber.props)
+  diffKids(fiber, simpleVnode(children))
 }
 
-const updateHost = (wip: IFiber): void => {
-  wip.parentNode = (getParentNode(wip) as any) || {}
-  if (!wip.node) {
-    if (wip.type === 'svg') wip.lane |= TAG.SVG
-    wip.node = createElement(wip) as HTMLElementEx
+const updateHost = (fiber: IFiber): void => {
+  fiber.parentNode = (getParentNode(fiber) as any) || {}
+  if (!fiber.node) {
+    if (fiber.type === 'svg') fiber.lane |= TAG.SVG
+    fiber.node = createElement(fiber) as HTMLElementEx
   }
-  wip.childNodes = Array.from(wip.node.childNodes || [])
-  diffKids(wip, wip.props.children)
+  fiber.childNodes = Array.from(fiber.node.childNodes || [])
+  diffKids(fiber, fiber.props.children)
 }
 
 const simpleVnode = (type: any) =>
   isStr(type) ? createText(type as string) : type
 
-const getParentNode = (wip: IFiber): HTMLElement | undefined => {
-  while ((wip = wip.parent)) {
-    if (!wip.isComp) return wip.node
+const getParentNode = (fiber: IFiber): HTMLElement | undefined => {
+  while ((fiber = fiber.parent)) {
+    if (!fiber.isComp) return fiber.node
   }
 }
 
-const diffKids = (wip: any, children: FreNode): void => {
-  let isMount = !wip.kids,
-    aCh = wip.kids || [],
-    bCh = (wip.kids = arrayfy(children) as any),
+const diffKids = (fiber: any, children: FreNode): void => {
+  let isMount = !fiber.kids,
+    aCh = fiber.kids || [],
+    bCh = (fiber.kids = arrayfy(children) as any),
     aHead = 0,
     bHead = 0,
     aTail = aCh.length - 1,
@@ -158,7 +158,7 @@ const diffKids = (wip: any, children: FreNode): void => {
 
   for (let i = 0, aIndex = aHead, bIndex = bHead, mIndex; i < diff.length; i++) {
     const op = diff[i]
-    const after = wip.node?.childNodes[aIndex]
+    const after = fiber.node?.childNodes[aIndex]
     if (op === TAG.UPDATE) {
       if (!same(aCh[aIndex], bCh[bIndex])) {
         bCh[bIndex].lane = TAG.INSERT
@@ -205,14 +205,14 @@ const diffKids = (wip: any, children: FreNode): void => {
 
   for (let i = 0, prev = null, len = bCh.length; i < len; i++) {
     const child = bCh[i]
-    if (wip.lane & TAG.SVG) {
+    if (fiber.lane & TAG.SVG) {
       child.lane |= TAG.SVG
     }
-    child.parent = wip
+    child.parent = fiber
     if (i > 0) {
       prev.sibling = child
     } else {
-      wip.child = child
+      fiber.child = child
     }
     prev = child
   }

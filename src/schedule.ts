@@ -16,8 +16,7 @@ export const schedule = (callback: any): void => {
 
 const task = (pending: boolean) => {
   const cb = () => transitions.splice(0, 1).forEach(c => c())
-  if (!pending && typeof Promise !== 'undefined') {
-    // Todo queueMicrotask
+  if (!pending && typeof queueMicrotask !== 'undefined') {
     return () => queueMicrotask(cb)
   }
   if (typeof MessageChannel !== 'undefined') {
