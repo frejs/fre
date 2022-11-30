@@ -1,4 +1,4 @@
-import { IFiber, ITask, ITaskCallback } from './type'
+import { ITask } from './type'
 
 const queue: ITask[] = []
 const threshold: number = 5

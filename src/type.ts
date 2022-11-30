@@ -17,7 +17,6 @@ export interface Attributes extends Record<string, any> {
 export interface FC<P extends Attributes = {}> {
   (props: P): FreElement<P> | null
   fiber?: IFiber
-  tag?: number
   type?: string
   memo?: boolean
   shouldUpdate?: (newProps: P, oldProps: P) => boolean
@@ -60,12 +59,8 @@ export interface IFiber<P extends Attributes = any> {
   lane: number
   time: number
   next: IFiber
-  prev: IFiber
-  d: IFiber
-  laziness: any[]
   dirty: boolean
   isComp: boolean
-  walker: any
 }
 
 export type HTMLElementEx = HTMLElement & { last: IFiber | null }

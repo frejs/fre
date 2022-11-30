@@ -16,7 +16,7 @@ import { commit } from './commit'
 let currentFiber: IFiber
 let effectlist: any = {}
 
-export const enum LANE {
+export const enum TAG {
   UPDATE = 1 << 1,
   INSERT = 1 << 2,
   REMOVE = 1 << 3,
@@ -34,8 +34,8 @@ export const render = (vnode: FreElement, node: Node): void => {
 }
 
 export const update = (fiber?: IFiber) => {
-  if (fiber && !(fiber.lane & LANE.DIRTY)) {
-    fiber.lane = LANE.UPDATE | LANE.DIRTY
+  if (fiber && !(fiber.lane & TAG.DIRTY)) {
+    fiber.lane = TAG.UPDATE | TAG.DIRTY
     schedule(() => {
       effectlist = fiber
       return reconcile(fiber)
@@ -78,8 +78,8 @@ const capture = (wip: IFiber): IFiber | undefined => {
 const getSibling = (wip) => {
   while (wip) {
     bubble(wip)
-    if (wip.lane & LANE.DIRTY) {
-      wip.lane &= ~LANE.DIRTY
+    if (wip.lane & TAG.DIRTY) {
+      wip.lane &= ~TAG.DIRTY
       commit(wip)
       return null
     }
@@ -118,7 +118,7 @@ const updateHook = <P = Attributes>(wip: IFiber): any => {
 const updateHost = (wip: IFiber): void => {
   wip.parentNode = (getParentNode(wip) as any) || {}
   if (!wip.node) {
-    if (wip.type === 'svg') wip.lane |= LANE.SVG
+    if (wip.type === 'svg') wip.lane |= TAG.SVG
     wip.node = createElement(wip) as HTMLElementEx
   }
   wip.childNodes = Array.from(wip.node.childNodes || [])
@@ -145,12 +145,12 @@ const diffKids = (wip: any, children: FreNode): void => {
 
   while (aHead <= aTail && bHead <= bTail) {
     if (!same(aCh[aHead], bCh[bHead])) break
-    clone(aCh[aHead++], bCh[bHead++], LANE.UPDATE)
+    clone(aCh[aHead++], bCh[bHead++], TAG.UPDATE)
   }
 
   while (aHead <= aTail && bHead <= bTail) {
     if (!same(aCh[aTail], bCh[bTail])) break
-    clone(aCh[aTail--], bCh[bTail--], LANE.UPDATE)
+    clone(aCh[aTail--], bCh[bTail--], TAG.UPDATE)
   }
 
   const { diff, keymap } = LCSdiff(bCh, aCh, bHead, bTail, aHead, aTail)
@@ -159,44 +159,44 @@ const diffKids = (wip: any, children: FreNode): void => {
   for (let i = 0, aIndex = aHead, bIndex = bHead, mIndex; i < diff.length; i++) {
     const op = diff[i]
     const after = wip.node?.childNodes[aIndex]
-    if (op === LANE.UPDATE) {
+    if (op === TAG.UPDATE) {
       if (!same(aCh[aIndex], bCh[bIndex])) {
-        bCh[bIndex].lane = LANE.INSERT
+        bCh[bIndex].lane = TAG.INSERT
         bCh[bIndex].after = after
-        aCh[aIndex].lane = LANE.REMOVE
+        aCh[aIndex].lane = TAG.REMOVE
         append(aCh[aIndex])
         append(bCh[bIndex])
       } else {
-        clone(aCh[aIndex], bCh[bIndex], LANE.UPDATE)
+        clone(aCh[aIndex], bCh[bIndex], TAG.UPDATE)
       }
       aIndex++
       bIndex++
-    } else if (op === LANE.INSERT) {
+    } else if (op === TAG.INSERT) {
       let c = bCh[bIndex]
       mIndex = c.key != null ? keymap[c.key] : null
       if (mIndex != null) {
         c.after = after
-        clone(aCh[mIndex], c, LANE.INSERT)
+        clone(aCh[mIndex], c, TAG.INSERT)
         aCh[mIndex] = undefined
       } else {
         c.after = isMount ? null : after
-        c.lane = LANE.INSERT
+        c.lane = TAG.INSERT
         append(c)
       }
       bIndex++
-    } else if (op === LANE.REMOVE) {
+    } else if (op === TAG.REMOVE) {
       aIndex++
     }
   }
 
   for (let i = 0, aIndex = aHead; i < diff.length; i++) {
     let op = diff[i]
-    if (op === LANE.UPDATE) {
+    if (op === TAG.UPDATE) {
       aIndex++
-    } else if (op === LANE.REMOVE) {
+    } else if (op === TAG.REMOVE) {
       let c = aCh[aIndex]
       if (c !== undefined) {
-        c.lane = LANE.REMOVE
+        c.lane = TAG.REMOVE
         append(c)
       }
       aIndex++
@@ -205,8 +205,8 @@ const diffKids = (wip: any, children: FreNode): void => {
 
   for (let i = 0, prev = null, len = bCh.length; i < len; i++) {
     const child = bCh[i]
-    if (wip.lane & LANE.SVG) {
-      child.lane |= LANE.SVG
+    if (wip.lane & TAG.SVG) {
+      child.lane |= TAG.SVG
     }
     child.parent = wip
     if (i > 0) {
@@ -301,24 +301,24 @@ function LCSdiff(
   while (ptr) {
     const { newi, oldi } = ptr
     while (curNewi > newi) {
-      diff[d--] = LANE.INSERT
+      diff[d--] = TAG.INSERT
       curNewi--
     }
     while (curOldi > oldi) {
-      diff[d--] = LANE.REMOVE
+      diff[d--] = TAG.REMOVE
       curOldi--
     }
-    diff[d--] = LANE.UPDATE
+    diff[d--] = TAG.UPDATE
     curNewi--
     curOldi--
     ptr = ptr.prev
   }
   while (curNewi >= bHead) {
-    diff[d--] = LANE.INSERT
+    diff[d--] = TAG.INSERT
     curNewi--
   }
   while (curOldi >= aHead) {
-    diff[d--] = LANE.REMOVE
+    diff[d--] = TAG.REMOVE
     curOldi--
   }
   return {

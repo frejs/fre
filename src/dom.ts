@@ -1,5 +1,5 @@
 import { Attributes, DOM, IFiber } from './type'
-import { isStr, LANE } from './reconcile'
+import { isStr, TAG } from './reconcile'
 
 const defaultObj = {} as const
 
@@ -45,7 +45,7 @@ export const createElement = <P = Attributes>(fiber: IFiber) => {
   const dom =
     fiber.type === '#text'
       ? document.createTextNode('')
-      : fiber.lane & LANE.SVG
+      : fiber.lane & TAG.SVG
       ? document.createElementNS(
           'http://www.w3.org/2000/svg',
           fiber.type as string

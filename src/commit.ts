@@ -1,6 +1,6 @@
 import { IFiber, IRef } from './type'
 import { updateElement } from './dom'
-import { isFn, LANE } from './reconcile'
+import { isFn, TAG } from './reconcile'
 
 export const commit = (fiber: IFiber): void => {
   let current = fiber.next
@@ -11,28 +11,27 @@ export const commit = (fiber: IFiber): void => {
 }
 
 const op = (fiber: any) => {
-  if (fiber.lane & LANE.NOWORK) {
+  if (fiber.lane & TAG.NOWORK) {
     return
   }
-  if (fiber.lane === LANE.REMOVE) {
+  if (fiber.lane === TAG.REMOVE) {
     remove(fiber)
     return
   }
-  if (fiber.lane & LANE.INSERT) {
+  if (fiber.lane & TAG.INSERT) {
     if (fiber.isComp) {
       fiber.child.lane = fiber.lane
       op(fiber.child)
-      fiber.child.lane |= LANE.NOWORK
+      fiber.child.lane |= TAG.NOWORK
     } else {
       fiber.parentNode.insertBefore(fiber.node, fiber.after || null)
     }
-    // 
   }
-  if (fiber.lane & LANE.UPDATE) {
+  if (fiber.lane & TAG.UPDATE) {
     if (fiber.isComp) {
       fiber.child.lane = fiber.lane
       op(fiber.child)
-      fiber.child.lane |= LANE.NOWORK
+      fiber.child.lane |= TAG.NOWORK
     } else {
       updateElement(fiber.node, fiber.oldProps || {}, fiber.props)
     }
