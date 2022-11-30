@@ -149,7 +149,7 @@ const diffKids = (WIP: any, children: FreNode): void => {
     clone(aCh[aTail--], bCh[bTail--], LANE.UPDATE)
   }
 
-  const { diff, keymap } = lcs(bCh, aCh, bHead, bTail, aHead, aTail)
+  const { diff, keymap } = LCSdiff(bCh, aCh, bHead, bTail, aHead, aTail)
 
 
   for (let i = 0, aIndex = aHead, bIndex = bHead, mIndex; i < diff.length; i++) {
@@ -236,7 +236,7 @@ const side = (effects: IEffect[]): void => {
   effects.length = 0
 }
 
-function lcs(
+function LCSdiff(
   bArr,
   aArr,
   bHead = 0,
