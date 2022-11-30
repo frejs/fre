@@ -1,6 +1,6 @@
 {
   "name": "fre",
-  "version": "2.5.6",
+  "version": "2.6.0",
   "type": "module",
   "main": "dist/fre.js",
   "unpkg": "dist/fre.umd.js",
