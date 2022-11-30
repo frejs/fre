@@ -12,8 +12,9 @@ jobs:
       - name: test
         run: yarn && yarn test && yarn report
       - name: report
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
           file: .nyc_output/coverage-pw.json
+          token: c7a23beb-e642-432f-bcbc-7a0385a75c81
         env:
           CI: true
