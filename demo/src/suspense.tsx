@@ -1,4 +1,4 @@
-import { render, lazy, Suspense } from '../../src/index'
+import { render, lazy, Suspense, h } from '../../src/index'
 
 const Lazy = lazy(() => {
   return new Promise(resolve =>
@@ -12,12 +12,17 @@ const Lazy = lazy(() => {
   )
 })
 
-function App() {
-  return <Suspense fallback={'loading'}>
-    <Lazy/>
-    <div>111</div>
-    <Lazy/>
-  </Suspense>
+export function App() {
+  return (
+    <div>
+      <Suspense fallback={<div>loading...</div>}>
+        <Lazy />
+        <div>111</div>
+        <Lazy />
+        <div>111</div>
+      </Suspense>
+    </div>
+  )
 }
 
 render(<App />, document.getElementById('app'))

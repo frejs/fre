@@ -45,9 +45,9 @@ export const update = (fiber?: IFiber) => {
   }
 }
 
-const reconcile = (WIP?: IFiber): boolean => {
-  while (WIP && !shouldYield()) WIP = capture(WIP)
-  if (WIP) return reconcile.bind(null, WIP)
+const reconcile = (wip?: IFiber): boolean => {
+  while (wip && !shouldYield()) wip = capture(wip)
+  if (wip) return reconcile.bind(null, wip)
   if (finish) {
     commit(finish)
     finish = null
@@ -55,41 +55,51 @@ const reconcile = (WIP?: IFiber): boolean => {
   return null
 }
 
-const capture = (WIP: IFiber): IFiber | undefined => {
-  WIP.isComp = isFn(WIP.type)
-  if (WIP.isComp) {
-    if ((WIP.type as FC).memo && WIP.oldProps) {
-      let scu = (WIP.type as FC).shouldUpdate || shouldUpdate
-      if (!scu(WIP.props, WIP.oldProps) && (WIP.lane === LANE.UPDATE)) { // fast-fix
-        while (WIP) {
-          if (WIP.sibling)
-            return WIP.sibling
-          WIP = WIP.parent
-        }
-      }
+const memo = (wip) => {
+  if ((wip.type as FC).memo && wip.oldProps) {
+    let scu = (wip.type as FC).shouldUpdate || shouldUpdate
+    if (!scu(wip.props, wip.oldProps)) { // fast-fix
+      return getSibling(wip)
     }
-    updateHook(WIP)
-  } else {
-    updateHost(WIP)
   }
-  if (WIP.child) return WIP.child
-  while (WIP) {
-    bubble(WIP)
-    if (!finish && WIP.lane & LANE.DIRTY) {
-      finish = WIP
-      WIP.lane &= ~LANE.DIRTY
-      return null
-    }
-    if (WIP.sibling) return WIP.sibling
-    WIP = WIP.parent
-  }
+  return null
 }
 
-const bubble = WIP => {
-  if (WIP.isComp) {
-    if (WIP.hooks) {
-      side(WIP.hooks.layout)
-      schedule(() => side(WIP.hooks.effect))
+const capture = (wip: IFiber): IFiber | undefined => {
+  wip.isComp = isFn(wip.type)
+  if (wip.isComp) {
+    const memoFiber = memo(wip)
+    if (memoFiber) {
+      return memoFiber
+    }
+    updateHook(wip)
+  } else {
+    updateHost(wip)
+  }
+  if (wip.child) return wip.child
+  const sibling = getSibling(wip)
+  return sibling
+}
+
+const getSibling = (wip) =>{
+  while (wip) {
+    bubble(wip)
+    if (!finish && wip.lane & LANE.DIRTY) {
+      finish = wip
+      wip.lane &= ~LANE.DIRTY
+      return null
+    }
+    if (wip.sibling) return wip.sibling
+    wip = wip.parent
+  }
+  return null
+}
+
+const bubble = wip => {
+  if (wip.isComp) {
+    if (wip.hooks) {
+      side(wip.hooks.layout)
+      schedule(() => side(wip.hooks.effect))
     }
   }
 }
@@ -104,36 +114,36 @@ const shouldUpdate = (a, b) => {
   for (let i in b) if (a[i] !== b[i]) return true
 }
 
-const updateHook = <P = Attributes>(WIP: IFiber): any => {
+const updateHook = <P = Attributes>(wip: IFiber): any => {
   resetCursor()
-  currentFiber = WIP
-  let children = (WIP.type as FC<P>)(WIP.props)
-  diffKids(WIP, simpleVnode(children))
+  currentFiber = wip
+  let children = (wip.type as FC<P>)(wip.props)
+  diffKids(wip, simpleVnode(children))
 }
 
-const updateHost = (WIP: IFiber): void => {
-  WIP.parentNode = (getParentNode(WIP) as any) || {}
-  if (!WIP.node) {
-    if (WIP.type === 'svg') WIP.lane |= LANE.SVG
-    WIP.node = createElement(WIP) as HTMLElementEx
+const updateHost = (wip: IFiber): void => {
+  wip.parentNode = (getParentNode(wip) as any) || {}
+  if (!wip.node) {
+    if (wip.type === 'svg') wip.lane |= LANE.SVG
+    wip.node = createElement(wip) as HTMLElementEx
   }
-  WIP.childNodes = Array.from(WIP.node.childNodes || [])
-  diffKids(WIP, WIP.props.children)
+  wip.childNodes = Array.from(wip.node.childNodes || [])
+  diffKids(wip, wip.props.children)
 }
 
 const simpleVnode = (type: any) =>
   isStr(type) ? createText(type as string) : type
 
-const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
-  while ((WIP = WIP.parent)) {
-    if (!WIP.isComp) return WIP.node
+const getParentNode = (wip: IFiber): HTMLElement | undefined => {
+  while ((wip = wip.parent)) {
+    if (!wip.isComp) return wip.node
   }
 }
 
-const diffKids = (WIP: any, children: FreNode): void => {
-  let isMount = !WIP.kids,
-    aCh = WIP.kids || [],
-    bCh = (WIP.kids = arrayfy(children) as any),
+const diffKids = (wip: any, children: FreNode): void => {
+  let isMount = !wip.kids,
+    aCh = wip.kids || [],
+    bCh = (wip.kids = arrayfy(children) as any),
     aHead = 0,
     bHead = 0,
     aTail = aCh.length - 1,
@@ -154,7 +164,7 @@ const diffKids = (WIP: any, children: FreNode): void => {
 
   for (let i = 0, aIndex = aHead, bIndex = bHead, mIndex; i < diff.length; i++) {
     const op = diff[i]
-    const after = WIP.node?.childNodes[aIndex]
+    const after = wip.node?.childNodes[aIndex]
     if (op === LANE.UPDATE) {
       if (!same(aCh[aIndex], bCh[bIndex])) {
         bCh[bIndex].lane = LANE.INSERT
@@ -201,14 +211,14 @@ const diffKids = (WIP: any, children: FreNode): void => {
 
   for (let i = 0, prev = null, len = bCh.length; i < len; i++) {
     const child = bCh[i]
-    if (WIP.lane & LANE.SVG) {
+    if (wip.lane & LANE.SVG) {
       child.lane |= LANE.SVG
     }
-    child.parent = WIP
+    child.parent = wip
     if (i > 0) {
       prev.sibling = child
     } else {
-      WIP.child = child
+      wip.child = child
     }
     prev = child
   }
