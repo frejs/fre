@@ -13,8 +13,8 @@ import { schedule, shouldYield } from './schedule'
 import { isArr, createText } from './h'
 import { commit } from './commit'
 
-let currentFiber: IFiber
-let effectlist: any = {}
+let currentFiber: IFiber = null
+let effectList: IFiber = null
 
 export const enum TAG {
   UPDATE = 1 << 1,
@@ -37,7 +37,7 @@ export const update = (fiber?: IFiber) => {
   if (fiber && !(fiber.lane & TAG.DIRTY)) {
     fiber.lane = TAG.UPDATE | TAG.DIRTY
     schedule(() => {
-      effectlist = fiber
+      effectList = fiber
       return reconcile(fiber)
     })
   }
@@ -99,8 +99,8 @@ const bubble = fiber => {
 }
 
 const append = function (fiber) {
-  effectlist.next = fiber
-  effectlist = fiber
+  effectList.next = fiber
+  effectList = fiber
 }
 
 const shouldUpdate = (a, b) => {
