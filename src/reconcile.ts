@@ -151,12 +151,14 @@ const diffKids = (WIP: any, children: FreNode): void => {
 
   const { diff, keymap } = lcs(bCh, aCh, bHead, bTail, aHead, aTail)
 
+
   for (let i = 0, aIndex = aHead, bIndex = bHead, mIndex; i < diff.length; i++) {
     const op = diff[i]
+    const after = WIP.node?.childNodes[aIndex]
     if (op === LANE.UPDATE) {
       if (!same(aCh[aIndex], bCh[bIndex])) {
         bCh[bIndex].lane = LANE.INSERT
-        bCh[bIndex].after = aIndex
+        bCh[bIndex].after = after
         aCh[aIndex].lane = LANE.REMOVE
         append(aCh[aIndex])
         append(bCh[bIndex])
@@ -169,13 +171,11 @@ const diffKids = (WIP: any, children: FreNode): void => {
       let c = bCh[bIndex]
       mIndex = c.key != null ? keymap[c.key] : null
       if (mIndex != null) {
+        c.after = after
         clone(aCh[mIndex], c, LANE.INSERT)
-        c.after = aIndex
         aCh[mIndex] = undefined
       } else {
-        c.after = isMount ? null : aIndex
-        console.log(c, c.after)
-
+        c.after = isMount ? null : after
         c.lane = LANE.INSERT
         append(c)
       }

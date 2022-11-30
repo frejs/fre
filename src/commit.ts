@@ -27,7 +27,7 @@ const op = (fiber: any) => {
       op(fiber.child)
       fiber.child.lane |= LANE.NOWORK
     } else {
-      const after = fiber.after != null ? fiber.parentNode.childNodes[fiber.after] : null
+      const after = fiber.after != null ? fiber.after : null
       fiber.parentNode.insertBefore(fiber.node, after)
     }
     // 

@@ -44,9 +44,9 @@ import {h, render, useState } from "../../src/index"
 // }
 
 function App() {
-  const [key, setKey] = useState([1,3])
+  const [key, setKey] = useState([1,2,3])
   return <div>
-    <button onClick={() => setKey([1,2,3])}>x</button>
+    <button onClick={() => setKey([3,2,1])}>x</button>
     <ul>
       {key.map((i) => (
         // <Li i={i} key={i} />

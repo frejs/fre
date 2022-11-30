@@ -54,8 +54,8 @@ export const refer = async t => {
     {
       content: <Component />,
       test: () => {
-        t.eq(refs, ['ref2', 'ref'])
-        refs = [] // The reverse order is right here
+        t.eq(refs, ['ref', 'ref2'])
+        refs = []
       },
     },
     {
