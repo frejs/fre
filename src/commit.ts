@@ -5,7 +5,6 @@ import { isFn, LANE } from './reconcile'
 export const commit = (fiber: IFiber): void => {
   let current = fiber.next
   fiber.next = null
-
   do {
     op(current)
   } while ((current = current.next))
@@ -15,20 +14,17 @@ const op = (fiber: any) => {
   if (fiber.lane & LANE.NOWORK) {
     return
   }
-
   if (fiber.lane === LANE.REMOVE) {
     remove(fiber)
     return
   }
-
   if (fiber.lane & LANE.INSERT) {
     if (fiber.isComp) {
       fiber.child.lane = fiber.lane
       op(fiber.child)
       fiber.child.lane |= LANE.NOWORK
     } else {
-      const after = fiber.after != null ? fiber.after : null
-      fiber.parentNode.insertBefore(fiber.node, after)
+      fiber.parentNode.insertBefore(fiber.node, fiber.after || null)
     }
     // 
   }
