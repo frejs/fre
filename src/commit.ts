@@ -3,38 +3,45 @@ import { updateElement } from './dom'
 import { isFn, LANE } from './reconcile'
 
 export const commit = (fiber: IFiber): void => {
-  let e = fiber.e
-  fiber.e = null
+  let current = fiber.next
+  fiber.next = null
+
   do {
-    insert(e)
-  } while ((e = e.e))
+    op(current)
+  } while ((current = current.next))
 }
-/**
- * A hack: When rendering a component list, the fiber lost it's `after` node data.
- * There should be a good way to prevent that lost.
- * @param fiber 
- * @returns HTMLElement
- */
-const findAfterNode = function(fiber: IFiber) {
-  if (isFn(fiber.type) && !isFn(fiber.parent.type)) {
-    return fiber.after;
+
+const op = (fiber: any) => {
+  if (fiber.lane & LANE.NOWORK) {
+    return
   }
-  if (!isFn(fiber.type) && !isFn(fiber.parent.type)) {
-    return fiber.after;
-  }
-  return findAfterNode(fiber.parent);
-}
-const insert = (fiber: IFiber): void => {
+
   if (fiber.lane === LANE.REMOVE) {
     remove(fiber)
     return
   }
-  if (fiber.lane & LANE.UPDATE) {
-    updateElement(fiber.node, fiber.oldProps || {}, fiber.props)
-  }
+
   if (fiber.lane & LANE.INSERT) {
-    fiber.parentNode.insertBefore(fiber.node,  findAfterNode(fiber))
+    if (fiber.isComp) {
+      fiber.child.lane = fiber.lane
+      op(fiber.child)
+      fiber.child.lane |= LANE.NOWORK
+    } else {
+      const after = fiber.after != null ? fiber.parentNode.childNodes[fiber.after] : null
+      fiber.parentNode.insertBefore(fiber.node, after)
+    }
+    // 
   }
+  if (fiber.lane & LANE.UPDATE) {
+    if (fiber.isComp) {
+      fiber.child.lane = fiber.lane
+      op(fiber.child)
+      fiber.child.lane |= LANE.NOWORK
+    } else {
+      updateElement(fiber.node, fiber.oldProps || {}, fiber.props)
+    }
+  }
+
   refer(fiber.ref, fiber.node)
 }
 

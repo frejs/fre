@@ -59,7 +59,7 @@ export interface IFiber<P extends Attributes = any> {
   props: P
   lane: number
   time: number
-  e: IFiber
+  next: IFiber
   prev: IFiber
   d: IFiber
   laziness: any[]

@@ -15,7 +15,7 @@ import { commit } from './commit'
 
 let currentFiber: IFiber
 let finish = null
-let effect = null
+let effectlist: any = {}
 
 export const enum LANE {
   UPDATE = 1 << 1,
@@ -39,7 +39,7 @@ export const update = (fiber?: IFiber) => {
   if (fiber && !(fiber.lane & LANE.DIRTY)) {
     fiber.lane = LANE.UPDATE | LANE.DIRTY
     schedule(() => {
-      effect = fiber
+      effectlist = fiber
       return reconcile(fiber)
     })
   }
@@ -57,15 +57,15 @@ const reconcile = (WIP?: IFiber): boolean => {
 
 const capture = (WIP: IFiber): IFiber | undefined => {
   WIP.isComp = isFn(WIP.type)
-  if(WIP.isComp) {
-    if((WIP.type as FC).memo && WIP.oldProps) {
+  if (WIP.isComp) {
+    if ((WIP.type as FC).memo && WIP.oldProps) {
       let scu = (WIP.type as FC).shouldUpdate || shouldUpdate
       if (!scu(WIP.props, WIP.oldProps) && (WIP.lane === LANE.UPDATE)) { // fast-fix
         while (WIP) {
           if (WIP.sibling)
-              return WIP.sibling
+            return WIP.sibling
           WIP = WIP.parent
-      }
+        }
       }
     }
     updateHook(WIP)
@@ -91,13 +91,12 @@ const bubble = WIP => {
       side(WIP.hooks.layout)
       schedule(() => side(WIP.hooks.effect))
     }
-    if (WIP.lane > 2){ // fast-fix
-      WIP.child.lane |= WIP.lane
-    }
-  } else {
-    effect.e = WIP
-    effect = WIP
   }
+}
+
+const append = function (fiber) {
+  effectlist.next = fiber
+  effectlist = fiber
 }
 
 const shouldUpdate = (a, b) => {
@@ -108,7 +107,7 @@ const shouldUpdate = (a, b) => {
 const updateHook = <P = Attributes>(WIP: IFiber): any => {
   resetCursor()
   currentFiber = WIP
-  let children = (WIP.type as FC<P>)(WIP.props) 
+  let children = (WIP.type as FC<P>)(WIP.props)
   diffKids(WIP, simpleVnode(children))
 }
 
@@ -132,7 +131,8 @@ const getParentNode = (WIP: IFiber): HTMLElement | undefined => {
 }
 
 const diffKids = (WIP: any, children: FreNode): void => {
-  let aCh = WIP.kids || [],
+  let isMount = !WIP.kids,
+    aCh = WIP.kids || [],
     bCh = (WIP.kids = arrayfy(children) as any),
     aHead = 0,
     bHead = 0,
@@ -149,22 +149,20 @@ const diffKids = (WIP: any, children: FreNode): void => {
     clone(aCh[aTail--], bCh[bTail--], LANE.UPDATE)
   }
 
-  // LCS
   const { diff, keymap } = lcs(bCh, aCh, bHead, bTail, aHead, aTail)
-  let len = diff.length
 
-  for (let i = 0, aIndex = aHead, bIndex = bHead, mIndex; i < len; i++) {
+  for (let i = 0, aIndex = aHead, bIndex = bHead, mIndex; i < diff.length; i++) {
     const op = diff[i]
     if (op === LANE.UPDATE) {
       if (!same(aCh[aIndex], bCh[bIndex])) {
         bCh[bIndex].lane = LANE.INSERT
+        bCh[bIndex].after = aIndex
         aCh[aIndex].lane = LANE.REMOVE
-        effect.e = aCh[aIndex]
-        effect = aCh[aIndex]
+        append(aCh[aIndex])
+        append(bCh[bIndex])
       } else {
         clone(aCh[aIndex], bCh[bIndex], LANE.UPDATE)
       }
-
       aIndex++
       bIndex++
     } else if (op === LANE.INSERT) {
@@ -172,11 +170,14 @@ const diffKids = (WIP: any, children: FreNode): void => {
       mIndex = c.key != null ? keymap[c.key] : null
       if (mIndex != null) {
         clone(aCh[mIndex], c, LANE.INSERT)
-        c.after = WIP.childNodes[aIndex]
+        c.after = aIndex
         aCh[mIndex] = undefined
       } else {
-        c.after = WIP.childNodes ? WIP.childNodes[aIndex] : null
+        c.after = isMount ? null : aIndex
+        console.log(c, c.after)
+
         c.lane = LANE.INSERT
+        append(c)
       }
       bIndex++
     } else if (op === LANE.REMOVE) {
@@ -184,7 +185,7 @@ const diffKids = (WIP: any, children: FreNode): void => {
     }
   }
 
-  for (let i = 0, aIndex = aHead; i < len; i++) {
+  for (let i = 0, aIndex = aHead; i < diff.length; i++) {
     let op = diff[i]
     if (op === LANE.UPDATE) {
       aIndex++
@@ -192,8 +193,7 @@ const diffKids = (WIP: any, children: FreNode): void => {
       let c = aCh[aIndex]
       if (c !== undefined) {
         c.lane = LANE.REMOVE
-        effect.e = c
-        effect = c
+        append(c)
       }
       aIndex++
     }
@@ -221,6 +221,7 @@ function clone(a, b, lane) {
   b.oldProps = a.props
   b.lane = lane
   b.kids = a.kids
+  append(b)
 }
 
 const same = (a, b) => {

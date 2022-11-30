@@ -30,17 +30,6 @@ import {h, render, useState } from "../../src/index"
 //   return h(A, null, 222, " items left")
 // }
 
-
-
-function Button(){
-  return <A/>
-}
-
-function A(props){
-  console.log(props)
-  return props.children
-}
-
 // function App() {
 //   const [key, setKey] = useState([1,2,3])
 //   return <div>
@@ -104,9 +93,6 @@ function App() {
 //   </div>
 // }
 
-function Li(props) {
-  return [<li>{props.i}</li>, <li>{props.i}</li>]
-}
 // function Li(props) {
 //   return <li>{props.i}</li>
 // }
