@@ -14,7 +14,6 @@ import { isArr, createText } from './h'
 import { commit } from './commit'
 
 let currentFiber: IFiber
-let finish = null
 let effectlist: any = {}
 
 export const enum LANE {
@@ -48,10 +47,6 @@ export const update = (fiber?: IFiber) => {
 const reconcile = (wip?: IFiber): boolean => {
   while (wip && !shouldYield()) wip = capture(wip)
   if (wip) return reconcile.bind(null, wip)
-  if (finish) {
-    commit(finish)
-    finish = null
-  }
   return null
 }
 
@@ -81,12 +76,12 @@ const capture = (wip: IFiber): IFiber | undefined => {
   return sibling
 }
 
-const getSibling = (wip) =>{
+const getSibling = (wip) => {
   while (wip) {
     bubble(wip)
-    if (!finish && wip.lane & LANE.DIRTY) {
-      finish = wip
+    if (wip.lane & LANE.DIRTY) {
       wip.lane &= ~LANE.DIRTY
+      commit(wip)
       return null
     }
     if (wip.sibling) return wip.sibling
