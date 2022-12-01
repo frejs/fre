@@ -15,6 +15,7 @@ import { commit } from './commit'
 
 let currentFiber: IFiber = null
 let effectList: IFiber = null
+let deletions: any = []
 
 export const enum TAG {
   UPDATE = 1 << 1,
@@ -80,7 +81,7 @@ const getSibling = (fiber) => {
     bubble(fiber)
     if (fiber.lane & TAG.DIRTY) {
       fiber.lane &= ~TAG.DIRTY
-      commit(fiber)
+      commit(fiber, deletions)
       return null
     }
     if (fiber.sibling) return fiber.sibling
@@ -164,7 +165,7 @@ const diffKids = (fiber: any, children: FreNode): void => {
         bCh[bIndex].lane = TAG.INSERT
         bCh[bIndex].after = after
         aCh[aIndex].lane = TAG.REMOVE
-        append(aCh[aIndex])
+        deletions.push(aCh[aIndex])
         append(bCh[bIndex])
       } else {
         clone(aCh[aIndex], bCh[bIndex], TAG.UPDATE)
@@ -197,7 +198,7 @@ const diffKids = (fiber: any, children: FreNode): void => {
       let c = aCh[aIndex]
       if (c !== undefined) {
         c.lane = TAG.REMOVE
-        append(c)
+        deletions.push(c)
       }
       aIndex++
     }

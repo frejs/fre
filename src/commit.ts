@@ -2,12 +2,14 @@ import { IFiber, IRef } from './type'
 import { updateElement } from './dom'
 import { isFn, TAG } from './reconcile'
 
-export const commit = (fiber: IFiber): void => {
+export const commit = (fiber: IFiber, deletions): void => {
   let current = fiber.next
   fiber.next = null
   do {
     op(current)
   } while ((current = current.next))
+
+  deletions.forEach(op)
 }
 
 const op = (fiber: any) => {
@@ -21,10 +23,11 @@ const op = (fiber: any) => {
   if (fiber.lane & TAG.INSERT) {
     if (fiber.isComp) {
       fiber.child.lane = fiber.lane
+      fiber.child.after = fiber.after
       op(fiber.child)
       fiber.child.lane |= TAG.NOWORK
     } else {
-      fiber.parentNode.insertBefore(fiber.node, fiber.after || null)
+      fiber.parentNode.insertBefore(fiber.node, fiber.after)
     }
   }
   if (fiber.lane & TAG.UPDATE) {
@@ -52,13 +55,14 @@ const kidsRefer = (kids: any): void => {
   })
 }
 
-const remove = d => {
-  if (d.isComp) {
-    d.hooks && d.hooks.list.forEach(e => e[2] && e[2]())
-    d.kids.forEach(remove)
+const remove = fiber => {
+  if (fiber.isComp) {
+    fiber.hooks && fiber.hooks.list.forEach(e => e[2] && e[2]())
+    fiber.kids.forEach(remove)
   } else {
-    kidsRefer(d.kids)
-    d.parentNode.removeChild(d.node)
-    refer(d.ref, null)
+    kidsRefer(fiber.kids)
+    fiber.parentNode.removeChild(fiber.node)
+    refer(fiber.ref, null)
   }
+  fiber.lane = 0
 }

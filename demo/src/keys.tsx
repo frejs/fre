@@ -1,4 +1,4 @@
-import {h, render, useState } from "../../src/index"
+import { h, render, useState } from "../../src/index"
 // import {h, render} from '../../.ignore/eee'
 
 // function App() {
@@ -43,9 +43,21 @@ import {h, render, useState } from "../../src/index"
 //   </div>
 // }
 
-function App() {
-  const [list, setList] = useState([1,2,3])
-return <div>{list.map((d) => <span>{d}</span>)} <button onClick={() => setList(list.concat(4))}>+</button></div>
+// function App() {
+//   const [list, setList] = useState([1, 2, 3])
+//   return <div>{list.map((d) => <span>{d}</span>)} <button onClick={() => setList(list.concat(4))}>+</button></div>
+// }
+
+const App = () => {
+  let [bool, setbool] = useState(true)
+  return <div>
+      {bool ? <Header /> : null}
+      <button onClick={()=>setbool(!bool)}>x</button>
+  </div>
+}
+
+function Header(){
+  return <div><a href="">222</a></div>
 }
 
 // function App() {
