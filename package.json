@@ -22,7 +22,7 @@
     "dist/*.map",
     "dist/types",
     "jsx-runtime.js",
-    "jsx-runtime.d.js",
+    "jsx-runtime.d.ts",
     "jsx-dev-runtime.js",
     "jsx-dev-runtime.d.ts"
   ],
