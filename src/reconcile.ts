@@ -11,7 +11,7 @@ import { createElement } from './dom'
 import { resetCursor } from './hook'
 import { schedule, shouldYield } from './schedule'
 import { isArr, createText } from './h'
-import { commit } from './commit'
+import { commit, removeElement } from './commit'
 
 let currentFiber: IFiber = null
 let rootFiber = null
@@ -132,9 +132,6 @@ const diffKids = (fiber: any, children: FreNode): void => {
     bCh = (fiber.kids = arrayfy(children) as any)
   const actions = idiff(aCh, bCh)
 
-  if (fiber.old && fiber.old.type != fiber.type) {
-    fiber.action = { op: TAG.REPLACE, elm: fiber.node, before: fiber.old.node }
-  }
   for (let i = 0, prev = null, len = bCh.length; i < len; i++) {
 
     const child = bCh[i]
@@ -156,7 +153,6 @@ function clone(a, b) {
   b.hooks = a.hooks
   b.ref = a.ref
   b.node = a.node // 临时修复
-
   b.kids = a.kids
   b.old = a
 }
@@ -225,8 +221,9 @@ var idiff = function (a, b) {
   var add = (elm, i) => actions.push({ op: TAG.INSERT, elm: elm, before: a[i] })
   var remove = (i) => {
     const fiber = a[i]
-    fiber.parentNode.removeChild(fiber.node) // 直接删除即可
+    removeElement(fiber)
   }
+
   diff({
     old: a,
     cur: b,

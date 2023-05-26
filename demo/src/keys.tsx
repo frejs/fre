@@ -19,7 +19,7 @@ function App() {
   const [state, setState] = useState(true)
   return <>
     <button onClick={() => setState(!state)}>change</button>
-    {state ? <span>0</span> : <a>none</a>}
+    {state ? <h1>0</h1> : <a>none</a>}
   </>
 }
 
