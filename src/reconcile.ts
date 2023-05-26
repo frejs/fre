@@ -14,8 +14,8 @@ import { isArr, createText } from './h'
 import { commit } from './commit'
 
 let currentFiber: IFiber = null
-let effectList: IFiber = null
 let deletions: any = []
+let rootFiber = null
 
 export const enum TAG {
   UPDATE = 1 << 1,
@@ -28,7 +28,7 @@ export const enum TAG {
 }
 
 export const render = (vnode: FreElement, node: Node): void => {
-  const rootFiber = {
+  rootFiber = {
     node,
     props: { children: vnode },
   } as IFiber
@@ -36,18 +36,13 @@ export const render = (vnode: FreElement, node: Node): void => {
 }
 
 export const update = (fiber?: IFiber) => {
-  if (fiber && !(fiber.lane & TAG.DIRTY)) {
-    fiber.lane = TAG.UPDATE | TAG.DIRTY
-    schedule(() => {
-      effectList = fiber
-      return reconcile(fiber)
-    })
-  }
+  schedule(() => reconcile(fiber))
 }
 
 const reconcile = (fiber?: IFiber): boolean => {
   while (fiber && !shouldYield()) fiber = capture(fiber)
   if (fiber) return reconcile.bind(null, fiber)
+  commit(rootFiber, deletions)
   return null
 }
 
@@ -80,11 +75,6 @@ const capture = (fiber: IFiber): IFiber | undefined => {
 const getSibling = (fiber) => {
   while (fiber) {
     bubble(fiber)
-    if (fiber.lane & TAG.DIRTY) {
-      fiber.lane &= ~TAG.DIRTY
-      commit(fiber, deletions)
-      return null
-    }
     if (fiber.sibling) return fiber.sibling
     fiber = fiber.parent
   }
@@ -224,9 +214,6 @@ var diff1 = function (a, b) {
   var extr = function (v) {
     return v.key;
   };
-  var replace = function (elm, i, newElm) {
-    actions.push({ op: 'replace', target: a[i], replacement: newElm })
-  };
   var update = function (a, b) {
     clone(a, b)
     actions.push({ op: TAG.UPDATE, old: a, new: b })
@@ -245,7 +232,7 @@ var diff1 = function (a, b) {
     old: a,
     cur: b,
     key: extr,
-    add, move, remove, replace, update
+    add, move, remove, update
   });
   return actions
 }
