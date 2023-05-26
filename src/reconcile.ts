@@ -109,7 +109,6 @@ const updateHost = (fiber: IFiber): void => {
     if (fiber.type === 'svg') fiber.lane |= TAG.SVG
     fiber.node = createElement(fiber) as HTMLElementEx
   }
-  fiber.childNodes = Array.from(fiber.node.childNodes || [])
   diffKids(fiber, fiber.props.children)
 }
 
@@ -226,7 +225,9 @@ var diff1 = function (a, b) {
     actions.push({ op: TAG.INSERT, elm: elm, before: a[i] })
   };
   var remove = function (i) {
-    actions.push({ op: TAG.REMOVE, elm: a[i], before: a[i + 1] })
+    const fiber = a[i]
+    fiber.parentNode.removeChild(fiber.node) // 直接删除即可
+    // actions.push({ op: TAG.REMOVE, elm: a[i], before: a[i + 1] })
   };
   diff({
     old: a,

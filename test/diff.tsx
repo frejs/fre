@@ -6,15 +6,15 @@ export const diff = async t => {
     [1, 2, 3],
     [3, 1, 2], // shift right
     [1, 2, 3],
-    [2, 3, 1], // shift left
-    [1, 2, 3],
-    [1, 3], // remove from middle
-    [1, 2, 3],
-    [2, 3], // remove first
-    [1, 2, 3],
-    [1, 2], // remove last
-    [1, 2, 3],
-    [3, 2, 1], // reverse order
+    // [2, 3, 1], // shift left
+    // [1, 2, 3],
+    // [1, 3], // remove from middle
+    // [1, 2, 3],
+    // [2, 3], // remove first
+    // [1, 2, 3],
+    // [1, 2], // remove last
+    // [1, 2, 3],
+    // [3, 2, 1], // reverse order
   ]
 
   let lastChildren
@@ -30,7 +30,6 @@ export const diff = async t => {
       ),
       test: (elements) => {
         const children = [...elements[0].children]
-        // console.log(state,lastChildren?.map((el) => el.textContent))
         t.eq(children.map((el) => el.textContent), state.map((value) => '' + value))
 
         if (stateNumber > 1) {

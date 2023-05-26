@@ -1,10 +1,29 @@
 import { h, render, useState } from "../../src/index"
 // import {h, render} from '../../.ignore/eee'
 
+const states = [
+  [1, 2, 3],
+  [3, 1, 2], // shift right
+  [1, 2, 3],
+  [2, 3, 1], // shift left
+  [1, 2, 3],
+  [1, 3], // remove from middle
+  [1, 2, 3],
+  [2, 3], // remove first
+  [1, 2, 3],
+  [1, 2], // remove last
+  [1, 2, 3],
+  [3, 2, 1], // reverse order
+]
+
 function App() {
-  const [key, setKey] = useState([1,2,3])
+  const [key, setKey] = useState(states[0])
+  const [count, setCount] = useState(0)
   return [
-    <button onClick={() => setKey([3,2,1])}>x</button>,
+    <button onClick={() => {
+      setKey(states[count])
+      setCount(count + 1)
+    }}>x</button>,
     <ul>
       {key.map((i) => (
         <li key={i}>{i}</li>
