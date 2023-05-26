@@ -7,7 +7,7 @@
 // import { render } from "react-dom";
 
 // // fre:
-import { render, useState, useEffect, useRef } from "../../src"
+import { render, useState, useEffect, useRef,h } from "../../src"
 
 const Wrapper = () => {
   const [showApp, setShowApp] = useState(true)
@@ -35,7 +35,7 @@ const Wrapper = () => {
 
   return (
     <div>
-      {showApp ? <div ref={p}>111</div> : <div ref={c}>App removed...</div>}
+      {showApp ? <div ref={p}>111</div> : <p ref={c}>App removed...</p>}
     </div>
   )
 }

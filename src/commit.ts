@@ -2,45 +2,33 @@ import { IFiber, IRef } from './type'
 import { updateElement } from './dom'
 import { isFn, TAG } from './reconcile'
 
-export const commit = (fiber: IFiber, deletions): void => {
-  let current = fiber.next
-  fiber.next = null
-  do {
-    op(current)
-  } while ((current = current.next))
 
-  deletions.forEach(op)
-}
-
-const op = (fiber: any) => {
-  if (fiber.lane & TAG.NOWORK) {
+export const commit = (fiber: any) => {
+  if (!fiber) {
     return
   }
-  if (fiber.lane === TAG.REMOVE) {
-    remove(fiber)
-    return
-  }
-  if (fiber.lane & TAG.INSERT) {
+  const { op, before, elm } = fiber.action || {}
+  if (op & TAG.INSERT || op & TAG.MOVE) {
     if (fiber.isComp) {
-      fiber.child.lane = fiber.lane
-      fiber.child.after = fiber.after
-      op(fiber.child)
-      fiber.child.lane |= TAG.NOWORK
+      fiber.child.action.op |= fiber.action.op
     } else {
-      fiber.parentNode.insertBefore(fiber.node, fiber.after)
+      fiber.parentNode.insertBefore(elm.node, before?.node)
     }
   }
-  if (fiber.lane & TAG.UPDATE) {
+  if (op & TAG.UPDATE) {
     if (fiber.isComp) {
-      fiber.child.lane = fiber.lane
-      op(fiber.child)
-      fiber.child.lane |= TAG.NOWORK
+      fiber.child.action.op |= fiber.action.op
     } else {
-      updateElement(fiber.node, fiber.oldProps || {}, fiber.props)
+      updateElement(fiber.node, fiber.old.props || {}, fiber.props)
     }
   }
 
   refer(fiber.ref, fiber.node)
+
+  fiber.action = null
+
+  commit(fiber.child)
+  commit(fiber.sibling)
 }
 
 const refer = (ref: IRef, dom?: HTMLElement): void => {
@@ -55,14 +43,13 @@ const kidsRefer = (kids: any): void => {
   })
 }
 
-const remove = fiber => {
+export const removeElement = fiber => {
   if (fiber.isComp) {
     fiber.hooks && fiber.hooks.list.forEach(e => e[2] && e[2]())
-    fiber.kids.forEach(remove)
+    fiber.kids.forEach(removeElement)
   } else {
-    kidsRefer(fiber.kids)
     fiber.parentNode.removeChild(fiber.node)
+    kidsRefer(fiber.kids)
     refer(fiber.ref, null)
   }
-  fiber.lane = 0
 }

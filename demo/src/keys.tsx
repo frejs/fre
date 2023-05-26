@@ -1,10 +1,36 @@
-import { h, render, useState } from "../../src/index"
+import { h, render, useState, Fragment } from "../../src/index"
 // import {h, render} from '../../.ignore/eee'
 
+const states = [
+  [3, 1, 2], // shift right
+  [1, 2, 3],
+  [2, 3, 1], // shift left
+  [1, 2, 3],
+  [1, 3], // remove from middle
+  [1, 2, 3],
+  [2, 3], // remove first
+  [1, 2, 3],
+  [1, 2], // remove last
+  [1, 2, 3],
+  [3, 2, 1], // reverse order
+]
+
+function App() {
+  const [state, setState] = useState(true)
+  return <>
+    <button onClick={() => setState(!state)}>change</button>
+    {state ? <h1>0</h1> : <a>none</a>}
+  </>
+}
+
 // function App() {
-//   const [key, setKey] = useState([3,1,2])
+//   const [key, setKey] = useState([1,2,3])
+//   const [count, setCount] = useState(0)
 //   return [
-//     <button onClick={() => setKey([1,2,3])}>x</button>,
+//     <button onClick={() => {
+//       setKey(states[count])
+//       setCount(count + 1)
+//     }}>x</button>,
 //     <ul>
 //       {key.map((i) => (
 //         <li key={i}>{i}</li>
@@ -48,17 +74,17 @@ import { h, render, useState } from "../../src/index"
 //   return <div>{list.map((d) => <span>{d}</span>)} <button onClick={() => setList(list.concat(4))}>+</button></div>
 // }
 
-const App = () => {
-  let [bool, setbool] = useState(true)
-  return <div>
-      {bool ? <Header /> : null}
-      <button onClick={()=>setbool(!bool)}>x</button>
-  </div>
-}
+// const App = () => {
+//   let [bool, setbool] = useState(true)
+//   return <div>
+//       {bool ? <Header /> : null}
+//       <button onClick={()=>setbool(!bool)}>x</button>
+//   </div>
+// }
 
-function Header(){
-  return <div><a href="">222</a></div>
-}
+// function Header(){
+//   return <div><a href="">222</a></div>
+// }
 
 // function App() {
 //   const [key, setKey] = useState([1,2,3,4,5])

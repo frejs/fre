@@ -11,11 +11,10 @@ import { createElement } from './dom'
 import { resetCursor } from './hook'
 import { schedule, shouldYield } from './schedule'
 import { isArr, createText } from './h'
-import { commit } from './commit'
+import { commit, removeElement } from './commit'
 
 let currentFiber: IFiber = null
-let effectList: IFiber = null
-let deletions: any = []
+let rootFiber = null
 
 export const enum TAG {
   UPDATE = 1 << 1,
@@ -23,11 +22,12 @@ export const enum TAG {
   REMOVE = 1 << 3,
   SVG = 1 << 4,
   DIRTY = 1 << 5,
-  NOWORK = 1 << 6,
+  MOVE = 1 << 6,
+  REPLACE = 1 << 7
 }
 
 export const render = (vnode: FreElement, node: Node): void => {
-  const rootFiber = {
+  rootFiber = {
     node,
     props: { children: vnode },
   } as IFiber
@@ -35,12 +35,9 @@ export const render = (vnode: FreElement, node: Node): void => {
 }
 
 export const update = (fiber?: IFiber) => {
-  if (fiber && !(fiber.lane & TAG.DIRTY)) {
-    fiber.lane = TAG.UPDATE | TAG.DIRTY
-    schedule(() => {
-      effectList = fiber
-      return reconcile(fiber)
-    })
+  if (!fiber.dirty) {
+    fiber.dirty = true
+    schedule(() => reconcile(fiber))
   }
 }
 
@@ -51,9 +48,9 @@ const reconcile = (fiber?: IFiber): boolean => {
 }
 
 const memo = (fiber) => {
-  if ((fiber.type as FC).memo && fiber.oldProps) {
+  if ((fiber.type as FC).memo && fiber.old?.props) {
     let scu = (fiber.type as FC).shouldUpdate || shouldUpdate
-    if (!scu(fiber.props, fiber.oldProps)) { // fast-fix
+    if (!scu(fiber.props, fiber.old.props)) { // fast-fix
       return getSibling(fiber)
     }
   }
@@ -79,9 +76,9 @@ const capture = (fiber: IFiber): IFiber | undefined => {
 const getSibling = (fiber) => {
   while (fiber) {
     bubble(fiber)
-    if (fiber.lane & TAG.DIRTY) {
-      fiber.lane &= ~TAG.DIRTY
-      commit(fiber, deletions)
+    if (fiber.dirty) {
+      fiber.dirty = false
+      commit(fiber)
       return null
     }
     if (fiber.sibling) return fiber.sibling
@@ -99,10 +96,6 @@ const bubble = fiber => {
   }
 }
 
-const append = function (fiber) {
-  effectList.next = fiber
-  effectList = fiber
-}
 
 const shouldUpdate = (a, b) => {
   for (let i in a) if (!(i in b)) return true
@@ -122,7 +115,6 @@ const updateHost = (fiber: IFiber): void => {
     if (fiber.type === 'svg') fiber.lane |= TAG.SVG
     fiber.node = createElement(fiber) as HTMLElementEx
   }
-  fiber.childNodes = Array.from(fiber.node.childNodes || [])
   diffKids(fiber, fiber.props.children)
 }
 
@@ -136,76 +128,14 @@ const getParentNode = (fiber: IFiber): HTMLElement | undefined => {
 }
 
 const diffKids = (fiber: any, children: FreNode): void => {
-  let isMount = !fiber.kids,
-    aCh = fiber.kids || [],
-    bCh = (fiber.kids = arrayfy(children) as any),
-    aHead = 0,
-    bHead = 0,
-    aTail = aCh.length - 1,
-    bTail = bCh.length - 1
-
-  while (aHead <= aTail && bHead <= bTail) {
-    if (!same(aCh[aHead], bCh[bHead])) break
-    clone(aCh[aHead++], bCh[bHead++], TAG.UPDATE)
-  }
-
-  while (aHead <= aTail && bHead <= bTail) {
-    if (!same(aCh[aTail], bCh[bTail])) break
-    clone(aCh[aTail--], bCh[bTail--], TAG.UPDATE)
-  }
-
-  const { diff, keymap } = LCSdiff(bCh, aCh, bHead, bTail, aHead, aTail)
-
-
-  for (let i = 0, aIndex = aHead, bIndex = bHead, mIndex; i < diff.length; i++) {
-    const op = diff[i]
-    const after = fiber.node?.childNodes[aIndex]
-    if (op === TAG.UPDATE) {
-      if (!same(aCh[aIndex], bCh[bIndex])) {
-        bCh[bIndex].lane = TAG.INSERT
-        bCh[bIndex].after = after
-        aCh[aIndex].lane = TAG.REMOVE
-        deletions.push(aCh[aIndex])
-        append(bCh[bIndex])
-      } else {
-        clone(aCh[aIndex], bCh[bIndex], TAG.UPDATE)
-      }
-      aIndex++
-      bIndex++
-    } else if (op === TAG.INSERT) {
-      let c = bCh[bIndex]
-      mIndex = c.key != null ? keymap[c.key] : null
-      if (mIndex != null) {
-        c.after = after
-        clone(aCh[mIndex], c, TAG.INSERT)
-        aCh[mIndex] = undefined
-      } else {
-        c.after = isMount ? null : after
-        c.lane = TAG.INSERT
-        append(c)
-      }
-      bIndex++
-    } else if (op === TAG.REMOVE) {
-      aIndex++
-    }
-  }
-
-  for (let i = 0, aIndex = aHead; i < diff.length; i++) {
-    let op = diff[i]
-    if (op === TAG.UPDATE) {
-      aIndex++
-    } else if (op === TAG.REMOVE) {
-      let c = aCh[aIndex]
-      if (c !== undefined) {
-        c.lane = TAG.REMOVE
-        deletions.push(c)
-      }
-      aIndex++
-    }
-  }
+  let aCh = fiber.kids || [],
+    bCh = (fiber.kids = arrayfy(children) as any)
+  const actions = idiff(aCh, bCh)
 
   for (let i = 0, prev = null, len = bCh.length; i < len; i++) {
+
     const child = bCh[i]
+    child.action = actions[i]
     if (fiber.lane & TAG.SVG) {
       child.lane |= TAG.SVG
     }
@@ -219,18 +149,12 @@ const diffKids = (fiber: any, children: FreNode): void => {
   }
 }
 
-function clone(a, b, lane) {
+function clone(a, b) {
   b.hooks = a.hooks
   b.ref = a.ref
-  b.node = a.node
-  b.oldProps = a.props
-  b.lane = lane
+  b.node = a.node // 临时修复
   b.kids = a.kids
-  append(b)
-}
-
-const same = (a, b) => {
-  return a && b && a.key === b.key && a.type === b.type
+  b.old = a
 }
 
 export const arrayfy = arr => (!arr ? [] : isArr(arr) ? arr : [arr])
@@ -241,102 +165,72 @@ const side = (effects: IEffect[]): void => {
   effects.length = 0
 }
 
-function LCSdiff(
-  bArr,
-  aArr,
-  bHead = 0,
-  bTail = bArr.length - 1,
-  aHead = 0,
-  aTail = aArr.length - 1
-) {
-  let keymap = {},
-    unkeyed = [],
-    idxUnkeyed = 0,
-    ch,
-    item,
-    k,
-    idxInOld,
-    key
-
-  let newLen = bArr.length
-  let oldLen = aArr.length
-  let minLen = Math.min(newLen, oldLen)
-  let tresh = Array(minLen + 1)
-  tresh[0] = -1
-
-  for (var i = 1; i < tresh.length; i++) {
-    tresh[i] = aTail + 1
+const diff = function (opts) {
+  var actions = [],
+    aIdx = {},
+    bIdx = {},
+    a = opts.old,
+    b = opts.cur,
+    key = opts.key,
+    i, j;
+  for (i = 0; i < a.length; i++) {
+    aIdx[key(a[i])] = i;
   }
-  let link = Array(minLen)
-
-  for (i = aHead; i <= aTail; i++) {
-    item = aArr[i]
-    key = item.key
-    if (key != null) {
-      keymap[key] = i
+  for (i = 0; i < b.length; i++) {
+    bIdx[key(b[i])] = i;
+  }
+  for (i = j = 0; i !== a.length || j !== b.length;) {
+    var aElm = a[i], bElm = b[j];
+    if (aElm === null) {
+      i++;
+    } else if (b.length <= j) {
+      opts.remove(i)
+      i++;
+    } else if (a.length <= i) {
+      opts.add(bElm, i)
+      j++;
+    } else if (key(aElm) === key(bElm)) {
+      clone(aElm, bElm)
+      opts.update(aElm, bElm)
+      i++; j++;
     } else {
-      unkeyed.push(i)
-    }
-  }
-
-  for (i = bHead; i <= bTail; i++) {
-    ch = bArr[i]
-    idxInOld = ch.key == null ? unkeyed[idxUnkeyed++] : keymap[ch.key]
-    if (idxInOld != null) {
-      k = bs(tresh, idxInOld)
-      if (k >= 0) {
-        tresh[k] = idxInOld
-        link[k] = { newi: i, oldi: idxInOld, prev: link[k - 1] }
+      var curElmInNew = bIdx[key(aElm)]
+      var wantedElmInOld = aIdx[key(bElm)]
+      if (curElmInNew === undefined) {
+        opts.remove(i);
+        i++;
+      } else if (wantedElmInOld === undefined) {
+        opts.add(bElm, i)
+        j++
+      } else {
+        clone(a[wantedElmInOld], bElm)
+        opts.move(wantedElmInOld, i)
+        a[wantedElmInOld] = null
+        j++
       }
     }
   }
-
-  k = tresh.length - 1
-  while (tresh[k] > aTail) k--
-
-  let ptr = link[k]
-  let diff = Array(oldLen + newLen - k)
-  let curNewi = bTail,
-    curOldi = aTail
-  let d = diff.length - 1
-  while (ptr) {
-    const { newi, oldi } = ptr
-    while (curNewi > newi) {
-      diff[d--] = TAG.INSERT
-      curNewi--
-    }
-    while (curOldi > oldi) {
-      diff[d--] = TAG.REMOVE
-      curOldi--
-    }
-    diff[d--] = TAG.UPDATE
-    curNewi--
-    curOldi--
-    ptr = ptr.prev
-  }
-  while (curNewi >= bHead) {
-    diff[d--] = TAG.INSERT
-    curNewi--
-  }
-  while (curOldi >= aHead) {
-    diff[d--] = TAG.REMOVE
-    curOldi--
-  }
-  return {
-    diff,
-    keymap,
-  }
+  return actions
 }
 
-function bs(ktr, j) {
-  let lo = 1
-  let hi = ktr.length - 1
-  while (lo <= hi) {
-    let mid = (lo + hi) >>> 1
-    if (j < ktr[mid]) hi = mid - 1
-    else lo = mid + 1
+var idiff = function (a, b) {
+  var actions = [] // 必须保持和 b 一致的顺序
+  var extr = (v) => v.key + v.type
+  var update = (a, b) => actions.push({ op: TAG.UPDATE })
+  var move = (from, to) => actions.push({ op: TAG.MOVE, elm: a[from], before: a[to] })
+  var add = (elm, i) => actions.push({ op: TAG.INSERT, elm: elm, before: a[i] })
+  var remove = (i) => {
+    const fiber = a[i]
+    removeElement(fiber)
   }
-  return lo
+
+  diff({
+    old: a,
+    cur: b,
+    key: extr,
+    add, move, remove, update
+  })
+  return actions
 }
 
 export const getCurrentFiber = () => currentFiber || null

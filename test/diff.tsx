@@ -30,7 +30,6 @@ export const diff = async t => {
       ),
       test: (elements) => {
         const children = [...elements[0].children]
-        // console.log(state,lastChildren?.map((el) => el.textContent))
         t.eq(children.map((el) => el.textContent), state.map((value) => '' + value))
 
         if (stateNumber > 1) {
