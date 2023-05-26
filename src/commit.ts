@@ -3,44 +3,39 @@ import { updateElement } from './dom'
 import { isFn, TAG } from './reconcile'
 
 export const commit = (fiber: IFiber, deletions): void => {
-  let current = fiber.next
-  fiber.next = null
-  do {
-    op(current)
-  } while ((current = current.next))
-
-  deletions.forEach(op)
+  commitWork(fiber)
+  deletions.forEach(commitWork)
 }
 
-const op = (fiber: any) => {
-  if (fiber.lane & TAG.NOWORK) {
+const commitWork = (fiber: any) => {
+  if (!fiber) {
     return
   }
-  if (fiber.lane === TAG.REMOVE) {
+  const { op, before, elm } = fiber.action || {}
+
+  if (op === TAG.REMOVE) {
     remove(fiber)
     return
   }
-  if (fiber.lane & TAG.INSERT) {
+  if (op & TAG.INSERT || op & TAG.MOVE) {
     if (fiber.isComp) {
       fiber.child.lane = fiber.lane
-      fiber.child.after = fiber.after
-      op(fiber.child)
-      fiber.child.lane |= TAG.NOWORK
     } else {
-      fiber.parentNode.insertBefore(fiber.node, fiber.after)
+      fiber.parentNode.insertBefore(elm.node, before?.node)
     }
   }
-  if (fiber.lane & TAG.UPDATE) {
+  if (op & TAG.UPDATE) {
     if (fiber.isComp) {
       fiber.child.lane = fiber.lane
-      op(fiber.child)
-      fiber.child.lane |= TAG.NOWORK
     } else {
       updateElement(fiber.node, fiber.oldProps || {}, fiber.props)
     }
   }
 
   refer(fiber.ref, fiber.node)
+
+  commitWork(fiber.child)
+  commitWork(fiber.sibling)
 }
 
 const refer = (ref: IRef, dom?: HTMLElement): void => {

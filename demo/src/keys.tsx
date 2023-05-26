@@ -1,17 +1,17 @@
 import { h, render, useState } from "../../src/index"
 // import {h, render} from '../../.ignore/eee'
 
-// function App() {
-//   const [key, setKey] = useState([3,1,2])
-//   return [
-//     <button onClick={() => setKey([1,2,3])}>x</button>,
-//     <ul>
-//       {key.map((i) => (
-//         <li key={i}>{i}</li>
-//       ))}
-//     </ul>,
-//   ]
-// }
+function App() {
+  const [key, setKey] = useState([1,2,3])
+  return [
+    <button onClick={() => setKey([3,2,1])}>x</button>,
+    <ul>
+      {key.map((i) => (
+        <li key={i}>{i}</li>
+      ))}
+    </ul>,
+  ]
+}
 
 // function App() {
 //   const [key, setKey] = useState([1,2,6, 3])
@@ -48,17 +48,17 @@ import { h, render, useState } from "../../src/index"
 //   return <div>{list.map((d) => <span>{d}</span>)} <button onClick={() => setList(list.concat(4))}>+</button></div>
 // }
 
-const App = () => {
-  let [bool, setbool] = useState(true)
-  return <div>
-      {bool ? <Header /> : null}
-      <button onClick={()=>setbool(!bool)}>x</button>
-  </div>
-}
+// const App = () => {
+//   let [bool, setbool] = useState(true)
+//   return <div>
+//       {bool ? <Header /> : null}
+//       <button onClick={()=>setbool(!bool)}>x</button>
+//   </div>
+// }
 
-function Header(){
-  return <div><a href="">222</a></div>
-}
+// function Header(){
+//   return <div><a href="">222</a></div>
+// }
 
 // function App() {
 //   const [key, setKey] = useState([1,2,3,4,5])
