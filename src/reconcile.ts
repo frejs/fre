@@ -187,6 +187,7 @@ const diff = function (opts) {
       opts.add(bElm, i)
       j++;
     } else if (key(aElm) === key(bElm)) {
+      clone(aElm,bElm)
       opts.update(aElm, bElm)
       i++; j++;
     } else {
@@ -199,6 +200,7 @@ const diff = function (opts) {
         opts.add(bElm, i)
         j++
       } else {
+        clone(a[wantedElmInOld],bElm)
         opts.move(wantedElmInOld, i)
         a[wantedElmInOld] = null
         j++
@@ -214,11 +216,9 @@ var diff1 = function (a, b) {
     return v.key;
   };
   var update = function (a, b) {
-    clone(a, b)
     actions.push({ op: TAG.UPDATE, old: a, new: b })
   }
   var move = function (from, to) {
-    clone(a, b)
     actions.push({ op: TAG.MOVE, elm: a[from], before: a[to] })
   };
   var add = function (elm, i) {

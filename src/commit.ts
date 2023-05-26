@@ -22,7 +22,6 @@ const commitWork = (fiber: any) => {
     if (fiber.isComp) {
       fiber.child.lane = fiber.lane
     } else {
-      console.log(elm.node, before?.node)
       fiber.parentNode.insertBefore(elm.node, before?.node)
     }
   }
@@ -58,7 +57,6 @@ const remove = fiber => {
     fiber.kids.forEach(remove)
   } else {
     kidsRefer(fiber.kids)
-    // fiber.parentNode.removeChild(fiber.node)
     refer(fiber.ref, null)
   }
   fiber.lane = 0

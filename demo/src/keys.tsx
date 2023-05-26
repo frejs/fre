@@ -2,7 +2,6 @@ import { h, render, useState } from "../../src/index"
 // import {h, render} from '../../.ignore/eee'
 
 const states = [
-  [1, 2, 3],
   [3, 1, 2], // shift right
   [1, 2, 3],
   [2, 3, 1], // shift left
@@ -17,7 +16,7 @@ const states = [
 ]
 
 function App() {
-  const [key, setKey] = useState(states[0])
+  const [key, setKey] = useState([1,2,3])
   const [count, setCount] = useState(0)
   return [
     <button onClick={() => {
