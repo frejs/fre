@@ -17,20 +17,23 @@ const commitWork = (fiber: any) => {
   }
   if (op & TAG.INSERT || op & TAG.MOVE) {
     if (fiber.isComp) {
-      fiber.child.action = fiber.action
+      console.log(fiber.action.op)
+      fiber.child.action.op = fiber.action.op
     } else {
       fiber.parentNode.insertBefore(elm.node, before?.node)
     }
   }
   if (op & TAG.UPDATE) {
     if (fiber.isComp) {
-      fiber.child.action = fiber.action
+      fiber.child.action.op = fiber.action.op
     } else {
       updateElement(fiber.node, fiber.oldProps || {}, fiber.props)
     }
   }
 
   refer(fiber.ref, fiber.node)
+
+  fiber.action = null
 
   commitWork(fiber.child)
   commitWork(fiber.sibling)

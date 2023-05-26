@@ -46,6 +46,7 @@ export interface IFiber<P extends Attributes = any> {
   parentNode: HTMLElementEx
   node: HTMLElementEx
   kids?: any
+  dirty:boolean,
   parent?: IFiber<P>
   sibling?: IFiber<P>
   child?: IFiber<P>

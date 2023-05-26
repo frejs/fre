@@ -35,13 +35,15 @@ export const render = (vnode: FreElement, node: Node): void => {
 }
 
 export const update = (fiber?: IFiber) => {
-  schedule(() => reconcile(fiber))
+  if (!fiber.dirty) {
+    fiber.dirty = true
+    schedule(() => reconcile(fiber))
+  }
 }
 
 const reconcile = (fiber?: IFiber): boolean => {
   while (fiber && !shouldYield()) fiber = capture(fiber)
   if (fiber) return reconcile.bind(null, fiber)
-  commit(rootFiber)
   return null
 }
 
@@ -74,6 +76,11 @@ const capture = (fiber: IFiber): IFiber | undefined => {
 const getSibling = (fiber) => {
   while (fiber) {
     bubble(fiber)
+    if (fiber.dirty) {
+      fiber.dirty = false
+      commit(fiber)
+      return null
+    }
     if (fiber.sibling) return fiber.sibling
     fiber = fiber.parent
   }
@@ -186,7 +193,7 @@ const diff = function (opts) {
       opts.add(bElm, i)
       j++;
     } else if (key(aElm) === key(bElm)) {
-      clone(aElm,bElm)
+      clone(aElm, bElm)
       opts.update(aElm, bElm)
       i++; j++;
     } else {
@@ -199,7 +206,7 @@ const diff = function (opts) {
         opts.add(bElm, i)
         j++
       } else {
-        clone(a[wantedElmInOld],bElm)
+        clone(a[wantedElmInOld], bElm)
         opts.move(wantedElmInOld, i)
         a[wantedElmInOld] = null
         j++

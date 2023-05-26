@@ -10,7 +10,7 @@ import { memor } from './memo'
 
 test('render', async t => {
   await diff(t)
-  // await update(t)
+  await update(t)
   await handler(t)
   await style(t)
   await dom(t)
