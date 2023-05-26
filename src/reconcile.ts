@@ -130,7 +130,7 @@ const getParentNode = (fiber: IFiber): HTMLElement | undefined => {
 const diffKids = (fiber: any, children: FreNode): void => {
   let aCh = fiber.kids || [],
     bCh = (fiber.kids = arrayfy(children) as any)
-  const actions = idiff(aCh, bCh)
+  const actions = diff(aCh, bCh)
 
   for (let i = 0, prev = null, len = bCh.length; i < len; i++) {
 
@@ -165,13 +165,11 @@ const side = (effects: IEffect[]): void => {
   effects.length = 0
 }
 
-const diff = function (opts) {
+const diff = function (a, b) {
   var actions = [],
     aIdx = {},
     bIdx = {},
-    a = opts.old,
-    b = opts.cur,
-    key = opts.key,
+    key = v => v.key + v.type,
     i, j;
   for (i = 0; i < a.length; i++) {
     aIdx[key(a[i])] = i;
@@ -184,52 +182,32 @@ const diff = function (opts) {
     if (aElm === null) {
       i++;
     } else if (b.length <= j) {
-      opts.remove(i)
+      removeElement(a[i])
       i++;
     } else if (a.length <= i) {
-      opts.add(bElm, i)
+      actions.push({ op: TAG.INSERT, elm: bElm, before: a[i] })
       j++;
     } else if (key(aElm) === key(bElm)) {
       clone(aElm, bElm)
-      opts.update(aElm, bElm)
+      actions.push({ op: TAG.UPDATE })
       i++; j++;
     } else {
       var curElmInNew = bIdx[key(aElm)]
       var wantedElmInOld = aIdx[key(bElm)]
       if (curElmInNew === undefined) {
-        opts.remove(i);
+        removeElement(a[i])
         i++;
       } else if (wantedElmInOld === undefined) {
-        opts.add(bElm, i)
+        actions.push({ op: TAG.INSERT, elm: bElm, before: a[i] })
         j++
       } else {
         clone(a[wantedElmInOld], bElm)
-        opts.move(wantedElmInOld, i)
+        actions.push({ op: TAG.MOVE, elm: a[wantedElmInOld], before: a[i] })
         a[wantedElmInOld] = null
         j++
       }
     }
   }
-  return actions
-}
-
-var idiff = function (a, b) {
-  var actions = [] // 必须保持和 b 一致的顺序
-  var extr = (v) => v.key + v.type
-  var update = (a, b) => actions.push({ op: TAG.UPDATE })
-  var move = (from, to) => actions.push({ op: TAG.MOVE, elm: a[from], before: a[to] })
-  var add = (elm, i) => actions.push({ op: TAG.INSERT, elm: elm, before: a[i] })
-  var remove = (i) => {
-    const fiber = a[i]
-    removeElement(fiber)
-  }
-
-  diff({
-    old: a,
-    cur: b,
-    key: extr,
-    add, move, remove, update
-  })
   return actions
 }
 
