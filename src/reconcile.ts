@@ -14,7 +14,6 @@ import { isArr, createText } from './h'
 import { commit } from './commit'
 
 let currentFiber: IFiber = null
-let deletions: any = []
 let rootFiber = null
 
 export const enum TAG {
@@ -42,7 +41,7 @@ export const update = (fiber?: IFiber) => {
 const reconcile = (fiber?: IFiber): boolean => {
   while (fiber && !shouldYield()) fiber = capture(fiber)
   if (fiber) return reconcile.bind(null, fiber)
-  commit(rootFiber, deletions)
+  commit(rootFiber)
   return null
 }
 

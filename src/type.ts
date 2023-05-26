@@ -44,7 +44,6 @@ export interface IFiber<P extends Attributes = any> {
   key?: string
   type: string | FC<P>
   parentNode: HTMLElementEx
-  childNodes: any
   node: HTMLElementEx
   kids?: any
   parent?: IFiber<P>
@@ -54,12 +53,9 @@ export interface IFiber<P extends Attributes = any> {
   ref: IRef
   hooks: IHook
   oldProps: P
-  after: any
+  action: any
   props: P
   lane: number
-  time: number
-  next: IFiber
-  dirty: boolean
   isComp: boolean
 }
 

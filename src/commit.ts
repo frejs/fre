@@ -2,32 +2,29 @@ import { IFiber, IRef } from './type'
 import { updateElement } from './dom'
 import { isFn, TAG } from './reconcile'
 
-export const commit = (fiber: IFiber, deletions): void => {
+export const commit = (fiber: IFiber): void => {
   commitWork(fiber)
-  deletions.forEach(commitWork)
 }
 
 const commitWork = (fiber: any) => {
   if (!fiber) {
     return
   }
-
   const { op, before, elm } = fiber.action || {}
-
   if (op === TAG.REMOVE) {
     remove(fiber)
     return
   }
   if (op & TAG.INSERT || op & TAG.MOVE) {
     if (fiber.isComp) {
-      fiber.child.lane = fiber.lane
+      fiber.child.action = fiber.action
     } else {
       fiber.parentNode.insertBefore(elm.node, before?.node)
     }
   }
   if (op & TAG.UPDATE) {
     if (fiber.isComp) {
-      fiber.child.lane = fiber.lane
+      fiber.child.action = fiber.action
     } else {
       updateElement(fiber.node, fiber.oldProps || {}, fiber.props)
     }
@@ -59,5 +56,4 @@ const remove = fiber => {
     kidsRefer(fiber.kids)
     refer(fiber.ref, null)
   }
-  fiber.lane = 0
 }
