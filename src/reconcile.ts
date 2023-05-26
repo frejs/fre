@@ -48,9 +48,9 @@ const reconcile = (fiber?: IFiber): boolean => {
 }
 
 const memo = (fiber) => {
-  if ((fiber.type as FC).memo && fiber.oldProps) {
+  if ((fiber.type as FC).memo && fiber.old?.props) {
     let scu = (fiber.type as FC).shouldUpdate || shouldUpdate
-    if (!scu(fiber.props, fiber.oldProps)) { // fast-fix
+    if (!scu(fiber.props, fiber.old.props)) { // fast-fix
       return getSibling(fiber)
     }
   }
@@ -130,9 +130,13 @@ const getParentNode = (fiber: IFiber): HTMLElement | undefined => {
 const diffKids = (fiber: any, children: FreNode): void => {
   let aCh = fiber.kids || [],
     bCh = (fiber.kids = arrayfy(children) as any)
-  const actions = diff1(aCh, bCh)
+  const actions = idiff(aCh, bCh)
 
+  if (fiber.old && fiber.old.type != fiber.type) {
+    fiber.action = { op: TAG.REPLACE, elm: fiber.node, before: fiber.old.node }
+  }
   for (let i = 0, prev = null, len = bCh.length; i < len; i++) {
+
     const child = bCh[i]
     child.action = actions[i]
     if (fiber.lane & TAG.SVG) {
@@ -151,13 +155,10 @@ const diffKids = (fiber: any, children: FreNode): void => {
 function clone(a, b) {
   b.hooks = a.hooks
   b.ref = a.ref
-  b.node = a.node
-  b.oldProps = a.props
-  b.kids = a.kids
-}
+  b.node = a.node // 临时修复
 
-const same = (a, b) => {
-  return a && b && a.key === b.key && a.type === b.type
+  b.kids = a.kids
+  b.old = a
 }
 
 export const arrayfy = arr => (!arr ? [] : isArr(arr) ? arr : [arr])
@@ -216,31 +217,22 @@ const diff = function (opts) {
   return actions
 }
 
-var diff1 = function (a, b) {
-  var actions = [];
-  var extr = function (v) {
-    return v.key;
-  };
-  var update = function (a, b) {
-    actions.push({ op: TAG.UPDATE, old: a, new: b })
-  }
-  var move = function (from, to) {
-    actions.push({ op: TAG.MOVE, elm: a[from], before: a[to] })
-  };
-  var add = function (elm, i) {
-    actions.push({ op: TAG.INSERT, elm: elm, before: a[i] })
-  };
-  var remove = function (i) {
+var idiff = function (a, b) {
+  var actions = [] // 必须保持和 b 一致的顺序
+  var extr = (v) => v.key + v.type
+  var update = (a, b) => actions.push({ op: TAG.UPDATE })
+  var move = (from, to) => actions.push({ op: TAG.MOVE, elm: a[from], before: a[to] })
+  var add = (elm, i) => actions.push({ op: TAG.INSERT, elm: elm, before: a[i] })
+  var remove = (i) => {
     const fiber = a[i]
     fiber.parentNode.removeChild(fiber.node) // 直接删除即可
-    // actions.push({ op: TAG.REMOVE, elm: a[i], before: a[i + 1] })
-  };
+  }
   diff({
     old: a,
     cur: b,
     key: extr,
     add, move, remove, update
-  });
+  })
   return actions
 }
 

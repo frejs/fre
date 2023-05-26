@@ -27,8 +27,12 @@ const commitWork = (fiber: any) => {
     if (fiber.isComp) {
       fiber.child.action.op = fiber.action.op
     } else {
-      updateElement(fiber.node, fiber.oldProps || {}, fiber.props)
+      updateElement(fiber.node, fiber.old.props || {}, fiber.props)
     }
+  }
+  if (op & TAG.REPLACE) {
+    console.log(elm.node, elm.node)
+    fiber.parentNode.replaceChild(before, elm)
   }
 
   refer(fiber.ref, fiber.node)

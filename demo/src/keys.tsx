@@ -1,4 +1,4 @@
-import { h, render, useState } from "../../src/index"
+import { h, render, useState, Fragment } from "../../src/index"
 // import {h, render} from '../../.ignore/eee'
 
 const states = [
@@ -16,20 +16,28 @@ const states = [
 ]
 
 function App() {
-  const [key, setKey] = useState([1,2,3])
-  const [count, setCount] = useState(0)
-  return [
-    <button onClick={() => {
-      setKey(states[count])
-      setCount(count + 1)
-    }}>x</button>,
-    <ul>
-      {key.map((i) => (
-        <li key={i}>{i}</li>
-      ))}
-    </ul>,
-  ]
+  const [state, setState] = useState(true)
+  return <>
+    <button onClick={() => setState(!state)}>change</button>
+    {state ? <span>0</span> : <a>none</a>}
+  </>
 }
+
+// function App() {
+//   const [key, setKey] = useState([1,2,3])
+//   const [count, setCount] = useState(0)
+//   return [
+//     <button onClick={() => {
+//       setKey(states[count])
+//       setCount(count + 1)
+//     }}>x</button>,
+//     <ul>
+//       {key.map((i) => (
+//         <li key={i}>{i}</li>
+//       ))}
+//     </ul>,
+//   ]
+// }
 
 // function App() {
 //   const [key, setKey] = useState([1,2,6, 3])
