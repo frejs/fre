@@ -11,7 +11,7 @@
 
 - **Concurrent Mode** — This is an amazing idea, which implements the coroutine scheduler in JavaScript, it also called **Time slicing**.
 
-- **O(ND) reconcilation algorithm** — Fre has a minimal longest-common-subsequence algorithm, It supported keyed, pre-process.
+- **Keyed reconcilation algorithm** — Fre has a minimal longest-common-subsequence algorithm, It supported keyed, pre-process.
 
 - **Do more with less** — After tree shaking, project of hello world is only 1KB, but it has most features, virtual DOM, hooks API, Fragments, Fre.memo and so on.
 
