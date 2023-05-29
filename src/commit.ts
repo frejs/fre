@@ -9,14 +9,14 @@ export const commit = (fiber: any) => {
   }
   const { op, before, elm } = fiber.action || {}
   if (op & TAG.INSERT || op & TAG.MOVE) {
-    if (fiber.isComp) {
+    if (fiber.isComp && fiber.child) {
       fiber.child.action.op |= fiber.action.op
     } else {
       fiber.parentNode.insertBefore(elm.node, before?.node)
     }
   }
   if (op & TAG.UPDATE) {
-    if (fiber.isComp) {
+    if (fiber.isComp && fiber.child) {
       fiber.child.action.op |= fiber.action.op
     } else {
       updateElement(fiber.node, fiber.old.props || {}, fiber.props)
