@@ -106,7 +106,7 @@ const updateHook = <P = Attributes>(fiber: IFiber): any => {
   resetCursor()
   currentFiber = fiber
   let children = (fiber.type as FC<P>)(fiber.props)
-  diffKids(fiber, simpleVnode(children))
+  reconcileChidren(fiber, simpleVnode(children))
 }
 
 const updateHost = (fiber: IFiber): void => {
@@ -115,7 +115,7 @@ const updateHost = (fiber: IFiber): void => {
     if (fiber.type === 'svg') fiber.lane |= TAG.SVG
     fiber.node = createElement(fiber) as HTMLElementEx
   }
-  diffKids(fiber, fiber.props.children)
+  reconcileChidren(fiber, fiber.props.children)
 }
 
 const simpleVnode = (type: any) =>
@@ -127,13 +127,12 @@ const getParentNode = (fiber: IFiber): HTMLElement | undefined => {
   }
 }
 
-const diffKids = (fiber: any, children: FreNode): void => {
+const reconcileChidren = (fiber: any, children: FreNode): void => {
   let aCh = fiber.kids || [],
     bCh = (fiber.kids = arrayfy(children) as any)
   const actions = diff(aCh, bCh)
 
   for (let i = 0, prev = null, len = bCh.length; i < len; i++) {
-
     const child = bCh[i]
     child.action = actions[i]
     if (fiber.lane & TAG.SVG) {
