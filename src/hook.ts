@@ -32,12 +32,15 @@ export const useReducer = <S, A>(
   if (hook.length === 0) {
     hook[0] = initState
     hook[1] = (value: A | Dispatch<A>) => {
-      hook[0] = reducer
+      let v = reducer
         ? reducer(hook[0], value as any)
         : isFn(value)
           ? value(hook[0])
           : value
-      update(current)
+      if (hook[0] !== v) {
+        hook[0] = v
+        update(current)
+      }
     }
   }
   return hook
