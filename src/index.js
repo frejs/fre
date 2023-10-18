@@ -151,7 +151,7 @@ function mount(vnode, isSvg) {
                 setDOMAttribute(node, key, props[key], isSvg)
             }
         }
-        
+
         let childrenRef = props.children == null ? null : mount(props.children, isSvg)
         childrenRef && insertDom(node, childrenRef)
         return {
@@ -196,9 +196,11 @@ function reconcile(
     ref,
     isSvg
 ) {
-    if (oldVnode === newVnode && !newVnode.dirty) {
-        return ref
-    } else if (isEmpty(newVnode) && isEmpty(oldVnode)) {
+    // if (oldVnode === newVnode) {
+    //     return ref
+    // } else 
+
+    if (isEmpty(newVnode) && isEmpty(oldVnode)) {
         return ref
     } else if (isLeaf(newVnode) && isLeaf(oldVnode)) {
         ref.node.nodeValue = newVnode
@@ -208,10 +210,12 @@ function reconcile(
         isElement(oldVnode) &&
         newVnode.type === oldVnode.type
     ) {
+
         isSvg = isSvg || newVnode.type === 'svg'
         reconcileProps(ref.node, newVnode.props, oldVnode.props, isSvg)
         let oldCh = oldVnode.props.children
         let newCh = newVnode.props.children
+
         if (oldCh == null) {
             if (newCh != null) {
                 ref.children = mount(newCh, isSvg)
@@ -232,19 +236,15 @@ function reconcile(
             }
         }
         return ref
-    } else if (isNonEmptyArray(newVnode) && isNonEmptyArray(oldVnode)) {
-        reconcileChildren(parent, newVnode, oldVnode, ref, isSvg)
-        return ref
     } else if (
         isComponent(newVnode) &&
         isComponent(oldVnode) &&
         newVnode.type === oldVnode.type
     ) {
-
         let fn = newVnode.type
-        let shouldUpdate = newVnode.dirty || (fn.shouldUpdate != null
+        let shouldUpdate = fn.shouldUpdate != null
             ? fn.shouldUpdate(oldVnode.props, newVnode.props)
-            : defaultShouldUpdate(oldVnode.props, newVnode.props))
+            : defaultShouldUpdate(oldVnode.props, newVnode.props)
 
         if (shouldUpdate) {
             currentVnode = newVnode
@@ -274,11 +274,9 @@ function reconcile(
         } else {
             return ref
         }
-    } else if (newVnode instanceof Node && oldVnode instanceof Node) {
-        ref.node = newVnode
-        return ref
     } else {
-        return mount(newVnode, isSvg)
+        reconcileChildren(parent, newVnode, oldVnode, ref, isSvg)
+        return ref
     }
 }
 
@@ -435,8 +433,8 @@ const useReducer = (
                     : value
             if (hook[0] !== v) {
                 hook[0] = v
-                c.dirty = true
-                defer(() => render(c, rootRef))
+                c.type.shouldUpdate = () => true
+                render(c, rootRef)
             }
         }
     }
