@@ -1,12 +1,2 @@
 /node_modules/
-/.idea/
-/.cache/
-/.nyc_output/
-yarn-error.log
-demo/**/node_modules/
-demo/**/dist/
-/dist/
-/**/node_modules/
-.DS_Store
-/.ignore/
-yarn.lock
+/ignore/
