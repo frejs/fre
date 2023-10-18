@@ -1,21 +1,13 @@
 import { terser } from 'rollup-plugin-terser'
-import typescript from 'rollup-plugin-typescript2'
 import size from 'rollup-plugin-size'
 
 const plugins = [
-  typescript({
-    tsconfig: 'tsconfig.json',
-    removeComments: true,
-    useTsconfigDeclarationDir: true,
-  }),
-  terser({
-    include: ['fre.js'],
-  }),
+  terser(),
   size()
 ]
 
 export default {
-  input: 'src/index.ts',
+  input: 'src/index.js',
   output: [
     { file: 'dist/fre.umd.js', format: 'umd', name: 'fre', sourcemap: true },
     { file: 'dist/fre.js', format: 'esm', sourcemap: true },

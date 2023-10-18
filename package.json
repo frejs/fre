@@ -1,11 +1,12 @@
 {
-  "name": "fre3",
-  "version": "1.0.0",
+  "name": "fre",
+  "version": "3.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "vite dev"
+    "start": "vite dev",
+    "build": "rollup -c"
   },
   "repository": {
     "type": "git",
@@ -19,7 +20,11 @@
   },
   "homepage": "https://github.com/yisar/fre3#readme",
   "dependencies": {
-    "sinuous": "0.30.0",
+    "rollup": "^4.1.4",
     "vite": "^4.4.9"
+  },
+  "devDependencies": {
+    "rollup-plugin-size": "^0.3.1",
+    "rollup-plugin-terser": "^7.0.2"
   }
 }
