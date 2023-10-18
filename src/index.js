@@ -199,7 +199,7 @@ function reconcile(
     // if (oldVnode === newVnode) {
     //     return ref
     // } else 
-
+    
     if (isEmpty(newVnode) && isEmpty(oldVnode)) {
         return ref
     } else if (isLeaf(newVnode) && isLeaf(oldVnode)) {
@@ -210,7 +210,6 @@ function reconcile(
         isElement(oldVnode) &&
         newVnode.type === oldVnode.type
     ) {
-
         isSvg = isSvg || newVnode.type === 'svg'
         reconcileProps(ref.node, newVnode.props, oldVnode.props, isSvg)
         let oldCh = oldVnode.props.children
