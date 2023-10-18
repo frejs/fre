@@ -86,7 +86,7 @@ function removeDom(parent, ref) {
     }
 }
 
-function reconcileAttributes(dom, newProps, oldProps, isSvg) {
+function reconcileProps(dom, newProps, oldProps, isSvg) {
     for (var key in newProps) {
         if (key === "key" || key === "children") continue
         var oldValue = oldProps[key]
@@ -208,7 +208,7 @@ function reconcile(
         newVnode.type === oldVnode.type
     ) {
         isSvg = isSvg || newVnode.type === 'svg'
-        reconcileAttributes(ref.node, newVnode.props, oldVnode.props, isSvg)
+        reconcileProps(ref.node, newVnode.props, oldVnode.props, isSvg)
         let oldCh = oldVnode.props.children
         let newCh = newVnode.props.children
         if (oldCh == null) {
