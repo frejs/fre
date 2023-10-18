@@ -17,16 +17,13 @@ const isComponent = (c) => c?.vtype === VTYPE_FUNCTION
 
 function h(type, props, ...children) {
     props = props || {}
-
     if (children.length) {
         props.children = children.length === 1 ? children[0] : children
     }
-
     const vtype =
         typeof type === "string"
             ? VTYPE_ELEMENT
             : VTYPE_FUNCTION
-
     return {
         vtype,
         type,
