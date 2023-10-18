@@ -151,7 +151,7 @@ function mount(vnode, isSvg) {
                 setDOMAttribute(node, key, props[key], isSvg)
             }
         }
-
+        
         let childrenRef = props.children == null ? null : mount(props.children, isSvg)
         childrenRef && insertDom(node, childrenRef)
         return {
