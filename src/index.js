@@ -14,6 +14,7 @@ const isNonEmptyArray = (c) => Array.isArray(c) && c.length > 0
 const isLeaf = (c) => typeof c === "string" || typeof c === "number"
 const isElement = (c) => c?.vtype === VTYPE_ELEMENT
 const isComponent = (c) => c?.vtype === VTYPE_FUNCTION
+const defer = cb => Promise.resolve().then(cb)
 
 function h(type, props, ...children) {
     props = props || {}
@@ -435,7 +436,7 @@ const useReducer = (
             if (hook[0] !== v) {
                 hook[0] = v
                 c.dirty = true
-                requestAnimationFrame(() => render(c, rootRef))
+                defer(() => render(c, rootRef))
             }
         }
     }
