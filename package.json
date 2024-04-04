@@ -1,6 +1,6 @@
 {
   "name": "fre",
-  "version": "2.6.5",
+  "version": "2.6.6",
   "type": "module",
   "main": "dist/fre.js",
   "unpkg": "dist/fre.umd.js",
@@ -8,11 +8,13 @@
   "exports": {
     ".": {
       "import": "./dist/fre.js",
-      "require": "./dist/fre.umd.js"
+      "require": "./dist/fre.umd.js",      
+      "types": "./dist/types/index.d.ts"
     },
     "./jsx-runtime": {
       "import": "./jsx-runtime.js",
-      "require": "./jsx-runtime.js"
+      "require": "./jsx-runtime.js",
+      "types": "./jsx-runtime.d.ts"
     }
   },
   "typings": "./dist/types/index.d.ts",
