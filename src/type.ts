@@ -46,14 +46,12 @@ export interface IFiber<P extends Attributes = any> {
   parentNode: HTMLElementEx
   node: HTMLElementEx
   kids?: any
-  dirty:boolean,
+  dirty: boolean
   parent?: IFiber<P>
   sibling?: IFiber<P>
   child?: IFiber<P>
-  done?: () => void
-  ref: IRef
+  ref?: Ref<HTMLElement | undefined>
   hooks: IHook
-  oldProps: P
   action: any
   props: P
   lane: number
@@ -61,7 +59,7 @@ export interface IFiber<P extends Attributes = any> {
 }
 
 export type HTMLElementEx = HTMLElement & { last: IFiber | null }
-export type IEffect = [Function?, number?, Function?]
+export type IEffect = [Function?, number?, cleanup?: Function]
 
 export type FreText = string | number
 export type FreNode =
@@ -72,11 +70,10 @@ export type FreNode =
   | null
   | undefined
 export type SetStateAction<S> = S | ((prevState: S) => S)
-export type Dispatch<A> = (value: A, resume?: boolean) => void
+export type Dispatch<A> = (value: A) => void
 export type Reducer<S, A> = (prevState: S, action: A) => S
-export type IVoidCb = () => void
-export type EffectCallback = () => void | (IVoidCb | undefined)
-export type DependencyList = Array<any>
+export type EffectCallback = () => void | (() => void | undefined)
+export type DependencyList = ReadonlyArray<unknown>
 
 export interface PropsWithChildren {
   children?: FreNode
@@ -86,7 +83,6 @@ export type ITaskCallback = (() => ITaskCallback) | null
 
 export interface ITask {
   callback?: ITaskCallback
-  fiber: IFiber
 }
 
 export type DOM = HTMLElement | SVGElement
