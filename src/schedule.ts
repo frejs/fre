@@ -33,11 +33,11 @@ const flush = (): void => {
   deadline = getTime() + threshold
   let job = peek(queue)
   while (job && !shouldYield()) {
-    const { callback } = job as any
+    const { callback } = job
     job.callback = null
     const next = callback()
     if (next) {
-      job.callback = next as any
+      job.callback = next
     } else {
       queue.shift()
     }
