@@ -2,7 +2,7 @@ import { ITask } from './type'
 
 const queue: ITask[] = []
 const threshold: number = 5
-const transitions = []
+const transitions: (() => void)[] = []
 let deadline: number = 0
 
 export const startTransition = cb => {

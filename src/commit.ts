@@ -1,4 +1,4 @@
-import { IFiber, IRef } from './type'
+import { Ref } from './type'
 import { updateElement } from './dom'
 import { isFn, TAG } from './reconcile'
 
@@ -31,12 +31,12 @@ export const commit = (fiber: any) => {
   commit(fiber.sibling)
 }
 
-const refer = (ref: IRef, dom?: HTMLElement): void => {
+const refer = (ref?: Ref<HTMLElement | undefined>, dom?: HTMLElement) => {
   if (ref)
-    isFn(ref) ? ref(dom) : ((ref as { current?: HTMLElement })!.current = dom)
+    isFn(ref) ? ref(dom) : ref.current = dom
 }
 
-const kidsRefer = (kids: any): void => {
+const kidsRefer = (kids: any) => {
   kids.forEach(kid => {
     kid.kids && kidsRefer(kid.kids)
     refer(kid.ref, null)
