@@ -5,7 +5,7 @@ import {
   Attributes,
   HTMLElementEx,
   FreNode,
-  IEffect,
+  HookEffect,
 } from './type'
 import { createElement } from './dom'
 import { resetCursor } from './hook'
@@ -158,7 +158,7 @@ function clone(a, b) {
 
 export const arrayfy = arr => (!arr ? [] : isArr(arr) ? arr : [arr])
 
-const side = (effects: IEffect[]): void => {
+const side = (effects: HookEffect[]): void => {
   effects.forEach(e => e[2] && e[2]())
   effects.forEach(e => (e[2] = e[0]()))
   effects.length = 0
