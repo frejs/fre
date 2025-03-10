@@ -1,4 +1,4 @@
-import { update, isFn, getCurrentFiber } from "./reconcile"
+import { update, isFn, getCurrentFiber } from './reconcile'
 import {
   DependencyList,
   Reducer,
@@ -6,11 +6,13 @@ import {
   Dispatch,
   SetStateAction,
   EffectCallback,
-  HookTypes,
   RefObject,
-  IEffect,
   FreNode,
-} from "./type"
+  HookList,
+  HookEffect,
+  HookReducer,
+  HookMemo,
+} from './type'
 
 const EMPTY_ARR = []
 
@@ -28,15 +30,15 @@ export const useReducer = <S, A>(
   reducer?: Reducer<S, A>,
   initState?: S
 ): [S, Dispatch<A>] => {
-  const [hook, current]: [any, IFiber] = getHook<S>(cursor++)
+  const [hook, current]: [any, IFiber] = getHook<HookReducer>(cursor++)
   if (hook.length === 0) {
     hook[0] = initState
     hook[1] = (value: A | Dispatch<A>) => {
       let v = reducer
         ? reducer(hook[0], value as any)
         : isFn(value)
-          ? value(hook[0])
-          : value
+        ? value(hook[0])
+        : value
       if (hook[0] !== v) {
         hook[0] = v
         update(current)
@@ -47,23 +49,23 @@ export const useReducer = <S, A>(
 }
 
 export const useEffect = (cb: EffectCallback, deps?: DependencyList): void => {
-  return effectImpl(cb, deps!, "effect")
+  return effectImpl(cb, deps!, 'effect')
 }
 
 export const useLayout = (cb: EffectCallback, deps?: DependencyList): void => {
-  return effectImpl(cb, deps!, "layout")
+  return effectImpl(cb, deps!, 'layout')
 }
 
 const effectImpl = (
   cb: EffectCallback,
   deps: DependencyList,
-  key: HookTypes
+  key: 'effect' | 'layout'
 ): void => {
-  const [hook, current] = getHook(cursor++)
+  const [hook, current] = getHook<HookEffect>(cursor++)
   if (isChanged(hook[1], deps)) {
     hook[0] = cb
     hook[1] = deps
-    current.hooks[key].push(hook)
+    current.hooks[key].push(hook as Required<HookEffect>)
   }
 }
 
@@ -71,7 +73,7 @@ export const useMemo = <S = Function>(
   cb: () => S,
   deps?: DependencyList
 ): S => {
-  const hook = getHook<S>(cursor++)[0]
+  const hook = getHook<HookMemo>(cursor++)[0]
   if (isChanged(hook[1], deps!)) {
     hook[1] = deps
     return (hook[0] = cb())
@@ -90,24 +92,22 @@ export const useRef = <T>(current: T): RefObject<T> => {
   return useMemo(() => ({ current }), [])
 }
 
-export const getHook = <S = Function | undefined, Dependency = any>(
-  cursor: number
-): [[S, Dependency], IFiber] => {
+export const getHook = <T extends HookList = HookList>(cursor: number) => {
   const current: IFiber<any> = getCurrentFiber()
   const hooks =
     current.hooks || (current.hooks = { list: [], effect: [], layout: [] })
   if (cursor >= hooks.list.length) {
-    hooks.list.push([] as IEffect)
+    hooks.list.push([] as any)
   }
-  return [(hooks.list[cursor] as unknown) as [S, Dependency], current]
+  return [hooks.list[cursor], current] as unknown as [Partial<T>, IFiber]
 }
 
 export type ContextType<T> = {
-  ({ value, children }: { value: T, children: FreNode }): FreNode;
-  initialValue: T;
+  ({ value, children }: { value: T; children: FreNode }): FreNode
+  initialValue: T
 }
 
-type SubscriberCb = () => void;
+type SubscriberCb = () => void
 
 export const createContext = <T>(initialValue: T): ContextType<T> => {
   const contextComponent: ContextType<T> = ({ value, children }) => {
@@ -115,14 +115,14 @@ export const createContext = <T>(initialValue: T): ContextType<T> => {
     const subscribers = useMemo(() => new Set<SubscriberCb>(), EMPTY_ARR)
 
     if (valueRef.current !== value) {
-      valueRef.current = value;
+      valueRef.current = value
       subscribers.forEach((subscriber) => subscriber())
     }
 
     return children
   }
-  contextComponent.initialValue = initialValue;
-  return contextComponent;
+  contextComponent.initialValue = initialValue
+  return contextComponent
 }
 
 export const useContext = <T>(contextType: ContextType<T>): T => {
@@ -132,7 +132,7 @@ export const useContext = <T>(contextType: ContextType<T>): T => {
 
   useEffect(() => {
     return () => subscribersSet && subscribersSet.delete(triggerUpdate)
-  }, EMPTY_ARR);
+  }, EMPTY_ARR)
 
   let contextFiber = getCurrentFiber().parent
   while (contextFiber && contextFiber.type !== contextType) {
@@ -140,8 +140,11 @@ export const useContext = <T>(contextType: ContextType<T>): T => {
   }
 
   if (contextFiber) {
-    const hooks = contextFiber.hooks.list as unknown as [[RefObject<T>], [Set<SubscriberCb>]]
-    const [[value], [subscribers]] = hooks;
+    const hooks = contextFiber.hooks.list as unknown as [
+      [RefObject<T>],
+      [Set<SubscriberCb>]
+    ]
+    const [[value], [subscribers]] = hooks
 
     subscribersSet = subscribers.add(triggerUpdate)
 
@@ -151,6 +154,10 @@ export const useContext = <T>(contextType: ContextType<T>): T => {
   }
 }
 
-export const isChanged = (a: DependencyList, b: DependencyList) => {
-  return !a || a.length !== b.length || b.some((arg, index) => !Object.is(arg, a[index]))
+export const isChanged = (a: DependencyList | undefined, b: DependencyList) => {
+  return (
+    !a ||
+    a.length !== b.length ||
+    b.some((arg, index) => !Object.is(arg, a[index]))
+  )
 }

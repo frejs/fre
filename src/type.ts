@@ -30,15 +30,19 @@ export interface FreElement<P extends Attributes = any, T = string> {
 
 export type HookTypes = 'list' | 'effect' | 'layout'
 
-export interface IHook {
-  list: IEffect[]
-  layout: IEffect[]
-  effect: IEffect[]
+export interface Hooks {
+  list: HookList[]
+  layout: HookEffect[]
+  effect: HookEffect[]
 }
-
-export type IRef = (
-  e: HTMLElement | undefined
-) => void | { current?: HTMLElement }
+export type HookList = HookMemo | HookEffect | HookReducer
+export type HookMemo<V = any> = [value: V, deps: DependencyList]
+export type HookEffect = [
+  cb: EffectCallback,
+  deps: DependencyList,
+  cleanup?: () => any
+]
+export type HookReducer<V = any, A = any> = [value: V, dispatch: Dispatch<A>]
 
 export interface IFiber<P extends Attributes = any> {
   key?: string
@@ -51,7 +55,7 @@ export interface IFiber<P extends Attributes = any> {
   sibling?: IFiber<P>
   child?: IFiber<P>
   ref?: Ref<HTMLElement | undefined>
-  hooks: IHook
+  hooks?: Hooks
   action: any
   props: P
   lane: number
@@ -59,7 +63,6 @@ export interface IFiber<P extends Attributes = any> {
 }
 
 export type HTMLElementEx = HTMLElement & { last: IFiber | null }
-export type IEffect = [Function?, number?, cleanup?: Function]
 
 export type FreText = string | number
 export type FreNode =
@@ -72,7 +75,7 @@ export type FreNode =
 export type SetStateAction<S> = S | ((prevState: S) => S)
 export type Dispatch<A> = (value: A) => void
 export type Reducer<S, A> = (prevState: S, action: A) => S
-export type EffectCallback = () => void | (() => void | undefined)
+export type EffectCallback = () => any | (() => () => any)
 export type DependencyList = ReadonlyArray<unknown>
 
 export interface PropsWithChildren {
