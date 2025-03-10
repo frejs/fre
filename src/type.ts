@@ -82,7 +82,7 @@ export interface PropsWithChildren {
   children?: FreNode
 }
 
-export type ITaskCallback = ((time: boolean) => boolean) | null
+export type ITaskCallback = (() => ITaskCallback) | null
 
 export interface ITask {
   callback?: ITaskCallback
