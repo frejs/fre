@@ -22,15 +22,15 @@ export const resetCursor = () => {
   cursor = 0
 }
 
-export const useState = <T>(initState: T): [T, Dispatch<SetStateAction<T>>] => {
-  return useReducer(null, initState)
+export const useState = <T>(initState: T) => {
+  return useReducer<T, SetStateAction<T>>(null, initState)
 }
 
 export const useReducer = <S, A>(
   reducer?: Reducer<S, A>,
   initState?: S
 ): [S, Dispatch<A>] => {
-  const [hook, current]: [any, IFiber] = getHook<HookReducer>(cursor++)
+  const [hook, current] = getHook<HookReducer>(cursor++)
   if (hook.length === 0) {
     hook[0] = initState
     hook[1] = (value: A | Dispatch<A>) => {
@@ -45,14 +45,14 @@ export const useReducer = <S, A>(
       }
     }
   }
-  return hook
+  return hook as Required<HookReducer>
 }
 
-export const useEffect = (cb: EffectCallback, deps?: DependencyList): void => {
+export const useEffect = (cb: EffectCallback, deps?: DependencyList) => {
   return effectImpl(cb, deps!, 'effect')
 }
 
-export const useLayout = (cb: EffectCallback, deps?: DependencyList): void => {
+export const useLayout = (cb: EffectCallback, deps?: DependencyList) => {
   return effectImpl(cb, deps!, 'layout')
 }
 
@@ -60,7 +60,7 @@ const effectImpl = (
   cb: EffectCallback,
   deps: DependencyList,
   key: 'effect' | 'layout'
-): void => {
+) => {
   const [hook, current] = getHook<HookEffect>(cursor++)
   if (isChanged(hook[1], deps)) {
     hook[0] = cb
