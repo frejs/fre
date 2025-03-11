@@ -9,7 +9,7 @@ export const startTransition = (cb: () => void) => {
   transitions.push(cb) && translate()
 }
 
-export const schedule = (callback: ITaskCallback): void => {
+export const schedule = (callback: ITaskCallback) => {
   queue.push({ callback })
   startTransition(flush)
 }
@@ -46,7 +46,7 @@ const flush = () => {
   job && (translate = task(shouldYield())) && startTransition(flush)
 }
 
-export const shouldYield = (): boolean => {
+export const shouldYield = () => {
   return getTime() >= deadline
 }
 

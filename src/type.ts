@@ -2,10 +2,9 @@ export type Key = FreText
 export interface RefObject<T> {
   current: T
 }
-
-export type RefCallback<T> = {
-  bivarianceHack(instance: T | null): void
-}['bivarianceHack']
+export interface RefCallback<T> {
+  (instance: T | null): void
+}
 export type Ref<T = any> = RefCallback<T> | RefObject<T> | null
 
 export interface IntrinsicAttributes extends Record<string, any> {

@@ -125,7 +125,7 @@ export const createContext = <T>(initialValue: T): ContextType<T> => {
   return contextComponent
 }
 
-export const useContext = <T>(contextType: ContextType<T>): T => {
+export const useContext = <T>(contextType: ContextType<T>) => {
   let subscribersSet: Set<Function>
 
   const triggerUpdate = useReducer(null, null)[1] as SubscriberCb
