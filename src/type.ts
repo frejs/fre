@@ -2,10 +2,9 @@ export type Key = FreText
 export interface RefObject<T> {
   current: T
 }
-
-export type RefCallback<T> = {
-  bivarianceHack(instance: T | null): void
-}['bivarianceHack']
+export interface RefCallback<T> {
+  (instance: T | null): void
+}
 export type Ref<T = any> = RefCallback<T> | RefObject<T> | null
 
 export interface IntrinsicAttributes extends Record<string, any> {
@@ -17,12 +16,12 @@ export interface IntrinsicAttributes extends Record<string, any> {
 export interface Attributes extends Record<string, any> {
   key?: Key
   ref?: Ref
-  children?: IFiber[]
+  children?: Fiber[]
 }
 
 export interface FC<P extends IntrinsicAttributes = IntrinsicAttributes> {
-  (props: P): IFiber | FreText | null | undefined
-  fiber?: IFiber
+  (props: P): Fiber | FreText | null | undefined
+  fiber?: Fiber
   type?: string
   memo?: boolean
   shouldUpdate?: (newProps: P, oldProps: P) => boolean
@@ -42,7 +41,27 @@ export type HookEffect = [
 ]
 export type HookReducer<V = any, A = any> = [value: V, dispatch: Dispatch<A>]
 
-export type IFiber = FiberHost | FiberComp | FiberBase
+export type FiberFinish = FiberHostFinish | FiberCompFinish
+type FiberHostFinish = FiberBaseFinish &
+  FiberHost & {
+    node: HTMLElementEx
+    parentNode: HTMLElementEx
+  }
+type FiberCompFinish = FiberBaseFinish &
+  FiberComp & {
+    node: undefined
+    parentNode: undefined
+  }
+
+interface FiberBaseFinish extends FiberBase {
+  kids?: FiberFinish[]
+  parent?: FiberFinish
+  sibling?: FiberFinish
+  child?: FiberFinish
+  old?: FiberFinish
+}
+
+export type Fiber = FiberHost | FiberComp | FiberBase
 
 export interface FiberHost extends FiberBase {
   type?: string
@@ -69,13 +88,13 @@ interface FiberBase {
   isComp?: boolean
   parentNode?: HTMLElementEx | {}
   node?: HTMLElementEx
-  kids?: IFiber[]
+  kids?: Fiber[]
   dirty?: boolean
-  parent?: IFiber
-  sibling?: IFiber
-  child?: IFiber
+  parent?: Fiber
+  sibling?: Fiber
+  child?: Fiber
   ref?: Ref<HTMLElement | undefined>
-  old?: IFiber
+  old?: Fiber
   hooks?: Hooks
   action?: Action | null
   lane?: number
@@ -83,8 +102,8 @@ interface FiberBase {
 
 export interface Action {
   op: TAG
-  elm?: IFiber
-  before?: IFiber
+  elm?: Fiber
+  before?: Fiber
 }
 
 export const enum TAG {
@@ -101,15 +120,15 @@ export type HTMLElementEx = HTMLElement | Text | SVGElement
 
 export type FreText = string | number
 export type FreNode = Child[] | Child
-export type Child = IFiber | FreText | null | undefined | boolean
+export type Child = Fiber | FreText | null | undefined | boolean
 export type SetStateAction<S> = S | ((prevState: S) => S)
 export type Dispatch<A> = (value: A) => void
 export type Reducer<S, A> = (prevState: S, action: A) => S
 export type EffectCallback = () => any | (() => () => any)
 export type DependencyList = ReadonlyArray<unknown>
 
-export type ITaskCallback = (() => ITaskCallback) | null | undefined
+export type TaskCallback = (() => TaskCallback) | null | undefined
 
-export interface ITask {
-  callback?: ITaskCallback
+export interface Task {
+  callback?: TaskCallback
 }

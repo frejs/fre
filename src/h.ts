@@ -1,5 +1,5 @@
 import { isStr, arrayfy } from './reconcile'
-import { FC, FreNode, FreText, IFiber } from './type'
+import { FC, FreNode, FreText, Fiber } from './type'
 
 // for jsx2
 export const h = (type: string | FC, props: any, ...kids: FreNode[]) => {
@@ -20,7 +20,7 @@ export const h = (type: string | FC, props: any, ...kids: FreNode[]) => {
 const some = <T>(x: T | boolean | null | undefined): x is T =>
   x != null && x !== true && x !== false
 
-const flat = (arr: FreNode[], target: IFiber[] = []) => {
+const flat = (arr: FreNode[], target: Fiber[] = []) => {
   arr.forEach((v) => {
     isArr(v)
       ? flat(v, target)
@@ -37,16 +37,13 @@ export const createVnode = (type, props, key, ref) => ({
 })
 
 export const createText = (vnode: FreText) =>
-  ({ type: '#text', props: { nodeValue: vnode + '' } } as IFiber)
+  ({ type: '#text', props: { nodeValue: vnode + '' } } as Fiber)
 
 export function Fragment(props) {
   return props.children
 }
 
-export function memo<T extends object>(
-  fn: FC<T>,
-  compare?: FC<T>['shouldUpdate']
-) {
+export function memo<T extends FC>(fn: T, compare?: T['shouldUpdate']) {
   fn.memo = true
   fn.shouldUpdate = compare
   return fn

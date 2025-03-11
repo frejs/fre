@@ -1,8 +1,8 @@
-import { IFiber, Ref, TAG } from './type'
+import { FiberFinish, FiberHost, HTMLElementEx, Fiber, Ref, TAG } from './type'
 import { updateElement } from './dom'
 import { isFn } from './reconcile'
 
-export const commit = (fiber: any) => {
+export const commit = (fiber: FiberFinish) => {
   if (!fiber) {
     return
   }
@@ -18,7 +18,11 @@ export const commit = (fiber: any) => {
     if (fiber.isComp && fiber.child) {
       fiber.child.action.op |= fiber.action.op
     } else {
-      updateElement(fiber.node, fiber.old.props || {}, fiber.props)
+      updateElement(
+        fiber.node,
+        (fiber.old as FiberHost).props || {},
+        (fiber as FiberHost).props
+      )
     }
   }
 
@@ -30,18 +34,18 @@ export const commit = (fiber: any) => {
   commit(fiber.sibling)
 }
 
-const refer = (ref?: Ref<HTMLElement | undefined>, dom?: HTMLElement) => {
+const refer = (ref?: Ref<HTMLElementEx>, dom?: HTMLElementEx) => {
   if (ref) isFn(ref) ? ref(dom) : (ref.current = dom)
 }
 
-const kidsRefer = (kids: IFiber[]) => {
+const kidsRefer = (kids: Fiber[]) => {
   kids.forEach((kid) => {
     kid.kids && kidsRefer(kid.kids)
     refer(kid.ref, null)
   })
 }
 
-export const removeElement = (fiber: IFiber) => {
+export const removeElement = (fiber: Fiber) => {
   if (fiber.isComp) {
     fiber.hooks && fiber.hooks.list.forEach((e) => e[2] && e[2]())
     fiber.kids.forEach(removeElement)

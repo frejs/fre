@@ -1,35 +1,35 @@
-import { IFiber, FC, HookEffect, FreText, TAG, Action, FiberHost } from './type'
+import { Fiber, FC, HookEffect, FreText, TAG, Action, FiberHost, FiberFinish } from './type'
 import { createElement } from './dom'
 import { resetCursor } from './hook'
 import { schedule, shouldYield } from './schedule'
 import { isArr, createText } from './h'
 import { commit, removeElement } from './commit'
 
-let currentFiber: IFiber = null
+let currentFiber: Fiber = null
 let rootFiber = null
 
-export const render = (vnode: IFiber, node: Node) => {
+export const render = (vnode: Fiber, node: Node) => {
   rootFiber = {
     node,
     props: { children: vnode },
-  } as IFiber
+  } as Fiber
   update(rootFiber)
 }
 
-export const update = (fiber?: IFiber) => {
+export const update = (fiber?: Fiber) => {
   if (!fiber.dirty) {
     fiber.dirty = true
     schedule(() => reconcile(fiber))
   }
 }
 
-const reconcile = (fiber?: IFiber) => {
+const reconcile = (fiber?: Fiber) => {
   while (fiber && !shouldYield()) fiber = capture(fiber)
   if (fiber) return reconcile.bind(null, fiber) as typeof reconcile
   return null
 }
 
-const memo = (fiber: IFiber) => {
+const memo = (fiber: Fiber) => {
   if ((fiber.type as FC).memo && fiber.old?.props) {
     let scu = (fiber.type as FC).shouldUpdate || shouldUpdate
     if (!scu(fiber.props, fiber.old.props)) {
@@ -40,7 +40,7 @@ const memo = (fiber: IFiber) => {
   return null
 }
 
-const capture = (fiber: IFiber) => {
+const capture = (fiber: Fiber) => {
   fiber.isComp = isFn(fiber.type)
   if (fiber.isComp) {
     const memoFiber = memo(fiber)
@@ -56,12 +56,12 @@ const capture = (fiber: IFiber) => {
   return sibling
 }
 
-const getSibling = (fiber?: IFiber) => {
+const getSibling = (fiber?: Fiber) => {
   while (fiber) {
     bubble(fiber)
     if (fiber.dirty) {
       fiber.dirty = false
-      commit(fiber)
+      commit(fiber as FiberFinish)
       return null
     }
     if (fiber.sibling) return fiber.sibling
@@ -70,7 +70,7 @@ const getSibling = (fiber?: IFiber) => {
   return null
 }
 
-const bubble = (fiber: IFiber) => {
+const bubble = (fiber: Fiber) => {
   if (fiber.isComp) {
     if (fiber.hooks) {
       side(fiber.hooks.layout)
@@ -87,7 +87,7 @@ const shouldUpdate = (
   for (let i in b) if (a[i] !== b[i]) return true
 }
 
-const updateHook = (fiber: IFiber) => {
+const updateHook = (fiber: Fiber) => {
   resetCursor()
   currentFiber = fiber
   let children = (fiber.type as FC)(fiber.props)
@@ -103,18 +103,18 @@ const updateHost = (fiber: FiberHost) => {
   reconcileChidren(fiber, fiber.props.children)
 }
 
-const simpleVnode = (type: IFiber | FreText) =>
+const simpleVnode = (type: Fiber | FreText) =>
   isStr(type) ? createText(type) : type
 
-const getParentNode = (fiber: IFiber) => {
+const getParentNode = (fiber: Fiber) => {
   while ((fiber = fiber.parent)) {
     if (!fiber.isComp) return fiber.node
   }
 }
 
 const reconcileChidren = (
-  fiber: IFiber,
-  children: IFiber | IFiber[] | null | undefined
+  fiber: Fiber,
+  children: Fiber | Fiber[] | null | undefined
 ) => {
   let aCh = fiber.kids || [],
     bCh = (fiber.kids = arrayfy(children))
@@ -136,7 +136,7 @@ const reconcileChidren = (
   }
 }
 
-function clone(a: IFiber, b: IFiber) {
+function clone(a: Fiber, b: Fiber) {
   b.hooks = a.hooks
   b.ref = a.ref
   b.node = a.node // 临时修复
@@ -153,11 +153,11 @@ const side = (effects?: HookEffect[]) => {
   effects.length = 0
 }
 
-const diff = function (a: IFiber[], b: IFiber[]) {
+const diff = function (a: Fiber[], b: Fiber[]) {
   var actions: Action[] = [],
     aIdx: Record<string, number | undefined> = {},
     bIdx: Record<string, number | undefined> = {},
-    key = (v: IFiber) => v.key + v.type,
+    key = (v: Fiber) => v.key + v.type,
     i: number,
     j: number
   for (i = 0; i < a.length; i++) {
