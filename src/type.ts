@@ -8,14 +8,20 @@ export type RefCallback<T> = {
 }['bivarianceHack']
 export type Ref<T = any> = RefCallback<T> | RefObject<T> | null
 
-export interface Attributes extends Record<string, any> {
+export interface IntrinsicAttributes extends Record<string, any> {
   key?: Key
   ref?: Ref
   children?: FreNode
 }
 
-export interface FC<P extends Attributes = {}> {
-  (props: P): IFiber | FreText | null | undefined 
+export interface Attributes extends Record<string, any> {
+  key?: Key
+  ref?: Ref
+  children?: IFiber[]
+}
+
+export interface FC<P extends IntrinsicAttributes = IntrinsicAttributes> {
+  (props: P): IFiber | FreText | null | undefined
   fiber?: IFiber
   type?: string
   memo?: boolean
@@ -36,23 +42,59 @@ export type HookEffect = [
 ]
 export type HookReducer<V = any, A = any> = [value: V, dispatch: Dispatch<A>]
 
-export interface IFiber<P extends Attributes = any> {
+export type IFiber = FiberHost | FiberComp | FiberBase
+
+export interface FiberHost extends FiberBase {
+  type?: string
+  props: PropsOf<string>
+  isComp: false
+}
+
+export interface FiberComp extends FiberBase {
+  type: FC
+  props: PropsOf<FC>
+  isComp: true
+}
+
+export type PropsOf<T extends FC | string> = T extends FC<infer P>
+  ? P
+  : T extends string
+  ? Attributes
+  : never
+
+interface FiberBase {
   key?: string
-  type?: string | FC<P>
+  type?: string | FC
+  props?: PropsOf<FC | string>
+  isComp?: boolean
   parentNode?: HTMLElementEx | {}
   node?: HTMLElementEx
   kids?: IFiber[]
   dirty?: boolean
-  parent?: IFiber<P>
-  sibling?: IFiber<P>
-  child?: IFiber<P>
+  parent?: IFiber
+  sibling?: IFiber
+  child?: IFiber
   ref?: Ref<HTMLElement | undefined>
   old?: IFiber
   hooks?: Hooks
-  action: any
-  props: P
-  lane: number
-  isComp: boolean
+  action?: Action | null
+  lane?: number
+}
+
+export interface Action {
+  op: TAG
+  elm?: IFiber
+  before?: IFiber
+}
+
+export const enum TAG {
+  UPDATE = 1 << 1,
+  INSERT = 1 << 2,
+  REMOVE = 1 << 3,
+  SVG = 1 << 4,
+  DIRTY = 1 << 5,
+  MOVE = 1 << 6,
+  REPLACE = 1 << 7,
 }
 
 export type HTMLElementEx = HTMLElement | Text | SVGElement
@@ -66,10 +108,8 @@ export type Reducer<S, A> = (prevState: S, action: A) => S
 export type EffectCallback = () => any | (() => () => any)
 export type DependencyList = ReadonlyArray<unknown>
 
-export type ITaskCallback = (() => ITaskCallback) | null
+export type ITaskCallback = (() => ITaskCallback) | null | undefined
 
 export interface ITask {
   callback?: ITaskCallback
 }
-
-export type DOM = HTMLElement | SVGElement

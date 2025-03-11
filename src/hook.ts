@@ -93,7 +93,7 @@ export const useRef = <T>(current: T): RefObject<T> => {
 }
 
 export const getHook = <T extends HookList = HookList>(cursor: number) => {
-  const current: IFiber<any> = getCurrentFiber()
+  const current: IFiber = getCurrentFiber()
   const hooks =
     current.hooks || (current.hooks = { list: [], effect: [], layout: [] })
   if (cursor >= hooks.list.length) {

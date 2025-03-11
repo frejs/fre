@@ -1,4 +1,4 @@
-import { IFiber, FC, HookEffect, FreNode, Child, FreText } from './type'
+import { IFiber, FC, HookEffect, FreText, TAG, Action, FiberHost } from './type'
 import { createElement } from './dom'
 import { resetCursor } from './hook'
 import { schedule, shouldYield } from './schedule'
@@ -7,16 +7,6 @@ import { commit, removeElement } from './commit'
 
 let currentFiber: IFiber = null
 let rootFiber = null
-
-export const enum TAG {
-  UPDATE = 1 << 1,
-  INSERT = 1 << 2,
-  REMOVE = 1 << 3,
-  SVG = 1 << 4,
-  DIRTY = 1 << 5,
-  MOVE = 1 << 6,
-  REPLACE = 1 << 7,
-}
 
 export const render = (vnode: IFiber, node: Node) => {
   rootFiber = {
@@ -59,7 +49,7 @@ const capture = (fiber: IFiber) => {
     }
     updateHook(fiber)
   } else {
-    updateHost(fiber)
+    updateHost(fiber as FiberHost)
   }
   if (fiber.child) return fiber.child
   const sibling = getSibling(fiber)
@@ -84,7 +74,7 @@ const bubble = (fiber: IFiber) => {
   if (fiber.isComp) {
     if (fiber.hooks) {
       side(fiber.hooks.layout)
-      schedule(() => side(fiber.hooks.effect))
+      schedule(() => side(fiber.hooks.effect) as undefined)
     }
   }
 }
@@ -104,7 +94,7 @@ const updateHook = (fiber: IFiber) => {
   reconcileChidren(fiber, simpleVnode(children))
 }
 
-const updateHost = (fiber: IFiber) => {
+const updateHost = (fiber: FiberHost) => {
   fiber.parentNode = getParentNode(fiber) || {}
   if (!fiber.node) {
     if (fiber.type === 'svg') fiber.lane |= TAG.SVG
@@ -157,19 +147,19 @@ function clone(a: IFiber, b: IFiber) {
 export const arrayfy = <T>(arr: T | T[] | null | undefined) =>
   !arr ? [] : isArr(arr) ? arr : [arr]
 
-const side = (effects: HookEffect[]) => {
+const side = (effects?: HookEffect[]) => {
   effects.forEach((e) => e[2] && e[2]())
   effects.forEach((e) => (e[2] = e[0]()))
   effects.length = 0
 }
 
 const diff = function (a: IFiber[], b: IFiber[]) {
-  var actions = [],
-    aIdx = {},
-    bIdx = {},
-    key = (v) => v.key + v.type,
-    i,
-    j
+  var actions: Action[] = [],
+    aIdx: Record<string, number | undefined> = {},
+    bIdx: Record<string, number | undefined> = {},
+    key = (v: IFiber) => v.key + v.type,
+    i: number,
+    j: number
   for (i = 0; i < a.length; i++) {
     aIdx[key(a[i])] = i
   }
