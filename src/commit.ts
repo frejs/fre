@@ -1,6 +1,6 @@
-import { IFiber, Ref } from './type'
+import { IFiber, Ref, TAG } from './type'
 import { updateElement } from './dom'
-import { isFn, TAG } from './reconcile'
+import { isFn } from './reconcile'
 
 export const commit = (fiber: any) => {
   if (!fiber) {

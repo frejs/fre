@@ -1,21 +1,21 @@
-import { ITask } from './type'
+import { ITask, ITaskCallback } from './type'
 
 const queue: ITask[] = []
 const threshold: number = 5
 const transitions: (() => void)[] = []
 let deadline: number = 0
 
-export const startTransition = cb => {
+export const startTransition = (cb: () => void) => {
   transitions.push(cb) && translate()
 }
 
-export const schedule = (callback: any): void => {
-  queue.push({ callback } as any)
+export const schedule = (callback: ITaskCallback): void => {
+  queue.push({ callback })
   startTransition(flush)
 }
 
 const task = (pending: boolean) => {
-  const cb = () => transitions.splice(0, 1).forEach(c => c())
+  const cb = () => transitions.splice(0, 1).forEach((c) => c())
   if (!pending && typeof queueMicrotask !== 'undefined') {
     return () => queueMicrotask(cb)
   }
@@ -29,7 +29,7 @@ const task = (pending: boolean) => {
 
 let translate = task(false)
 
-const flush = (): void => {
+const flush = () => {
   deadline = getTime() + threshold
   let job = peek(queue)
   while (job && !shouldYield()) {
