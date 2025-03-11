@@ -10,22 +10,16 @@ export type Ref<T = any> = RefCallback<T> | RefObject<T> | null
 
 export interface Attributes extends Record<string, any> {
   key?: Key
-  children?: FreNode
   ref?: Ref
+  children?: FreNode
 }
 
 export interface FC<P extends Attributes = {}> {
-  (props: P): FreElement<P> | null
+  (props: P): IFiber | FreText | null | undefined 
   fiber?: IFiber
   type?: string
   memo?: boolean
   shouldUpdate?: (newProps: P, oldProps: P) => boolean
-}
-
-export interface FreElement<P extends Attributes = any, T = string> {
-  type: T
-  props: P
-  key: string
 }
 
 export interface Hooks {
@@ -44,11 +38,11 @@ export type HookReducer<V = any, A = any> = [value: V, dispatch: Dispatch<A>]
 
 export interface IFiber<P extends Attributes = any> {
   key?: string
-  type: string | FC<P>
-  parentNode: HTMLElementEx | {}
-  node: HTMLElementEx
-  kids?: any
-  dirty: boolean
+  type?: string | FC<P>
+  parentNode?: HTMLElementEx | {}
+  node?: HTMLElementEx
+  kids?: IFiber[]
+  dirty?: boolean
   parent?: IFiber<P>
   sibling?: IFiber<P>
   child?: IFiber<P>
@@ -64,22 +58,13 @@ export interface IFiber<P extends Attributes = any> {
 export type HTMLElementEx = HTMLElement | Text | SVGElement
 
 export type FreText = string | number
-export type FreNode =
-  | FreText
-  | FreElement
-  | FreNode[]
-  | boolean
-  | null
-  | undefined
+export type FreNode = Child[] | Child
+export type Child = IFiber | FreText | null | undefined | boolean
 export type SetStateAction<S> = S | ((prevState: S) => S)
 export type Dispatch<A> = (value: A) => void
 export type Reducer<S, A> = (prevState: S, action: A) => S
 export type EffectCallback = () => any | (() => () => any)
 export type DependencyList = ReadonlyArray<unknown>
-
-export interface PropsWithChildren {
-  children?: FreNode
-}
 
 export type ITaskCallback = (() => ITaskCallback) | null
 

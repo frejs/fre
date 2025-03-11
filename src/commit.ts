@@ -1,7 +1,6 @@
-import { Ref } from './type'
+import { IFiber, Ref } from './type'
 import { updateElement } from './dom'
 import { isFn, TAG } from './reconcile'
-
 
 export const commit = (fiber: any) => {
   if (!fiber) {
@@ -32,22 +31,22 @@ export const commit = (fiber: any) => {
 }
 
 const refer = (ref?: Ref<HTMLElement | undefined>, dom?: HTMLElement) => {
-  if (ref)
-    isFn(ref) ? ref(dom) : ref.current = dom
+  if (ref) isFn(ref) ? ref(dom) : (ref.current = dom)
 }
 
-const kidsRefer = (kids: any) => {
-  kids.forEach(kid => {
+const kidsRefer = (kids: IFiber[]) => {
+  kids.forEach((kid) => {
     kid.kids && kidsRefer(kid.kids)
     refer(kid.ref, null)
   })
 }
 
-export const removeElement = fiber => {
+export const removeElement = (fiber: IFiber) => {
   if (fiber.isComp) {
-    fiber.hooks && fiber.hooks.list.forEach(e => e[2] && e[2]())
+    fiber.hooks && fiber.hooks.list.forEach((e) => e[2] && e[2]())
     fiber.kids.forEach(removeElement)
   } else {
+    // @ts-expect-error
     fiber.parentNode.removeChild(fiber.node)
     kidsRefer(fiber.kids)
     refer(fiber.ref, null)

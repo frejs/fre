@@ -1,11 +1,4 @@
-import {
-  IFiber,
-  FreElement,
-  FC,
-  HTMLElementEx,
-  FreNode,
-  HookEffect,
-} from './type'
+import { IFiber, FC, HookEffect, FreNode, Child, FreText } from './type'
 import { createElement } from './dom'
 import { resetCursor } from './hook'
 import { schedule, shouldYield } from './schedule'
@@ -25,7 +18,7 @@ export const enum TAG {
   REPLACE = 1 << 7,
 }
 
-export const render = (vnode: FreElement, node: Node) => {
+export const render = (vnode: IFiber, node: Node) => {
   rootFiber = {
     node,
     props: { children: vnode },
@@ -120,8 +113,8 @@ const updateHost = (fiber: IFiber) => {
   reconcileChidren(fiber, fiber.props.children)
 }
 
-const simpleVnode = (type: any) =>
-  isStr(type) ? createText(type as string) : type
+const simpleVnode = (type: IFiber | FreText) =>
+  isStr(type) ? createText(type) : type
 
 const getParentNode = (fiber: IFiber) => {
   while ((fiber = fiber.parent)) {
@@ -129,7 +122,10 @@ const getParentNode = (fiber: IFiber) => {
   }
 }
 
-const reconcileChidren = (fiber: IFiber, children: FreNode) => {
+const reconcileChidren = (
+  fiber: IFiber,
+  children: IFiber | IFiber[] | null | undefined
+) => {
   let aCh = fiber.kids || [],
     bCh = (fiber.kids = arrayfy(children))
   const actions = diff(aCh, bCh)
@@ -150,7 +146,7 @@ const reconcileChidren = (fiber: IFiber, children: FreNode) => {
   }
 }
 
-function clone(a, b) {
+function clone(a: IFiber, b: IFiber) {
   b.hooks = a.hooks
   b.ref = a.ref
   b.node = a.node // 临时修复
@@ -158,7 +154,8 @@ function clone(a, b) {
   b.old = a
 }
 
-export const arrayfy = (arr: unknown) => (!arr ? [] : isArr(arr) ? arr : [arr])
+export const arrayfy = <T>(arr: T | T[] | null | undefined) =>
+  !arr ? [] : isArr(arr) ? arr : [arr]
 
 const side = (effects: HookEffect[]) => {
   effects.forEach((e) => e[2] && e[2]())
@@ -166,7 +163,7 @@ const side = (effects: HookEffect[]) => {
   effects.length = 0
 }
 
-const diff = function (a, b) {
+const diff = function (a: IFiber[], b: IFiber[]) {
   var actions = [],
     aIdx = {},
     bIdx = {},
