@@ -1,8 +1,8 @@
 import { isStr, arrayfy } from './reconcile'
-import { FC, FreElement } from './type'
+import { FC, FreNode, FreText, IFiber } from './type'
 
 // for jsx2
-export const h = (type, props: any, ...kids) => {
+export const h = (type: string | FC, props: any, ...kids: FreNode[]) => {
   props = props || {}
   kids = flat(arrayfy(props.children || kids))
 
@@ -17,10 +17,11 @@ export const h = (type, props: any, ...kids) => {
   return createVnode(type, props, key, ref)
 }
 
-const some = (x: unknown) => x != null && x !== true && x !== false
+const some = <T>(x: T | boolean | null | undefined): x is T =>
+  x != null && x !== true && x !== false
 
-const flat = (arr: any[], target = []) => {
-  arr.forEach(v => {
+const flat = (arr: FreNode[], target: IFiber[] = []) => {
+  arr.forEach((v) => {
     isArr(v)
       ? flat(v, target)
       : some(v) && target.push(isStr(v) ? createText(v) : v)
@@ -35,14 +36,17 @@ export const createVnode = (type, props, key, ref) => ({
   ref,
 })
 
-export const createText = (vnode: any) =>
-  ({ type: '#text', props: { nodeValue: vnode + '' } } as FreElement)
+export const createText = (vnode: FreText) =>
+  ({ type: '#text', props: { nodeValue: vnode + '' } } as IFiber)
 
 export function Fragment(props) {
   return props.children
 }
 
-export function memo<T extends object>(fn: FC<T>, compare?: FC<T>['shouldUpdate']) {
+export function memo<T extends object>(
+  fn: FC<T>,
+  compare?: FC<T>['shouldUpdate']
+) {
   fn.memo = true
   fn.shouldUpdate = compare
   return fn
