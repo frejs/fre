@@ -28,8 +28,6 @@ export interface FreElement<P extends Attributes = any, T = string> {
   key: string
 }
 
-export type HookTypes = 'list' | 'effect' | 'layout'
-
 export interface Hooks {
   list: HookList[]
   layout: HookEffect[]
@@ -47,7 +45,7 @@ export type HookReducer<V = any, A = any> = [value: V, dispatch: Dispatch<A>]
 export interface IFiber<P extends Attributes = any> {
   key?: string
   type: string | FC<P>
-  parentNode: HTMLElementEx
+  parentNode: HTMLElementEx | {}
   node: HTMLElementEx
   kids?: any
   dirty: boolean
@@ -55,6 +53,7 @@ export interface IFiber<P extends Attributes = any> {
   sibling?: IFiber<P>
   child?: IFiber<P>
   ref?: Ref<HTMLElement | undefined>
+  old?: IFiber
   hooks?: Hooks
   action: any
   props: P
@@ -62,7 +61,7 @@ export interface IFiber<P extends Attributes = any> {
   isComp: boolean
 }
 
-export type HTMLElementEx = HTMLElement & { last: IFiber | null }
+export type HTMLElementEx = HTMLElement | Text | SVGElement
 
 export type FreText = string | number
 export type FreNode =
