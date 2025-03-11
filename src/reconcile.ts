@@ -1,4 +1,4 @@
-import { IFiber, FC, HookEffect, FreText, TAG, Action, FiberHost } from './type'
+import { IFiber, FC, HookEffect, FreText, TAG, Action, FiberHost, FiberFinish } from './type'
 import { createElement } from './dom'
 import { resetCursor } from './hook'
 import { schedule, shouldYield } from './schedule'
@@ -61,7 +61,7 @@ const getSibling = (fiber?: IFiber) => {
     bubble(fiber)
     if (fiber.dirty) {
       fiber.dirty = false
-      commit(fiber)
+      commit(fiber as FiberFinish)
       return null
     }
     if (fiber.sibling) return fiber.sibling

@@ -41,6 +41,26 @@ export type HookEffect = [
 ]
 export type HookReducer<V = any, A = any> = [value: V, dispatch: Dispatch<A>]
 
+export type FiberFinish = FiberHostFinish | FiberCompFinish
+type FiberHostFinish = FiberBaseFinish &
+  FiberHost & {
+    node: HTMLElementEx
+    parentNode: HTMLElementEx
+  }
+type FiberCompFinish = FiberBaseFinish &
+  FiberComp & {
+    node: undefined
+    parentNode: undefined
+  }
+
+interface FiberBaseFinish extends FiberBase {
+  kids?: FiberFinish[]
+  parent?: FiberFinish
+  sibling?: FiberFinish
+  child?: FiberFinish
+  old?: FiberFinish
+}
+
 export type IFiber = FiberHost | FiberComp | FiberBase
 
 export interface FiberHost extends FiberBase {
