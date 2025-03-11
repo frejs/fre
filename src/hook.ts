@@ -2,7 +2,7 @@ import { update, isFn, getCurrentFiber } from './reconcile'
 import {
   DependencyList,
   Reducer,
-  IFiber,
+  Fiber,
   Dispatch,
   SetStateAction,
   EffectCallback,
@@ -93,13 +93,13 @@ export const useRef = <T>(current: T): RefObject<T> => {
 }
 
 export const getHook = <T extends HookList = HookList>(cursor: number) => {
-  const current: IFiber = getCurrentFiber()
+  const current: Fiber = getCurrentFiber()
   const hooks =
     current.hooks || (current.hooks = { list: [], effect: [], layout: [] })
   if (cursor >= hooks.list.length) {
     hooks.list.push([] as any)
   }
-  return [hooks.list[cursor], current] as unknown as [Partial<T>, IFiber]
+  return [hooks.list[cursor], current] as unknown as [Partial<T>, Fiber]
 }
 
 export type ContextType<T> = {

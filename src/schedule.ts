@@ -1,6 +1,6 @@
-import { ITask, ITaskCallback } from './type'
+import { Task, TaskCallback } from './type'
 
-const queue: ITask[] = []
+const queue: Task[] = []
 const threshold: number = 5
 const transitions: (() => void)[] = []
 let deadline: number = 0
@@ -9,7 +9,7 @@ export const startTransition = (cb: () => void) => {
   transitions.push(cb) && translate()
 }
 
-export const schedule = (callback: ITaskCallback) => {
+export const schedule = (callback: TaskCallback) => {
   queue.push({ callback })
   startTransition(flush)
 }
@@ -52,4 +52,4 @@ export const shouldYield = () => {
 
 export const getTime = () => performance.now()
 
-const peek = (queue: ITask[]) => queue[0]
+const peek = (queue: Task[]) => queue[0]

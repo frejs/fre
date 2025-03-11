@@ -1,4 +1,4 @@
-import { FiberFinish, FiberHost, HTMLElementEx, IFiber, Ref, TAG } from './type'
+import { FiberFinish, FiberHost, HTMLElementEx, Fiber, Ref, TAG } from './type'
 import { updateElement } from './dom'
 import { isFn } from './reconcile'
 
@@ -38,14 +38,14 @@ const refer = (ref?: Ref<HTMLElementEx>, dom?: HTMLElementEx) => {
   if (ref) isFn(ref) ? ref(dom) : (ref.current = dom)
 }
 
-const kidsRefer = (kids: IFiber[]) => {
+const kidsRefer = (kids: Fiber[]) => {
   kids.forEach((kid) => {
     kid.kids && kidsRefer(kid.kids)
     refer(kid.ref, null)
   })
 }
 
-export const removeElement = (fiber: IFiber) => {
+export const removeElement = (fiber: Fiber) => {
   if (fiber.isComp) {
     fiber.hooks && fiber.hooks.list.forEach((e) => e[2] && e[2]())
     fiber.kids.forEach(removeElement)
