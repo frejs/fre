@@ -33,16 +33,16 @@ export const useReducer = <S, A>(
   const [hook, current] = getHook<HookReducer>(cursor++)
   if (hook.length === 0) {
     hook[0] = initState
-    hook[1] = (value: A | Dispatch<A>) => {
-      let v = reducer
-        ? reducer(hook[0], value as any)
-        : isFn(value)
-        ? value(hook[0])
-        : value
-      if (hook[0] !== v) {
-        hook[0] = v
-        update(current)
-      }
+  }
+  hook[1] = (value: A | Dispatch<A>) => {
+    let v = reducer
+      ? reducer(hook[0], value as any)
+      : isFn(value)
+      ? value(hook[0])
+      : value
+    if (hook[0] !== v) {
+      hook[0] = v
+      update(current)
     }
   }
   return hook as Required<HookReducer>
