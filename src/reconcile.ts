@@ -1,4 +1,13 @@
-import { Fiber, FC, HookEffect, FreText, TAG, Action, FiberHost, FiberFinish } from './type'
+import {
+  Fiber,
+  FC,
+  HookEffect,
+  FreText,
+  TAG,
+  Action,
+  FiberHost,
+  FiberFinish,
+} from './type'
 import { createElement } from './dom'
 import { resetCursor } from './hook'
 import { schedule, shouldYield } from './schedule'
@@ -30,7 +39,11 @@ const reconcile = (fiber?: Fiber) => {
 }
 
 const memo = (fiber: Fiber) => {
-  if ((fiber.type as FC).memo && fiber.old?.props) {
+  if (
+    (fiber.type as FC).memo &&
+    fiber.type === fiber.old?.type &&
+    fiber.old?.props
+  ) {
     let scu = (fiber.type as FC).shouldUpdate || shouldUpdate
     if (!scu(fiber.props, fiber.old.props)) {
       // fast-fix
