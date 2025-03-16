@@ -1,6 +1,6 @@
 import { FiberFinish, FiberHost, HTMLElementEx, Fiber, Ref, TAG } from './type'
 import { updateElement } from './dom'
-import { isFn, isMemo } from './reconcile'
+import { isFn } from './reconcile'
 
 export const commit = (fiber?: FiberFinish) => {
   if (!fiber) {
@@ -35,7 +35,7 @@ export const commit = (fiber?: FiberFinish) => {
 }
 
 function commitSibling(fiber?: FiberFinish) {
-  if (fiber && isMemo(fiber)) {
+  if (fiber?.memo) {
     commitSibling(fiber.sibling)
   } else {
     commit(fiber)

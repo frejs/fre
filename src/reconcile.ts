@@ -42,8 +42,11 @@ const capture = (fiber: Fiber) => {
   fiber.isComp = isFn(fiber.type)
   if (fiber.isComp) {
     if (isMemo(fiber)) {
+      fiber.memo = true
       // fast-fix
       return getSibling(fiber)
+    } else if (fiber.memo) {
+      fiber.memo = false
     }
 
     updateHook(fiber)
