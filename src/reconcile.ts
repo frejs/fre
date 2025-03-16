@@ -38,28 +38,17 @@ const reconcile = (fiber?: Fiber) => {
   return null
 }
 
-const memo = (fiber: Fiber) => {
-  if (
-    (fiber.type as FC).memo &&
-    fiber.type === fiber.old?.type &&
-    fiber.old?.props
-  ) {
-    let scu = (fiber.type as FC).shouldUpdate || shouldUpdate
-    if (!scu(fiber.props, fiber.old.props)) {
-      // fast-fix
-      return getSibling(fiber)
-    }
-  }
-  return null
-}
-
 const capture = (fiber: Fiber) => {
   fiber.isComp = isFn(fiber.type)
   if (fiber.isComp) {
-    const memoFiber = memo(fiber)
-    if (memoFiber) {
-      return memoFiber
+    if (isMemo(fiber)) {
+      fiber.memo = true
+      // fast-fix
+      return getSibling(fiber)
+    } else if (fiber.memo) {
+      fiber.memo = false
     }
+
     updateHook(fiber)
   } else {
     updateHost(fiber as FiberHost)
@@ -67,6 +56,20 @@ const capture = (fiber: Fiber) => {
   if (fiber.child) return fiber.child
   const sibling = getSibling(fiber)
   return sibling
+}
+
+export const isMemo = (fiber: Fiber) => {
+  if (
+    (fiber.type as FC).memo &&
+    fiber.type === fiber.old?.type &&
+    fiber.old?.props
+  ) {
+    let scu = (fiber.type as FC).shouldUpdate || shouldUpdate
+    if (!scu(fiber.props, fiber.old.props)) {
+      return true
+    }
+  }
+  return false
 }
 
 const getSibling = (fiber?: Fiber) => {
