@@ -1,6 +1,6 @@
 import { FiberFinish, FiberHost, HTMLElementEx, Fiber, Ref, TAG } from './type'
 import { updateElement } from './dom'
-import { isFn } from './reconcile'
+import { getParentNode, isFn } from './reconcile'
 
 export const commit = (fiber?: FiberFinish) => {
   if (!fiber) {
@@ -8,23 +8,18 @@ export const commit = (fiber?: FiberFinish) => {
   }
   const { op, ref, elm } = fiber.action || {}
   if (op & TAG.INSERT || op & TAG.MOVE) {
-    if (fiber.isComp && fiber.child) {
-      fiber.child.action.op |= fiber.action.op
-    } else {
-      console.log(fiber,elm.node,ref?.node)
-      fiber.parentNode.insertBefore(elm.node, ref?.node)
-    }
+    const parent = fiber.parentNode as HTMLElementEx
+    const node = getChildNode(elm)
+    const refnode = getChildNode(ref)
+    parent.insertBefore(node, refnode)
   }
   if (op & TAG.UPDATE) {
-    if (fiber.isComp && fiber.child) {
-      fiber.child.action.op |= fiber.action.op
-    } else {
-      updateElement(
-        fiber.node,
-        (fiber.old as FiberHost).props || {},
-        (fiber as FiberHost).props
-      )
-    }
+    const node = getChildNode(fiber)
+    updateElement(
+      node,
+      (fiber.old as FiberHost).props || {},
+      (fiber as FiberHost).props
+    )
   }
 
   refer(fiber.ref, fiber.node)
@@ -43,6 +38,13 @@ function commitSibling(fiber?: FiberFinish) {
   }
 }
 
+const getChildNode = (fiber: Fiber): HTMLElementEx => {
+  if (fiber == null) return null
+  if (fiber.node) return fiber.node
+  while ((fiber = fiber.child)) {
+    if (!fiber.isComp) return fiber.node
+  }
+}
 const refer = (ref?: Ref<HTMLElementEx>, dom?: HTMLElementEx) => {
   if (ref) isFn(ref) ? ref(dom) : (ref.current = dom)
 }

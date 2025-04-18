@@ -24,9 +24,9 @@ import { h, render, useState, Fragment } from "../../src/index"
 //     {state ? <h1>0</h1> : <a>none</a>}
 //   </>
 // }
-function A(props){
-  return <li>1</li>
-}
+// function A(props){
+//   return <li>1</li>
+// }
 // function App() {
 //   const [key, setKey] = useState([1,2,3])
 //   const [count, setCount] = useState(0)
@@ -43,17 +43,16 @@ function A(props){
 //   ]
 // }
 
-// function App() {
-//   const [key, setKey] = useState([1,2,6, 3])
-//   return [
-//     <button onClick={() => setKey([1,3,5,2,4])}>x</button>,
-//     <ul>
-//       {key.map((i) => (
-//         <li key={i}>{i}</li>
-//       ))}
-//     </ul>,
-//   ]
-// }
+function App() {
+  const [key, setKey] = useState([1,2,6,3])
+  return [
+    <button onClick={() => setKey([1,3,5,2,4])}>x</button>,
+    <ul>
+      {key.map((i) => <Li key={i} i={i}/>
+      )}
+    </ul>
+  ]
+}
 
 // function App() {
 //   const [key, setKey] = useState(['a', 'b', 'c'])
@@ -126,9 +125,9 @@ function A(props){
 //   </div>
 // }
 
-// function Li(props) {
-//   return <li>{props.i}</li>
-// }
+function Li(props) {
+  return <li>{props.i}</li>
+}
 
 // const parentNode = document.getElementById("app");
 
@@ -136,4 +135,4 @@ function A(props){
 
 // render(<div><li key={3}>3</li><li key={2}>2</li><li key={1}>1</li></div>, parentNode);
 
-render(<A />, document.getElementById("app"))
+render(<App />, document.getElementById("app"))

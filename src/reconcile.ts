@@ -43,6 +43,7 @@ const capture = (fiber: Fiber) => {
   if (fiber.isComp) {
     if (isMemo(fiber)) {
       fiber.memo = true
+      // fast-fix
       return getSibling(fiber)
     } else if (fiber.memo) {
       fiber.memo = false
@@ -105,8 +106,9 @@ const shouldUpdate = (
 const updateHook = (fiber: Fiber) => {
   resetCursor()
   currentFiber = fiber
+  fiber.parentNode = getParentNode(fiber) || {}
   let children = (fiber.type as FC)(fiber.props)
-  isArr(children) ? reconcileChidren(fiber, children) : reconcileChild(fiber, simpleVnode(children))
+  reconcileChidren(fiber, simpleVnode(children))
 }
 
 const updateHost = (fiber: FiberHost) => {
@@ -115,40 +117,13 @@ const updateHost = (fiber: FiberHost) => {
     if (fiber.type === 'svg') fiber.lane |= TAG.SVG
     fiber.node = createElement(fiber)
   }
-
-  const children = fiber.props.children
-
-  isArr(children) ? reconcileChidren(fiber, children) : reconcileChild(fiber, children)
-}
-
-const reconcileChild = (fiber, child) => {
-
-
-  let oldType = fiber.oldType
-  let type = (fiber.oldType = fiber.type)
-
-  if (oldType == null && type == null) {
-  } else if (oldType == null) {
-    fiber.action = { op: TAG.INSERT, elm: fiber }
-  } else if (oldType === type) {
-    fiber.action = { op: TAG.UPDATE, elm: fiber }
-  } else {
-    fiber.action = { op: TAG.REPLACE, elm: fiber }
-  }
-
-  if (child) {
-    if (fiber.lane & TAG.SVG) {
-      child.lane |= TAG.SVG
-    }
-    child.parent = fiber
-    fiber.child = child
-  }
+  reconcileChidren(fiber, fiber.props.children)
 }
 
 const simpleVnode = (type: Fiber | FreText) =>
   isStr(type) ? createText(type) : type
 
-const getParentNode = (fiber: Fiber) => {
+export const getParentNode = (fiber: Fiber) => {
   while ((fiber = fiber.parent)) {
     if (!fiber.isComp) return fiber.node
   }
@@ -159,7 +134,7 @@ const reconcileChidren = (
   children: Fiber | Fiber[] | null | undefined
 ) => {
   let aCh = fiber.kids || [],
-    bCh = (fiber.kids = children as Fiber[])
+    bCh = (fiber.kids = arrayfy(children))
   const actions = diff(aCh, bCh)
 
   for (let i = 0, prev = null, len = bCh.length; i < len; i++) {
@@ -187,6 +162,9 @@ function clone(a: Fiber, b: Fiber) {
   b.old = a
 }
 
+export const arrayfy = <T>(arr: T | T[] | null | undefined) =>
+  !arr ? [] : isArr(arr) ? arr : [arr]
+
 const side = (effects?: HookEffect[]) => {
   effects.forEach((e) => e[2] && e[2]())
   effects.forEach((e) => (e[2] = e[0]()))
@@ -197,7 +175,7 @@ const diff = function (a: Fiber[], b: Fiber[]) {
   var actions: Action[] = [],
     aMap: Record<string, number | undefined> = {},
     bMap: Record<string, number | undefined> = {},
-    key = (v: Fiber) => v.key + v.type,
+    key = (v: Fiber) => v.key,
     i: number,
     j: number
   for (i = 0; i < a.length; i++) {
@@ -212,14 +190,21 @@ const diff = function (a: Fiber[], b: Fiber[]) {
     if (aElm === null) {
       i++
     } else if (b.length <= j) {
-      removeElement(a[i])
+      removeElement(aElm)
       i++
     } else if (a.length <= i) {
       actions.push({ op: TAG.INSERT, elm: bElm, ref: aElm })
       j++
     } else if (key(aElm) === key(bElm)) {
-      clone(aElm, bElm)
-      actions.push({ op: TAG.UPDATE })
+
+      if (aElm.type === bElm.type) {
+        clone(aElm, bElm)
+        actions.push({ op: TAG.UPDATE })
+      } else { // replace
+        removeElement(aElm)
+        actions.push({ op: TAG.INSERT, elm: bElm, ref: aElm })
+      }
+
       i++
       j++
     } else {
