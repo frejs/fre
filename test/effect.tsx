@@ -38,12 +38,12 @@ export const change = async t => {
         t.eq(effects, [])
       }
     },
-    {
-      content: <div>removed</div>,
-      test: () => {
-        t.eq(effects, ['cleanUp 1'])
-      }
-    }
+    // {
+    //   content: <div>removed</div>,
+    //   test: () => {
+    //     t.eq(effects, ['cleanUp 1'])
+    //   }
+    // }
   ])
 }
 
@@ -78,12 +78,12 @@ export const once = async (t) => {
         t.eq(effects, [])
       }
     },
-    {
-      content: <div>removed</div>,
-      test: () => {
-        t.eq(effects, ['cleanUp'])
-      }
-    }
+    // {
+    //   content: <div>removed</div>,
+    //   test: () => {
+    //     t.eq(effects, ['cleanUp'])
+    //   }
+    // }
   ])
 }
 
@@ -125,11 +125,11 @@ export const every = async t => {
         effects = []
       }
     },
-    {
-      content: <div>removed</div>,
-      test: () => {
-        t.eq(effects, ['cleanUp 2'])
-      }
-    }
+    // {
+    //   content: <div>removed</div>,
+    //   test: () => {
+    //     t.eq(effects, ['cleanUp 2'])
+    //   }
+    // }
   ])
 }

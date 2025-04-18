@@ -13,6 +13,13 @@ export const commit = (fiber?: FiberFinish) => {
     const refnode = getChildNode(ref)
     parent.insertBefore(node, refnode)
   }
+  if (op & TAG.REPLACE) {
+    const parent = fiber.parentNode as HTMLElementEx
+    const node = getChildNode(elm)
+    const refnode = getChildNode(ref)
+    parent.replaceChild(node, refnode)
+    // removeElement(fiber.alternate)
+  }
   if (op & TAG.UPDATE) {
     const node = getChildNode(fiber)
     updateElement(
@@ -40,10 +47,15 @@ function commitSibling(fiber?: FiberFinish) {
 
 const getChildNode = (fiber: Fiber): HTMLElementEx => {
   if (fiber == null) return null
-  if (fiber.node) return fiber.node
-  while ((fiber = fiber.child)) {
-    if (!fiber.isComp) return fiber.node
+  if (fiber.isComp) {
+    while ((fiber = fiber.child)) {
+      if (!fiber.isComp) return fiber.node
+    }
+  } else {
+    return fiber.node
   }
+
+
 }
 const refer = (ref?: Ref<HTMLElementEx>, dom?: HTMLElementEx) => {
   if (ref) isFn(ref) ? ref(dom) : (ref.current = dom)
@@ -59,7 +71,7 @@ const kidsRefer = (kids: Fiber[]) => {
 export const removeElement = (fiber: Fiber) => {
   if (fiber.isComp) {
     fiber.hooks && fiber.hooks.list.forEach((e) => e[2] && e[2]())
-    fiber.kids.forEach(removeElement)
+    fiber.kids.forEach(removeElement as any)
   } else {
     // @ts-expect-error
     fiber.parentNode.removeChild(fiber.node)

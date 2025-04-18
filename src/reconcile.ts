@@ -135,6 +135,7 @@ const reconcileChidren = (
 ) => {
   let aCh = fiber.kids || [],
     bCh = (fiber.kids = arrayfy(children))
+
   const actions = diff(aCh, bCh)
 
   for (let i = 0, prev = null, len = bCh.length; i < len; i++) {
@@ -201,8 +202,7 @@ const diff = function (a: Fiber[], b: Fiber[]) {
         clone(aElm, bElm)
         actions.push({ op: TAG.UPDATE })
       } else { // replace
-        removeElement(aElm)
-        actions.push({ op: TAG.INSERT, elm: bElm, ref: aElm })
+        actions.push({ op: TAG.REPLACE, elm: bElm, ref: aElm })
       }
 
       i++
