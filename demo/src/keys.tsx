@@ -1,19 +1,21 @@
-import { h, render, useState, Fragment } from "../../src/index"
+// import { h, render, useState, Fragment } from "../../src/index"
+import {createElement as h,useState,Fragment} from '../react/react'
+import {render} from '../react/react-dom'
 // import {h, render} from '../../.ignore/eee'
 
-const states = [
-  [3, 1, 2], // shift right
-  [1, 2, 3],
-  [2, 3, 1], // shift left
-  [1, 2, 3],
-  [1, 3], // remove from middle
-  [1, 2, 3],
-  [2, 3], // remove first
-  [1, 2, 3],
-  [1, 2], // remove last
-  [1, 2, 3],
-  [3, 2, 1], // reverse order
-]
+// const states = [
+//   [3, 1, 2], // shift right
+//   [1, 2, 3],
+//   [2, 3, 1], // shift left
+//   [1, 2, 3],
+//   [1, 3], // remove from middle
+//   [1, 2, 3],
+//   [2, 3], // remove first
+//   [1, 2, 3],
+//   [1, 2], // remove last
+//   [1, 2, 3],
+//   [3, 2, 1], // reverse order
+// ]
 
 function App() {
   const [state, setState] = useState(true)
