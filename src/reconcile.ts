@@ -43,7 +43,6 @@ const capture = (fiber: Fiber) => {
   if (fiber.isComp) {
     if (isMemo(fiber)) {
       fiber.memo = true
-      // fast-fix
       return getSibling(fiber)
     } else if (fiber.memo) {
       fiber.memo = false
@@ -107,7 +106,7 @@ const updateHook = (fiber: Fiber) => {
   resetCursor()
   currentFiber = fiber
   let children = (fiber.type as FC)(fiber.props)
-  reconcileChidren(fiber, simpleVnode(children))
+  Array.isArray(children) ? reconcileChidren(fiber, children) : reconcileChild(fiber, simpleVnode(children))
 }
 
 const updateHost = (fiber: FiberHost) => {
@@ -116,7 +115,31 @@ const updateHost = (fiber: FiberHost) => {
     if (fiber.type === 'svg') fiber.lane |= TAG.SVG
     fiber.node = createElement(fiber)
   }
-  reconcileChidren(fiber, fiber.props.children)
+
+  const children = fiber.props.children
+
+  Array.isArray(children) ? reconcileChidren(fiber, children) : reconcileChild(fiber, children)
+}
+
+const reconcileChild = (fiber, child) => {
+  if (child == null) {
+    return //text
+  }
+
+  let oldType = fiber.oldType
+  let type = (fiber.oldType = fiber.type)
+
+  if (oldType == null) {
+    fiber.action = { op: TAG.INSERT, elm: fiber.node }
+    console.log(fiber)
+  } else if (oldType === type) {
+
+    fiber.action = { op: TAG.UPDATE, elm: fiber.node }
+  } else {
+    fiber.action = { op: TAG.REPLACE, elm: fiber.node }
+  }
+  fiber.child = child
+
 }
 
 const simpleVnode = (type: Fiber | FreText) =>
@@ -133,7 +156,7 @@ const reconcileChidren = (
   children: Fiber | Fiber[] | null | undefined
 ) => {
   let aCh = fiber.kids || [],
-    bCh = (fiber.kids = arrayfy(children))
+    bCh = (fiber.kids = children as Fiber[])
   const actions = diff(aCh, bCh)
 
   for (let i = 0, prev = null, len = bCh.length; i < len; i++) {
@@ -183,7 +206,7 @@ const diff = function (a: Fiber[], b: Fiber[]) {
   for (i = 0; i < b.length; i++) {
     bMap[key(b[i])] = i
   }
-  for (i = j = 0; i !== a.length || j !== b.length; ) {
+  for (i = j = 0; i !== a.length || j !== b.length;) {
     var aElm = a[i],
       bElm = b[j]
     if (aElm === null) {

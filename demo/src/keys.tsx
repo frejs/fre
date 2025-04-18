@@ -1,6 +1,6 @@
-// import { h, render, useState, Fragment } from "../../src/index"
-import {createElement as h,useState,Fragment} from '../react/react'
-import {render} from '../react/react-dom'
+import { h, render, useState, Fragment } from "../../src/index"
+// import {createElement as h,useState,Fragment} from '../react/react'
+// import {render} from '../react/react-dom'
 // import {h, render} from '../../.ignore/eee'
 
 // const states = [
@@ -25,7 +25,7 @@ import {render} from '../react/react-dom'
 //   </>
 // }
 function A(props){
-  return <li>{props.id}</li>
+  return <li>1</li>
 }
 // function App() {
 //   const [key, setKey] = useState([1,2,3])
@@ -60,18 +60,17 @@ function A(props){
 //   return h(A, null, 222, " items left")
 // }
 
-function App() {
-  const [key, setKey] = useState([1,2,3])
-  return <div>
-    <button onClick={() => setKey([3,1,2])}>x</button>
-    <ul>
-      {key.map((i) => (
-        <A id={i} key={i} />
-        // <li key={'#'+i}>{i}</li>
-      ))}
-    </ul>
-  </div>
-}
+// function App() {
+//   const [key, setKey] = useState([1,2,3])
+//   return <div>
+//     <button onClick={() => setKey([3,1,2])}>x</button>
+//     <ul>
+//       {key.map((i) => {
+//         return i == 1?<A id={i} key={i} />:<div key={i}>{i}</div>
+//       })}
+//     </ul>
+//   </div>
+// }
 
 // function App() {
 //   const [list, setList] = useState([1, 2, 3])
@@ -81,7 +80,7 @@ function App() {
 // const App = () => {
 //   let [bool, setbool] = useState(true)
 //   return <div>
-//       {bool ? <Header /> : null}
+//       <div>{bool ? <A id={0}/> : null}</div>
 //       <button onClick={()=>setbool(!bool)}>x</button>
 //   </div>
 // }
@@ -137,4 +136,4 @@ function App() {
 
 // render(<div><li key={3}>3</li><li key={2}>2</li><li key={1}>1</li></div>, parentNode);
 
-render(<App />, document.getElementById("app"))
+render(<A />, document.getElementById("app"))
