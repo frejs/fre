@@ -11,6 +11,7 @@ export const commit = (fiber?: FiberFinish) => {
     if (fiber.isComp && fiber.child) {
       fiber.child.action.op |= fiber.action.op
     } else {
+      console.log(fiber,elm.node,ref?.node)
       fiber.parentNode.insertBefore(elm.node, ref?.node)
     }
   }

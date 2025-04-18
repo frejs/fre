@@ -106,7 +106,7 @@ const updateHook = (fiber: Fiber) => {
   resetCursor()
   currentFiber = fiber
   let children = (fiber.type as FC)(fiber.props)
-  Array.isArray(children) ? reconcileChidren(fiber, children) : reconcileChild(fiber, simpleVnode(children))
+  isArr(children) ? reconcileChidren(fiber, children) : reconcileChild(fiber, simpleVnode(children))
 }
 
 const updateHost = (fiber: FiberHost) => {
@@ -118,30 +118,32 @@ const updateHost = (fiber: FiberHost) => {
 
   const children = fiber.props.children
 
-  Array.isArray(children) ? reconcileChidren(fiber, children) : reconcileChild(fiber, children)
+  isArr(children) ? reconcileChidren(fiber, children) : reconcileChild(fiber, children)
 }
 
 const reconcileChild = (fiber, child) => {
-  if (child == null) {
-    return //text
-  }
+
 
   let oldType = fiber.oldType
   let type = (fiber.oldType = fiber.type)
 
-  if (oldType == null) {
-    fiber.action = { op: TAG.INSERT, elm: fiber.node }
+  if (oldType == null && type == null) {
+  } else if (oldType == null) {
+    fiber.action = { op: TAG.INSERT, elm: fiber }
   } else if (oldType === type) {
-
-    fiber.action = { op: TAG.UPDATE, elm: fiber.node }
+    fiber.action = { op: TAG.UPDATE, elm: fiber }
   } else {
-    fiber.action = { op: TAG.REPLACE, elm: fiber.node }
+    fiber.action = { op: TAG.REPLACE, elm: fiber }
   }
-  if (fiber.lane & TAG.SVG) {
-    child.lane |= TAG.SVG
+
+  if (child) {
+    if (fiber.lane & TAG.SVG) {
+      child.lane |= TAG.SVG
+    }
+    child.parent = fiber
+    fiber.child = child
   }
-  child.parent = fiber
-  fiber.child = child
+
 
 }
 
