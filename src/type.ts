@@ -90,6 +90,8 @@ interface FiberBase {
   parentNode?: HTMLElementEx | {}
   node?: HTMLElementEx
   kids?: Fiber[]
+  before?: Fiber,
+  alternate?: Fiber
   dirty?: boolean
   parent?: Fiber
   sibling?: Fiber
@@ -104,7 +106,7 @@ interface FiberBase {
 export interface Action {
   op: TAG
   elm?: Fiber
-  before?: Fiber
+  ref?: Fiber
 }
 
 export const enum TAG {

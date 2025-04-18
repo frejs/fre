@@ -139,6 +139,7 @@ const reconcileChidren = (
   for (let i = 0, prev = null, len = bCh.length; i < len; i++) {
     const child = bCh[i]
     child.action = actions[i]
+
     if (fiber.lane & TAG.SVG) {
       child.lane |= TAG.SVG
     }
@@ -171,16 +172,16 @@ const side = (effects?: HookEffect[]) => {
 
 const diff = function (a: Fiber[], b: Fiber[]) {
   var actions: Action[] = [],
-    aIdx: Record<string, number | undefined> = {},
-    bIdx: Record<string, number | undefined> = {},
+    aMap: Record<string, number | undefined> = {},
+    bMap: Record<string, number | undefined> = {},
     key = (v: Fiber) => v.key + v.type,
     i: number,
     j: number
   for (i = 0; i < a.length; i++) {
-    aIdx[key(a[i])] = i
+    aMap[key(a[i])] = i
   }
   for (i = 0; i < b.length; i++) {
-    bIdx[key(b[i])] = i
+    bMap[key(b[i])] = i
   }
   for (i = j = 0; i !== a.length || j !== b.length; ) {
     var aElm = a[i],
@@ -191,7 +192,7 @@ const diff = function (a: Fiber[], b: Fiber[]) {
       removeElement(a[i])
       i++
     } else if (a.length <= i) {
-      actions.push({ op: TAG.INSERT, elm: bElm, before: a[i] })
+      actions.push({ op: TAG.INSERT, elm: bElm, ref: aElm })
       j++
     } else if (key(aElm) === key(bElm)) {
       clone(aElm, bElm)
@@ -199,18 +200,18 @@ const diff = function (a: Fiber[], b: Fiber[]) {
       i++
       j++
     } else {
-      var curElmInNew = bIdx[key(aElm)]
-      var wantedElmInOld = aIdx[key(bElm)]
-      if (curElmInNew === undefined) {
+      var foundB = bMap[key(aElm)]
+      var foundA = aMap[key(bElm)]
+      if (foundB === undefined) {
         removeElement(a[i])
         i++
-      } else if (wantedElmInOld === undefined) {
-        actions.push({ op: TAG.INSERT, elm: bElm, before: a[i] })
+      } else if (foundA === undefined) {
+        actions.push({ op: TAG.INSERT, elm: bElm, ref: aElm })
         j++
       } else {
-        clone(a[wantedElmInOld], bElm)
-        actions.push({ op: TAG.MOVE, elm: a[wantedElmInOld], before: a[i] })
-        a[wantedElmInOld] = null
+        clone(a[foundA], bElm)
+        actions.push({ op: TAG.MOVE, elm: a[foundA], ref: aElm })
+        a[foundA] = null
         j++
       }
     }

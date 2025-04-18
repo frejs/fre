@@ -30,7 +30,7 @@ export const useReducer = <S, A>(
   reducer?: Reducer<S, A>,
   initState?: S
 ): [S, Dispatch<A>] => {
-  const [hook, current] = getHook<HookReducer>(cursor++)
+  const [hook, current] = getSlot<HookReducer>(cursor++)
   if (hook.length === 0) {
     hook[0] = initState
   }
@@ -61,7 +61,7 @@ const effectImpl = (
   deps: DependencyList,
   key: 'effect' | 'layout'
 ) => {
-  const [hook, current] = getHook<HookEffect>(cursor++)
+  const [hook, current] = getSlot<HookEffect>(cursor++)
   if (isChanged(hook[1], deps)) {
     hook[0] = cb
     hook[1] = deps
@@ -73,7 +73,7 @@ export const useMemo = <S = Function>(
   cb: () => S,
   deps?: DependencyList
 ): S => {
-  const hook = getHook<HookMemo>(cursor++)[0]
+  const hook = getSlot<HookMemo>(cursor++)[0]
   if (isChanged(hook[1], deps!)) {
     hook[1] = deps
     return (hook[0] = cb())
@@ -92,7 +92,7 @@ export const useRef = <T>(current: T): RefObject<T> => {
   return useMemo(() => ({ current }), [])
 }
 
-export const getHook = <T extends HookList = HookList>(cursor: number) => {
+export const getSlot = <T extends HookList = HookList>(cursor: number) => {
   const current: Fiber = getCurrentFiber()
   const hooks =
     current.hooks || (current.hooks = { list: [], effect: [], layout: [] })

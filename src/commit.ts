@@ -6,12 +6,12 @@ export const commit = (fiber?: FiberFinish) => {
   if (!fiber) {
     return
   }
-  const { op, before, elm } = fiber.action || {}
+  const { op, ref, elm } = fiber.action || {}
   if (op & TAG.INSERT || op & TAG.MOVE) {
     if (fiber.isComp && fiber.child) {
       fiber.child.action.op |= fiber.action.op
     } else {
-      fiber.parentNode.insertBefore(elm.node, before?.node)
+      fiber.parentNode.insertBefore(elm.node, ref?.node)
     }
   }
   if (op & TAG.UPDATE) {
