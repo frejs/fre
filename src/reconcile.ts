@@ -131,13 +131,16 @@ const reconcileChild = (fiber, child) => {
 
   if (oldType == null) {
     fiber.action = { op: TAG.INSERT, elm: fiber.node }
-    console.log(fiber)
   } else if (oldType === type) {
 
     fiber.action = { op: TAG.UPDATE, elm: fiber.node }
   } else {
     fiber.action = { op: TAG.REPLACE, elm: fiber.node }
   }
+  if (fiber.lane & TAG.SVG) {
+    child.lane |= TAG.SVG
+  }
+  child.parent = fiber
   fiber.child = child
 
 }
