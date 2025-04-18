@@ -143,8 +143,6 @@ const reconcileChild = (fiber, child) => {
     child.parent = fiber
     fiber.child = child
   }
-
-
 }
 
 const simpleVnode = (type: Fiber | FreText) =>
@@ -188,9 +186,6 @@ function clone(a: Fiber, b: Fiber) {
   b.kids = a.kids
   b.old = a
 }
-
-export const arrayfy = <T>(arr: T | T[] | null | undefined) =>
-  !arr ? [] : isArr(arr) ? arr : [arr]
 
 const side = (effects?: HookEffect[]) => {
   effects.forEach((e) => e[2] && e[2]())

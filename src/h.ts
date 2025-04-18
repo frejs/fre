@@ -1,4 +1,4 @@
-import { isStr, arrayfy } from './reconcile'
+import { isStr } from './reconcile'
 import { FC, FreNode, FreText, Fiber } from './type'
 
 // for jsx2
@@ -16,6 +16,9 @@ export const h = (type: string | FC, props: any, ...kids: FreNode[]) => {
 
   return createVnode(type, props, key, ref)
 }
+
+const arrayfy = <T>(arr: T | T[] | null | undefined) =>
+  !arr ? [] : isArr(arr) ? arr : [arr]
 
 const some = <T>(x: T | boolean | null | undefined): x is T =>
   x != null && x !== true && x !== false
