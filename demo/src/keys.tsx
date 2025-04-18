@@ -17,14 +17,16 @@ import {render} from '../react/react-dom'
 //   [3, 2, 1], // reverse order
 // ]
 
-function App() {
-  const [state, setState] = useState(true)
-  return <>
-    <button onClick={() => setState(!state)}>change</button>
-    {state ? <h1>0</h1> : <a>none</a>}
-  </>
+// function App() {
+//   const [state, setState] = useState([1,2,3])
+//   return <>
+//     <button onClick={() => setState(!state)}>change</button>
+//     {state ? <h1>0</h1> : <a>none</a>}
+//   </>
+// }
+function A(props){
+  return <li>{props.id}</li>
 }
-
 // function App() {
 //   const [key, setKey] = useState([1,2,3])
 //   const [count, setCount] = useState(0)
@@ -58,18 +60,18 @@ function App() {
 //   return h(A, null, 222, " items left")
 // }
 
-// function App() {
-//   const [key, setKey] = useState([1,2,3])
-//   return <div>
-//     <button onClick={() => setKey([3,1])}>x</button>
-//     <ul>
-//       {key.map((i) => (
-//         <Li i={i} key={i} />
-//         // <li key={'#'+i}>{i}</li>
-//       ))}
-//     </ul>
-//   </div>
-// }
+function App() {
+  const [key, setKey] = useState([1,2,3])
+  return <div>
+    <button onClick={() => setKey([3,1,2])}>x</button>
+    <ul>
+      {key.map((i) => (
+        <A id={i} key={i} />
+        // <li key={'#'+i}>{i}</li>
+      ))}
+    </ul>
+  </div>
+}
 
 // function App() {
 //   const [list, setList] = useState([1, 2, 3])
