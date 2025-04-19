@@ -106,7 +106,7 @@ interface FiberBase {
 
 export interface Action {
   op: TAG
-  elm?: Fiber
+  cur?: Fiber
   ref?: Fiber
 }
 

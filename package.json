@@ -1,6 +1,6 @@
 {
   "name": "fre",
-  "version": "2.6.6",
+  "version": "2.7.0",
   "type": "module",
   "main": "dist/fre.js",
   "unpkg": "dist/fre.umd.js",
@@ -32,8 +32,8 @@
     "test": "cross-env pw-test test/*.spec.tsx --runner zora --extensions tsx --cov",
     "report": "npx nyc report",
     "build": "rollup -c",
-    "dev": "cd demo && yarn dev",
-    "prepublishOnly": "yarn build"
+    "dev": "cd demo && pnpm dev",
+    "prepublishOnly": "pnpm build"
   },
   "description": "Tiny Concurrent UI library with Fiber.",
   "keywords": [

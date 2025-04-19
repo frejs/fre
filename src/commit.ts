@@ -6,19 +6,16 @@ export const commit = (fiber?: FiberFinish) => {
   if (!fiber) {
     return
   }
-  const { op, ref, elm } = fiber.action || {}
+  const { op, ref, cur } = fiber.action || {}
+  const parent = fiber.parentNode as HTMLElementEx
+  const curnode = getChildNode(cur)
+  const refnode = getChildNode(ref)
   if (op & TAG.INSERT || op & TAG.MOVE) {
-    const parent = fiber.parentNode as HTMLElementEx
-    const node = getChildNode(elm)
-    const refnode = getChildNode(ref)
-    parent.insertBefore(node, refnode)
+
+    parent.insertBefore(curnode, refnode)
   }
   if (op & TAG.REPLACE) {
-    const parent = fiber.parentNode as HTMLElementEx
-    const node = getChildNode(elm)
-    const refnode = getChildNode(ref)
-    parent.replaceChild(node, refnode)
-    // removeElement(fiber.alternate)
+    parent.replaceChild(curnode, refnode)
   }
   if (op & TAG.UPDATE) {
     const node = getChildNode(fiber)

@@ -194,7 +194,7 @@ const diff = function (a: Fiber[], b: Fiber[]) {
       removeElement(aElm)
       i++
     } else if (a.length <= i) {
-      actions.push({ op: TAG.INSERT, elm: bElm, ref: aElm })
+      actions.push({ op: TAG.INSERT, cur: bElm, ref: aElm })
       j++
     } else if (key(aElm) === key(bElm)) {
 
@@ -202,7 +202,7 @@ const diff = function (a: Fiber[], b: Fiber[]) {
         clone(aElm, bElm)
         actions.push({ op: TAG.UPDATE })
       } else { // replace
-        actions.push({ op: TAG.REPLACE, elm: bElm, ref: aElm })
+        actions.push({ op: TAG.REPLACE, cur: bElm, ref: aElm })
       }
 
       i++
@@ -214,11 +214,11 @@ const diff = function (a: Fiber[], b: Fiber[]) {
         removeElement(a[i])
         i++
       } else if (foundA === undefined) {
-        actions.push({ op: TAG.INSERT, elm: bElm, ref: aElm })
+        actions.push({ op: TAG.INSERT, cur: bElm, ref: aElm })
         j++
       } else {
         clone(a[foundA], bElm)
-        actions.push({ op: TAG.MOVE, elm: a[foundA], ref: aElm })
+        actions.push({ op: TAG.MOVE, cur: a[foundA], ref: aElm })
         a[foundA] = null
         j++
       }
