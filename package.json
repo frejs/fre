@@ -49,6 +49,7 @@
   "author": "132yse",
   "license": "MIT",
   "devDependencies": {
+    "playwright-test": "7.2.2",
     "@skypack/package-check": "^0.2.2",
     "codecov": "^3.8.2",
     "cross-env": "^5.2.0",
@@ -65,7 +66,4 @@
   },
   "repository": "yisar/fre",
   "homepage": "https://fre.js.org",
-  "dependencies": {
-    "playwright-test": "7.2.2"
-  }
 }
