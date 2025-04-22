@@ -177,8 +177,8 @@ const diff = (aCh, bCh) => {
     bHead = 0,
     aTail = aCh.length - 1,
     bTail = bCh.length - 1,
-    aMap = null,
-    bMap = null,
+    aMap = {},
+    bMap = {},
     same = (a, b) => a.key != null && b.key != null && a.key === b.key,
     temp = [],
     actions = []
@@ -206,18 +206,13 @@ const diff = (aCh, bCh) => {
     aHead++
     bHead++
   }
-  if (!aMap) {
-    aMap = {}
-    for (let i = aHead; i <= aTail; i++) {
-      aMap[aCh[i].key] = i
-    }
+  for (let i = aHead; i <= aTail; i++) {
+    aMap[aCh[i].key] = i
   }
-  if (!bMap) {
-    bMap = {}
-    for (let i = bHead; i <= bTail; i++) {
-      bMap[bCh[i].key] = i
-    }
+  for (let i = bHead; i <= bTail; i++) {
+    bMap[bCh[i].key] = i
   }
+
   while (aHead <= aTail || bHead <= bTail) {
     var aElm = aCh[aHead],
       bElm = bCh[bHead]
