@@ -179,35 +179,43 @@ const diff = (aCh, bCh) => {
     bTail = bCh.length - 1,
     aMap = null,
     bMap = null,
-    key = (v) => v.key,
+    same = (a, b) => a.key != null && b.key != null && a.key === b.key,
     temp = [],
     actions = []
 
   while (aHead <= aTail && bHead <= bTail) {
-    if (key(aCh[aTail]) !== key(bCh[bTail])) break
-    clone(aCh[aTail], bCh[bTail])
-    temp.push({ op: TAG.UPDATE })
+    if (!same(aCh[aTail], bCh[bTail])) break
+    if (aCh[aTail].type === bCh[bTail].type) {
+      clone(aCh[aTail], bCh[bTail])
+      temp.push({ op: TAG.UPDATE })
+    } else {
+      actions.push({ op: TAG.REPLACE, cur: bCh[bTail], ref: aCh[aTail] })
+    }
     aTail--
     bTail--
   }
 
   while (aHead <= aTail && bHead <= bTail) {
-    if (key(aCh[aHead]) !== key(bCh[bHead])) break
-    clone(aCh[aHead], bCh[bHead])
-    actions.push({ op: TAG.UPDATE })
+    if (!same(aCh[aHead], bCh[bHead])) break
+    if (aCh[aHead].type === bCh[bHead].type) {
+      clone(aCh[aHead], bCh[bHead])
+      actions.push({ op: TAG.UPDATE })
+    } else {
+      actions.push({ op: TAG.REPLACE, cur: bCh[bHead], ref: aCh[aHead] })
+    }
     aHead++
     bHead++
   }
   if (!aMap) {
     aMap = {}
     for (let i = aHead; i <= aTail; i++) {
-      aMap[key(aCh[i])] = i
+      aMap[aCh[i].key] = i
     }
   }
   if (!bMap) {
     bMap = {}
     for (let i = bHead; i <= bTail; i++) {
-      bMap[key(bCh[i])] = i
+      bMap[bCh[i].key] = i
     }
   }
   while (aHead !== aTail + 1 || bHead !== bTail + 1) {
@@ -221,7 +229,7 @@ const diff = (aCh, bCh) => {
     } else if (aTail + 1 <= aHead) {
       actions.push({ op: TAG.INSERT, cur: bElm, ref: aElm })
       bHead++
-    } else if (key(aElm) === key(bElm)) {
+    } else if (aElm.key === bElm.key) {
       if (aElm.type === bElm.type) {
         clone(aElm, bElm)
         actions.push({ op: TAG.UPDATE })
@@ -231,8 +239,8 @@ const diff = (aCh, bCh) => {
       aHead++
       bHead++
     } else {
-      var foundB = bMap[key(aElm)]
-      var foundA = aMap[key(bElm)]
+      var foundB = bMap[aElm.key]
+      var foundA = aMap[bElm.key]
       if (foundB === undefined) {
         removeElement(aElm)
         aHead++
