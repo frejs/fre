@@ -241,10 +241,10 @@ const diff = (aCh, bCh) => {
     } else {
       var foundB = bMap[aElm.key]
       var foundA = aMap[bElm.key]
-      if (foundB === undefined) {
+      if (foundB == null) {
         removeElement(aElm)
         aHead++
-      } else if (foundA === undefined) {
+      } else if (foundA == null) {
         actions.push({ op: TAG.INSERT, cur: bElm, ref: aElm })
         bHead++
       } else {
