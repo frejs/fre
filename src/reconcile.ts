@@ -218,7 +218,7 @@ const diff = (aCh, bCh) => {
       bMap[bCh[i].key] = i
     }
   }
-  while (aHead !== aTail + 1 || bHead !== bTail + 1) {
+  while (aHead <= aTail || bHead <= bTail) {
     var aElm = aCh[aHead],
       bElm = bCh[bHead]
     if (aElm === null) {
