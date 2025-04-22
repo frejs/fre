@@ -172,61 +172,84 @@ const side = (effects?: HookEffect[]) => {
   effects.length = 0
 }
 
-const diff = function (a: Fiber[], b: Fiber[]) {
-  var actions: Action[] = [],
-    aMap: Record<string, number | undefined> = {},
-    bMap: Record<string, number | undefined> = {},
-    key = (v: Fiber) => v.key,
-    i: number,
-    j: number
-  for (i = 0; i < a.length; i++) {
-    aMap[key(a[i])] = i
-  }
-  for (i = 0; i < b.length; i++) {
-    bMap[key(b[i])] = i
-  }
-  for (i = j = 0; i !== a.length || j !== b.length;) {
-    var aElm = a[i],
-      bElm = b[j]
-    if (aElm === null) {
-      i++
-    } else if (b.length <= j) {
-      removeElement(aElm)
-      i++
-    } else if (a.length <= i) {
-      actions.push({ op: TAG.INSERT, cur: bElm, ref: aElm })
-      j++
-    } else if (key(aElm) === key(bElm)) {
+const diff = (aCh, bCh) => {
+  let aHead = 0,
+    bHead = 0,
+    aTail = aCh.length - 1,
+    bTail = bCh.length - 1,
+    aMap = null,
+    bMap = null,
+    key = (v) => v.key,
+    temp = [],
+    actions = []
 
+  while (aHead <= aTail && bHead <= bTail) {
+    if (key(aCh[aTail]) !== key(bCh[bTail])) break
+    clone(aCh[aTail], bCh[bTail])
+    temp.push({ op: TAG.UPDATE })
+    aTail--
+    bTail--
+  }
+
+  while (aHead <= aTail && bHead <= bTail) {
+    if (key(aCh[aHead]) !== key(bCh[bHead])) break
+    clone(aCh[aHead], bCh[bHead])
+    actions.push({ op: TAG.UPDATE })
+    aHead++
+    bHead++
+  }
+  if (!aMap) {
+    aMap = {}
+    for (let i = aHead; i <= aTail; i++) {
+      aMap[key(aCh[i])] = i
+    }
+  }
+  if (!bMap) {
+    bMap = {}
+    for (let i = bHead; i <= bTail; i++) {
+      bMap[key(bCh[i])] = i
+    }
+  }
+  while (aHead !== aTail + 1 || bHead !== bTail + 1) {
+    var aElm = aCh[aHead],
+      bElm = bCh[bHead]
+    if (aElm === null) {
+      aHead++
+    } else if (bTail + 1 <= bHead) {
+      removeElement(aElm)
+      aHead++
+    } else if (aTail + 1 <= aHead) {
+      actions.push({ op: TAG.INSERT, cur: bElm, ref: aElm })
+      bHead++
+    } else if (key(aElm) === key(bElm)) {
       if (aElm.type === bElm.type) {
         clone(aElm, bElm)
         actions.push({ op: TAG.UPDATE })
       } else { // replace
         actions.push({ op: TAG.REPLACE, cur: bElm, ref: aElm })
       }
-
-      i++
-      j++
+      aHead++
+      bHead++
     } else {
       var foundB = bMap[key(aElm)]
       var foundA = aMap[key(bElm)]
       if (foundB === undefined) {
-        removeElement(a[i])
-        i++
+        removeElement(aElm)
+        aHead++
       } else if (foundA === undefined) {
         actions.push({ op: TAG.INSERT, cur: bElm, ref: aElm })
-        j++
+        bHead++
       } else {
-        clone(a[foundA], bElm)
-        actions.push({ op: TAG.MOVE, cur: a[foundA], ref: aElm })
-        a[foundA] = null
-        j++
+        clone(aCh[foundA], bElm)
+        actions.push({ op: TAG.MOVE, cur: aCh[foundA], ref: aElm })
+        aCh[foundA] = null
+        bHead++
       }
     }
   }
+  actions.concat(temp)
   return actions
 }
-
 export const getCurrentFiber = () => currentFiber || null
 export const isFn = (x: unknown): x is Function => typeof x === 'function'
 export const isStr = (s: unknown): s is number | string =>
