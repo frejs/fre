@@ -172,14 +172,14 @@ const side = (effects?: HookEffect[]) => {
   effects.length = 0
 }
 
-const diff = (aCh:Fiber[], bCh:Fiber[]) => {
+const diff = (aCh: Fiber[], bCh: Fiber[]) => {
   let aHead = 0,
     bHead = 0,
     aTail = aCh.length - 1,
     bTail = bCh.length - 1,
     aMap = {},
     bMap = {},
-    same = (a, b) => a.key != null && b.key != null && a.key === b.key,
+    same = (a: Fiber, b: Fiber) => a.key != null && b.key != null && a.key === b.key,
     temp = [],
     actions = []
 
