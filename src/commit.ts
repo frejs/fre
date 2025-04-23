@@ -68,11 +68,13 @@ const kidsRefer = (kids: Fiber[]) => {
 export const removeElement = (fiber: Fiber, flag: boolean = true) => {
   if (fiber.isComp) {
     fiber.hooks && fiber.hooks.list.forEach((e) => e[2] && e[2]())
-    fiber.kids.forEach(v => removeElement(v, flag))
   } else {
-    // @ts-expect-error
-    if (flag) fiber.parentNode.removeChild(fiber.node)
+    if (flag) {
+      (fiber.parentNode as any).removeChild(fiber.node)
+      flag = false
+    }
     kidsRefer(fiber.kids)
     refer(fiber.ref, null)
+    fiber.kids.forEach(v => removeElement(v, flag))
   }
 }
