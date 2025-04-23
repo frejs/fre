@@ -43,16 +43,16 @@ import { h, render, useState, Fragment } from "../../src/index"
 //   ]
 // }
 
-function App() {
-  const [key, setKey] = useState([1,2,6,3])
-  return [
-    <button onClick={() => setKey([1,3,5,2,4])}>x</button>,
-    <ul>
-      {key.map((i) => <Li key={i} i={i}/>
-      )}
-    </ul>
-  ]
-}
+// function App() {
+//   const [key, setKey] = useState([1,2,6,3])
+//   return [
+//     <button onClick={() => setKey([1,3,5,2,4])}>x</button>,
+//     <ul>
+//       {key.map((i) => <Li key={i} i={i}/>
+//       )}
+//     </ul>
+//   ]
+// }
 
 // function App() {
 //   const [key, setKey] = useState(['a', 'b', 'c'])
@@ -76,13 +76,13 @@ function App() {
 //   return <div>{list.map((d) => <span>{d}</span>)} <button onClick={() => setList(list.concat(4))}>+</button></div>
 // }
 
-// const App = () => {
-//   let [bool, setbool] = useState(true)
-//   return <div>
-//       <div>{bool ? <A id={0}/> : null}</div>
-//       <button onClick={()=>setbool(!bool)}>x</button>
-//   </div>
-// }
+const App = () => {
+  let [bool, setbool] = useState(true)
+  return <div>
+      <div>{bool ? <p>111</p> : <span>222</span>}</div>
+      <button onClick={()=>setbool(!bool)}>x</button>
+  </div>
+}
 
 // function Header(){
 //   return <div><a href="">222</a></div>
@@ -125,9 +125,9 @@ function App() {
 //   </div>
 // }
 
-function Li(props) {
-  return <li>{props.i}</li>
-}
+// function Li(props) {
+//   return <li>{props.i}</li>
+// }
 
 // const parentNode = document.getElementById("app");
 

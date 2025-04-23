@@ -4,7 +4,6 @@ import {
   HookEffect,
   FreText,
   TAG,
-  Action,
   FiberHost,
   FiberFinish,
 } from './type'
