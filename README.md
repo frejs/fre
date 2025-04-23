@@ -1,7 +1,7 @@
 <p align="center"><img src="https://user-images.githubusercontent.com/44045911/147237798-174728c9-7399-4b47-be39-78ef69198a0d.png" alt="fre logo" width="130"></p>
 <h1 align="center">Fre</h1>
 <p align="center">👻 Tiny Concurrent UI library with Fiber.</p>
-<p align="center">
+
 [![Apache licesed](https://img.shields.io/badge/MIT-cyan?logo=mit)](https://github.com/frejs/fre/blob/master/LICENSE)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/yisar/fre/main.yml)](https://github.com/yisar/fre/actions)
 [![Code Coverage](https://img.shields.io/codecov/c/github/frejs/fre.svg)](https://codecov.io/gh/yisar/fre)
@@ -9,7 +9,7 @@
 [![npm-d](https://img.shields.io/npm/dt/fre.svg)](https://npmjs.com/package/fre)
 [![brotli](http://img.badgesize.io/https://unpkg.com/fre/dist/fre.js?compression=brotli&label=brotli)](https://bundlephobia.com/result?p=fre)
 
-</p>
+
 
 - **Concurrent Mode** — This is an amazing idea, which implements the coroutine scheduler in JavaScript, it also called **Time slicing**.
 
