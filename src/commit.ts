@@ -75,6 +75,6 @@ export const removeElement = (fiber: Fiber, flag: boolean = true) => {
     }
     kidsRefer(fiber.kids)
     refer(fiber.ref, null)
-    fiber.kids.forEach(v => removeElement(v, flag))
   }
+  fiber.kids.forEach(v => removeElement(v, flag))
 }
