@@ -11,11 +11,11 @@ export const commit = (fiber?: FiberFinish) => {
   const curnode = getChildNode(cur)
   const refnode = getChildNode(ref)
   if (op & TAG.INSERT || op & TAG.MOVE) {
-
     parent.insertBefore(curnode, refnode)
   }
   if (op & TAG.REPLACE) {
     parent.replaceChild(curnode, refnode)
+    removeElement(ref,false)
   }
   if (op & TAG.UPDATE) {
     const node = getChildNode(fiber)
@@ -65,13 +65,13 @@ const kidsRefer = (kids: Fiber[]) => {
   })
 }
 
-export const removeElement = (fiber: Fiber) => {
+export const removeElement = (fiber: Fiber, flag: boolean = true) => {
   if (fiber.isComp) {
     fiber.hooks && fiber.hooks.list.forEach((e) => e[2] && e[2]())
-    fiber.kids.forEach(removeElement as any)
+    fiber.kids.forEach(v => removeElement(v, flag))
   } else {
     // @ts-expect-error
-    fiber.parentNode.removeChild(fiber.node)
+    if (flag) fiber.parentNode.removeChild(fiber.node)
     kidsRefer(fiber.kids)
     refer(fiber.ref, null)
   }
