@@ -172,7 +172,7 @@ const side = (effects?: HookEffect[]) => {
   effects.length = 0
 }
 
-const diff = (aCh, bCh) => {
+const diff = (aCh:Fiber[], bCh:Fiber[]) => {
   let aHead = 0,
     bHead = 0,
     aTail = aCh.length - 1,
