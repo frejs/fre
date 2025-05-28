@@ -7,31 +7,23 @@ export const commit = (fiber?: FiberFinish) => {
     return
   }
   refer(fiber.ref, fiber.node)
-
   commitSibling(fiber.child)
   const { op, ref, cur } = fiber.action || {}
 
   const parent = fiber?.parent?.node
   if (op & TAG.INSERT || op & TAG.MOVE) {
-    console.log(cur.node.nodeValue, parent.nodeName)
     parent.insertBefore(cur.node, ref?.node)
-  }
-  if (op & TAG.REPLACE) {
-    parent.replaceChild(cur.node, ref?.node)
-    removeElement(ref, false)
   }
   if (op & TAG.UPDATE) {
     const node = fiber.node
     updateElement(
       node,
-      (fiber.old as FiberHost).props || {},
+      (fiber.alternate as FiberHost).props || {},
       (fiber as FiberHost).props
     )
   }
   fiber.action = null
-
   commitSibling(fiber.sibling)
-
 }
 
 function commitSibling(fiber?: FiberFinish) {

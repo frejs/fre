@@ -84,11 +84,9 @@ export type PropsOf<T extends FC | string> = T extends FC<infer P>
 interface FiberBase {
   key?: string
   type?: string | FC,
-  oldType?:string|FC,
   memo?: boolean
   props?: PropsOf<FC | string>
   isComp?: boolean
-  parentNode?: HTMLElementEx | {}
   node?: HTMLElementEx
   kids?: Fiber[]
   before?: Fiber,
@@ -98,7 +96,6 @@ interface FiberBase {
   sibling?: Fiber
   child?: Fiber
   ref?: Ref<HTMLElement | undefined>
-  old?: Fiber
   hooks?: Hooks
   action?: Action | null
   lane?: number

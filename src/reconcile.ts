@@ -60,11 +60,11 @@ const capture = (fiber: Fiber) => {
 export const isMemo = (fiber: Fiber) => {
   if (
     (fiber.type as FC).memo &&
-    fiber.type === fiber.old?.type &&
-    fiber.old?.props
+    fiber.type === fiber.alternate?.type &&
+    fiber.alternate?.props
   ) {
     let scu = (fiber.type as FC).shouldUpdate || shouldUpdate
-    if (!scu(fiber.props, fiber.old.props)) {
+    if (!scu(fiber.props, fiber.alternate.props)) {
       return true
     }
   }
@@ -157,7 +157,7 @@ function clone(a: Fiber, b: Fiber) {
   b.ref = a.ref
   b.node = a.node // 临时修复
   b.kids = a.kids
-  b.old = a
+  b.alternate = a
 }
 
 export const arrayfy = <T>(arr: T | T[] | null | undefined) =>
@@ -176,38 +176,33 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
     bTail = bCh.length - 1,
     aMap = {},
     bMap = {},
-    same = (a: Fiber, b: Fiber) => a.type === b.type && a.key === b.key,
+    same = (a: Fiber, b: Fiber) => {
+      return a.type === b.type && a.key === b.key
+    },
     temp = [],
     actions = []
 
   while (aHead <= aTail && bHead <= bTail) {
     if (!same(aCh[aTail], bCh[bTail])) break
-    if (aCh[aTail].type === bCh[bTail].type) {
-      clone(aCh[aTail], bCh[bTail])
-      temp.push({ op: TAG.UPDATE })
-    } else {
-      actions.push({ op: TAG.REPLACE, cur: bCh[bTail], ref: aCh[aTail] })
-    }
+    clone(aCh[aTail], bCh[bTail])
+    temp.push({ op: TAG.UPDATE })
+
     aTail--
     bTail--
   }
 
   while (aHead <= aTail && bHead <= bTail) {
     if (!same(aCh[aHead], bCh[bHead])) break
-    if (aCh[aHead].type === bCh[bHead].type) {
-      clone(aCh[aHead], bCh[bHead])
-      actions.push({ op: TAG.UPDATE })
-    } else {
-      actions.push({ op: TAG.REPLACE, cur: bCh[bHead], ref: aCh[aHead] })
-    }
+    clone(aCh[aHead], bCh[bHead])
+    actions.push({ op: TAG.UPDATE })
     aHead++
     bHead++
   }
   for (let i = aHead; i <= aTail; i++) {
-    aMap[aCh[i].key] = i
+    if (aCh[i].key) aMap[aCh[i].key] = i
   }
   for (let i = bHead; i <= bTail; i++) {
-    bMap[bCh[i].key] = i
+    if (bCh[i].key) bMap[bCh[i].key] = i
   }
 
   while (aHead <= aTail || bHead <= bTail) {
@@ -222,12 +217,8 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
       actions.push({ op: TAG.INSERT, cur: bElm, ref: aElm })
       bHead++
     } else if (same(aElm, bElm)) {
-      if (aElm.type === bElm.type) {
-        clone(aElm, bElm)
-        actions.push({ op: TAG.UPDATE })
-      } else { // replace
-        actions.push({ op: TAG.REPLACE, cur: bElm, ref: aElm })
-      }
+      clone(aElm, bElm)
+      actions.push({ op: TAG.UPDATE })
       aHead++
       bHead++
     } else {
