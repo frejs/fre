@@ -102,16 +102,20 @@ const shouldUpdate = (
   for (let i in b) if (a[i] !== b[i]) return true
 }
 
+const fragment = () => {
+  const f = document.createDocumentFragment() as any
+  return f
+}
+
 const updateHook = (fiber: Fiber) => {
   resetCursor()
   currentFiber = fiber
-  fiber.parentNode = getParentNode(fiber) || {}
+  fiber.node = fragment()
   let children = (fiber.type as FC)(fiber.props)
   reconcileChidren(fiber, simpleVnode(children))
 }
 
 const updateHost = (fiber: FiberHost) => {
-  fiber.parentNode = getParentNode(fiber) || {}
   if (!fiber.node) {
     if (fiber.type === 'svg') fiber.lane |= TAG.SVG
     fiber.node = createElement(fiber)
@@ -121,12 +125,6 @@ const updateHost = (fiber: FiberHost) => {
 
 const simpleVnode = (type: Fiber | FreText) =>
   isStr(type) ? createText(type) : type
-
-export const getParentNode = (fiber: Fiber) => {
-  while ((fiber = fiber.parent)) {
-    if (!fiber.isComp) return fiber.node
-  }
-}
 
 const reconcileChidren = (
   fiber: Fiber,
@@ -178,7 +176,7 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
     bTail = bCh.length - 1,
     aMap = {},
     bMap = {},
-    same = (a: Fiber, b: Fiber) => a.key != null && b.key != null && a.key === b.key,
+    same = (a: Fiber, b: Fiber) => a.type === b.type && a.key === b.key,
     temp = [],
     actions = []
 
@@ -223,7 +221,7 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
     } else if (aTail + 1 <= aHead) {
       actions.push({ op: TAG.INSERT, cur: bElm, ref: aElm })
       bHead++
-    } else if (aElm.key === bElm.key) {
+    } else if (same(aElm, bElm)) {
       if (aElm.type === bElm.type) {
         clone(aElm, bElm)
         actions.push({ op: TAG.UPDATE })
@@ -254,7 +252,7 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
   }
   return actions
 }
-export const getCurrentFiber = () => currentFiber || null
+export const useFiber = () => currentFiber || null
 export const isFn = (x: unknown): x is Function => typeof x === 'function'
 export const isStr = (s: unknown): s is number | string =>
   typeof s === 'number' || typeof s === 'string'

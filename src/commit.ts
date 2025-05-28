@@ -1,37 +1,37 @@
 import { FiberFinish, FiberHost, HTMLElementEx, Fiber, Ref, TAG } from './type'
 import { updateElement } from './dom'
-import { getParentNode, isFn } from './reconcile'
+import { isFn } from './reconcile'
 
 export const commit = (fiber?: FiberFinish) => {
   if (!fiber) {
     return
   }
+  refer(fiber.ref, fiber.node)
+
+  commitSibling(fiber.child)
   const { op, ref, cur } = fiber.action || {}
-  const parent = fiber.parentNode as HTMLElementEx
-  const curnode = getChildNode(cur)
-  const refnode = getChildNode(ref)
+
+  const parent = fiber?.parent?.node
   if (op & TAG.INSERT || op & TAG.MOVE) {
-    parent.insertBefore(curnode, refnode)
+    console.log(cur.node.nodeValue, parent.nodeName)
+    parent.insertBefore(cur.node, ref?.node)
   }
   if (op & TAG.REPLACE) {
-    parent.replaceChild(curnode, refnode)
-    removeElement(ref,false)
+    parent.replaceChild(cur.node, ref?.node)
+    removeElement(ref, false)
   }
   if (op & TAG.UPDATE) {
-    const node = getChildNode(fiber)
+    const node = fiber.node
     updateElement(
       node,
       (fiber.old as FiberHost).props || {},
       (fiber as FiberHost).props
     )
   }
-
-  refer(fiber.ref, fiber.node)
-
   fiber.action = null
 
-  commitSibling(fiber.child)
   commitSibling(fiber.sibling)
+
 }
 
 function commitSibling(fiber?: FiberFinish) {
@@ -40,19 +40,6 @@ function commitSibling(fiber?: FiberFinish) {
   } else {
     commit(fiber)
   }
-}
-
-const getChildNode = (fiber: Fiber): HTMLElementEx => {
-  if (fiber == null) return null
-  if (fiber.isComp) {
-    while ((fiber = fiber.child)) {
-      if (!fiber.isComp) return fiber.node
-    }
-  } else {
-    return fiber.node
-  }
-
-
 }
 const refer = (ref?: Ref<HTMLElementEx>, dom?: HTMLElementEx) => {
   if (ref) isFn(ref) ? ref(dom) : (ref.current = dom)
@@ -70,7 +57,7 @@ export const removeElement = (fiber: Fiber, flag: boolean = true) => {
     fiber.hooks && fiber.hooks.list.forEach((e) => e[2] && e[2]())
   } else {
     if (flag) {
-      (fiber.parentNode as any).removeChild(fiber.node)
+      (fiber.node.parentNode as any).removeChild(fiber.node)
       flag = false
     }
     kidsRefer(fiber.kids)

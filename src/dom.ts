@@ -40,7 +40,7 @@ export const updateElement = (
       dom.removeAttribute(name)
     } else {
       // @ts-expect-error Property 'setAttribute' does not exist on type 'Text'.
-      dom.setAttribute(name, b)
+      dom.setAttribute && dom?.setAttribute(name, b)
     }
   })
 }
@@ -50,8 +50,8 @@ export const createElement = (fiber: FiberHost) => {
     fiber.type === '#text'
       ? document.createTextNode('')
       : fiber.lane & TAG.SVG
-      ? document.createElementNS('http://www.w3.org/2000/svg', fiber.type)
-      : document.createElement(fiber.type)
+        ? document.createElementNS('http://www.w3.org/2000/svg', fiber.type)
+        : document.createElement(fiber.type)
   updateElement(dom, {}, fiber.props)
   return dom
 }

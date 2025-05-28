@@ -1,5 +1,5 @@
 import { h, render, useState, Fragment } from "../../src/index"
-// import {createElement as h,useState,Fragment} from '../react/react'
+// import { jsx as h,useState,Fragment,createRoot} from '../react/frei'
 // import {render} from '../react/react-dom'
 // import {h, render} from '../../.ignore/eee'
 
@@ -76,30 +76,30 @@ import { h, render, useState, Fragment } from "../../src/index"
 //   return <div>{list.map((d) => <span>{d}</span>)} <button onClick={() => setList(list.concat(4))}>+</button></div>
 // }
 
-const App = () => {
-  let [bool, setbool] = useState(true)
-  return <div>
-      <div>{bool ? <p>111</p> : <span>222</span>}</div>
-      <button onClick={()=>setbool(!bool)}>x</button>
-  </div>
-}
+// const App = () => {
+//   let [bool, setbool] = useState(true)
+//   return <div>
+//       <div>{bool ? <p>111</p> : <span>222</span>}</div>
+//       <button onClick={()=>setbool(!bool)}>x</button>
+//   </div>
+// }
 
 // function Header(){
 //   return <div><a href="">222</a></div>
 // }
 
-// function App() {
-//   const [key, setKey] = useState([1,2,3,4,5])
-//   return (
-//     <div>
-//       {key.map((i) => (
-//         // <Li i={i} key={i} />
-//         <li key={i} >{i}</li>
-//       ))}
-//       <button onClick={() => setKey([5,3,4])}>x</button>
-//     </div>
-//   )
-// }
+function App() {
+  const [key, setKey] = useState([1,2,3])
+  return (
+    <div>
+      {key.map((i) => (
+        // <Li i={i} key={i} />
+        <li key={i} >{i}</li>
+      ))}
+      <button onClick={() => setKey([3,1,2])}>x</button>
+    </div>
+  )
+}
 
 // export default function App() {
 //   const [state, setState] = useState(true);
@@ -125,14 +125,17 @@ const App = () => {
 //   </div>
 // }
 
-// function Li(props) {
-//   return <li>{props.i}</li>
-// }
+function Li(props) {
+  return <li>{props.i}</li>
+}
 
 // const parentNode = document.getElementById("app");
 
 // render(<div><li key={1}>1</li><li key={2}>2</li><li key={3}>3</li></div>, parentNode);
 
 // render(<div><li key={3}>3</li><li key={2}>2</li><li key={1}>1</li></div>, parentNode);
+// const render = (jsx, node) =>{
+//   createRoot(node).render(jsx)
+// }
 
 render(<App />, document.getElementById("app"))

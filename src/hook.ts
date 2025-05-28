@@ -1,4 +1,4 @@
-import { update, isFn, getCurrentFiber } from './reconcile'
+import { update, isFn, useFiber } from './reconcile'
 import {
   DependencyList,
   Reducer,
@@ -93,7 +93,7 @@ export const useRef = <T>(current: T): RefObject<T> => {
 }
 
 export const getSlot = <T extends HookList = HookList>(cursor: number) => {
-  const current: Fiber = getCurrentFiber()
+  const current: Fiber = useFiber()
   const hooks =
     current.hooks || (current.hooks = { list: [], effect: [], layout: [] })
   if (cursor >= hooks.list.length) {
@@ -134,7 +134,7 @@ export const useContext = <T>(contextType: ContextType<T>) => {
     return () => subscribersSet && subscribersSet.delete(triggerUpdate)
   }, EMPTY_ARR)
 
-  let contextFiber = getCurrentFiber().parent
+  let contextFiber = useFiber().parent
   while (contextFiber && contextFiber.type !== contextType) {
     contextFiber = contextFiber.parent
   }
