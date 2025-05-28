@@ -6,13 +6,27 @@ export const commit = (fiber?: FiberFinish) => {
   if (!fiber) {
     return
   }
+
   refer(fiber.ref, fiber.node)
   commitSibling(fiber.child)
   const { op, ref, cur } = fiber.action || {}
 
-  const parent = fiber?.parent?.node
+  let parent = fiber?.parent?.node
+    if (parent?.nodeType === 8) {
+      parent = parent.parentNode as any
+    }
+  
+
   if (op & TAG.INSERT || op & TAG.MOVE) {
+    let comment = null
+    if (fiber.isComp) {
+      //@ts-ignore
+      comment = fiber?.node?.firstChild
+    }
     parent.insertBefore(cur.node, ref?.node)
+    if (fiber.isComp) {
+      fiber.node = comment
+    }
   }
   if (op & TAG.UPDATE) {
     const node = fiber.node

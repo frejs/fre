@@ -132,12 +132,11 @@ export const dom = async (t) => {
         )
       },
     },
-    // {
-    //   content: <div>removed</div>,
-    //   test: (text) => {
-    //     console.log(111,text)
-    //     t.eq(text.textContent, "removed")
-    //   },
-    // },
+    {
+      content: 'removed',
+      test: ([text]) => {
+        t.eq(text.textContent, "removed")
+      },
+    },
   ])
 }

@@ -4,7 +4,7 @@ export const testRender = jsx => {
   return new Promise(resolve => {
     const Wrapper = () => {
       useEffect(() => {
-        resolve([...document.body.childNodes])
+        resolve([...document.body.childNodes].filter(node => node.nodeType !== 8))
       }, [])
       return jsx
     }
@@ -27,7 +27,7 @@ export const testUpdates = async updates => {
   }
 
   const run = index => {
-    updates[index].test([...document.body.childNodes])
+    updates[index].test([...document.body.childNodes].filter(node => node.nodeType !== 8))
   }
 
   await testRender(<Component />)

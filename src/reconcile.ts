@@ -42,7 +42,6 @@ const capture = (fiber: Fiber) => {
   if (fiber.isComp) {
     if (isMemo(fiber)) {
       fiber.memo = true
-      // fast-fix
       return getSibling(fiber)
     } else if (fiber.memo) {
       fiber.memo = false
@@ -102,15 +101,19 @@ const shouldUpdate = (
   for (let i in b) if (a[i] !== b[i]) return true
 }
 
-const fragment = () => {
+const fragment = (fiber: Fiber) => {
   const f = document.createDocumentFragment() as any
+  const c = document.createComment((fiber.type as FC).name)
+  f.appendChild(c)
   return f
 }
 
 const updateHook = (fiber: Fiber) => {
+
   resetCursor()
   currentFiber = fiber
-  fiber.node = fragment()
+  fiber.node = fiber.node || fragment(fiber)
+
   let children = (fiber.type as FC)(fiber.props)
   reconcileChidren(fiber, simpleVnode(children))
 }
@@ -186,13 +189,13 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
     if (!same(aCh[aTail], bCh[bTail])) break
     clone(aCh[aTail], bCh[bTail])
     temp.push({ op: TAG.UPDATE })
-
     aTail--
     bTail--
   }
 
   while (aHead <= aTail && bHead <= bTail) {
     if (!same(aCh[aHead], bCh[bHead])) break
+
     clone(aCh[aHead], bCh[bHead])
     actions.push({ op: TAG.UPDATE })
     aHead++
@@ -205,9 +208,12 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
     if (bCh[i].key) bMap[bCh[i].key] = i
   }
 
+
+
   while (aHead <= aTail || bHead <= bTail) {
     var aElm = aCh[aHead],
       bElm = bCh[bHead]
+
     if (aElm === null) {
       aHead++
     } else if (bTail + 1 <= bHead) {
