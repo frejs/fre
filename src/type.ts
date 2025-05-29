@@ -45,12 +45,10 @@ export type FiberFinish = FiberHostFinish | FiberCompFinish
 type FiberHostFinish = FiberBaseFinish &
   FiberHost & {
     node: HTMLElementEx
-    parentNode: HTMLElementEx
   }
 type FiberCompFinish = FiberBaseFinish &
   FiberComp & {
     node: undefined
-    parentNode: undefined
   }
 
 interface FiberBaseFinish extends FiberBase {
@@ -89,7 +87,6 @@ interface FiberBase {
   isComp?: boolean
   node?: HTMLElementEx
   kids?: Fiber[]
-  before?: Fiber,
   alternate?: Fiber
   dirty?: boolean
   parent?: Fiber
@@ -98,7 +95,7 @@ interface FiberBase {
   ref?: Ref<HTMLElement | undefined>
   hooks?: Hooks
   action?: Action | null
-  lane?: number
+  lane?: number,
 }
 
 export interface Action {

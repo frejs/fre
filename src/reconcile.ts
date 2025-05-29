@@ -10,7 +10,7 @@ import {
 import { createElement } from './dom'
 import { resetCursor } from './hook'
 import { schedule, shouldYield } from './schedule'
-import { isArr, createText } from './h'
+import { isArr, createText, createVnode } from './h'
 import { commit, removeElement } from './commit'
 
 let currentFiber: Fiber = null
@@ -20,6 +20,7 @@ export const render = (vnode: Fiber, node: Node) => {
   rootFiber = {
     node,
     props: { children: vnode },
+    kids: recycleNode(node).props.children // hydrate
   } as Fiber
   update(rootFiber)
 }
@@ -29,6 +30,21 @@ export const update = (fiber?: Fiber) => {
     fiber.dirty = true
     schedule(() => reconcile(fiber))
   }
+}
+
+const recycleNode = (node: Node) => {
+  let vnode: any = createVnode(
+    node.nodeName.toLowerCase(),
+    node.nodeType === 3 ? { nodeValue: node.nodeValue, } : {
+      children: Array.from(node.childNodes).filter((node: Node) => {
+        return node.nodeType !== Node.TEXT_NODE || node.nodeValue.trim() !== ''
+      }).map(recycleNode)
+    },
+    null,
+    null
+  )
+  vnode.node = node
+  return vnode
 }
 
 const reconcile = (fiber?: Fiber) => {
@@ -135,7 +151,7 @@ const reconcileChidren = (
 ) => {
   let aCh = fiber.kids || [],
     bCh = (fiber.kids = arrayfy(children))
-
+  console.log(aCh, bCh)
   const actions = diff(aCh, bCh)
 
   for (let i = 0, prev = null, len = bCh.length; i < len; i++) {

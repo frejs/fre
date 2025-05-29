@@ -52,7 +52,7 @@ const refer = (ref?: Ref<HTMLElementEx>, dom?: HTMLElementEx) => {
 }
 
 const kidsRefer = (kids: Fiber[]) => {
-  kids.forEach((kid) => {
+  kids?.forEach((kid) => {
     kid.kids && kidsRefer(kid.kids)
     refer(kid.ref, null)
   })
@@ -69,5 +69,5 @@ export const removeElement = (fiber: Fiber, flag: boolean = true) => {
     kidsRefer(fiber.kids)
     refer(fiber.ref, null)
   }
-  fiber.kids.forEach(v => removeElement(v, flag))
+  fiber?.kids?.forEach(v => removeElement(v, flag))
 }
