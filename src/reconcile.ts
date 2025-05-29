@@ -36,9 +36,9 @@ const recycleNode = (node: Node) => {
   let vnode: any = createVnode(
     node.nodeName.toLowerCase(),
     node.nodeType === 3 ? { nodeValue: node.nodeValue, } : {
-      children: Array.from(node.childNodes).filter((node: Node) => {
-        return node.nodeType !== Node.TEXT_NODE || node.nodeValue.trim() !== ''
-      }).map(recycleNode)
+      children: Array.from(node.childNodes)
+        .filter((node: Node) => node.nodeType !== Node.TEXT_NODE || node.nodeValue.trim() !== '')
+        .map(recycleNode)
     },
     null,
     null
