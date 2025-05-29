@@ -151,7 +151,6 @@ const reconcileChidren = (
 ) => {
   let aCh = fiber.kids || [],
     bCh = (fiber.kids = arrayfy(children))
-  console.log(aCh, bCh)
   const actions = diff(aCh, bCh)
 
   for (let i = 0, prev = null, len = bCh.length; i < len; i++) {
