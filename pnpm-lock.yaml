@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      playwright-test:
-        specifier: 7.2.2
-        version: 7.2.2
     devDependencies:
       '@skypack/package-check':
         specifier: ^0.2.2
@@ -24,6 +20,9 @@ importers:
       nyc:
         specifier: ^15.1.0
         version: 15.1.0
+      playwright-test:
+        specifier: 7.2.2
+        version: 7.2.2
       rollup:
         specifier: ^2.11.2
         version: 2.79.2
@@ -44,7 +43,7 @@ importers:
         version: 4.9.5
       vite:
         specifier: ^4.5.13
-        version: 4.5.13(@types/node@22.14.1)(terser@4.8.1)
+        version: 4.5.14(@types/node@22.14.1)(terser@4.8.1)
       yarpm:
         specifier: ^0.2.1
         version: 0.2.1
@@ -1955,8 +1954,8 @@ packages:
     resolution: {integrity: sha512-FGtKtv3xIpR6BYhvgH8MI/y78oT7d8Au3ww4QIxymrCtZEh5b8gCw2siywE+puhEmuWKDtmfrvF5UlB298ut3w==}
     engines: {node: '>=10.12.0'}
 
-  vite@4.5.13:
-    resolution: {integrity: sha512-Hgp8IF/yZDzKsN1hQWOuQZbrKiaFsbQud+07jJ8h9m9PaHWkpvZ5u55Xw5yYjWRXwRQ4jwFlJvY7T7FUJG9MCA==}
+  vite@4.5.14:
+    resolution: {integrity: sha512-+v57oAaoYNnO3hIu5Z/tJRZjq5aHM2zDve9YZ8HngVHbhk66RStobhb1sqPMIPEleV6cNKYK4eGrAbE9Ulbl2g==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
@@ -4230,7 +4229,7 @@ snapshots:
       convert-source-map: 1.9.0
       source-map: 0.7.4
 
-  vite@4.5.13(@types/node@22.14.1)(terser@4.8.1):
+  vite@4.5.14(@types/node@22.14.1)(terser@4.8.1):
     dependencies:
       esbuild: 0.18.20
       postcss: 8.5.3
