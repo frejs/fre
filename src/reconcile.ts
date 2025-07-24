@@ -63,14 +63,12 @@ const getBoundary = (fiber, name) => {
   }
   return null
 }
-const handleSuspense = (fiber, promise) => {
+const suspense = (fiber, promise) => {
   const boundary = getBoundary(fiber, 'Suspense')
   if (!boundary) throw promise
   boundary.kids = []
   reconcileChidren(boundary, simpleVnode(boundary.props.fallback))
-  promise.then(() => {
-    update(boundary)
-  })
+  promise.then(() => update(boundary))
   return boundary
 }
 
@@ -78,21 +76,15 @@ const capture = (fiber: Fiber) => {
   fiber.isComp = isFn(fiber.type)
   if (fiber.isComp) {
     if (isMemo(fiber)) {
-      fiber.memo = true
-      return getSibling(fiber)
-    } else if (fiber.memo) {
       fiber.memo = false
+      return getSibling(fiber)
     }
     try {
       updateHook(fiber)
     } catch (e) {
       if (e instanceof Promise) {
-        const s = handleSuspense(fiber, e)
-        return s.child
-      } else {
-        throw e
-      }
-
+        return suspense(fiber, e).child
+      } else throw e
     }
   } else {
     updateHost(fiber as FiberHost)
