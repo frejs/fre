@@ -17,9 +17,7 @@ export function App() {
     <div>
       <Suspense fallback={<div>loading...</div>}>
         <Lazy />
-        <div>111</div>
-        <Lazy />
-        <div>111</div>
+        <div>222</div>
       </Suspense>
     </div>
   )

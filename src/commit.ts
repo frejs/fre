@@ -6,16 +6,15 @@ export const commit = (fiber?: FiberFinish) => {
   if (!fiber) {
     return
   }
-
   refer(fiber.ref, fiber.node)
   commitSibling(fiber.child)
-  const { op, ref, cur } = fiber.action || {}
+  let { op, ref, cur } = fiber.action || {}
+
 
   let parent = fiber?.parent?.node
-    if (parent?.nodeType === 8) {
-      parent = parent.parentNode as any
-    }
-  
+  if (parent?.nodeType === 8) {
+    parent = parent.parentNode as any
+  }
 
   if (op & TAG.INSERT || op & TAG.MOVE) {
     let comment = null
@@ -23,7 +22,8 @@ export const commit = (fiber?: FiberFinish) => {
       //@ts-ignore
       comment = fiber?.node?.firstChild
     }
-    parent.insertBefore(cur.node, ref?.node)
+    // console.log(cur?.node, ref?.node)
+    parent.insertBefore(cur?.node, ref?.node)
     if (fiber.isComp) {
       fiber.node = comment
     }
@@ -63,7 +63,7 @@ export const removeElement = (fiber: Fiber, flag: boolean = true) => {
     fiber.hooks && fiber.hooks.list.forEach((e) => e[2] && e[2]())
   } else {
     if (flag) {
-      (fiber.node.parentNode as any).removeChild(fiber.node)
+      (fiber.node?.parentNode as any)?.removeChild(fiber.node)
       flag = false
     }
     kidsRefer(fiber.kids)

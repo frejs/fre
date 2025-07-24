@@ -88,16 +88,23 @@ import { h, render, useState, Fragment } from "../../src/index"
 //   return <div><a href="">222</a></div>
 // }
 
+function Lazy() {
+  return <div>hello</div>
+}
+
+function Suspense(props) {
+  return props.children
+}
+
 function App() {
-  const [key, setKey] = useState([1,2,3])
+  const [key, setKey] = useState(false)
   return (
-    <div>
-      {key.map((i) => (
-        // <Li i={i} key={i} />
-        <li key={i} >{i}</li>
-      ))}
-      <button onClick={() => setKey([3,1,2])}>x</button>
-    </div>
+    <Suspense><Lazy />
+      {key ? <div>loading...</div> : <div>1111</div>}
+      <button onClick={() => setKey(!key)}>+</button>
+
+    </Suspense>
+
   )
 }
 

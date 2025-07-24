@@ -96,6 +96,7 @@ interface FiberBase {
   hooks?: Hooks
   action?: Action | null
   lane?: number,
+  suspend?: boolean
 }
 
 export interface Action {

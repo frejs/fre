@@ -10,7 +10,7 @@ import {
 import { createElement } from './dom'
 import { resetCursor } from './hook'
 import { schedule, shouldYield } from './schedule'
-import { isArr, createText, createVnode } from './h'
+import { isArr, createText, createVnode, Suspense } from './h'
 import { commit, removeElement } from './commit'
 
 let currentFiber: Fiber = null
@@ -48,9 +48,30 @@ const recycleNode = (node: Node) => {
 }
 
 const reconcile = (fiber?: Fiber) => {
-  while (fiber && !shouldYield()) fiber = capture(fiber)
+  while (fiber && !shouldYield()) {
+    fiber = capture(fiber) as any
+  }
   if (fiber) return reconcile.bind(null, fiber) as typeof reconcile
   return null
+}
+
+const getBoundary = (fiber, name) => {
+  let current = fiber.parent
+  while (current) {
+    if (current.type.name === name) return current
+    current = current.parent
+  }
+  return null
+}
+const handleSuspense = (fiber, promise) => {
+  const boundary = getBoundary(fiber, 'Suspense')
+  if (!boundary) throw promise
+  boundary.kids = []
+  reconcileChidren(boundary, simpleVnode(boundary.props.fallback))
+  promise.then(() => {
+    update(boundary)
+  })
+  return boundary
 }
 
 const capture = (fiber: Fiber) => {
@@ -62,14 +83,21 @@ const capture = (fiber: Fiber) => {
     } else if (fiber.memo) {
       fiber.memo = false
     }
+    try {
+      updateHook(fiber)
+    } catch (e) {
+      if (e instanceof Promise) {
+        const s = handleSuspense(fiber, e)
+        return s.child
+      } else {
+        throw e
+      }
 
-    updateHook(fiber)
+    }
   } else {
     updateHost(fiber as FiberHost)
   }
-  if (fiber.child) return fiber.child
-  const sibling = getSibling(fiber)
-  return sibling
+  return fiber.child || getSibling(fiber)
 }
 
 export const isMemo = (fiber: Fiber) => {
@@ -129,7 +157,6 @@ const updateHook = (fiber: Fiber) => {
   resetCursor()
   currentFiber = fiber
   fiber.node = fiber.node || fragment(fiber)
-
   let children = (fiber.type as FC)(fiber.props)
   reconcileChidren(fiber, simpleVnode(children))
 }
@@ -156,7 +183,6 @@ const reconcileChidren = (
   for (let i = 0, prev = null, len = bCh.length; i < len; i++) {
     const child = bCh[i]
     child.action = actions[i]
-
     if (fiber.lane & TAG.SVG) {
       child.lane |= TAG.SVG
     }

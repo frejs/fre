@@ -53,3 +53,29 @@ export function memo<T extends FC>(fn: T, compare?: T['shouldUpdate']) {
 }
 
 export const isArr = Array.isArray
+
+export function lazy(factory) {
+  let status = 'unloaded'
+  let result
+  let promise
+
+  const LazyComponent = (props) => {
+    switch (status) {
+      case 'loaded': return h(result, props)
+      case 'loading': throw promise
+      default:
+        status = 'loading'
+        promise = factory().then((m) => {
+          status = 'loaded'
+          result = m.default
+        })
+        throw promise
+    }
+  }
+  return LazyComponent
+}
+
+export function Suspense(props){
+  return props.children
+}
+
