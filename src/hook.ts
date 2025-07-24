@@ -1,4 +1,4 @@
-import { update, isFn, useFiber } from './reconcile'
+import { update, isFn, useFiber, getBoundary } from './reconcile'
 import {
   DependencyList,
   Reducer,
@@ -38,8 +38,8 @@ export const useReducer = <S, A>(
     let v = reducer
       ? reducer(hook[0], value as any)
       : isFn(value)
-      ? value(hook[0])
-      : value
+        ? value(hook[0])
+        : value
     if (hook[0] !== v) {
       hook[0] = v
       update(current)
@@ -125,7 +125,7 @@ export const createContext = <T>(initialValue: T): ContextType<T> => {
   return contextComponent
 }
 
-export const useContext = <T>(contextType: ContextType<T>) => {
+export const useContext = <T>(ctx: ContextType<T>) => {
   let subscribersSet: Set<Function>
 
   const triggerUpdate = useReducer(null, null)[1] as SubscriberCb
@@ -134,10 +134,7 @@ export const useContext = <T>(contextType: ContextType<T>) => {
     return () => subscribersSet && subscribersSet.delete(triggerUpdate)
   }, EMPTY_ARR)
 
-  let contextFiber = useFiber().parent
-  while (contextFiber && contextFiber.type !== contextType) {
-    contextFiber = contextFiber.parent
-  }
+  let contextFiber = getBoundary(useFiber(), ctx)
 
   if (contextFiber) {
     const hooks = contextFiber.hooks.list as unknown as [
@@ -150,7 +147,7 @@ export const useContext = <T>(contextType: ContextType<T>) => {
 
     return value.current
   } else {
-    return contextType.initialValue
+    return ctx.initialValue
   }
 }
 

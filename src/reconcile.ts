@@ -10,7 +10,7 @@ import {
 import { createElement } from './dom'
 import { resetCursor } from './hook'
 import { schedule, shouldYield } from './schedule'
-import { isArr, createText, createVnode } from './h'
+import { isArr, createText, createVnode, Suspense } from './h'
 import { commit, removeElement } from './commit'
 
 let currentFiber: Fiber = null
@@ -55,16 +55,16 @@ const reconcile = (fiber?: Fiber) => {
   return null
 }
 
-const getBoundary = (fiber, name) => {
+export const getBoundary = (fiber, name) => {
   let current = fiber.parent
   while (current) {
-    if (current.type.name === name) return current
+    if (current.type === name) return current
     current = current.parent
   }
   return null
 }
 const suspense = (fiber, promise) => {
-  const boundary = getBoundary(fiber, 'Suspense')
+  const boundary = getBoundary(fiber, Suspense)
   if (!boundary) throw promise
   boundary.kids = []
   reconcileChidren(boundary, simpleVnode(boundary.props.fallback))
