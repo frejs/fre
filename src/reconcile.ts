@@ -10,7 +10,7 @@ import {
 import { createElement } from './dom'
 import { resetCursor } from './hook'
 import { schedule, shouldYield } from './schedule'
-import { isArr, createText, createVnode, Suspense } from './h'
+import { isArr, createText, createVnode } from './h'
 import { commit, removeElement } from './commit'
 
 let currentFiber: Fiber = null
