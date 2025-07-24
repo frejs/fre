@@ -45,6 +45,11 @@ function App() {
 
 render(<App/>, document.body)
 ```
+### Features
+
+- [Suspense](https://github.com/yisar/fre#Suspense)
+
+- [memo](https://github.com/yisar/fre#memo)
 
 ### Hooks API
 
@@ -61,6 +66,9 @@ render(<App/>, document.body)
 - [useMemo](https://github.com/yisar/fre#usememo)
 
 - [useRef](https://github.com/yisar/fre#useref)
+
+- [useContext](https://github.com/yisar/fre#useContext)
+
 
 #### useState
 
@@ -201,6 +209,49 @@ function App() {
   return flag && <span ref={t}>I will removed</span>
 }
 ```
+
+#### useContext
+
+```js
+import { createContext, useContext } from 'react';
+
+const ThemeContext = createContext(null);
+
+function App() {
+  return (
+    <ThemeContext.Provider value="dark">
+      <Button />
+    </ThemeContext.Provider>
+  )
+}
+
+function Button({ children }) {
+  const theme = useContext(ThemeContext);
+  const className = 'button-' + theme;
+  return (
+    <button class={className}>
+      {children}
+    </button>
+  );
+}
+```
+
+### Suspense
+```js
+const Hello = lazy('./hello.js')
+
+export function App() {
+  return (
+    <div>
+      <Suspense fallback={<div>loading...</div>}>
+        <Hello />
+        <div>world!</div>
+      </Suspense>
+    </div>
+  )
+}
+```
+
 ### Fragments
 
 ```js
@@ -228,22 +279,6 @@ plugins: [
   ],
 ]
 ```
-
-### Compare with other frameworks
-
-The comparison is difficult because the roadmap and trade-offs of each framework are different, but we have to do so.
-
-- react
-
-React is the source of inspiration for fre. Their implementation and asynchronous rendering are similar. The most amazing thing is **concurrent mode**, which means that react and fre have the same roadmap -- **Exploring concurrent use cases**.
-
-But at the same time, fre has obvious advantages in concurrent mode and bundle size.
-
-- vue / preact
-
-To some extent, vue and preact are similar. They have similar synchronous rendering, only the API is different.
-
-The reconciliation algorithm of fre is similar to vue2, but the biggest difference is that vue/preact do not support concurrent mode, this means that the roadmap is totally different.
 
 #### License
 
