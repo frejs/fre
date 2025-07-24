@@ -18,7 +18,7 @@
 
 - **Keyed reconcilation algorithm** — Fre has a minimal diff algorithm, It supported keyed, pre-process, offscreen rendering and hydrate.
 
-- **Do more with less** — After tree shaking, project of hello world is only 1KB, but it has most features, virtual DOM, hooks API, Fragments, Fre.memo and so on.
+- **Do more with less** — Fre get the tiny size, but it has most features, virtual DOM, hooks API, Suspense, Fragments, Fre.memo and so on.
 
 ### Contributors
 
