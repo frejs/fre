@@ -211,9 +211,7 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
     aTail = aCh.length - 1,
     bTail = bCh.length - 1,
     bMap = {},
-    same = (a: Fiber, b: Fiber) => {
-      return a.type === b.type && a.key === b.key
-    },
+    same = (a: Fiber, b: Fiber) => a.type === b.type && a.key === b.key,
     temp = [],
     actions = []
 
