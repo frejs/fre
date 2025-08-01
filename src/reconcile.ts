@@ -191,7 +191,7 @@ const reconcileChidren = (
 function clone(a: Fiber, b: Fiber) {
   b.hooks = a.hooks
   b.ref = a.ref
-  b.node = a.node // 临时修复
+  b.node = a.node
   b.kids = a.kids
   b.alternate = a
 }
@@ -210,7 +210,6 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
     bHead = 0,
     aTail = aCh.length - 1,
     bTail = bCh.length - 1,
-    aMap = {},
     bMap = {},
     same = (a: Fiber, b: Fiber) => {
       return a.type === b.type && a.key === b.key
@@ -228,24 +227,18 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
 
   while (aHead <= aTail && bHead <= bTail) {
     if (!same(aCh[aHead], bCh[bHead])) break
-
     clone(aCh[aHead], bCh[bHead])
     actions.push({ op: TAG.UPDATE })
     aHead++
     bHead++
   }
-  for (let i = aHead; i <= aTail; i++) {
-    if (aCh[i].key) aMap[aCh[i].key] = i
-  }
+
   for (let i = bHead; i <= bTail; i++) {
     if (bCh[i].key) bMap[bCh[i].key] = i
   }
 
-
-
   while (aHead <= aTail || bHead <= bTail) {
-    var aElm = aCh[aHead],
-      bElm = bCh[bHead]
+    const aElm = aCh[aHead], bElm = bCh[bHead]
 
     if (aElm === null) {
       aHead++
@@ -261,22 +254,25 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
       aHead++
       bHead++
     } else {
-      var foundB = bMap[aElm.key]
-      var foundA = aMap[bElm.key]
+      const foundB = aElm.key ? bMap[aElm.key] : null
+
       if (foundB == null) {
         removeElement(aElm)
         aHead++
-      } else if (foundA == null) {
-        actions.push({ op: TAG.INSERT, cur: bElm, ref: aElm })
-        bHead++
       } else {
-        clone(aCh[foundA], bElm)
-        actions.push({ op: TAG.MOVE, cur: aCh[foundA], ref: aElm })
-        aCh[foundA] = null
-        bHead++
+        if (bHead <= foundB) {
+          actions.push({ op: TAG.INSERT, cur: bElm, ref: aElm })
+          bHead++
+        } else {
+          clone(aElm, bCh[foundB])
+          actions.push({ op: TAG.MOVE, cur: aElm, ref: aCh[aHead] })
+          aCh[aHead] = null
+          aHead++
+        }
       }
     }
   }
+
   for (let i = temp.length - 1; i >= 0; i--) {
     actions.push(temp[i])
   }
