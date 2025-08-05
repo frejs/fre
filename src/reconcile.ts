@@ -77,7 +77,7 @@ const capture = (fiber: Fiber) => {
   if (fiber.isComp) {
     if (isMemo(fiber)) {
       fiber.memo = false
-      return getSibling(fiber)
+      return sibling(fiber)
     }
     try {
       updateHook(fiber)
@@ -89,7 +89,7 @@ const capture = (fiber: Fiber) => {
   } else {
     updateHost(fiber as FiberHost)
   }
-  return fiber.child || getSibling(fiber)
+  return fiber.child || sibling(fiber)
 }
 
 export const isMemo = (fiber: Fiber) => {
@@ -106,7 +106,7 @@ export const isMemo = (fiber: Fiber) => {
   return false
 }
 
-const getSibling = (fiber?: Fiber) => {
+const sibling = (fiber?: Fiber) => {
   while (fiber) {
     bubble(fiber)
     if (fiber.dirty) {
