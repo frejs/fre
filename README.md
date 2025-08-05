@@ -219,9 +219,9 @@ const ThemeContext = createContext(null);
 
 function App() {
   return (
-    <ThemeContext.Provider value="dark">
+    <ThemeContext value="dark">
       <Button />
-    </ThemeContext.Provider>
+    </ThemeContext>
   )
 }
 

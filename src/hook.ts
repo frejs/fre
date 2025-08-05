@@ -109,46 +109,32 @@ export type ContextType<T> = {
 
 type SubscriberCb = () => void
 
-export const createContext = <T>(initialValue: T): ContextType<T> => {
-  const contextComponent: ContextType<T> = ({ value, children }) => {
-    const valueRef = useRef(value)
-    const subscribers = useMemo(() => new Set<SubscriberCb>(), EMPTY_ARR)
-
-    if (valueRef.current !== value) {
-      valueRef.current = value
-      subscribers.forEach((subscriber) => subscriber())
+export const createContext = <T>(value: T): ContextType<T> => {
+  const C = ({ value, children }: { value: T; children: any }) => {
+    const ref = useRef(value)
+    const subs = useMemo(() => new Set<() => void>(), EMPTY_ARR)
+    if (ref.current !== value) {
+      ref.current = value
+      subs.forEach(cb => cb())
     }
-
     return children
   }
-  contextComponent.initialValue = initialValue
-  return contextComponent
+  C.initialValue = value
+  return C as ContextType<T>
 }
 
+
 export const useContext = <T>(ctx: ContextType<T>) => {
-  let subscribersSet: Set<Function>
+  const update = useReducer(null,null)[1] as SubscriberCb
+  let subs: Set<SubscriberCb>
 
-  const triggerUpdate = useReducer(null, null)[1] as SubscriberCb
+  useEffect(() => () => subs?.delete(update), EMPTY_ARR)
 
-  useEffect(() => {
-    return () => subscribersSet && subscribersSet.delete(triggerUpdate)
-  }, EMPTY_ARR)
-
-  let contextFiber = getBoundary(useFiber(), ctx)
-
-  if (contextFiber) {
-    const hooks = contextFiber.hooks.list as unknown as [
-      [RefObject<T>],
-      [Set<SubscriberCb>]
-    ]
-    const [[value], [subscribers]] = hooks
-
-    subscribersSet = subscribers.add(triggerUpdate)
-
-    return value.current
-  } else {
-    return ctx.initialValue
-  }
+  const fiber = getBoundary(useFiber(), ctx)
+  return fiber
+    ? (subs = (fiber.hooks.list[1][0]).add(update),
+      (fiber.hooks.list[0][0] as { current: T }).current)
+    : ctx.initialValue
 }
 
 export const isChanged = (a: DependencyList | undefined, b: DependencyList) => {
