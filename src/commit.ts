@@ -12,7 +12,11 @@ export const commit = (fiber?: FiberFinish) => {
 
 
   let parent = fiber?.parent?.node
+  let suspenseNodeComment = null
   if (parent?.nodeType === 8) {
+    if (parent?.nodeValue === 'Suspense') {
+      suspenseNodeComment = parent
+    }
     parent = parent.parentNode as any
   }
 
@@ -23,7 +27,7 @@ export const commit = (fiber?: FiberFinish) => {
       comment = fiber?.node?.firstChild
     }
     // console.log(cur?.node, ref?.node)
-    parent.insertBefore(cur?.node, ref?.node)
+    parent.insertBefore(cur?.node, suspenseNodeComment ?? ref?.node)
     if (fiber.isComp) {
       fiber.node = comment
     }
