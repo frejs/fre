@@ -32,7 +32,7 @@ export const useReducer = <S, A>(
 ): [S, Dispatch<A>] => {
   const [hook, current] = getSlot<HookReducer>(cursor++)
   if (hook.length === 0) {
-    hook[0] = initState
+    hook[0] = isFn(initState) ? initState() : initState
   }
   hook[1] = (value: A | Dispatch<A>) => {
     let v = reducer
