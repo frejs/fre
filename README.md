@@ -79,7 +79,7 @@ You can use it many times, new state is available when component is rerender
 ```js
 function App() {
   const [up, setUp] = useState(0)
-  const [down, setDown] = useState(0)
+  const [down, setDown] = useState(() => 0)
   return (
     <>
       <h1>{up}</h1>

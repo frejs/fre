@@ -22,13 +22,13 @@ export const resetCursor = () => {
   cursor = 0
 }
 
-export const useState = <T>(initState: T) => {
+export const useState = <T>(initState: T | (() => T)) => {
   return useReducer<T, SetStateAction<T>>(null, initState)
 }
 
 export const useReducer = <S, A>(
   reducer?: Reducer<S, A>,
-  initState?: S
+  initState?: S | (() => S)
 ): [S, Dispatch<A>] => {
   const [hook, current] = getSlot<HookReducer>(cursor++)
   if (hook.length === 0) {
@@ -125,7 +125,7 @@ export const createContext = <T>(value: T): ContextType<T> => {
 
 
 export const useContext = <T>(ctx: ContextType<T>) => {
-  const update = useReducer(null,null)[1] as SubscriberCb
+  const update = useReducer(null, null)[1] as SubscriberCb
   let subs: Set<SubscriberCb>
 
   useEffect(() => () => subs?.delete(update), EMPTY_ARR)
