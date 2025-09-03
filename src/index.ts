@@ -12,5 +12,5 @@ export {
   useContext,
   createContext,
 } from './hook'
-export { shouldYield, schedule as startTranstion } from './schedule'
+export { shouldYield, schedule as startTransition } from './schedule'
 export * from './type'
