@@ -153,7 +153,7 @@ const updateHook = (fiber: Fiber) => {
   reconcileChidren(fiber, simpleVnode(children))
 }
 
-export const resetFiber = (fiber:Fiber) =>{
+export const resetFiber = (fiber: Fiber | null) => {
   currentFiber = fiber
 }
 
