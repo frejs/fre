@@ -147,10 +147,14 @@ const fragment = (fiber: Fiber) => {
 const updateHook = (fiber: Fiber) => {
 
   resetCursor()
-  currentFiber = fiber
+  resetFiber(fiber)
   fiber.node = fiber.node || fragment(fiber)
   let children = (fiber.type as FC)(fiber.props)
   reconcileChidren(fiber, simpleVnode(children))
+}
+
+export const resetFiber = (fiber:Fiber) =>{
+  currentFiber = fiber
 }
 
 const updateHost = (fiber: FiberHost) => {

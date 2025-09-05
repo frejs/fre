@@ -42,7 +42,9 @@ export const useReducer = <S, A>(
         : value
     if (hook[0] !== v) {
       hook[0] = v
-      update(current)
+      if (typeof window !== 'undefined') {
+        update(current)
+      }
     }
   }
   return hook as Required<HookReducer>
