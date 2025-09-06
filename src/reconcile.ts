@@ -18,17 +18,17 @@ let currentFiber: Fiber = null
 let rootFiber: Fiber = null
 let domCursor: any = null
 
-
+export const options = {} as any
 
 export const render = (vnode: Fiber, node: Node, hydrating: boolean) => {
 
-  if (hydrating) {
-    domCursor = domToLinkedList(node)
+  if (options.hydrate) {
+    domCursor = options.hydrate(node)
   }
   rootFiber = {
     node,
     props: { children: vnode },
-    hydrating
+    hydrating: !!options.hydrate
   } as Fiber
 
   update(rootFiber)
