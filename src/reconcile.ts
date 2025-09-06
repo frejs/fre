@@ -12,7 +12,6 @@ import { resetCursor } from './hook'
 import { schedule, shouldYield } from './schedule'
 import { isArr, createText, Suspense } from './h'
 import { commit, removeElement } from './commit'
-import { domToLinkedList } from './ssr'
 
 let currentFiber: Fiber = null
 let rootFiber: Fiber = null
