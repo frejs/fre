@@ -8,11 +8,11 @@ export function domToLinkedList(domNode) {
             const name = node.textContent.trim()
             if (!name) return
 
-            if (stack.length && stack[stack.length - 1].data === `$${name}`) {
+            if (stack.length && stack[stack.length - 1].type === `$${name}`) {
                 stack.pop()
             }
             else {
-                const newNode = { data: `$${name}`, next: null, kids: [] }
+                const newNode = { type: `$${name}`, next: null, kids: [] }
                 if (head) {
                     tail.next = newNode
                     tail = newNode
@@ -31,7 +31,7 @@ export function domToLinkedList(domNode) {
             const currentParent = stack[stack.length - 1]
 
             if (node.nodeType === 1) {
-                const newNode = { type: node.tagName.toLowerCase(), next: null, kids: [] }
+                const newNode = { type: node.tagName.toLowerCase(), next: null, kids: [], node: node, key: null }
                 tail.next = newNode
                 tail = newNode
                 currentParent.kids.push(newNode)
@@ -46,7 +46,7 @@ export function domToLinkedList(domNode) {
             else if (node.nodeType === 3) {
                 const text = node.textContent.trim()
                 if (text) {
-                    const newNode = { type: '#text', props: { nodeValue: text }, next: null, kids: [] }
+                    const newNode = { type: '#text', alternate: { props: { nodeValue: text } }, next: null, kids: [], node: node }
                     tail.next = newNode
                     tail = newNode
                     currentParent.kids.push(newNode)
@@ -60,7 +60,8 @@ export function domToLinkedList(domNode) {
     traverse(domNode)
 
     return {
-        data: domNode.tagName.toLowerCase(),
+        type: domNode.tagName.toLowerCase(),
+        node: domNode,
         next: head,
         kids: [head]
     }

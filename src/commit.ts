@@ -9,8 +9,7 @@ export const commit = (fiber?: FiberFinish) => {
   refer(fiber.ref, fiber.node)
   commitSibling(fiber.child)
   let { op, ref, cur } = fiber.action || {}
-
-
+  
   let parent = fiber?.parent?.node
   let suspenseNodeComment = null
   if (parent?.nodeType === 8) {

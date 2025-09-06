@@ -209,13 +209,20 @@ const side = (effects?: HookEffect[]) => {
   effects.length = 0
 }
 
+const isHydrateComponent = (a, b) => {
+  if (b.isComp) {
+    return a.type === '$' + b.type.name
+  }
+  return false
+}
+
 const diff = (aCh: Fiber[], bCh: Fiber[]) => {
   let aHead = 0,
     bHead = 0,
     aTail = aCh.length - 1,
     bTail = bCh.length - 1,
     bMap = {},
-    same = (a: Fiber, b: Fiber) => (b.hydrating && b.reused) || (a.type === b.type && a.key === b.key),
+    same = (a: Fiber, b: Fiber) => isHydrateComponent(a, b) || (a.type === b.type && a.key === b.key),
     temp = [],
     actions = []
 
