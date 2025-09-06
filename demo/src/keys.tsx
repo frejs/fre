@@ -99,11 +99,12 @@ function Suspense(props) {
 function App() {
   const [key, setKey] = useState(false)
   return (
-    <Suspense><Lazy />
-      {key ? <div>loading...</div> : <div>1111</div>}
-      <button onClick={() => setKey(!key)}>+</button>
 
-    </Suspense>
+    <div>
+      {key ? <h1>1111</h1> : <div>1111</div>}
+      <button onClick={() => setKey(!key)}>+</button>
+    </div>
+
 
   )
 }

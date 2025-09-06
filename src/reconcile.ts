@@ -20,15 +20,15 @@ let domCursor: any = null
 
 
 
-export const render = (vnode: Fiber, node: Node) => {
-  const hasDOM = node.firstChild !== null
-  domCursor = domToLinkedList(node)
-  console.log(domCursor)
+export const render = (vnode: Fiber, node: Node, hydrating: boolean) => {
 
+  if (hydrating) {
+    domCursor = domToLinkedList(node)
+  }
   rootFiber = {
     node,
     props: { children: vnode },
-    hydrating: hasDOM
+    hydrating
   } as Fiber
 
   update(rootFiber)
@@ -69,8 +69,10 @@ const suspense = (fiber, promise) => {
 const capture = (fiber: Fiber) => {
   fiber.isComp = isFn(fiber.type)
 
-  if (domCursor) {
-    fiber.kids = domCursor.kids
+  if (domCursor && fiber.hydrating) {
+    if (domCursor.type === fiber.type || domCursor.type === ((fiber.type as any).name && `$${(fiber.type as any).name}`)) {
+      fiber.kids = domCursor.kids
+    }
     domCursor = domCursor.next
   }
   if (fiber.isComp) {
@@ -171,15 +173,17 @@ const reconcileChidren = (
 ) => {
   let aCh = fiber.kids || [],
     bCh = (fiber.kids = arrayfy(children))
-  console.log(aCh, bCh)
   const actions = diff(aCh, bCh)
 
   for (let i = 0, prev = null, len = bCh.length; i < len; i++) {
     const child = bCh[i]
     child.action = actions[i]
-    child.hydrating = fiber.hydrating
+
     if (fiber.lane & TAG.SVG) {
       child.lane |= TAG.SVG
+    }
+    if (fiber.hydrating) {
+      child.hydrating = true
     }
     child.parent = fiber
     if (i > 0) {
@@ -209,20 +213,13 @@ const side = (effects?: HookEffect[]) => {
   effects.length = 0
 }
 
-const isHydrateComponent = (a, b) => {
-  if (b.isComp) {
-    return a.type === '$' + b.type.name
-  }
-  return false
-}
-
 const diff = (aCh: Fiber[], bCh: Fiber[]) => {
   let aHead = 0,
     bHead = 0,
     aTail = aCh.length - 1,
     bTail = bCh.length - 1,
     bMap = {},
-    same = (a: Fiber, b: Fiber) => isHydrateComponent(a, b) || (a.type === b.type && a.key === b.key),
+    same = (a: Fiber, b: Fiber) => (a.type === b.type && a.key === b.key),
     temp = [],
     actions = []
 

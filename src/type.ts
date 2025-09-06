@@ -97,9 +97,7 @@ interface FiberBase {
   action?: Action | null
   lane?: number,
   suspend?: boolean,
-  hydrateMismatch?: boolean,
   hydrating?: boolean,
-  reused?: boolean
 }
 
 export interface Action {
