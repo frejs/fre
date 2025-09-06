@@ -12,40 +12,18 @@ import { resetCursor } from './hook'
 import { schedule, shouldYield } from './schedule'
 import { isArr, createText, Suspense } from './h'
 import { commit, removeElement } from './commit'
+import { domToLinkedList } from './ssr'
 
 let currentFiber: Fiber = null
 let rootFiber: Fiber = null
-let domCursor: Node = null
+let domCursor: any = null
 
-const domToFiber = (dom: Node, parent: Fiber): Fiber => {
-  const fiber: Fiber = {
-    parent,
-    node: dom,
-    kids: [],
-    hydrating: true,
-    reused: true,
-    props: {}
-  } as Fiber
 
-  if (dom.nodeType === Node.TEXT_NODE) {
-    fiber.type = '#text'
-    fiber.props.nodeValue = dom.nodeValue
-  } else if (dom.nodeType === Node.ELEMENT_NODE) {
-    const el = dom as HTMLElement
-    fiber.type = el.tagName.toLowerCase()
-    Array.from(el.attributes).forEach(attr => {
-      fiber.props[attr.name] = attr.value
-    })
-    Array.from(el.childNodes).forEach(child => {
-      fiber.kids.push(domToFiber(child, fiber))
-    })
-  }
-  return fiber
-}
 
 export const render = (vnode: Fiber, node: Node) => {
   const hasDOM = node.firstChild !== null
-  domCursor = hasDOM ? node.firstChild : null
+  domCursor = domToLinkedList(node)
+  console.log(domCursor)
 
   rootFiber = {
     node,
@@ -90,6 +68,11 @@ const suspense = (fiber, promise) => {
 
 const capture = (fiber: Fiber) => {
   fiber.isComp = isFn(fiber.type)
+
+  if (domCursor) {
+    fiber.kids = domCursor.kids
+    domCursor = domCursor.next
+  }
   if (fiber.isComp) {
     if (isMemo(fiber)) {
       fiber.memo = false
@@ -131,9 +114,6 @@ const sibling = (fiber?: Fiber) => {
       return null
     }
     if (fiber.sibling) return fiber.sibling
-    if (fiber.parent) {
-      domCursor = fiber.parent.node.nextSibling
-    }
     fiber = fiber.parent
   }
   return null
@@ -172,11 +152,7 @@ const updateHook = (fiber: Fiber) => {
 }
 
 const updateHost = (fiber: FiberHost) => {
-  if (fiber.hydrating && !fiber.kids && fiber.node) {
-    fiber.kids = Array.from(fiber.node.childNodes).map(child =>
-      domToFiber(child, fiber)
-    )
-  }
+
   if (!fiber.node) {
     if (fiber.type === 'svg') fiber.lane |= TAG.SVG
     fiber.node = createElement(fiber)
@@ -195,6 +171,7 @@ const reconcileChidren = (
 ) => {
   let aCh = fiber.kids || [],
     bCh = (fiber.kids = arrayfy(children))
+  console.log(aCh, bCh)
   const actions = diff(aCh, bCh)
 
   for (let i = 0, prev = null, len = bCh.length; i < len; i++) {

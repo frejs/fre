@@ -11,6 +11,8 @@ function App() {
   )
 }
 
-render(<App />, document.getElementById('app'))
+// setTimeout(() => {
+  render(<App />, document.getElementById('app'))
+// }, 2000);
 
 // document.querySelector('#focus').focus()
