@@ -7,21 +7,26 @@ import {
   FiberHost,
   FiberFinish,
 } from './type'
-import { createElement } from './dom'
+import { createElement, updateElement } from './dom'
 import { resetCursor } from './hook'
 import { schedule, shouldYield } from './schedule'
-import { isArr, createText, createVnode, Suspense } from './h'
+import { isArr, createText, Suspense } from './h'
 import { commit, removeElement } from './commit'
 
 let currentFiber: Fiber = null
-let rootFiber = null
+let rootFiber: Fiber = null
+let domCursor: Node = null
 
 export const render = (vnode: Fiber, node: Node) => {
+  const hasDOM = node.firstChild !== null
+  domCursor = hasDOM ? node.firstChild : null
+
   rootFiber = {
     node,
     props: { children: vnode },
-    kids: recycleNode(node).props.children // hydrate
+    hydrating: hasDOM
   } as Fiber
+
   update(rootFiber)
 }
 
@@ -32,27 +37,11 @@ export const update = (fiber?: Fiber) => {
   }
 }
 
-const recycleNode = (node: Node) => {
-  let vnode: any = createVnode(
-    node.nodeName.toLowerCase(),
-    node.nodeType === 3 ? { nodeValue: node.nodeValue, } : {
-      children: Array.from(node.childNodes)
-        .filter((node: Node) => node.nodeType !== Node.TEXT_NODE || node.nodeValue.trim() !== '')
-        .map(recycleNode)
-    },
-    null,
-    null
-  )
-  vnode.node = node
-  return vnode
-}
-
 const reconcile = (fiber?: Fiber) => {
   while (fiber && !shouldYield()) {
     fiber = capture(fiber) as any
   }
-  if (fiber) return reconcile.bind(null, fiber) as typeof reconcile
-  return null
+  return fiber ? reconcile.bind(null, fiber) : null
 }
 
 export const getBoundary = (fiber, name) => {
@@ -63,6 +52,7 @@ export const getBoundary = (fiber, name) => {
   }
   return null
 }
+
 const suspense = (fiber, promise) => {
   const boundary = getBoundary(fiber, Suspense)
   if (!boundary) throw promise
@@ -74,6 +64,18 @@ const suspense = (fiber, promise) => {
 
 const capture = (fiber: Fiber) => {
   fiber.isComp = isFn(fiber.type)
+
+  if (fiber.hydrating && !fiber.node) {
+    const matchedNode = matchDOM(fiber)
+    if (matchedNode) {
+      fiber.node = matchedNode as any
+      fiber.reused = true
+    } else {
+      fiber.node = null
+      fiber.reused = false
+    }
+  }
+
   if (fiber.isComp) {
     if (isMemo(fiber)) {
       fiber.memo = false
@@ -90,6 +92,31 @@ const capture = (fiber: Fiber) => {
     updateHost(fiber as FiberHost)
   }
   return fiber.child || sibling(fiber)
+}
+
+const matchDOM = (fiber: Fiber): Node => {
+  if (!domCursor) return null
+
+  if (fiber.type === '#text') {
+    if (domCursor.nodeType === Node.TEXT_NODE &&
+      domCursor.textContent === fiber.props.nodeValue) {
+      const matched = domCursor
+      domCursor = domCursor.nextSibling
+      return matched
+    }
+    return null
+  }
+
+  if (typeof fiber.type === 'string') {
+    if (domCursor.nodeType === Node.ELEMENT_NODE &&
+      (domCursor as Element).tagName.toLowerCase() === fiber.type.toLowerCase()) {
+      const matched = domCursor
+      domCursor = matched.firstChild
+      return matched
+    }
+  }
+
+  return null
 }
 
 export const isMemo = (fiber: Fiber) => {
@@ -115,6 +142,9 @@ const sibling = (fiber?: Fiber) => {
       return null
     }
     if (fiber.sibling) return fiber.sibling
+    if (fiber.parent) {
+      domCursor = fiber.parent.node.nextSibling
+    }
     fiber = fiber.parent
   }
   return null
@@ -145,22 +175,19 @@ const fragment = (fiber: Fiber) => {
 }
 
 const updateHook = (fiber: Fiber) => {
-
   resetCursor()
-  resetFiber(fiber)
+  currentFiber = fiber
   fiber.node = fiber.node || fragment(fiber)
   let children = (fiber.type as FC)(fiber.props)
   reconcileChidren(fiber, simpleVnode(children))
 }
 
-export const resetFiber = (fiber: Fiber | null) => {
-  currentFiber = fiber
-}
-
 const updateHost = (fiber: FiberHost) => {
-  if (!fiber.node) {
+  if (!fiber.node || fiber.hydrateMismatch) {
     if (fiber.type === 'svg') fiber.lane |= TAG.SVG
     fiber.node = createElement(fiber)
+  } else if (fiber.hydrating) {
+    updateElement(fiber.node as HTMLElement, {}, fiber.props)
   }
   reconcileChidren(fiber, fiber.props.children)
 }
@@ -179,6 +206,7 @@ const reconcileChidren = (
   for (let i = 0, prev = null, len = bCh.length; i < len; i++) {
     const child = bCh[i]
     child.action = actions[i]
+    child.hydrating = fiber.hydrating && !fiber.hydrateMismatch
     if (fiber.lane & TAG.SVG) {
       child.lane |= TAG.SVG
     }
@@ -198,6 +226,8 @@ function clone(a: Fiber, b: Fiber) {
   b.node = a.node
   b.kids = a.kids
   b.alternate = a
+  b.hydrating = a.hydrating
+  b.hydrateMismatch = a.hydrateMismatch
 }
 
 export const arrayfy = <T>(arr: T | T[] | null | undefined) =>
@@ -215,7 +245,7 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
     aTail = aCh.length - 1,
     bTail = bCh.length - 1,
     bMap = {},
-    same = (a: Fiber, b: Fiber) => a.type === b.type && a.key === b.key,
+    same = (a: Fiber, b: Fiber) => (b.hydrating && b.reused) || (a.type === b.type && a.key === b.key),
     temp = [],
     actions = []
 
@@ -280,6 +310,7 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
   }
   return actions
 }
+
 export const useFiber = () => currentFiber || null
 export const isFn = (x: unknown): x is Function => typeof x === 'function'
 export const isStr = (s: unknown): s is number | string =>

@@ -96,7 +96,10 @@ interface FiberBase {
   hooks?: Hooks
   action?: Action | null
   lane?: number,
-  suspend?: boolean
+  suspend?: boolean,
+  hydrateMismatch?: boolean,
+  hydrating?: boolean,
+  reused?: boolean
 }
 
 export interface Action {

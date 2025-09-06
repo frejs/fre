@@ -26,7 +26,6 @@ export const commit = (fiber?: FiberFinish) => {
       //@ts-ignore
       comment = fiber?.node?.firstChild
     }
-    // console.log(cur?.node, ref?.node)
     parent.insertBefore(cur?.node, suspenseNodeComment ?? ref?.node)
     if (fiber.isComp) {
       fiber.node = comment
