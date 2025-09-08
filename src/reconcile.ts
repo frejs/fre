@@ -19,7 +19,7 @@ let domCursor: any = null
 
 export const options = {} as any
 
-export const render = (vnode: Fiber, node: Node, hydrating: boolean) => {
+export const render = (vnode: Fiber, node: Node) => {
 
   if (options.hydrate) {
     domCursor = options.hydrate(node)
@@ -146,7 +146,7 @@ const fragment = (fiber: Fiber) => {
 
 const updateHook = (fiber: Fiber) => {
   resetCursor()
-  currentFiber = fiber
+  resetFiber(fiber)
   fiber.node = fiber.node || fragment(fiber)
   let children = (fiber.type as FC)(fiber.props)
   reconcileChidren(fiber, simpleVnode(children))
@@ -284,6 +284,7 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
 }
 
 export const useFiber = () => currentFiber || null
+export const resetFiber = (fiber: Fiber) => currentFiber = fiber
 export const isFn = (x: unknown): x is Function => typeof x === 'function'
 export const isStr = (s: unknown): s is number | string =>
   typeof s === 'number' || typeof s === 'string'
