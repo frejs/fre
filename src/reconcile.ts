@@ -13,9 +13,12 @@ import { schedule, shouldYield } from './schedule'
 import { isArr, createText, Suspense } from './h'
 import { commit, removeElement } from './commit'
 
-let currentFiber: Fiber = null
-let rootFiber: Fiber = null
+// let currentFiber: Fiber = null
 let domCursor: any = null
+
+if (!globalThis.currentFiber) { // 兼容 server
+  globalThis.currentFiber = null
+}
 
 export const options = {} as any
 
@@ -24,7 +27,7 @@ export const render = (vnode: Fiber, node: Node) => {
   if (options.hydrate) {
     domCursor = options.hydrate(node)
   }
-  rootFiber = {
+  let rootFiber = {
     node,
     props: { children: vnode },
     hydrating: !!options.hydrate
@@ -283,8 +286,8 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
   return actions
 }
 
-export const useFiber = () => currentFiber || null
-export const resetFiber = (fiber: Fiber) => currentFiber = fiber
+export const useFiber = () => globalThis.currentFiber || null
+export const resetFiber = (fiber: Fiber) => globalThis.currentFiber = fiber
 export const isFn = (x: unknown): x is Function => typeof x === 'function'
 export const isStr = (s: unknown): s is number | string =>
   typeof s === 'number' || typeof s === 'string'
