@@ -126,6 +126,18 @@ function App() {
 //   );
 // }
 
+function AAA() {
+
+  // const data = useLoaderData()
+  // console.log(data)
+  return (
+    <div>
+      <h1>Hello</h1>
+      <img src="/static/example.jpg" style={{width:'400px'}}/>
+    </div>
+  )
+}
+
 // function Li(props) {
 //   return <div>
 //     <li>{props.i}</li>
@@ -146,4 +158,4 @@ function Li(props) {
 //   createRoot(node).render(jsx)
 // }
 
-render(<App />, document.getElementById("app"))
+render(<AAA />, document.getElementById("app"))

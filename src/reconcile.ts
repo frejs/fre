@@ -7,30 +7,18 @@ import {
   FiberHost,
   FiberFinish,
 } from './type'
-import { createElement, updateElement } from './dom'
+import { createElement } from './dom'
 import { resetCursor } from './hook'
 import { schedule, shouldYield } from './schedule'
 import { isArr, createText, Suspense } from './h'
 import { commit, removeElement } from './commit'
 
-// let currentFiber: Fiber = null
-let domCursor: any = null
-
-if (!globalThis.currentFiber) { // 兼容 server
-  globalThis.currentFiber = null
-}
-
-export const options = {} as any
-
+let currentFiber: Fiber = null
 export const render = (vnode: Fiber, node: Node) => {
-
-  if (options.hydrate) {
-    domCursor = options.hydrate(node)
-  }
+  if (node.firstChild) node.removeChild(node.firstChild) // no hydrating
   let rootFiber = {
     node,
     props: { children: vnode },
-    hydrating: !!options.hydrate
   } as Fiber
 
   update(rootFiber)
@@ -71,12 +59,6 @@ const suspense = (fiber, promise) => {
 const capture = (fiber: Fiber) => {
   fiber.isComp = isFn(fiber.type)
 
-  if (domCursor && fiber.hydrating) {
-    if (domCursor.type === fiber.type || domCursor.type === ((fiber.type as any).name && `$${(fiber.type as any).name}`)) {
-      fiber.kids = domCursor.kids
-    }
-    domCursor = domCursor.next
-  }
   if (fiber.isComp) {
     if (isMemo(fiber)) {
       fiber.memo = false
@@ -160,8 +142,6 @@ const updateHost = (fiber: FiberHost) => {
   if (!fiber.node) {
     if (fiber.type === 'svg') fiber.lane |= TAG.SVG
     fiber.node = createElement(fiber)
-  } else if (fiber.hydrating) {
-    updateElement(fiber.node as HTMLElement, {}, fiber.props)
   }
   reconcileChidren(fiber, fiber.props.children)
 }
@@ -184,9 +164,6 @@ const reconcileChidren = (
     if (fiber.lane & TAG.SVG) {
       child.lane |= TAG.SVG
     }
-    if (fiber.hydrating) {
-      child.hydrating = true
-    }
     child.parent = fiber
     if (i > 0) {
       prev.sibling = child
@@ -203,7 +180,6 @@ function clone(a: Fiber, b: Fiber) {
   b.node = a.node
   b.kids = a.kids
   b.alternate = a
-  b.hydrating = a.hydrating
 }
 
 export const arrayfy = <T>(arr: T | T[] | null | undefined) =>
@@ -286,8 +262,8 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
   return actions
 }
 
-export const useFiber = () => globalThis.currentFiber || null
-export const resetFiber = (fiber: Fiber) => globalThis.currentFiber = fiber
+export const useFiber = () => currentFiber || null
+export const resetFiber = (fiber: Fiber) => currentFiber = fiber
 export const isFn = (x: unknown): x is Function => typeof x === 'function'
 export const isStr = (s: unknown): s is number | string =>
   typeof s === 'number' || typeof s === 'string'

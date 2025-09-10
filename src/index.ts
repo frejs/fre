@@ -1,5 +1,5 @@
 export { h, Fragment, h as createElement, memo, Suspense, lazy } from './h'
-export { render, useFiber, options, resetFiber } from './reconcile'
+export { render, useFiber, resetFiber } from './reconcile'
 export {
   useState,
   useReducer,
