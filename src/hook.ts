@@ -105,14 +105,14 @@ export const getSlot = <T extends HookList = HookList>(cursor: number) => {
 }
 
 export type ContextType<T> = {
-  ({ value, children }: { value: T; children: FreNode }): FreNode
+  ({ value, children }: { value: T; children?: FreNode }): FreNode
   initialValue: T
 }
 
 type SubscriberCb = () => void
 
 export const createContext = <T>(value: T): ContextType<T> => {
-  const C = ({ value, children }: { value: T; children: any }) => {
+  const C = ({ value, children }: Parameters<ContextType<T>>[0]) => {
     const ref = useRef(value)
     const subs = useMemo(() => new Set<() => void>(), EMPTY_ARR)
     if (ref.current !== value) {
