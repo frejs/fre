@@ -51,6 +51,8 @@ render(<App/>, document.body)
 
 - [memo](https://github.com/yisar/fre#memo)
 
+- [ErrorBoundary](https://github.com/yisar/fre#ErrorBoundary)
+
 ### Hooks API
 
 - [useState](https://github.com/yisar/fre#usestate)
@@ -247,6 +249,23 @@ export function App() {
         <Hello />
         <div>world!</div>
       </Suspense>
+    </div>
+  )
+}
+```
+
+### ErrorBoundary
+```js
+function A(){
+  throw new Error('render error test')
+}
+
+export function App() {
+  return (
+    <div>
+      <ErrorBoundary fallback={<div>occur an error</div>}>
+        <A />
+      </ErrorBoundary>
     </div>
   )
 }
