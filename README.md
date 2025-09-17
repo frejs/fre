@@ -16,7 +16,7 @@
 
 - **Concurrent Mode** — This is an amazing idea, which implements the coroutine scheduler in JavaScript, it also called **Time slicing**.
 
-- **Keyed reconcilation algorithm** — Fre has a minimal diff algorithm, It supported keyed, pre-process, offscreen rendering and hydrate.
+- **Keyed reconcilation algorithm** — Fre has a minimal diff algorithm, It supported keyed, pre-process, offscreen rendering and SSR hydration.
 
 - **Do more with less** — Fre get the tiny size, but it has most features, virtual DOM, hooks API, Suspense, Fragments, Fre.memo and so on.
 
