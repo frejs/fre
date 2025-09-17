@@ -1,4 +1,4 @@
-import { render, useState, useMemo, useEffect } from '../../src/index'
+import { render, useState, useMemo, useEffect,h } from '../../src/index'
 
 function Counter() {
   const [count, setCount] = useState(0)

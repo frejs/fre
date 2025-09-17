@@ -285,18 +285,20 @@ function App() {
 ```
 
 
-### jsx2
+### jsx
+
+For vite example
 
 ```js
-plugins: [
-  [
-    '@babel/plugin-transform-react-jsx',
-    {
-      runtime: 'automatic',
-      importSource: 'fre',
-    },
-  ],
-]
+export default {
+  esbuild: {
+    jsxFactory: 'h',
+    jsxFragment: 'Fragment',
+    jsxInject: `import { h, Fragment } from 'fre'`,
+    target: 'es2020',
+    format: 'esm'
+  }
+}
 ```
 
 #### License

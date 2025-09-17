@@ -1,4 +1,4 @@
-import { render, useState, h, useEffect } from '../../src/index'
+import { render, useState, useEffect } from '../../src/index'
 
 function App() {
   const [list, setList] = useState([1, 2, 3])
