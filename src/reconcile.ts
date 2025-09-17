@@ -10,7 +10,7 @@ import {
 import { createElement } from './dom'
 import { resetCursor } from './hook'
 import { schedule, shouldYield } from './schedule'
-import { isArr, createText, Suspense } from './h'
+import { isArr, createText, Suspense, ErrorBoundary } from './h'
 import { commit, removeElement } from './commit'
 
 let currentFiber: Fiber = null
@@ -46,12 +46,18 @@ export const getBoundary = (fiber, name) => {
   }
   return null
 }
-
-const suspense = (fiber, promise) => {
+const errorBoundaryRender = (fiber, error) => {
+  const boundary = getBoundary(fiber, ErrorBoundary)
+  if (!boundary) throw error
+  const formatError = error instanceof Error ? error : new Error(error)
+  reconcileChildren(boundary, isFn(boundary.props.fallback) ? boundary.props.fallback({ error: formatError }) : simpleVnode(boundary.props.fallback))
+  return boundary
+}
+const suspenseRender = (fiber, promise) => {
   const boundary = getBoundary(fiber, Suspense)
   if (!boundary) throw promise
   boundary.kids = []
-  reconcileChidren(boundary, simpleVnode(boundary.props.fallback))
+  reconcileChildren(boundary, simpleVnode(boundary.props.fallback))
   promise.then(() => update(boundary))
   return boundary
 }
@@ -68,8 +74,10 @@ const capture = (fiber: Fiber) => {
       updateHook(fiber)
     } catch (e) {
       if (e instanceof Promise) {
-        return suspense(fiber, e).child
-      } else throw e
+        return suspenseRender(fiber, e).child
+      } else {
+        return errorBoundaryRender(fiber, e).child
+      }
     }
   } else {
     updateHost(fiber as FiberHost)
@@ -134,7 +142,7 @@ const updateHook = (fiber: Fiber) => {
   resetFiber(fiber)
   fiber.node = fiber.node || fragment(fiber)
   let children = (fiber.type as FC)(fiber.props)
-  reconcileChidren(fiber, simpleVnode(children))
+  reconcileChildren(fiber, simpleVnode(children))
 }
 
 const updateHost = (fiber: FiberHost) => {
@@ -143,13 +151,13 @@ const updateHost = (fiber: FiberHost) => {
     if (fiber.type === 'svg') fiber.lane |= TAG.SVG
     fiber.node = createElement(fiber)
   }
-  reconcileChidren(fiber, fiber.props.children)
+  reconcileChildren(fiber, fiber.props.children)
 }
 
 const simpleVnode = (type: Fiber | FreText) =>
   isStr(type) ? createText(type) : type
 
-const reconcileChidren = (
+const reconcileChildren = (
   fiber: Fiber,
   children: Fiber | Fiber[] | null | undefined
 ) => {

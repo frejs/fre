@@ -1,18 +1,23 @@
-import { render, ErrorBoundary } from '../../src/index'
+import { render, ErrorBoundary, h } from '../../src/index'
 
-function errorFn(error){
-  console.error(error)
-  return <div>hello</div>
+function ErrorFn(props){
+  return <div>{props.error.message}</div>
 }
 
 function App() {
-  return <ErrorBoundary fallback={errorFn}>
-    <A/>
-  </ErrorBoundary>
+  return <div>
+    <ErrorBoundary fallback={ErrorFn}>
+      <A/>
+    </ErrorBoundary>
+    <ErrorBoundary fallback={<div>occur an error when render A </div>}>
+      <A/>
+    </ErrorBoundary>
+    <ErrorFn error={{message:'error rendering'}} />
+  </div>
 }
 
 function A(){
-  throw 111
+  throw new Error('render error test')
 }
 
 render(<App />, document.getElementById('app'))

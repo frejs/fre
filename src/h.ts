@@ -75,7 +75,11 @@ export function lazy(factory) {
   return LazyComponent
 }
 
-export function Suspense(props){
+export function Suspense(props) {
+  return props.children
+}
+
+export function ErrorBoundary(props) {
   return props.children
 }
 
