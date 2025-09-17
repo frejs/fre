@@ -298,7 +298,6 @@ function nextDom(currentNode: Node | null): Node | null {
     }
     node = node.parentNode
   }
-
   return null
 }
 
