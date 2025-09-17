@@ -14,8 +14,11 @@ import { isArr, createText, Suspense, ErrorBoundary } from './h'
 import { commit, removeElement } from './commit'
 
 let currentFiber: Fiber = null
+let currentDom: Node | null = null
+
 export const render = (vnode: Fiber, node: Node) => {
-  if (node.firstChild) node.removeChild(node.firstChild) // no hydrating
+  currentDom = node.firstChild
+
   let rootFiber = {
     node,
     props: { children: vnode },
@@ -70,15 +73,8 @@ const capture = (fiber: Fiber) => {
       fiber.memo = false
       return sibling(fiber)
     }
-    try {
-      updateHook(fiber)
-    } catch (e) {
-      if (e instanceof Promise) {
-        return suspenseRender(fiber, e).child
-      } else {
-        return errorBoundaryRender(fiber, e).child
-      }
-    }
+    updateHook(fiber)
+
   } else {
     updateHost(fiber as FiberHost)
   }
@@ -141,16 +137,37 @@ const updateHook = (fiber: Fiber) => {
   resetCursor()
   resetFiber(fiber)
   fiber.node = fiber.node || fragment(fiber)
-  let children = (fiber.type as FC)(fiber.props)
-  reconcileChildren(fiber, simpleVnode(children))
+  try {
+    let children = (fiber.type as FC)(fiber.props)
+    reconcileChildren(fiber, simpleVnode(children))
+  } catch (e) {
+    if (e instanceof Promise) {
+      return suspenseRender(fiber, e).child
+    } else {
+      return errorBoundaryRender(fiber, e).child
+    }
+  }
 }
 
 const updateHost = (fiber: FiberHost) => {
+  if (fiber.type) {
+    const ssrDom = currentDom
+    if (ssrDom) {
+      if (fiber.type !== ssrDom.nodeName.toLowerCase()) {
+        removeElement({ node: ssrDom } as FiberFinish)
+        fiber.kids = [] // all kids should INSERT
+      } else {
+        fiber.action.op = TAG.UPDATE
+      }
+    }
+    currentDom = ssrDom ? nextDom(ssrDom) : null
+  }
 
   if (!fiber.node) {
     if (fiber.type === 'svg') fiber.lane |= TAG.SVG
     fiber.node = createElement(fiber)
   }
+
   reconcileChildren(fiber, fiber.props.children)
 }
 
@@ -205,7 +222,6 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
     aTail = aCh.length - 1,
     bTail = bCh.length - 1,
     bMap = {},
-    same = (a: Fiber, b: Fiber) => (a.type === b.type && a.key === b.key),
     temp = [],
     actions = []
 
@@ -269,6 +285,24 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
   }
   return actions
 }
+
+function nextDom(currentNode: Node | null): Node | null {
+  if (!currentNode) return null
+  if (currentNode.firstChild) {
+    return currentNode.firstChild
+  }
+  let node = currentNode
+  while (node) {
+    if (node.nextSibling) {
+      return node.nextSibling
+    }
+    node = node.parentNode
+  }
+
+  return null
+}
+
+const same = (a: Fiber, b: Fiber) => a && b && (a.type === b.type && a.key === b.key)
 
 export const useFiber = () => currentFiber || null
 export const resetFiber = (fiber: Fiber) => currentFiber = fiber

@@ -33,7 +33,7 @@ export const commit = (fiber?: FiberFinish) => {
     const node = fiber.node
     updateElement(
       node,
-      (fiber.alternate as FiberHost).props || {},
+      (fiber.alternate as FiberHost)?.props || {},
       (fiber as FiberHost).props
     )
   }
