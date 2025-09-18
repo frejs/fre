@@ -4,9 +4,17 @@ import { FC, FreNode, FreText, Fiber } from './type'
 // for jsx2
 export const h = (type: string | FC, props: any, ...kids: FreNode[]) => {
   props = props || {}
-  kids = flat(arrayfy(props.children || kids))
 
-  if (kids.length) props.children = kids.length === 1 ? kids[0] : kids
+  // JSX Transform 会将 children 作为 props 传递
+  if (props.children !== undefined) {
+    kids = flat(arrayfy([props.children]))
+  } else if (kids.length) {
+    kids = flat(arrayfy(kids))
+  }
+
+  if (kids.length) {
+    props.children = kids.length === 1 ? kids[0] : kids
+  }
 
   const key = props.key || null
   const ref = props.ref || null
