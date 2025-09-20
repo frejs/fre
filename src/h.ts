@@ -6,7 +6,9 @@ export const h = (type: string | FC, props: any, ...kids: FreNode[]) => {
   props = props || {}
   kids = flat(arrayfy(props.children || kids))
 
-  if (kids.length) props.children = kids.length === 1 ? kids[0] : kids
+  if (kids.length) {
+    props.children = kids.length === 1 ? kids[0] : kids
+  } else delete props.children
 
   const key = props.key || null
   const ref = props.ref || null
