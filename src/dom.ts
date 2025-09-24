@@ -36,11 +36,11 @@ export const updateElement = (
     } else if (name in dom && !(dom instanceof SVGElement)) {
       dom[name] = b || ''
     } else if (b == null || b === false) {
-      // @ts-expect-error Property 'removeAttribute' does not exist on type 'Text'.
-      dom.removeAttribute(name)
+      // @ts-expect-error Property 'removeAttribute' does not exist on type 'Text' | type 'Commit'
+      dom.removeAttribute?.(name)
     } else {
-      // @ts-expect-error Property 'setAttribute' does not exist on type 'Text'.
-      dom.setAttribute && dom?.setAttribute(name, b)
+      // @ts-expect-error Property 'setAttribute' does not exist on type 'Text' | type 'Commit'
+      dom.setAttribute?.(name, b)
     }
   })
 }
