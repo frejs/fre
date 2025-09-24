@@ -73,8 +73,10 @@ const capture = (fiber: Fiber) => {
       fiber.memo = false
       return sibling(fiber)
     }
-    updateHook(fiber)
-
+    const isMatchSuspenseOrErrorBoundary = updateHook(fiber)
+    if(isMatchSuspenseOrErrorBoundary) {
+      return isMatchSuspenseOrErrorBoundary
+    }
   } else {
     updateHost(fiber as FiberHost)
   }
