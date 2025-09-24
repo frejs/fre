@@ -15,7 +15,7 @@ import { commit, removeElement } from './commit'
 
 let currentFiber: Fiber = null
 let currentDom: Node | null = null
-
+const suspendPromiseMap = new WeakMap()
 export const render = (vnode: Fiber, node: Node) => {
   currentDom = node.firstChild
 
@@ -59,9 +59,13 @@ const errorBoundaryRender = (fiber, error) => {
 const suspenseRender = (fiber, promise) => {
   const boundary = getBoundary(fiber, Suspense)
   if (!boundary) throw promise
+  boundary.kids?.forEach(child => removeElement(child))
   boundary.kids = []
   reconcileChildren(boundary, simpleVnode(boundary.props.fallback))
-  promise.then(() => update(boundary))
+  if(!suspendPromiseMap.has(promise)) {
+    promise.then(() => update(suspendPromiseMap.get(promise))).finally(() => suspendPromiseMap.delete(promise))
+  }
+  suspendPromiseMap.set(promise, boundary)
   return boundary
 }
 
