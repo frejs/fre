@@ -98,6 +98,7 @@ interface FiberBase {
   lane?: number,
   suspend?: boolean,
   hydrating?: boolean,
+  isOutdated?: boolean
 }
 
 export interface Action {

@@ -34,6 +34,10 @@ export function App() {
                 <Lazy1 />
                 <div>222</div>
             </Suspense>
+            <Suspense fallback={<div>loading...</div>}>
+                <Lazy1 />
+                <div>222</div>
+            </Suspense>
         </div>
     )
 }

@@ -15,7 +15,7 @@ import { commit, removeElement } from './commit'
 
 let currentFiber: Fiber = null
 let currentDom: Node | null = null
-const suspendPromiseMap = new WeakMap()
+const suspendPromiseMap = new WeakMap<Promise<any>, Set<Fiber>>()
 export const render = (vnode: Fiber, node: Node) => {
   currentDom = node.firstChild
 
@@ -62,10 +62,14 @@ const suspenseRender = (fiber, promise) => {
   boundary.kids?.forEach(child => removeElement(child))
   boundary.kids = []
   reconcileChildren(boundary, simpleVnode(boundary.props.fallback))
-  if(!suspendPromiseMap.has(promise)) {
-    promise.then(() => update(suspendPromiseMap.get(promise))).finally(() => suspendPromiseMap.delete(promise))
-  }
-  suspendPromiseMap.set(promise, boundary)
+  let pSet = suspendPromiseMap.get(promise)
+  if(!pSet) {
+    suspendPromiseMap.set(promise, new Set([boundary]))
+    promise.then(() => {
+      const s = suspendPromiseMap.get(promise);
+      ([...s]).filter(b => !b.hasOwnProperty('isOutdated')).forEach(b => update(b))
+    }).finally(() => suspendPromiseMap.delete(promise))
+  } else pSet.add(boundary)
   return boundary
 }
 
@@ -210,6 +214,7 @@ function clone(a: Fiber, b: Fiber) {
   b.ref = a.ref
   b.node = a.node
   b.kids = a.kids
+  a.isOutdated = true
   b.alternate = a
 }
 
