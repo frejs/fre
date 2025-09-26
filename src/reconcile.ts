@@ -70,6 +70,7 @@ const suspenseRender = (fiber, promise) => {
   }
   const fallbackFragment = simpleVnode(boundary.props.fallback)
   fallbackFragment.key = SUSPENSE_FALLBACK_KEY
+  boundary.kids = []
   reconcileChildren(boundary, [primaryChildFragment, fallbackFragment])
   let pSet = suspendPromiseMap.get(promise)
   if(!pSet) {
