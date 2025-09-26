@@ -60,6 +60,7 @@ const kidsRefer = (kids: Fiber[]) => {
 }
 
 export const removeElement = (fiber: Fiber, flag: boolean = true) => {
+  fiber.flag = TAG.REMOVE
   if (fiber.isComp) {
     fiber.hooks && fiber.hooks.list.forEach((e) => e[2] && e[2]())
   } else {

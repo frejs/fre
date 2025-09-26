@@ -98,7 +98,7 @@ interface FiberBase {
   lane?: number,
   suspend?: boolean,
   hydrating?: boolean,
-  isOutdated?: boolean
+  flag?: TAG
 }
 
 export interface Action {

@@ -67,7 +67,7 @@ const suspenseRender = (fiber, promise) => {
     suspendPromiseMap.set(promise, new Set([boundary]))
     promise.then(() => {
       const s = suspendPromiseMap.get(promise);
-      ([...s]).filter(b => !b.hasOwnProperty('isOutdated')).forEach(b => update(b))
+      ([...s]).filter(b => !(b.flag && (b.flag & TAG.REPLACE || b.flag & TAG.REMOVE))).forEach(b => update(b))
     }).finally(() => suspendPromiseMap.delete(promise))
   } else pSet.add(boundary)
   return boundary
@@ -214,7 +214,7 @@ function clone(a: Fiber, b: Fiber) {
   b.ref = a.ref
   b.node = a.node
   b.kids = a.kids
-  a.isOutdated = true
+  a.flag = TAG.REPLACE
   b.alternate = a
 }
 
