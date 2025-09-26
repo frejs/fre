@@ -7,7 +7,7 @@ const Lazy = lazy(() => {
                 resolve({
                     default: () => <div>Hello2</div>
                 }),
-            3000
+            1000
         )
     )
 })
@@ -33,6 +33,10 @@ export function App() {
             <Suspense fallback={<div>loading...</div>}>
                 <Lazy1 />
                 <div>222</div>
+                <Suspense fallback={<div>loading...</div>}>
+                    <Lazy />
+                    <div>222</div>
+                </Suspense>
             </Suspense>
             <Suspense fallback={<div>loading...</div>}>
                 <Lazy1 />

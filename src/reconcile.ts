@@ -4,8 +4,10 @@ import {
   HookEffect,
   FreText,
   TAG,
+  MODE,
   FiberHost,
   FiberFinish,
+  SUSPENSE_FALLBACK_KEY
 } from './type'
 import { createElement } from './dom'
 import { resetCursor } from './hook'
@@ -59,9 +61,16 @@ const errorBoundaryRender = (fiber, error) => {
 const suspenseRender = (fiber, promise) => {
   const boundary = getBoundary(fiber, Suspense)
   if (!boundary) throw promise
-  boundary.kids?.forEach(child => removeElement(child))
-  boundary.kids = []
-  reconcileChildren(boundary, simpleVnode(boundary.props.fallback))
+  const primaryChildren = boundary.props.children
+  const primaryChildFragment = {
+    type: null,
+    props: { children: primaryChildren },
+    mode: MODE.OFFSCREEN,
+    kids: [],
+  }
+  const fallbackFragment = simpleVnode(boundary.props.fallback)
+  fallbackFragment.key = SUSPENSE_FALLBACK_KEY
+  reconcileChildren(boundary, [primaryChildFragment, fallbackFragment])
   let pSet = suspendPromiseMap.get(promise)
   if(!pSet) {
     suspendPromiseMap.set(promise, new Set([boundary]))
@@ -70,7 +79,7 @@ const suspenseRender = (fiber, promise) => {
       ([...s]).filter(b => !(b.flag && (b.flag & TAG.REPLACE || b.flag & TAG.REMOVE))).forEach(b => update(b))
     }).finally(() => suspendPromiseMap.delete(promise))
   } else pSet.add(boundary)
-  return boundary
+  return boundary.child
 }
 
 const capture = (fiber: Fiber) => {
@@ -152,7 +161,7 @@ const updateHook = (fiber: Fiber) => {
     reconcileChildren(fiber, simpleVnode(children))
   } catch (e) {
     if (e instanceof Promise) {
-      return suspenseRender(fiber, e).child
+      return suspenseRender(fiber, e).sibling
     } else {
       return errorBoundaryRender(fiber, e).child
     }
