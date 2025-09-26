@@ -98,8 +98,15 @@ interface FiberBase {
   lane?: number,
   suspend?: boolean,
   hydrating?: boolean,
+  flag?: TAG
+  mode?: MODE
 }
 
+export const SUSPENSE_FALLBACK_KEY = 'SUSPENSE_FALLBACK'
+
+export const enum MODE {
+  OFFSCREEN = 1 << 1
+}
 export interface Action {
   op: TAG
   cur?: Fiber

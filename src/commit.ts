@@ -1,4 +1,4 @@
-import { FiberFinish, FiberHost, HTMLElementEx, Fiber, Ref, TAG } from './type'
+import { FiberFinish, FiberHost, HTMLElementEx, Fiber, Ref, TAG, MODE } from './type'
 import { updateElement } from './dom'
 import { isFn } from './reconcile'
 
@@ -6,6 +6,7 @@ export const commit = (fiber?: FiberFinish) => {
   if (!fiber) {
     return
   }
+  if(fiber.mode & MODE.OFFSCREEN) return commitSibling(fiber.sibling)
   refer(fiber.ref, fiber.node)
   commitSibling(fiber.child)
   let { op, ref, cur } = fiber.action || {}
@@ -60,6 +61,7 @@ const kidsRefer = (kids: Fiber[]) => {
 }
 
 export const removeElement = (fiber: Fiber, flag: boolean = true) => {
+  fiber.flag = TAG.REMOVE
   if (fiber.isComp) {
     fiber.hooks && fiber.hooks.list.forEach((e) => e[2] && e[2]())
   } else {

@@ -4,8 +4,10 @@ import {
   HookEffect,
   FreText,
   TAG,
+  MODE,
   FiberHost,
   FiberFinish,
+  SUSPENSE_FALLBACK_KEY
 } from './type'
 import { createElement } from './dom'
 import { resetCursor } from './hook'
@@ -15,7 +17,7 @@ import { commit, removeElement } from './commit'
 
 let currentFiber: Fiber = null
 let currentDom: Node | null = null
-
+const suspendPromiseMap = new WeakMap<Promise<any>, Set<Fiber>>()
 export const render = (vnode: Fiber, node: Node) => {
   currentDom = node.firstChild
 
@@ -59,10 +61,25 @@ const errorBoundaryRender = (fiber, error) => {
 const suspenseRender = (fiber, promise) => {
   const boundary = getBoundary(fiber, Suspense)
   if (!boundary) throw promise
-  boundary.kids = []
-  reconcileChildren(boundary, simpleVnode(boundary.props.fallback))
-  promise.then(() => update(boundary))
-  return boundary
+  const primaryChildren = boundary.props.children
+  const primaryChildFragment = {
+    type: null,
+    props: { children: primaryChildren },
+    mode: MODE.OFFSCREEN,
+    kids: [],
+  }
+  const fallbackFragment = simpleVnode(boundary.props.fallback)
+  fallbackFragment.key = SUSPENSE_FALLBACK_KEY
+  reconcileChildren(boundary, [primaryChildFragment, fallbackFragment])
+  let pSet = suspendPromiseMap.get(promise)
+  if(!pSet) {
+    suspendPromiseMap.set(promise, new Set([boundary]))
+    promise.then(() => {
+      const s = suspendPromiseMap.get(promise);
+      ([...s]).filter(b => !(b.flag && (b.flag & TAG.REPLACE || b.flag & TAG.REMOVE))).forEach(b => update(b))
+    }).finally(() => suspendPromiseMap.delete(promise))
+  } else pSet.add(boundary)
+  return boundary.child
 }
 
 const capture = (fiber: Fiber) => {
@@ -144,7 +161,7 @@ const updateHook = (fiber: Fiber) => {
     reconcileChildren(fiber, simpleVnode(children))
   } catch (e) {
     if (e instanceof Promise) {
-      return suspenseRender(fiber, e).child
+      return suspenseRender(fiber, e).sibling
     } else {
       return errorBoundaryRender(fiber, e).child
     }
@@ -206,6 +223,7 @@ function clone(a: Fiber, b: Fiber) {
   b.ref = a.ref
   b.node = a.node
   b.kids = a.kids
+  a.flag = TAG.REPLACE
   b.alternate = a
 }
 
