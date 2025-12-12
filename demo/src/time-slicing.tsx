@@ -1,6 +1,8 @@
-import { useState, memo, h, render, useEffect } from "../../src/index"
 
-// 注入样式（包含CSS动画）
+import { useState, memo, render, useEffect,h } from "fre"
+// import { useState, memo, render, useEffect } from "preact/compat"
+// import {h} from 'preact' // Using Preact, you can see how the main thread gets blocked.
+
 const styleSheet = document.createElement("style")
 styleSheet.textContent = `
 .container {
@@ -58,11 +60,11 @@ const SlowDot = memo(({ x, y, size, text }) => {
   )
 })
 
-// Sierpinski 三角形组件
 const targetSize = 25
 
 const getValue = (key, kid) => {
-  const number = kid.props.nodeValue
+  console.log(kid)
+  const number = kid?.props?.nodeValue||kid
   return number
 }
 
@@ -97,11 +99,9 @@ const SierpinskiTriangle = memo(({ x, y, s, children }) => {
   )
 })
 
-// 主应用组件
 const App = () => {
   const [seconds, setSeconds] = useState(0)
 
-  // 仅更新秒数
   useEffect(() => {
     const timer = setInterval(() => {
       setSeconds(prev => (prev % 10) + 1)
@@ -122,5 +122,4 @@ const App = () => {
   )
 }
 
-// 渲染入口
 render(<App />, document.body)
