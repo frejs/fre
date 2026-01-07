@@ -12,8 +12,8 @@ importers:
         specifier: 2.5.5
         version: 2.5.5
       preact:
-        specifier: ^10.5.13
-        version: 10.26.5
+        specifier: ^10.26.10
+        version: 10.26.10
       react:
         specifier: ^17.0.2
         version: 17.0.2
@@ -975,8 +975,8 @@ packages:
     resolution: {integrity: sha512-QSa9EBe+uwlGTFmHsPKokv3B/oEMQZxfqW0QqNCyhpa6mB1afzulwn8hihglqAb2pOw+BJgNlmXQ8la2VeHB7w==}
     engines: {node: ^10 || ^12 || >=14}
 
-  preact@10.26.5:
-    resolution: {integrity: sha512-fmpDkgfGU6JYux9teDWLhj9mKN55tyepwYbxHgQuIxbWQzgFg5vk7Mrrtfx7xRxq798ynkY4DDDxZr235Kk+4w==}
+  preact@10.26.10:
+    resolution: {integrity: sha512-sqdfdSa8AZeJ+wfMYjFImIRTnhfyPSLCH+LEb1+BoRUDKLnE6AnvZeClx3Bkj2Q9nn44GFAefOKIx5oc54q93A==}
 
   premove@3.0.1:
     resolution: {integrity: sha512-lH6+7lVMTu7Fl3NdfptcY7E5ElRVhAOpW0mfJq8qPex84KEaT7TOXYvGLW2PFp+wpWrvNMAn3RNYyy+QKx2kiA==}
@@ -2368,7 +2368,7 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  preact@10.26.5: {}
+  preact@10.26.10: {}
 
   premove@3.0.1: {}
 
