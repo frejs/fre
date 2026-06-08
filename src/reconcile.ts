@@ -26,21 +26,21 @@ export const render = (vnode: Fiber, node: Node) => {
   update(rootFiber)
 }
 
-export const update = (fiber?: Fiber) => {
+export const update = (fiber: Fiber) => {
   if (!fiber.dirty) {
     fiber.dirty = true
     schedule(() => reconcile(fiber))
   }
 }
 
-const reconcile = (fiber?: Fiber) => {
+const reconcile = (fiber: Fiber) => {
   while (fiber && !shouldYield()) {
     fiber = capture(fiber) as any
   }
   return fiber ? reconcile.bind(null, fiber) : null
 }
 
-export const getBoundary = (fiber, name) => {
+export const getBoundary = (fiber: Fiber, name: string) => {
   let current = fiber.parent
   while (current) {
     if (current.type === name) return current
@@ -48,14 +48,14 @@ export const getBoundary = (fiber, name) => {
   }
   return null
 }
-const errorBoundaryRender = (fiber, error) => {
+const errorBoundaryRender = (fiber: Fiber, error: any) => {
   const boundary = getBoundary(fiber, ErrorBoundary)
   if (!boundary) throw error
   const formatError = error instanceof Error ? error : new Error(error)
   reconcileChildren(boundary, isFn(boundary.props.fallback) ? boundary.props.fallback({ error: formatError }) : simpleVnode(boundary.props.fallback))
   return boundary
 }
-const suspenseRender = (fiber, promise) => {
+const suspenseRender = (fiber: Fiber, promise: Promise<any>) => {
   const boundary = getBoundary(fiber, Suspense)
   if (!boundary) throw promise
   const primaryChildren = boundary.props.children
@@ -67,9 +67,9 @@ const suspenseRender = (fiber, promise) => {
   }
   const fallbackFragment = simpleVnode(boundary.props.fallback)
   fallbackFragment.key = SUSPENSE_FALLBACK_KEY
-  reconcileChildren(boundary, [primaryChildFragment, fallbackFragment])
+  reconcileChildren(boundary, [primaryChildFragment as any, fallbackFragment])
   let pSet = suspendPromiseMap.get(promise)
-  if(!pSet) {
+  if (!pSet) {
     suspendPromiseMap.set(promise, new Set([boundary]))
     promise.then(() => {
       const s = suspendPromiseMap.get(promise);
@@ -88,7 +88,7 @@ const capture = (fiber: Fiber) => {
       return sibling(fiber)
     }
     const isMatchSuspenseOrErrorBoundary = updateHook(fiber)
-    if(isMatchSuspenseOrErrorBoundary) {
+    if (isMatchSuspenseOrErrorBoundary) {
       return isMatchSuspenseOrErrorBoundary
     }
   } else {
@@ -150,7 +150,7 @@ const updateHook = (fiber: Fiber) => {
     reconcileChildren(fiber, simpleVnode(children))
   } catch (e) {
     if (e instanceof Promise) {
-      return suspenseRender(fiber, e).sibling
+      return suspenseRender(fiber, e)?.sibling
     } else {
       return errorBoundaryRender(fiber, e).child
     }
@@ -276,7 +276,7 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
         }
         foundB = bMap[aElm.key] ?? null
       }
-      
+
       if (foundB != null && aElm.type !== bCh[foundB].type) {
         foundB = null
       }

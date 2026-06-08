@@ -35,7 +35,7 @@ const flush = () => {
   while (job && !shouldYield()) {
     const { callback } = job
     job.callback = null
-    const next = callback()
+    const next = (callback as any)()
     if (next) {
       job.callback = next
     } else {

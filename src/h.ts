@@ -36,7 +36,7 @@ const flat = (arr: FreNode[], target: Fiber[] = []) => {
 export const createVnode = (type, props, key, ref) => ({ type, props, key, ref })
 
 export const createText = (vnode: FreText) =>
-  ({ type: '#text', props: { nodeValue: vnode + '' } } as Fiber)
+  ({ type: '#text', props: { nodeValue: vnode + '' } } as any)
 
 export const Fragment = (props) => props.children
 export const Suspense = (props) => props.children

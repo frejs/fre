@@ -93,7 +93,7 @@ interface FiberBase {
   sibling?: Fiber
   child?: Fiber
   ref?: Ref<HTMLElement | undefined>
-  hooks?: Hooks
+  hooks: Hooks
   action?: Action | null
   lane?: number,
   suspend?: boolean,
