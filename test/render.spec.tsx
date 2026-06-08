@@ -7,6 +7,7 @@ import { once, change, every } from './effect'
 import { svg } from './svg'
 import { fragment } from './fragment'
 import { memor } from './memo'
+import { suspense } from './suspense'
 
 test('render', async t => {
   await diff(t)
@@ -22,4 +23,5 @@ test('render', async t => {
   await svg(t)
   // await fragment(t)
   await memor(t)
+  await suspense(t)
 })

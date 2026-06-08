@@ -67,7 +67,6 @@ const suspenseRender = (fiber, promise) => {
   }
   const fallbackFragment = simpleVnode(boundary.props.fallback)
   fallbackFragment.key = SUSPENSE_FALLBACK_KEY
-  boundary.kids = []
   reconcileChildren(boundary, [primaryChildFragment, fallbackFragment])
   let pSet = suspendPromiseMap.get(promise)
   if(!pSet) {
@@ -179,11 +178,13 @@ const reconcileChildren = (
   children: Fiber | Fiber[] | null | undefined
 ) => {
   let aCh = fiber.kids || [],
-    bCh = (fiber.kids = arrayfy(children))
+    bCh = arrayfy(children).filter((ch) => ch != null) as Fiber[]
+  fiber.kids = bCh
   const actions = diff(aCh, bCh)
 
   for (let i = 0, prev = null, len = bCh.length; i < len; i++) {
     const child = bCh[i]
+    if (!child) continue
     child.action = actions[i]
 
     if (fiber.lane & TAG.SVG) {
@@ -200,6 +201,7 @@ const reconcileChildren = (
 }
 
 function clone(a: Fiber, b: Fiber) {
+  if (!a || !b) return
   b.hooks = a.hooks
   b.ref = a.ref
   b.node = a.node
@@ -226,7 +228,7 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
     bHead = 0,
     aTail = aCh.length - 1,
     bTail = bCh.length - 1,
-    bMap = {},
+    bMap: Record<any, number> | null = null,
     temp = [],
     actions = []
 
@@ -244,10 +246,6 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
     actions.push({ op: TAG.UPDATE })
     aHead++
     bHead++
-  }
-
-  for (let i = bHead; i <= bTail; i++) {
-    if (bCh[i].key) bMap[bCh[i].key] = i
   }
 
   while (aHead <= aTail || bHead <= bTail) {
@@ -268,7 +266,18 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
       aHead++
       bHead++
     } else {
-      let foundB = aElm.key ? bMap[aElm.key] : null
+      let foundB: number | null = null
+      // Lazy build bMap only when needed for key matching
+      if (aElm.key) {
+        if (!bMap) {
+          bMap = {}
+          for (let i = bHead; i <= bTail; i++) {
+            if (bCh[i].key) bMap[bCh[i].key] = i
+          }
+        }
+        foundB = bMap[aElm.key] ?? null
+      }
+      
       if (foundB != null && aElm.type !== bCh[foundB].type) {
         foundB = null
       }
