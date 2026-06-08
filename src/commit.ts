@@ -9,28 +9,28 @@ export const commit = (fiber?: FiberFinish) => {
   if(fiber.mode & MODE.OFFSCREEN) return commitSibling(fiber.sibling)
   refer(fiber.ref, fiber.node)
   commitSibling(fiber.child)
+  
   let { op, ref, cur } = fiber.action || {}
-  let parent = fiber?.parent?.node
   let suspenseNodeComment = null
-  if (parent?.nodeType === 8) {
-    if (parent?.nodeValue === 'Suspense') {
+  let p = fiber?.parent
+  let parent: any = null
+  
+  // Find nearest real DOM parent or root
+  while (p) {
+    parent = p.node
+    if (parent && parent.nodeType !== 8) break
+    if (parent?.nodeType === 8 && parent.nodeValue === 'Suspense') {
       suspenseNodeComment = parent
     }
-    parent = parent.parentNode as any
+    p = p.parent
   }
 
-  if (op & TAG.INSERT || op & TAG.MOVE) {
-    let comment = null
-    if (fiber.isComp) {
-      //@ts-ignore
-      comment = fiber?.node?.firstChild
-    }
-    parent.insertBefore(cur?.node, suspenseNodeComment ?? ref?.node)
-    if (fiber.isComp) {
-      fiber.node = comment
+  if ((op & TAG.INSERT || op & TAG.MOVE) && !fiber.isComp) {
+    if (parent) {
+      parent.insertBefore(cur?.node, suspenseNodeComment ?? ref?.node)
     }
   }
-  if (op & TAG.UPDATE) {
+  if ((op & TAG.UPDATE) && !fiber.isComp) {
     const node = fiber.node
     updateElement(
       node,

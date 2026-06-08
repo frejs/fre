@@ -15,12 +15,9 @@ import { schedule, shouldYield } from './schedule'
 import { isArr, createText, Suspense, ErrorBoundary } from './h'
 import { commit, removeElement } from './commit'
 
-let currentFiber: Fiber = null
-let currentDom: Node | null = null
+let currentFiber: Fiber | null = null
 const suspendPromiseMap = new WeakMap<Promise<any>, Set<Fiber>>()
 export const render = (vnode: Fiber, node: Node) => {
-  currentDom = node.firstChild
-
   let rootFiber = {
     node,
     props: { children: vnode },
@@ -146,17 +143,9 @@ const shouldUpdate = (
   for (let i in b) if (a[i] !== b[i]) return true
 }
 
-const fragment = (fiber: Fiber) => {
-  const f = document.createDocumentFragment() as any
-  const c = document.createComment((fiber.type as FC).name)
-  f.appendChild(c)
-  return f
-}
-
 const updateHook = (fiber: Fiber) => {
   resetCursor()
   resetFiber(fiber)
-  fiber.node = fiber.node || fragment(fiber)
   try {
     let children = (fiber.type as FC)(fiber.props)
     reconcileChildren(fiber, simpleVnode(children))
@@ -170,22 +159,13 @@ const updateHook = (fiber: Fiber) => {
 }
 
 const updateHost = (fiber: FiberHost) => {
-  if (fiber.type) {
-    const ssrDom = currentDom
-    if (ssrDom) {
-      if (fiber.type !== ssrDom.nodeName.toLowerCase()) {
-        removeElement({ node: ssrDom } as FiberFinish)
-        fiber.kids = [] // all kids should INSERT
-      } else {
-        fiber.action.op = TAG.UPDATE
-      }
-    }
-    currentDom = ssrDom ? nextDom(ssrDom) : null
-  }
-
   if (!fiber.node) {
     if (fiber.type === 'svg') fiber.lane |= TAG.SVG
     fiber.node = createElement(fiber)
+  }
+
+  if (!fiber.action) {
+    fiber.action = { op: 0 }
   }
 
   reconcileChildren(fiber, fiber.props.children)
@@ -223,12 +203,16 @@ function clone(a: Fiber, b: Fiber) {
   b.hooks = a.hooks
   b.ref = a.ref
   b.node = a.node
-  b.kids = a.kids
+  if (a.type !== b.type) {
+    b.kids = null
+  } else {
+    b.kids = a.kids
+  }
   a.flag = TAG.REPLACE
   b.alternate = a
 }
 
-export const arrayfy = <T>(arr: T | T[] | null | undefined) =>
+const arrayfy = <T>(arr: T | T[] | null | undefined) =>
   !arr ? [] : isArr(arr) ? arr : [arr]
 
 const side = (effects?: HookEffect[]) => {
@@ -267,13 +251,15 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
   }
 
   while (aHead <= aTail || bHead <= bTail) {
-    const aElm = aCh[aHead], bElm = bCh[bHead]
+    const aElm = aCh[aHead]
+    const bElm = bCh[bHead]
+
     if (aElm === null) {
       aHead++
-    } else if (bTail + 1 <= bHead) {
+    } else if (bTail < bHead) {
       removeElement(aElm)
       aHead++
-    } else if (aTail + 1 <= aHead) {
+    } else if (aTail < aHead) {
       actions.push({ op: TAG.INSERT, cur: bElm, ref: aElm })
       bHead++
     } else if (same(aElm, bElm)) {
@@ -282,21 +268,22 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
       aHead++
       bHead++
     } else {
-      const foundB = aElm.key ? bMap[aElm.key] : null
+      let foundB = aElm.key ? bMap[aElm.key] : null
+      if (foundB != null && aElm.type !== bCh[foundB].type) {
+        foundB = null
+      }
 
       if (foundB == null) {
         removeElement(aElm)
         aHead++
+      } else if (bHead <= foundB) {
+        actions.push({ op: TAG.INSERT, cur: bElm, ref: aElm })
+        bHead++
       } else {
-        if (bHead <= foundB) {
-          actions.push({ op: TAG.INSERT, cur: bElm, ref: aElm })
-          bHead++
-        } else {
-          clone(aElm, bCh[foundB])
-          actions.push({ op: TAG.MOVE, cur: aElm, ref: aCh[aHead] })
-          aCh[aHead] = null
-          aHead++
-        }
+        clone(aElm, bCh[foundB])
+        actions.push({ op: TAG.MOVE, cur: aElm, ref: aCh[aHead] })
+        aCh[aHead] = null
+        aHead++
       }
     }
   }
@@ -305,21 +292,6 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
     actions.push(temp[i])
   }
   return actions
-}
-
-function nextDom(currentNode: Node | null): Node | null {
-  if (!currentNode) return null
-  if (currentNode.firstChild) {
-    return currentNode.firstChild
-  }
-  let node = currentNode
-  while (node) {
-    if (node.nextSibling) {
-      return node.nextSibling
-    }
-    node = node.parentNode
-  }
-  return null
 }
 
 const same = (a: Fiber, b: Fiber) => a && b && (a.type === b.type && a.key === b.key)
