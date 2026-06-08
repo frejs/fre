@@ -52,4 +52,4 @@ export const shouldYield = () => {
 
 export const getTime = () => performance.now()
 
-const peek = (queue: Task[]) => queue[0]
+const peek = (q: Task[]) => q[0]

@@ -13,9 +13,7 @@ export const commit = (fiber?: FiberFinish) => {
   let { op, ref, cur } = fiber.action || {}
   let suspenseNodeComment = null
   let p = fiber?.parent
-  let parent: any = null
-  
-  // Find nearest real DOM parent or root
+  let parent = null
   while (p) {
     parent = p.node
     if (parent && parent.nodeType !== 8) break

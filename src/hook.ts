@@ -22,9 +22,8 @@ export const resetCursor = () => {
   cursor = 0
 }
 
-export const useState = <T>(initState: T | (() => T)) => {
-  return useReducer<T, SetStateAction<T>>(null, initState)
-}
+export const useState = <T>(initState: T | (() => T)) =>
+  useReducer<T, SetStateAction<T>>(null, initState)
 
 export const useReducer = <S, A>(
   reducer?: Reducer<S, A>,

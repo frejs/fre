@@ -267,7 +267,6 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
       bHead++
     } else {
       let foundB: number | null = null
-      // Lazy build bMap only when needed for key matching
       if (aElm.key) {
         if (!bMap) {
           bMap = {}

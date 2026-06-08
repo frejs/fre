@@ -1,7 +1,6 @@
 import { isStr } from './reconcile'
 import { FC, FreNode, FreText, Fiber } from './type'
 
-// for jsx2
 export const h = (type: string | FC, props: any, ...kids: FreNode[]) => {
   props = props || {}
   kids = flat(arrayfy(props.children || kids))
@@ -34,21 +33,16 @@ const flat = (arr: FreNode[], target: Fiber[] = []) => {
   return target
 }
 
-export const createVnode = (type, props, key, ref) => ({
-  type,
-  props,
-  key,
-  ref,
-})
+export const createVnode = (type, props, key, ref) => ({ type, props, key, ref })
 
 export const createText = (vnode: FreText) =>
   ({ type: '#text', props: { nodeValue: vnode + '' } } as Fiber)
 
-export function Fragment(props) {
-  return props.children
-}
+export const Fragment = (props) => props.children
+export const Suspense = (props) => props.children
+export const ErrorBoundary = (props) => props.children
 
-export function memo<T extends FC>(fn: T, compare?: T['shouldUpdate']) {
+export const memo = <T extends FC>(fn: T, compare?: T['shouldUpdate']) => {
   fn.memo = true
   fn.shouldUpdate = compare
   return fn
@@ -56,12 +50,11 @@ export function memo<T extends FC>(fn: T, compare?: T['shouldUpdate']) {
 
 export const isArr = Array.isArray
 
-export function lazy(factory) {
+export const lazy = (factory) => {
   let status = 'unloaded'
   let result
   let promise
-
-  const LazyComponent = (props) => {
+  return (props) => {
     switch (status) {
       case 'loaded': return h(result, props)
       case 'loading': throw promise
@@ -74,14 +67,5 @@ export function lazy(factory) {
         throw promise
     }
   }
-  return LazyComponent
-}
-
-export function Suspense(props) {
-  return props.children
-}
-
-export function ErrorBoundary(props) {
-  return props.children
 }
 
