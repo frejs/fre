@@ -9,14 +9,17 @@ import {
   FiberFinish,
   SUSPENSE_FALLBACK_KEY
 } from './type'
-import { createElement } from './dom'
 import { resetCursor } from './hook'
 import { schedule, shouldYield } from './schedule'
 import { isArr, createText, Suspense, ErrorBoundary } from './h'
-import { commit, removeElement } from './commit'
+import { commit, createNodes, flushEffects, removeElement } from './commit'
 
 let currentFiber: Fiber | null = null
 const suspendPromiseMap = new WeakMap<Promise<any>, Set<Fiber>>()
+let pendingRemovals: Fiber[] = []
+let pendingLayoutEffects: HookEffect[] = []
+let pendingEffects: HookEffect[] = []
+
 export const render = (vnode: Fiber, node: Node) => {
   let rootFiber = {
     node,
@@ -49,14 +52,14 @@ export const getBoundary = (fiber: Fiber, name: string) => {
   return null
 }
 const errorBoundaryRender = (fiber: Fiber, error: any) => {
-  const boundary = getBoundary(fiber, ErrorBoundary)
+  const boundary = getBoundary(fiber, ErrorBoundary as any)
   if (!boundary) throw error
   const formatError = error instanceof Error ? error : new Error(error)
   reconcileChildren(boundary, isFn(boundary.props.fallback) ? boundary.props.fallback({ error: formatError }) : simpleVnode(boundary.props.fallback))
   return boundary
 }
 const suspenseRender = (fiber: Fiber, promise: Promise<any>) => {
-  const boundary = getBoundary(fiber, Suspense)
+  const boundary = getBoundary(fiber, Suspense as any)
   if (!boundary) throw promise
   const primaryChildren = boundary.props.children
   const primaryChildFragment = {
@@ -116,7 +119,18 @@ const sibling = (fiber?: Fiber) => {
     bubble(fiber)
     if (fiber.dirty) {
       fiber.dirty = false
+      createNodes(fiber as FiberFinish)
       commit(fiber as FiberFinish)
+      // Process deferred removals (DOM removal via hostConfig)
+      pendingRemovals.forEach(f => removeElement(f))
+      pendingRemovals = []
+      flushEffects(pendingLayoutEffects)
+      if (pendingEffects.length) {
+        const effects = pendingEffects.slice()
+        pendingEffects = []
+        schedule(() => { flushEffects(effects); return null })
+      }
+      pendingLayoutEffects = []
       return null
     }
     if (fiber.sibling) return fiber.sibling
@@ -128,8 +142,14 @@ const sibling = (fiber?: Fiber) => {
 const bubble = (fiber: Fiber) => {
   if (fiber.isComp) {
     if (fiber.hooks) {
-      side(fiber.hooks.layout)
-      schedule(() => side(fiber.hooks.effect) as undefined)
+      if (fiber.hooks.layout.length) {
+        pendingLayoutEffects.push(...fiber.hooks.layout)
+        fiber.hooks.layout.length = 0
+      }
+      if (fiber.hooks.effect.length) {
+        pendingEffects.push(...fiber.hooks.effect)
+        fiber.hooks.effect.length = 0
+      }
     }
   }
 }
@@ -158,13 +178,11 @@ const updateHook = (fiber: Fiber) => {
 }
 
 const updateHost = (fiber: FiberHost) => {
-  if (!fiber.node) {
-    if (fiber.type === 'svg') fiber.lane |= TAG.SVG
-    fiber.node = createElement(fiber)
+  if (fiber.type === 'svg') {
+    fiber.lane |= TAG.SVG
   }
-
   if (!fiber.action) {
-    fiber.action = { op: 0 }
+    fiber.action = fiber.node ? { op: 0 as TAG } : { op: TAG.INSERT }
   }
 
   reconcileChildren(fiber, fiber.props.children)
@@ -217,12 +235,6 @@ function clone(a: Fiber, b: Fiber) {
 const arrayfy = <T>(arr: T | T[] | null | undefined) =>
   !arr ? [] : isArr(arr) ? arr : [arr]
 
-const side = (effects?: HookEffect[]) => {
-  effects.forEach((e) => e[2] && e[2]())
-  effects.forEach((e) => (e[2] = e[0]()))
-  effects.length = 0
-}
-
 const diff = (aCh: Fiber[], bCh: Fiber[]) => {
   let aHead = 0,
     bHead = 0,
@@ -255,7 +267,7 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
     if (aElm === null) {
       aHead++
     } else if (bTail < bHead) {
-      removeElement(aElm)
+      pendingRemovals.push(aElm)
       aHead++
     } else if (aTail < aHead) {
       actions.push({ op: TAG.INSERT, cur: bElm, ref: aElm })
@@ -282,7 +294,7 @@ const diff = (aCh: Fiber[], bCh: Fiber[]) => {
       }
 
       if (foundB == null) {
-        removeElement(aElm)
+        pendingRemovals.push(aElm)
         aHead++
       } else if (bHead <= foundB) {
         actions.push({ op: TAG.INSERT, cur: bElm, ref: aElm })
