@@ -15,7 +15,7 @@ FreTUI.render(<App text="hello world" />)
 #### How to handle input
 
 ```jsx
-import { useState } from 'react'
+import { useState } from 'fre'
 import FreTUI, { Text, useInput, exit } from 'fre/tui'
 
 const App = () => {
