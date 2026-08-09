@@ -217,7 +217,7 @@ function App() {
 #### useContext
 
 ```js
-import { createContext, useContext } from 'react';
+import { createContext, useContext } from 'fre';
 
 const ThemeContext = createContext(null);
 
