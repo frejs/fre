@@ -3,7 +3,7 @@
 #### Hello world
 
 ```jsx
-import ReactCurse, { Text } from 'fre/tui'
+import FreTUI, { Text } from 'fre/tui'
 
 const App = ({ text }) => {
   return <Text color="Red">{text}</Text>
@@ -16,7 +16,7 @@ FreTUI.render(<App text="hello world" />)
 
 ```jsx
 import { useState } from 'react'
-import ReactCurse, { Text, useInput, exit } from 'fre/tui'
+import FreTUI, { Text, useInput, exit } from 'fre/tui'
 
 const App = () => {
   const [counter, setCounter] = useState(0)
